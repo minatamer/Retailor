@@ -14,6 +14,8 @@ The owner has authorized queue execution and ticket-prefixed commits after clean
 
 [Running design baseline](design/RTL-002-DESIGN.md) records the finite palettes, licensed fonts, original reference photography and actual device observations. [Validation records](validation/RTL-002.md) distinguish local checks from unperformed owner/zoom acceptance.
 
+[Accepted FORME photo inputs](research/FORME-PHOTOS.md) records all fifteen original assets, bounded browser decoding/cache handling and actual device/theme checks. [RTL-003 validation](validation/RTL-003.md) records resolved findings, clean final gates and remaining follow-on evidence.
+
 ## Retained source material
 
 - [Original concept Markdown](retailor.md) and [original concept preview](retailor.html) are archived exploration; their simulations do not prove real recognition or deployed behavior.

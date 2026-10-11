@@ -1,6 +1,6 @@
 # RTL-003 — Prepare fifteen clothing photos and the bounded upload pipeline
 
-Status: **Planned — not started**\
+Status: **Implemented locally — owner/zoom and live recognition evidence pending in owning follow-on tickets**\
 Planning date: **11 October 2026**\
 Milestone: **Product inputs**\
 Depends on: [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md), [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md)\
@@ -57,14 +57,14 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Fifteen actual primary clothing photos have accepted source records.
-- [ ] Jeans/hoodies/tees and the full requested garment mix are represented.
-- [ ] Alternates match the same item and fit the 24-photo selection.
-- [ ] Signature/decode/hash/dimension/aggregate limits are enforced.
-- [ ] Invalid/animated/duplicate/oversized files have partial recovery.
-- [ ] Owner and Tailor reuse a mandatory-photo validation seam.
-- [ ] Picking photos and choosing the sample dispatch zero model calls.
-- [ ] Object URLs, owned cache and unavailable-photo behavior are correct.
+- [x] Fifteen actual primary clothing photos have accepted source records.
+- [x] Jeans/hoodies/tees and the full requested garment mix are represented.
+- [x] Alternates match the same item and fit the 24-photo selection.
+- [x] Signature/decode/hash/dimension/aggregate limits are enforced.
+- [x] Invalid/animated/duplicate/oversized files have partial recovery.
+- [x] Owner and Tailor reuse a mandatory-photo validation seam.
+- [x] Picking photos and choosing the sample dispatch zero model calls.
+- [x] Object URLs, owned cache and unavailable-photo behavior are correct.
 
 ## Focused verification and evidence
 
@@ -102,4 +102,4 @@ No runtime arbitrary URL fetch, untested HEIC decoder, virtual try-on or product
 
 Keep this outcome under `RTL-003:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-003.md` and actual check/review evidence under `docs/validation/RTL-003.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Local evidence: [photo production and browser checks](../research/FORME-PHOTOS.md), [clean read-only validation](../validation/RTL-003.md) and [file allocation](../commit-plans/RTL-003.md). No alternates ship; no matching view is falsely claimed. Live interpretation belongs to RTL-006/020; owner/zoom evidence belongs to RTL-019. The owner’s execution authorization covers these ticket-prefixed commits, not paid runtime calls or cloud publication.
