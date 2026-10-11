@@ -1,6 +1,6 @@
 # RTL-004 — Build exact commerce commands, invariants and metric facts
 
-Status: **Planned — not started**\
+Status: **Complete**\
 Planning date: **11 October 2026**\
 Milestone: **Domain authority**\
 Depends on: [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md)\
@@ -71,16 +71,16 @@ The initial limits include 20 active/40 retained products, 24 variants/product a
 
 ## Acceptance criteria — required local outcome
 
-- [ ] All product/commerce changes use one pure command/effect path.
-- [ ] Photo-backed clothing creation and relationship/cap invariants are enforced.
-- [ ] Order placement/stock/discount allocation are exact and atomic.
-- [ ] Cancellation, fulfilment, return, refund and restock cannot double apply.
-- [ ] Refund-only loss and eligible cost reversals reconcile correctly.
-- [ ] Posted expense/writeoff history is preserved through linked corrections.
-- [ ] Metrics expose precise basis and contributing records; negative/zero/unavailable remain distinct.
-- [ ] Cohorts exclude owner/designer events and never exceed 100% through repeated actions.
-- [ ] Idempotency, revision conflicts, bounded receipts and latest eligible Undo work.
-- [ ] No platform/provider/storage dependency enters pure code.
+- [x] All product/commerce changes use one pure command/effect path.
+- [x] Photo-backed clothing creation and relationship/cap invariants are enforced.
+- [x] Order placement/stock/discount allocation are exact and atomic.
+- [x] Cancellation, fulfilment, return, refund and restock cannot double apply.
+- [x] Refund-only loss and eligible cost reversals reconcile correctly.
+- [x] Posted expense/writeoff history is preserved through linked corrections.
+- [x] Metrics expose precise basis and contributing records; negative/zero/unavailable remain distinct.
+- [x] Cohorts exclude owner/designer events and never exceed 100% through repeated actions.
+- [x] Idempotency, revision conflicts, bounded receipts and latest eligible Undo work.
+- [x] No platform/provider/storage dependency enters pure code.
 
 ## Focused verification and evidence
 
@@ -119,4 +119,4 @@ No database, cash/bank model, real tax, payment API, arbitrary sales-total edito
 
 Keep this outcome under `RTL-004:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-004.md` and actual check/review evidence under `docs/validation/RTL-004.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Required local acceptance is verified in [RTL-004 evidence](../validation/RTL-004.md). The owner authorized ticket-prefixed commits after clean validation. No paid, hosted or browser acceptance belongs to this pure-domain packet.

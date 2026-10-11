@@ -4,7 +4,7 @@
 **Prepared:** 11 October 2026.\
 **Product:** Retailor. **Sample clothing brand:** FORME.\
 **Companion:** [Retailor product overview](RETAILOR_OVERVIEW.html).\
-**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–003 locally complete, next eligible packet RTL-004; owner visual/zoom evidence remains pending.\
+**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–004 locally complete, next eligible packet RTL-005; owner visual/zoom evidence remains pending.\
 **Signature promise:** **Bring your products. See your store.**\
 **Owner decisions incorporated:** all eleven answers on clothing-only scope, researched presets, Tailor-led setup, optional logos, mandatory photos, catalogue integrity, three scenarios, live sample processing, runway direction, image sourcing and USD/EUR; 11 October 2026.
 
@@ -972,7 +972,7 @@ These definitions are Retailor's explicit demo conventions. They are informed by
 | Refunded-order rate | Orders placed in period with any issued refund as of scope end / eligible orders placed in that period | Cohort/order adjustments; not event-period refunds divided by unrelated orders |
 | Received-return unit rate | Received returned units from period-placed orders as of scope end / shipped units from those orders | Known cohort and receipt/shipment units |
 | Product net contribution | Net merchandise sales attributable to each product on the event basis | Snapshots preserve historical identity |
-| Sell-through | Net units sold as of scope end / opening units plus positive inbound-stock units; unavailable for zero base | Scenario-to-date stock and sale/return links |
+| Sell-through | Net units sold as of scope end / opening units plus positive inbound-stock and positive correcting-supply units; unavailable for zero base; restocks are not new supply | Scenario-to-date stock and sale/return links; exact implementation in [COMMERCE.md](engineering/COMMERCE.md) |
 | Stockout/low-stock count | Current active variants at zero / at or below threshold | Current as-of inventory |
 | Inventory value | Current units × current disclosed demo unit-cost setting | Current stock and cost; estimated demo value rather than audited valuation |
 
@@ -1971,7 +1971,7 @@ The owner has authorized detailed ticket planning. The [canonical queue](tickets
 | Linux release preparation | [RTL-021](tickets/RTL-021-package-linux-services-and-manual-release-runbook.md) | Reproducible images, fixed private bridge, concrete manual deploy and rollback plan; independent of paid evaluation. |
 | Owner-authorized hosted release | [RTL-022](tickets/RTL-022-deploy-verify-hosted-demo-and-record-rollback.md) | Exact accepted artifacts, actual private IAM/origins, HTTPS walkthrough, usage evidence and recovery readiness. |
 
-RTL-001–003 have verified local completion. RTL-004 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
+RTL-001–004 have verified local completion. RTL-005 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
 
 The first complete local path may use declared development fixtures, but public acceptance requires fresh live recognition for sample and uploads. Security and cleanup start with the first owning feature; later hardening and lifecycle packets complete the combined surface. Optional logo generation follows a polished wordmark path. Domain integrity keeps charts connected to actual products; design evidence proves that all accepted storefront choices look excellent.
 
