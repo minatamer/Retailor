@@ -1,6 +1,6 @@
 # RTL-005 — Build the one-page workspace, catalogue review and recovery
 
-Status: **Planned — not started**\
+Status: **Complete**\
 Planning date: **11 October 2026**\
 Milestone: **Core workflow**\
 Depends on: [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md), [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-004](RTL-004-build-exact-commerce-commands-and-fact-engine.md)\
@@ -57,15 +57,15 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] One route/controller owns all workflow and perspective transitions.
-- [ ] Review is photo-first, compact and correct about provenance/unknowns.
-- [ ] Grouping/exclusion preserves complete input disposition and valid IDs.
-- [ ] Publication rejects photo-free products and incomplete references atomically.
-- [ ] Completed drafts/design can restore without automatic model dispatch.
-- [ ] Allow-listed bounded storage excludes runtime handles, bytes, grants and secrets.
-- [ ] Missing/cache-denied/corrupt/expired/duplicate-tab states recover safely.
-- [ ] Reset/input changes fence late results and release owned basic resources.
-- [ ] The development fixture path cannot be selected as public live fallback.
+- [x] One route/controller owns all workflow and perspective transitions.
+- [x] Review is photo-first, compact and correct about provenance/unknowns.
+- [x] Grouping/exclusion preserves complete input disposition and valid IDs.
+- [x] Publication rejects photo-free products and incomplete references atomically.
+- [x] Completed drafts/design can restore without automatic model dispatch.
+- [x] Allow-listed bounded storage excludes runtime handles, bytes, grants and secrets.
+- [x] Missing/cache-denied/corrupt/expired/duplicate-tab states recover safely.
+- [x] Reset/input changes fence late results and release owned basic resources.
+- [x] The development fixture path cannot be selected as public live fallback.
 
 ## Focused verification and evidence
 
@@ -104,4 +104,4 @@ No backend session store, localStorage merchant library, forced typed onboarding
 
 Keep this outcome under `RTL-005:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-005.md` and actual check/review evidence under `docs/validation/RTL-005.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Required local acceptance is verified in [RTL-005 validation](../validation/RTL-005.md), with semantics in [WORKSPACE.md](../engineering/WORKSPACE.md) and allocations in [the commit plan](../commit-plans/RTL-005.md). The owner has authorized these local commits. Physical-device, actual zoom and owner feedback remain separately tracked for RTL-019; no paid or hosted acceptance is claimed.

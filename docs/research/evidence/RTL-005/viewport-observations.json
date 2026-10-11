@@ -1,0 +1,115 @@
+{
+  "date": "2026-10-11",
+  "browser": "Chromium IAB; real UI with viewport overrides",
+  "review": [
+    {
+      "scroll": 305,
+      "small": [],
+      "width": 320
+    },
+    {
+      "scroll": 360,
+      "small": [],
+      "width": 375
+    },
+    {
+      "scroll": 753,
+      "small": [],
+      "width": 768
+    },
+    {
+      "scroll": 1009,
+      "small": [],
+      "width": 1024
+    },
+    {
+      "scroll": 1265,
+      "small": [],
+      "width": 1280
+    },
+    {
+      "scroll": 1425,
+      "small": [],
+      "width": 1440
+    },
+    {
+      "scroll": 1905,
+      "small": [],
+      "width": 1920
+    }
+  ],
+  "style": [
+    {
+      "cta": 659.4375,
+      "scroll": 305,
+      "width": 320
+    },
+    {
+      "cta": 553.75,
+      "scroll": 360,
+      "width": 375
+    },
+    {
+      "cta": 530.15625,
+      "scroll": 753,
+      "width": 768
+    },
+    {
+      "cta": 626.4375,
+      "scroll": 1009,
+      "width": 1024
+    },
+    {
+      "cta": 574.34375,
+      "scroll": 1265,
+      "width": 1280
+    },
+    {
+      "cta": 530.15625,
+      "scroll": 1425,
+      "width": 1440
+    },
+    {
+      "cta": 545.15625,
+      "scroll": 1905,
+      "width": 1920
+    }
+  ],
+  "choose": [
+    {
+      "scroll": 305,
+      "width": 320
+    },
+    {
+      "scroll": 360,
+      "width": 375
+    },
+    {
+      "scroll": 753,
+      "width": 768
+    },
+    {
+      "scroll": 1009,
+      "width": 1024
+    },
+    {
+      "scroll": 1265,
+      "width": 1280
+    },
+    {
+      "scroll": 1425,
+      "width": 1440
+    },
+    {
+      "scroll": 1905,
+      "width": 1920
+    }
+  ],
+  "notes": [
+    "No horizontal overflow",
+    "Review controls at least 44px in both dimensions",
+    "Style CTA visible without scrolling at 850px height",
+    "320x640 reset dialog 267x361.56px",
+    "Owner visual and actual 200-percent browser zoom remain pending RTL-019"
+  ]
+}
