@@ -22,6 +22,14 @@
     "./api": {
       "types": "./dist/api.d.ts",
       "import": "./dist/api.js"
+    },
+    "./photos": {
+      "types": "./dist/photos.d.ts",
+      "import": "./dist/photos.js"
+    },
+    "./raster": {
+      "types": "./dist/raster.d.ts",
+      "import": "./dist/raster.js"
     }
   },
   "scripts": {
