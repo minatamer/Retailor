@@ -1,0 +1,32 @@
+[
+  {
+    "file": "reference-shirt.png",
+    "sha256": "95cbf9c3454c5edc2c0cd7dec3fcca25f55c3b39ba6528492e26d06c96830490",
+    "bytes": 2011176,
+    "origin": "Codex built-in image_gen original generation",
+    "generatedDate": "2026-10-11",
+    "purpose": "Temporary RTL-002 design reference; not a precomputed production catalogue",
+    "prompt": "Use case: product-mockup. Asset type: original clothing ecommerce product photograph for a design reference. One single ivory short-sleeve camp-collar shirt, neatly styled on an invisible mannequin, full garment visible centered against warm pale stone seamless background. Premium editorial studio photography, soft daylight, realistic woven fabric and subtle folds, crisp collar and buttons. Portrait 4:5 composition, generous margins, no person, no trousers, no accessories, no logo, no text, no watermark. Beautiful understated contemporary fashion catalogue.",
+    "inspected": "Single complete garment, neutral background, no visible logos/text/watermarks; original rendered output reviewed."
+  },
+  {
+    "file": "reference-hoodie.png",
+    "sha256": "fbec8bd38e8996f6b511af658b49b82534a01f0529ea86e1b72ed79314407e51",
+    "bytes": 2025192,
+    "origin": "Codex built-in image_gen original generation",
+    "generatedDate": "2026-10-11",
+    "purpose": "Temporary RTL-002 design reference; not a precomputed production catalogue",
+    "prompt": "Use case: product-mockup. Asset type: original clothing ecommerce product photograph for a design reference. One single charcoal-black pullover hoodie, full garment visible on an invisible mannequin centered against warm light-gray seamless background. Premium editorial studio photography, soft daylight, realistic dense cotton fleece and subtle folds, elegant hood, front pocket, no drawstring text. Portrait 4:5 composition with generous margins, no person, no trousers, no accessories, no logos, no text, no watermark.",
+    "inspected": "Single complete garment, neutral background, no visible logos/text/watermarks; original rendered output reviewed."
+  },
+  {
+    "file": "reference-jeans.png",
+    "sha256": "1da9ce338a60e8c52cee3f7d47c775dc861855aaff62a21c06c603c19e1914ae",
+    "bytes": 2411787,
+    "origin": "Codex built-in image_gen original generation",
+    "generatedDate": "2026-10-11",
+    "purpose": "Temporary RTL-002 design reference; not a precomputed production catalogue",
+    "prompt": "Use case: product-mockup. Asset type: original clothing ecommerce product photograph for a design reference. One single pair of medium indigo straight-leg jeans, waist to both hems fully visible centered against warm pale stone seamless background. Premium editorial studio photography, soft daylight, realistic denim weave, understated faded blue and seams, natural slight folds. Portrait 4:5 composition, generous margins. No person, no shoes, no belt, no other garments, no brand labels, no text, no watermark.",
+    "inspected": "Single complete garment, neutral background, no visible logos/text/watermarks; original rendered output reviewed."
+  }
+]

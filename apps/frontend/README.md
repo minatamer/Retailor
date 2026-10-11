@@ -7,3 +7,5 @@ Development uses `.next-dev`; `pnpm build` writes `.next`, so release builds do 
 The initial `/` and `/demo` pages are foundation views, not completed product acceptance. Future feature tickets own the storefront, setup, copilot and dashboard. Run injected bridge checks through `pnpm exec vitest run apps/frontend/src/server/bridge.test.ts`; no metadata or provider request occurs in unpaid tests. Hosted invocation requires separate actual IAM evidence.
 
 Normal `dev` launchers explicitly select development/fake/paid-off even if the shell inherited live flags; the parent environment is untouched. `start` preserves normal configuration for separately authorized live/production operation.
+
+RTL-002 adds a provisional running `/design` reference under the normal dev launcher: finite store directions, licensed self-hosted typography, Tailor cards/photo-form and a labelled synthetic chart. This route requires the launcher-owned development flag and is unavailable under production/start. See `docs/design/RTL-002-DESIGN.md` for actual visual evidence and pending owner/zoom review.

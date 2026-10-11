@@ -1,12 +1,12 @@
 # Retailor implementation tickets
 
-**Status:** 22 implementation packets; RTL-001 complete, 21 planned.\
+**Status:** 22 implementation packets; RTL-001 complete, RTL-002 locally implemented with visual evidence pending, 20 planned.\
 **Prepared:** 11 October 2026.\
-**Next eligible packet:** [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md).\
+**Next eligible packet:** [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md).\
 **Product authority:** [Retailor blueprint](../RETAILOR_DEMO_SOURCE_OF_TRUTH.md).\
 **Quick product view:** [HTML overview](../RETAILOR_OVERVIEW.html).
 
-The owner has authorized the full execute/validate loop, local fake-mode services and commits after each cleanly validated ticket. RTL-001 has verified local evidence; remaining packets retain their own actual status. Paid provider and hosted acceptance remain pending without keys/cloud configuration. This queue translates the accepted blueprint and all eleven product answers into complete, reviewable work.
+The owner has authorized the full execute/validate loop, local fake-mode services and commits after each cleanly validated ticket. RTL-001 and RTL-002 have verified local evidence; remaining packets retain their own actual status. Paid provider and hosted acceptance remain pending without keys/cloud configuration. This queue translates the accepted blueprint and all eleven product answers into complete, reviewable work.
 
 The core promise determines the queue: clothing photos become an editable AI draft, then Tailor's visual chat cards make the same products look excellent across a complete storefront home, listing and detail page. The dashboard and commerce engine support that promise. Tickets cover coherent outcomes, rather than individual buttons, charts or files. The 22-packet scope reflects three complete templates, image handling, exact commerce operations, chat-led styling, a broad copilot, optional logos, EUR pricing and release evidence; it is not a mandate to create 22 independent subsystems.
 
@@ -29,7 +29,7 @@ All dependencies are direct prerequisites; transitive dependencies are resolved 
 | ID | Complete outcome | Direct dependencies | Status |
 | --- | --- | --- | --- |
 | [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md) | Initialize the workspace, contracts and safe runtime | None | Complete |
-| [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md) | Prove the brand system and storefront visual direction | [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md) | Planned |
+| [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md) | Prove the brand system and storefront visual direction | [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md) | Local complete; owner/zoom pending |
 | [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md) | Prepare fifteen clothing photos and the bounded upload pipeline | [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md), [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md) | Planned |
 | [RTL-004](RTL-004-build-exact-commerce-commands-and-fact-engine.md) | Build exact commerce commands, invariants and metric facts | [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md) | Planned |
 | [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md) | Build the one-page workspace, catalogue review and recovery | [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md), [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-004](RTL-004-build-exact-commerce-commands-and-fact-engine.md) | Planned |

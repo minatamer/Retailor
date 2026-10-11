@@ -1,6 +1,6 @@
 # RTL-002 — Prove the brand system and storefront visual direction
 
-Status: **Planned — not started**\
+Status: **Implemented locally; owner visual and real browser-zoom evidence pending**\
 Planning date: **11 October 2026**\
 Milestone: **Visual foundation**\
 Depends on: [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md)\
@@ -57,14 +57,14 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Platform/store tokens and typography have explicit shared ownership.
-- [ ] Four themes and three bundled type presets can be judged on one three-page family.
-- [ ] Three template directions differ visibly without capability loss.
-- [ ] Chat CTA, photo form and chart surfaces look coherent and readable.
-- [ ] Fonts/licences and measured text/action/focus contrast are recorded.
-- [ ] Long text, EUR amounts, keyboard/touch and short heights remain usable.
-- [ ] Visible motion has no suppression settings.
-- [ ] Owner response and actual visual observations remain separate from proposals.
+- [x] Platform/store tokens and typography have explicit shared ownership.
+- [x] Four themes and three bundled type presets can be judged on one three-page family.
+- [x] Three template directions differ visibly without capability loss.
+- [x] Chat CTA, photo form and chart surfaces look coherent and readable.
+- [x] Fonts/licences and measured text/action/focus contrast are recorded.
+- [x] Long text, EUR amounts, keyboard/touch and short heights remain usable.
+- [x] Visible motion has no suppression settings.
+- [x] Owner response and actual visual observations remain separate from proposals.
 
 ## Focused verification and evidence
 
@@ -98,4 +98,4 @@ No copied competitor identity/assets, fake testimonials, arbitrary colour/font c
 
 Keep this outcome under `RTL-002:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-002.md` and actual check/review evidence under `docs/validation/RTL-002.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Required local boxes are checked against [actual validation](../validation/RTL-002.md); owner feedback and actual browser zoom remain explicitly pending. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.

@@ -12,6 +12,8 @@ Retailor is a planned clothing-only demo built around a beautiful storefront fro
 
 The owner has authorized queue execution and ticket-prefixed commits after clean validation. [RTL-001](tickets/RTL-001-initialize-workspace-contracts-and-safe-runtime.md) owns the initial local foundation; consult the queue for the next eligible work. The latest owner instruction governs conflicting historical material; tickets apply the blueprint to a specific outcome and do not own a competing product contract.
 
+[Running design baseline](design/RTL-002-DESIGN.md) records the finite palettes, licensed fonts, original reference photography and actual device observations. [Validation records](validation/RTL-002.md) distinguish local checks from unperformed owner/zoom acceptance.
+
 ## Retained source material
 
 - [Original concept Markdown](retailor.md) and [original concept preview](retailor.html) are archived exploration; their simulations do not prove real recognition or deployed behavior.
