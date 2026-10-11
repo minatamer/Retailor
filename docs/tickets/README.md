@@ -1,12 +1,12 @@
 # Retailor implementation tickets
 
-**Status:** 22 planned implementation packets; none started.\
+**Status:** 22 implementation packets; RTL-001 complete, 21 planned.\
 **Prepared:** 11 October 2026.\
-**First eligible packet:** [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md).\
+**Next eligible packet:** [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md).\
 **Product authority:** [Retailor blueprint](../RETAILOR_DEMO_SOURCE_OF_TRUTH.md).\
 **Quick product view:** [HTML overview](../RETAILOR_OVERVIEW.html).
 
-The owner has now explicitly authorized ticket creation. This queue translates the accepted blueprint and all eleven product answers into complete, reviewable work. Application implementation, paid provider operations and deployment have not started. Every packet is **Planned — not started**, and every acceptance checkbox is unchecked.
+The owner has authorized the full execute/validate loop, local fake-mode services and commits after each cleanly validated ticket. RTL-001 has verified local evidence; remaining packets retain their own actual status. Paid provider and hosted acceptance remain pending without keys/cloud configuration. This queue translates the accepted blueprint and all eleven product answers into complete, reviewable work.
 
 The core promise determines the queue: clothing photos become an editable AI draft, then Tailor's visual chat cards make the same products look excellent across a complete storefront home, listing and detail page. The dashboard and commerce engine support that promise. Tickets cover coherent outcomes, rather than individual buttons, charts or files. The 22-packet scope reflects three complete templates, image handling, exact commerce operations, chat-led styling, a broad copilot, optional logos, EUR pricing and release evidence; it is not a mandate to create 22 independent subsystems.
 
@@ -28,7 +28,7 @@ All dependencies are direct prerequisites; transitive dependencies are resolved 
 
 | ID | Complete outcome | Direct dependencies | Status |
 | --- | --- | --- | --- |
-| [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md) | Initialize the workspace, contracts and safe runtime | None | Planned |
+| [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md) | Initialize the workspace, contracts and safe runtime | None | Complete |
 | [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md) | Prove the brand system and storefront visual direction | [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md) | Planned |
 | [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md) | Prepare fifteen clothing photos and the bounded upload pipeline | [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md), [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md) | Planned |
 | [RTL-004](RTL-004-build-exact-commerce-commands-and-fact-engine.md) | Build exact commerce commands, invariants and metric facts | [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md) | Planned |
@@ -53,7 +53,7 @@ All dependencies are direct prerequisites; transitive dependencies are resolved 
 
 ## Selection, dependencies and status
 
-When the owner authorizes execution, select the lowest numbered **Planned** packet whose required dependencies actually exist and have the necessary verified local behavior. At this planning snapshot only **RTL-001** qualifies. After RTL-001, RTL-002 and RTL-004 can become eligible; use numerical order by default. Eligibility does not authorize parallel agents or new chats. Do not claim a dependency passed because a ticket exists, its boxes were edited or a similarly named commit appeared.
+Under the current execution authorization, select the lowest numbered **Planned** packet whose required dependencies actually exist and have the necessary verified local behavior. RTL-001 is complete; **RTL-002** and RTL-004 are locally eligible. Select RTL-002 next in numerical order. Eligibility does not authorize parallel agents or new chats. Do not claim a dependency passed because a ticket exists, its boxes were edited or a similarly named commit appeared.
 
 A dependency may be locally implemented while a separately named owner-visual, paid or hosted check remains pending. That verified local behavior can support independent local follow-on work, provided pending capabilities stay clearly unavailable and their acceptance remains tracked. Public release must wait for required actual live and hosted evidence. In particular, RTL-021 packaging preparation does not depend on RTL-020's paid run; RTL-022 requires both.
 
@@ -61,7 +61,7 @@ Use these status meanings in the queue and packet together:
 
 | Status | Evidence needed |
 | --- | --- |
-| Planned — not started | Reviewed scope only; current status of every packet. |
+| Planned — not started | Reviewed scope only; no implementation evidence yet. |
 | In progress | Actual authorized implementation is underway; record meaningful completed and remaining work. |
 | Implemented locally — external acceptance pending | Required local behavior/checks exist at a named snapshot; each unperformed visual/live/container/hosted check has a concrete prerequisite. |
 | Complete | All required acceptance for that packet actually passes; evidence identifies the revision/environment and any explicit non-blocking limits. |
@@ -147,8 +147,8 @@ This map assigns every numbered blueprint section to concrete packets. Shared se
 | Linux/container candidate | RTL-021 | A Windows build or an unrun Dockerfile. |
 | Hosted behavior, IAM and production controls | RTL-022 | A local pass, deploy command template or recalled sibling setting. |
 
-The root commands described in packets are **future commands established by RTL-001**; this documentation-only repository does not already provide them. At execution, use focused meaningful checks during iteration and applicable settled root gates before handoff. Never attach paid evaluation or deployment to ordinary tests/builds.
+RTL-001 establishes the actual root commands. Use focused meaningful checks during iteration and applicable settled root gates before handoff. Never attach paid evaluation or deployment to ordinary tests/builds.
 
-Each packet includes standalone context, entry conditions, ownership, an ordered plan, unchecked acceptance, a failure/evidence matrix, precision references and scope limits. During actual substantial implementation, add real file allocations in `docs/commit-plans/RTL-###.md` and actual results in `docs/validation/RTL-###.md`. These folders/records are not precreated as empty shells or fabricated completed work.
+Each packet includes standalone context, entry conditions, ownership, an ordered plan, evidence-based acceptance status, a failure/evidence matrix, precision references and scope limits. During actual substantial implementation, add real file allocations in `docs/commit-plans/RTL-###.md` and actual results in `docs/validation/RTL-###.md`. These folders/records are not precreated as empty shells or fabricated completed work.
 
 Suggested commits use `RTL-###: concrete change`. The existing documentation commit used RTL-000; no artificial RTL-000 implementation packet is needed. Ticket creation does not stage, commit, push, start application services, call paid providers or deploy resources. Apply the owner's actual later execution authorization and prepare any externally consequential plan fully before requesting a missing final approval.

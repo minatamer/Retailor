@@ -1,6 +1,6 @@
 # RTL-001 — Initialize the workspace, contracts and safe runtime
 
-Status: **Planned — not started**\
+Status: **Complete — required local outcome verified**\
 Planning date: **11 October 2026**\
 Milestone: **Foundation**\
 Depends on: None\
@@ -58,14 +58,14 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Both real apps run locally without provider credentials.
-- [ ] Lockfile and public package exports build reproducibly.
-- [ ] Contracts/commerce contain no app, platform, environment or provider dependencies.
-- [ ] Invalid money, revisions and oversized public values are rejected.
-- [ ] Tests and default development remain fake/paid-off despite inherited live settings.
-- [ ] Health/readiness/capabilities are distinct and dispatch zero paid requests.
-- [ ] Client output contains no secret, private origin or cloud identity.
-- [ ] Executable boundaries and applicable root gates pass.
+- [x] Both real apps run locally without provider credentials.
+- [x] Lockfile and public package exports build reproducibly.
+- [x] Contracts/commerce contain no app, platform, environment or provider dependencies.
+- [x] Invalid money, revisions and oversized public values are rejected.
+- [x] Tests and default development remain fake/paid-off despite inherited live settings.
+- [x] Health/readiness/capabilities are distinct and dispatch zero paid requests.
+- [x] Client output contains no secret, private origin or cloud identity.
+- [x] Executable boundaries and applicable root gates pass.
 
 ## Focused verification and evidence
 
@@ -101,4 +101,8 @@ No database, ORM, Redis, bucket, queue, worker service, voice/video/PDF stack, p
 
 Keep this outcome under `RTL-001:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-001.md` and actual check/review evidence under `docs/validation/RTL-001.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. The original planning packet did not authorize execution. The latest owner instruction now authorizes local fake-mode implementation and ticket-prefixed commits after clean validation; paid and hosted operations remain outside that authorization.
+
+## Actual execution handoff
+
+The strict workspace, bounded public contracts, exact cents and safe runtimes are implemented. Final validation has no new actionable findings; all six root gates pass with 32 tests. Actual dev readiness and the fixed bridge pass without keys. Dedicated ports 4310/4311 override the proposed 3000/4000 to preserve other repos, as required by the latest owner instruction. See [validation and pending evidence](../validation/RTL-001.md), [file-level commit plan](../commit-plans/RTL-001.md) and [foundation guide](../engineering/FOUNDATION.md). Starter pages do not claim later product features or visual acceptance.

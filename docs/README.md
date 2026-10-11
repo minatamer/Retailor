@@ -1,6 +1,6 @@
 # Retailor documentation
 
-Retailor is a planned clothing-only demo built around a beautiful storefront from supplied product photos. Documentation and the 22-ticket implementation queue are prepared; application implementation and deployment have not started.
+Retailor is a planned clothing-only demo built around a beautiful storefront from supplied product photos. Documentation and the 22-ticket implementation queue are prepared; implementation is underway in fake mode and deployment preparation follows the queue.
 
 ## Current authority
 
@@ -10,7 +10,7 @@ Retailor is a planned clothing-only demo built around a beautiful storefront fro
 | [Visual HTML overview](RETAILOR_OVERVIEW.html) | Concise owner-facing product story and interactive documentation illustrations. |
 | [Implementation ticket queue](tickets/README.md) | All 22 detailed planned packets, dependencies, owner-answer traceability and execution evidence rules. |
 
-Start execution with [RTL-001](tickets/RTL-001-initialize-workspace-contracts-and-safe-runtime.md) when the owner authorizes implementation. The latest owner instruction governs conflicting historical material; tickets apply the blueprint to a specific outcome and do not own a competing product contract.
+The owner has authorized queue execution and ticket-prefixed commits after clean validation. [RTL-001](tickets/RTL-001-initialize-workspace-contracts-and-safe-runtime.md) owns the initial local foundation; consult the queue for the next eligible work. The latest owner instruction governs conflicting historical material; tickets apply the blueprint to a specific outcome and do not own a competing product contract.
 
 ## Retained source material
 

@@ -1,10 +1,10 @@
 # Retailor — product, architecture and delivery blueprint
 
-**Status:** accepted documentation baseline and 22 planned implementation tickets; application implementation has not started.\
+**Status:** accepted documentation baseline and 22 planned implementation tickets; implementation is underway in fake mode; paid and hosted acceptance remain pending.\
 **Prepared:** 11 October 2026.\
 **Product:** Retailor. **Sample clothing brand:** FORME.\
 **Companion:** [Retailor product overview](RETAILOR_OVERVIEW.html).\
-**Implementation queue:** [22 detailed planned tickets](tickets/README.md); first eligible packet RTL-001.\
+**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001 locally complete, next eligible packet RTL-002.\
 **Signature promise:** **Bring your products. See your store.**\
 **Owner decisions incorporated:** all eleven answers on clothing-only scope, researched presets, Tailor-led setup, optional logos, mandatory photos, catalogue integrity, three scenarios, live sample processing, runway direction, image sourcing and USD/EUR; 11 October 2026.
 
@@ -14,7 +14,7 @@ This document describes what to build, why it belongs in the demo, how its parts
 
 The target is a coherent five-minute portfolio experience demonstrating a reusable ecommerce foundation. A production store, payment processing, shipping services, legal store policies and an authenticated merchant platform are separate work.
 
-> **Planning boundary:** the owner has now authorized ticket creation. The [canonical queue](tickets/README.md) contains 22 detailed packets, all planned and not started. This revision performs no application implementation, cloud provisioning, paid provider operations or Git mutations. All routes, packages, commands and operating settings below remain intended implementation unless explicitly identified as inspected sibling evidence.
+> **Execution boundary:** the owner has authorized the full execute/validate queue, local fake-mode services and ticket-prefixed commits after clean validation. No API keys or paid budget have been provided; prepare live adapters and local deployment files while those external checks remain pending. RTL-001 introduces the local foundation. Later routes/features/settings below remain intended until their owning tickets have actual evidence.
 
 ## Contents
 
@@ -101,7 +101,7 @@ Use these words consistently:
 | Synthetic activity | Authored/generated demo orders, stock and feedback; never real commercial history |
 | Verified | A named check was actually performed against an identified revision and environment |
 
-No Retailor implementation or hosted acceptance is claimed in this revision.
+Local implementation progress is recorded in the queue and validation records. No paid provider or hosted acceptance is claimed.
 
 ## 2. Product contract and audience
 
@@ -175,7 +175,7 @@ These are accepted owner decisions. Visual tokens and implementation limits belo
 | Motion | Visible intended animation throughout | No animation-off, render-off or motion-suppression setting |
 | Framework/deployment | Sibling TypeScript/pnpm/Next/Express backbone and two Cloud Run services | Add only bounded image-generation and public FX adapters |
 | Development | Deterministic fixtures with paid calls disabled | Clearly labelled development simulation, never the public sample experience |
-| Deliverables now | Detailed Markdown, concise HTML overview and 22 planned implementation packets | Ticket planning is authorized; application scaffolding, paid calls and cloud provisioning have not started |
+| Deliverables now | Detailed Markdown, concise HTML overview and 22 planned implementation packets | Execution is authorized in fake mode; paid calls and cloud provisioning remain external pending checks |
 
 ### 3.2 Included capabilities
 
@@ -1243,7 +1243,7 @@ A database becomes necessary if merchant work must survive across devices/users 
 
 ### 18.1 Target structure
 
-This is an ownership map for future implementation. Create directories when their first real module arrives. None of this tree is scaffolded by the current documentation task.
+This is an ownership map for future implementation. Create directories when their first real module arrives. The foundation implements the core workspace; future feature directories are created only when their first real module arrives.
 
 ```text
 Retailor/
@@ -1540,7 +1540,7 @@ pnpm build
 pnpm check
 ```
 
-`dev:backend` and `dev:frontend` run in separate terminals and build shared packages first. Proposed local ports are frontend `127.0.0.1:3000` and backend `127.0.0.1:4000`, matching the siblings. These scripts do not exist yet and are not commands to run in the current documentation-only repository.
+`dev:backend` and `dev:frontend` run in separate terminals and build shared packages first. Retailor uses frontend `127.0.0.1:4310` and backend `127.0.0.1:4311`. The owner requested isolation from other repositories, and 3000/4000 were already occupied at setup. RTL-001 creates these commands and documents the override; no other repository service is stopped.
 
 ### 21.4 Process hygiene
 
@@ -1953,7 +1953,7 @@ Record what was actually checked separately from owner reports and planned setti
 
 ## 27. Implementation sequence and ticket map
 
-The owner has authorized detailed ticket planning. The [canonical queue](tickets/README.md) contains 22 complete, reviewable outcomes with standalone context, dependencies, ownership, implementation plans, acceptance and failure/evidence matrices. All are planned; application implementation has not started. The storefront design library remains an early dependency because it defines the main promise.
+The owner has authorized detailed ticket planning. The [canonical queue](tickets/README.md) contains 22 complete, reviewable outcomes with standalone context, dependencies, ownership, implementation plans, acceptance and failure/evidence matrices. All are planned; implementation is underway in fake mode; paid and hosted acceptance remain pending. The storefront design library remains an early dependency because it defines the main promise.
 
 | Phase | Planned packets | Concrete outcome |
 | --- | --- | --- |
@@ -1971,7 +1971,7 @@ The owner has authorized detailed ticket planning. The [canonical queue](tickets
 | Linux release preparation | [RTL-021](tickets/RTL-021-package-linux-services-and-manual-release-runbook.md) | Reproducible images, fixed private bridge, concrete manual deploy and rollback plan; independent of paid evaluation. |
 | Owner-authorized hosted release | [RTL-022](tickets/RTL-022-deploy-verify-hosted-demo-and-record-rollback.md) | Exact accepted artifacts, actual private IAM/origins, HTTPS walkthrough, usage evidence and recovery readiness. |
 
-RTL-001 is the first eligible packet. Select the lowest numbered eligible packet by default once implementation is authorized. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
+RTL-001 has verified local completion. RTL-002 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
 
 The first complete local path may use declared development fixtures, but public acceptance requires fresh live recognition for sample and uploads. Security and cleanup start with the first owning feature; later hardening and lifecycle packets complete the combined surface. Optional logo generation follows a polished wordmark path. Domain integrity keeps charts connected to actual products; design evidence proves that all accepted storefront choices look excellent.
 
@@ -2011,7 +2011,7 @@ Update the narrowest owning artifact when implementation changes. A material pro
 - Keep private env values/private diagnostics out of documentation and logs.
 - Mark external/manual checks pending honestly; never promote recollection into a verified pass.
 
-Root AGENTS does not exist in this documentation-only repository yet. This blueprint describes the operating approach to encode when initialization is requested; it does not silently install process rules into sibling repositories.
+RTL-001 adds root AGENTS with the owner-authorized execution/validation loop, local isolation and fake/paid boundaries. It changes no sibling repository instructions.
 
 ## 29. Decisions to settle during implementation
 
@@ -2043,7 +2043,7 @@ Routine composition, labels and token refinements can be decided within accepted
 
 The **documentation baseline** is complete when the detailed Markdown and summarized HTML are readable, consistent, linked and traceable to the inspected resources. The original documentation deliverable did not require application implementation.
 
-The **ticket-planning deliverable** is complete when the 22 detailed packets and canonical queue cover the accepted product decisions, have valid dependencies and precision links, and specify context, ownership, an implementation sequence, unchecked acceptance and actual evidence requirements. Ticket planning does not satisfy the future demo acceptance below. All packets remain planned and no app behavior is claimed delivered.
+The **ticket-planning deliverable** is complete when the 22 detailed packets and canonical queue cover the accepted product decisions, have valid dependencies and precision links, and specify context, ownership, an implementation sequence, unchecked acceptance and actual evidence requirements. Ticket planning does not satisfy the future demo acceptance below. Execution status is recorded in the queue; RTL-001 now delivers the verified local foundation. Later product behavior remains intended until its owning evidence exists.
 
 The **future demo** is complete only when:
 
