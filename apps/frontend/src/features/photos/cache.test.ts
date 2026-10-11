@@ -50,6 +50,7 @@ it("preserves valid rows on corruption and refuses understated write counters", 
 });
 beforeEach(() => {
   vi.stubGlobal("indexedDB", new IDBFactory());
+  vi.stubGlobal("navigator", {});
 });
 afterEach(async () => {
   for (const cache of caches.splice(0)) await cache.close();
@@ -114,6 +115,54 @@ it("removes only this workspace's bytes and preserves unrelated active workspace
   await first.clear();
   expect((await first.read()).photos).toEqual([]);
   expect((await second.read()).photos[0]?.photo.id).toBe("two");
+});
+it("queues ownership release immediately and prevents a closed runtime from renewing its lease", async () => {
+  const first = cache("reload_workspace", "first"),
+    second = cache("reload_workspace", "next_document");
+  await first.put(row("retained"));
+  const closing = first.close();
+  await expect(first.heartbeat()).rejects.toThrow("closed");
+  await second.heartbeat();
+  await closing;
+  expect((await second.read()).photos[0]?.photo.id).toBe("retained");
+  await first.close();
+  expect((await second.read()).photos).toHaveLength(1);
+});
+it("uses document locks to exclude a live duplicate and restore after a crashed document without waiting for TTL", async () => {
+  const held = new Map<string, object>();
+  let crash: (() => void) | undefined;
+  vi.stubGlobal("navigator", {
+    locks: {
+      async request(
+        name: string,
+        _options: unknown,
+        run: (lock: unknown) => Promise<void>,
+      ) {
+        if (held.has(name)) return run(null);
+        const identity = {};
+        held.set(name, identity);
+        crash = () => held.delete(name);
+        try {
+          await run({ name });
+        } finally {
+          if (held.get(name) === identity) held.delete(name);
+        }
+      },
+    },
+  });
+  const original = cache("locked_workspace", "first"),
+    next = cache("locked_workspace", "next");
+  await original.put(row("retained"));
+  await expect(next.heartbeat()).rejects.toBeInstanceOf(CacheConflict);
+  crash!();
+  await next.heartbeat();
+  expect((await next.read()).photos[0]?.photo.id).toBe("retained");
+  await expect(original.clear()).rejects.toBeInstanceOf(CacheConflict);
+  await original.close();
+  expect((await next.read()).photos).toHaveLength(1);
+  await expect(
+    cache("locked_workspace", "third").heartbeat(),
+  ).rejects.toBeInstanceOf(CacheConflict);
 });
 it("enforces original, count and origin budgets atomically", async () => {
   const first = cache("first_workspace", "owner"),

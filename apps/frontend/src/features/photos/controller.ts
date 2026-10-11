@@ -146,8 +146,19 @@ export class PhotoController {
     return [...this.entries.values()].map((item) => item.photo);
   }
   manifest() {
+    this.requireSelection(this.selected);
     return RecognitionManifestSchema.parse(
       this.selected.map((id) => this.entries.get(id)!.photo.derivative),
+    );
+  }
+  requireSelection(ids: readonly string[]) {
+    const available = this.availableIds();
+    if (ids.some((id) => !available.has(id)))
+      throw new Error(
+        "Selected photo bytes are unavailable. Repair them before processing.",
+      );
+    RecognitionManifestSchema.parse(
+      ids.map((id) => this.entries.get(id)!.photo.derivative),
     );
   }
   private current(generation: number) {
@@ -467,6 +478,110 @@ export class PhotoController {
       }
     }
   }
+  selectAvailable(ids: readonly string[]) {
+    if (
+      !this.valid() ||
+      new Set(ids).size !== ids.length ||
+      ids.length > PHOTO_LIMITS.selection
+    )
+      return;
+    const available = ids.filter((id) => this.entries.has(id));
+    if (available.length)
+      RecognitionManifestSchema.parse(
+        available.map((id) => this.entries.get(id)!.photo.derivative),
+      );
+    this.selected = available;
+    this.update({}, true);
+  }
+  async repair(expectedInput: Photo, file: NamedPhoto) {
+    if (!this.valid() || this.snapshot.busy) return;
+    const expected = PhotoSchema.parse(expectedInput);
+    if (this.entries.has(expected.id)) return;
+    if (
+      this.entries.size >= PHOTO_LIMITS.sources ||
+      file.blob.size < 1 ||
+      file.blob.size > PHOTO_LIMITS.original
+    ) {
+      this.update({
+        notice: "Reselect a supported photo within the remaining cache limits.",
+      });
+      return;
+    }
+    const originals = [...this.entries.values()].reduce(
+      (sum, item) => sum + item.original.size,
+      0,
+    );
+    if (originals + file.blob.size > PHOTO_LIMITS.originals) {
+      this.update({ notice: "Keep original photos under 40 MiB in total." });
+      return;
+    }
+    const generation = ++this.generation,
+      operation = new AbortController();
+    this.operation = operation;
+    this.update({
+      busy: true,
+      notice: "Checking the exact saved photo identity…",
+    });
+    try {
+      const decoded = await this.decode(
+        { id: expected.id, original: file.blob },
+        operation.signal,
+      );
+      if (!this.current(generation)) return;
+      if (
+        JSON.stringify(PhotoSchema.parse(decoded.photo)) !==
+        JSON.stringify(expected)
+      )
+        throw new Error(
+          "Choose the exact original photo used by this garment. Different bytes cannot replace its saved identity.",
+        );
+      const derivatives = [...this.entries.values()].reduce(
+        (sum, item) => sum + item.derivative.size,
+        0,
+      );
+      if (
+        derivatives + decoded.derivative.size >
+        PHOTO_LIMITS.cachedDerivatives
+      )
+        throw new Error(
+          "The saved photo previews have reached their cache limit.",
+        );
+      const stored = { ...decoded, name: file.name.slice(0, 120) };
+      let recoverable = true;
+      try {
+        await this.cache.put(stored);
+      } catch (error) {
+        if (error instanceof CacheConflict) throw error;
+        recoverable = false;
+      }
+      if (!this.current(generation)) return;
+      this.entries.set(expected.id, {
+        ...stored,
+        url: this.urls.create(decoded.derivative),
+      });
+      this.update(
+        {
+          notice: recoverable
+            ? "Exact garment photo restored. No interpretation was repeated."
+            : "Exact photo restored in memory. Storage is unavailable, so refreshing may lose it.",
+        },
+        true,
+      );
+    } catch (error) {
+      if (this.current(generation))
+        this.update({
+          notice:
+            error instanceof Error
+              ? error.message
+              : "This photo could not repair the saved garment.",
+        });
+    } finally {
+      if (this.current(generation)) {
+        this.operation = undefined;
+        this.update({ busy: false });
+      }
+    }
+  }
   async reset(notice = "Photos cleared. Start with a fresh collection.") {
     this.cancel();
     const generation = this.generation;
@@ -475,7 +590,9 @@ export class PhotoController {
     this.selected = [];
     this.protectedIds.clear();
     this.update({ issues: [], progress: 0, total: 0, notice }, true);
+    let cleared = true;
     await this.cache.clear().catch(() => {
+      cleared = false;
       if (this.active && this.generation === generation)
         this.update({
           notice:
@@ -486,6 +603,7 @@ export class PhotoController {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = undefined;
     }
+    return cleared;
   }
   dispose() {
     this.active = false;

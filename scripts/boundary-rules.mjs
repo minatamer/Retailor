@@ -99,6 +99,37 @@ export function inspectBoundary(filename, text, clientGraph = false) {
       report(node, "Live providers cannot load development fixtures");
   }
   function visit(node) {
+    const forbidden = pure
+      ? ["process", "Buffer", "fetch", "localStorage", "sessionStorage"]
+      : frontend && !server
+        ? ["process", "Buffer"]
+        : [];
+    const parent = node.parent;
+    const globalReceiver = (expression) =>
+      ts.isIdentifier(expression) &&
+      ["globalThis", "window", "self"].includes(expression.text);
+    const propertyName =
+      parent &&
+      ((ts.isPropertyAccessExpression(parent) &&
+        parent.name === node &&
+        !globalReceiver(parent.expression)) ||
+        ((ts.isPropertyAssignment(parent) ||
+          ts.isMethodDeclaration(parent) ||
+          ts.isPropertySignature(parent)) &&
+          parent.name === node));
+    if (
+      ts.isElementAccessExpression(node) &&
+      globalReceiver(node.expression) &&
+      node.argumentExpression &&
+      ts.isStringLiteral(node.argumentExpression) &&
+      forbidden.includes(node.argumentExpression.text)
+    )
+      report(
+        node,
+        pure
+          ? "Pure packages cannot access environment, network or browser storage"
+          : "Private environment belongs in server-only modules",
+      );
     if (
       (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
       node.moduleSpecifier &&
@@ -115,6 +146,7 @@ export function inspectBoundary(filename, text, clientGraph = false) {
     }
     if (
       ts.isIdentifier(node) &&
+      !propertyName &&
       ["process", "Buffer", "fetch", "localStorage", "sessionStorage"].includes(
         node.text,
       ) &&
@@ -126,6 +158,7 @@ export function inspectBoundary(filename, text, clientGraph = false) {
       );
     if (
       ts.isIdentifier(node) &&
+      !propertyName &&
       ["process", "Buffer"].includes(node.text) &&
       frontend &&
       !server

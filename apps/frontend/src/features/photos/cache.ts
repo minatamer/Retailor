@@ -23,6 +23,7 @@ export class CacheConflict extends Error {
 const LeaseSchema = z.strictObject({
   id: IdSchema,
   owner: IdSchema,
+  browserLock: z.boolean().default(false),
   fence: z.number().int().positive(),
   until: z.number().nonnegative(),
   expires: z.number().nonnegative(),
@@ -70,6 +71,10 @@ async function transaction<T>(
 }
 export class BrowserPhotoCache implements PhotoCache {
   private db: Promise<IDBDatabase> | undefined;
+  private liveDb: IDBDatabase | undefined;
+  private closing: Promise<void> | undefined;
+  private lockHeld = false;
+  private releaseLock: (() => void) | undefined;
   private fence: number | undefined;
   private queue: Promise<unknown> = Promise.resolve();
   constructor(
@@ -82,41 +87,84 @@ export class BrowserPhotoCache implements PhotoCache {
     IdSchema.parse(owner);
   }
   private serial<T>(run: () => Promise<T>): Promise<T> {
-    const next = this.queue.then(run);
+    const next = this.queue.then(() => {
+      if (this.closing) throw new Error("This photo cache is closed.");
+      return run();
+    });
     this.queue = next.catch(() => undefined);
     return next;
   }
   private open(): Promise<IDBDatabase> {
     if (this.db) return this.db;
-    this.db = new Promise((resolve, reject) => {
-      const opening = indexedDB.open("retailor-photos-v1", 1);
-      let settled = false;
-      const deadline = setTimeout(() => {
-        settled = true;
-        reject(new Error("Temporary photo storage unavailable."));
-      }, 3000);
-      opening.onupgradeneeded = () => {
-        const db = opening.result;
-        db.createObjectStore("workspaces", { keyPath: "id" });
-        db.createObjectStore("photos", { keyPath: "key" }).createIndex(
-          "workspace",
-          "workspace",
-        );
-      };
-      opening.onblocked = opening.onerror = () => {
-        clearTimeout(deadline);
-        settled = true;
-        reject(new Error("Temporary photo storage unavailable."));
-      };
-      opening.onsuccess = () => {
-        clearTimeout(deadline);
-        if (settled) return opening.result.close();
-        settled = true;
-        opening.result.onversionchange = () => opening.result.close();
-        resolve(opening.result);
-      };
-    });
+    this.db = this.acquireLock()
+      .then(
+        () =>
+          new Promise<IDBDatabase>((resolve, reject) => {
+            const opening = indexedDB.open("retailor-photos-v1", 1);
+            let settled = false;
+            const deadline = setTimeout(() => {
+              settled = true;
+              reject(new Error("Temporary photo storage unavailable."));
+            }, 3000);
+            opening.onupgradeneeded = () => {
+              const db = opening.result;
+              db.createObjectStore("workspaces", { keyPath: "id" });
+              db.createObjectStore("photos", { keyPath: "key" }).createIndex(
+                "workspace",
+                "workspace",
+              );
+            };
+            opening.onblocked = opening.onerror = () => {
+              clearTimeout(deadline);
+              settled = true;
+              reject(new Error("Temporary photo storage unavailable."));
+            };
+            opening.onsuccess = () => {
+              clearTimeout(deadline);
+              if (settled) return opening.result.close();
+              settled = true;
+              this.liveDb = opening.result;
+              opening.result.onversionchange = () => opening.result.close();
+              resolve(opening.result);
+            };
+          }),
+      )
+      .catch((error: unknown) => {
+        this.db = undefined;
+        this.releaseLock?.();
+        this.releaseLock = undefined;
+        throw error;
+      });
     return this.db;
+  }
+  private acquireLock() {
+    if (typeof navigator === "undefined" || !navigator.locks)
+      return Promise.resolve();
+    return new Promise<void>((resolve, reject) => {
+      void navigator.locks
+        .request(
+          `retailor.photos.${this.workspace}`,
+          { ifAvailable: true },
+          async (lock) => {
+            if (!lock) {
+              reject(new CacheConflict());
+              return;
+            }
+            if (this.closing) {
+              reject(new Error("This photo cache is closed."));
+              return;
+            }
+            this.lockHeld = true;
+            const held = new Promise<void>((done) => {
+              this.releaseLock = done;
+            });
+            resolve();
+            await held;
+            this.lockHeld = false;
+          },
+        )
+        .catch(reject);
+    });
   }
   private async owned(tx: IDBTransaction): Promise<Lease> {
     const store = tx.objectStore("workspaces");
@@ -139,7 +187,9 @@ export class BrowserPhotoCache implements PhotoCache {
     const current = input === undefined ? undefined : LeaseSchema.parse(input);
     if (
       current &&
-      ((current.owner !== this.owner && current.until > now) ||
+      ((current.owner !== this.owner &&
+        current.until > now &&
+        !(this.lockHeld && current.browserLock)) ||
         (this.fence !== undefined &&
           (current.owner !== this.owner || current.fence !== this.fence)))
     )
@@ -150,6 +200,7 @@ export class BrowserPhotoCache implements PhotoCache {
         : {
             id: this.workspace,
             owner: this.owner,
+            browserLock: this.lockHeld,
             fence: (current?.fence ?? 0) + 1,
             until: now + 20_000,
             expires: this.expires,
@@ -355,25 +406,47 @@ export class BrowserPhotoCache implements PhotoCache {
     );
   }
   close() {
-    return this.serial(async () => {
-      const pending = this.db;
-      this.db = undefined;
-      if (!pending) return;
-      const db = await pending.catch(() => undefined);
-      if (!db) return;
-      try {
-        await transaction(db, "readwrite", async (tx) => {
-          const input = await request(
-            tx.objectStore("workspaces").get(this.workspace),
-          );
-          if (input === undefined) return;
-          const lease = LeaseSchema.parse(input);
-          if (lease.owner === this.owner && lease.fence === this.fence)
-            tx.objectStore("workspaces").put({ ...lease, until: 0 });
-        });
-      } finally {
-        db.close();
-      }
+    if (this.closing) return this.closing;
+    // Enqueue the release transaction synchronously while pagehide still owns
+    // a live document. A promise-only queue can be discarded during navigation.
+    const release = (db: IDBDatabase) =>
+      new Promise<void>((resolve, reject) => {
+        let tx: IDBTransaction;
+        try {
+          tx = db.transaction("workspaces", "readwrite");
+          const get = tx.objectStore("workspaces").get(this.workspace);
+          get.onsuccess = () => {
+            const parsed = LeaseSchema.safeParse(get.result);
+            if (
+              parsed.success &&
+              parsed.data.owner === this.owner &&
+              parsed.data.fence === this.fence
+            )
+              tx.objectStore("workspaces").put({ ...parsed.data, until: 0 });
+          };
+        } catch {
+          db.close();
+          reject(new Error("Temporary photo storage unavailable."));
+          return;
+        }
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onabort = tx.onerror = () => {
+          db.close();
+          reject(new Error("Temporary photo storage unavailable."));
+        };
+      });
+    const closing = this.liveDb
+      ? release(this.liveDb)
+      : this.db
+        ? this.db.then(release, () => undefined)
+        : Promise.resolve();
+    this.closing = closing.finally(() => {
+      this.releaseLock?.();
+      this.releaseLock = undefined;
     });
+    return this.closing;
   }
 }

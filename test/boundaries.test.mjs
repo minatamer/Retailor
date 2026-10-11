@@ -34,6 +34,24 @@ it("rejects client server access, app coupling and computed imports", () => {
       inspectBoundary("apps/frontend/src/features/bad.tsx", source).length,
     ).toBeGreaterThan(0);
 });
+it("distinguishes ordinary workflow property names from private global references", () => {
+  expect(
+    inspectBoundary(
+      "apps/frontend/src/features/workflow.ts",
+      "const stages={process: []}; controller.process(); class Workflow { process() {} }",
+    ),
+  ).toEqual([]);
+  for (const source of [
+    "process.env.KEY",
+    "process?.env.KEY",
+    "globalThis.process.env.KEY",
+    'globalThis["process"].env.KEY',
+    "const {env}=process",
+  ])
+    expect(
+      inspectBoundary("apps/frontend/src/features/workflow.ts", source).length,
+    ).toBeGreaterThan(0);
+});
 
 it("rejects transitive private imports and legacy bare Node imports", () => {
   const sources = new Map([
