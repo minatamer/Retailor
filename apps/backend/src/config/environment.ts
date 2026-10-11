@@ -25,8 +25,16 @@ const EnvironmentSchema = z
       .default("local"),
     FAKE_MODE: bool.default(true),
     PAID_DEMO_ENABLED: bool.default(false),
+    LIVE_POLICY_APPROVED: bool.default(false),
+    PROCESS_BUDGET_MICRO_USD: z.coerce
+      .number()
+      .int()
+      .min(0)
+      .max(100_000_000)
+      .default(0),
     OPENAI_API_KEY: z.string().default(""),
     TURNSTILE_SECRET_KEY: z.string().default(""),
+    TURNSTILE_SITE_KEY: z.string().max(256).default(""),
     GRANT_SIGNING_SECRET: z.string().default(""),
   })
   .superRefine((env, ctx) => {

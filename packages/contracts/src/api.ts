@@ -29,12 +29,14 @@ export const CapabilitySchema = z.strictObject({
     "missing-prerequisites",
     "ready",
     "paid-disabled",
+    "unavailable",
   ]),
 });
 export const CapabilitiesSchema = z.strictObject({
   schemaVersion: z.literal(1),
   mode: ModeSchema,
   paidEnabled: z.boolean(),
+  admissionSiteKey: z.string().max(256).nullable().default(null),
   vision: CapabilitySchema,
   tailor: CapabilitySchema,
   logos: CapabilitySchema,

@@ -38,7 +38,7 @@ export async function validateDerivatives(
       limitInputPixels: PHOTO_LIMITS.derivativeSide ** 2,
       failOn: "warning",
       sequentialRead: true,
-    });
+    }).timeout({ seconds: PHOTO_LIMITS.decodeMs / 1000 });
     const abort = () => decoder.destroy();
     signal?.addEventListener("abort", abort, { once: true });
     try {

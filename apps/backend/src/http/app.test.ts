@@ -3,10 +3,102 @@ import request from "supertest";
 import { parseEnvironment } from "../config/environment.js";
 import { composeRuntime } from "../runtime/compose.js";
 import { createApp } from "./app.js";
+import { PaidAdmission } from "../security/admission.js";
+import { action } from "../../../../test/fixtures/recognition.js";
 function app(env: Record<string, string | undefined> = {}) {
   return createApp(composeRuntime(parseEnvironment(env), () => "req_test"));
 }
 describe("safe runtime composition", () => {
+  it("reports exhausted vision unavailable and rejects another proof before verification", async () => {
+    let checks = 0;
+    const gate = new PaidAdmission({
+      secret: "s".repeat(32),
+      budgetMicroUsd: 1_000_000,
+      challenge: {
+        verify: async () => {
+          checks++;
+          return true;
+        },
+      },
+    });
+    const runtime = composeRuntime(
+      parseEnvironment({
+        FAKE_MODE: "false",
+        PAID_DEMO_ENABLED: "true",
+        LIVE_POLICY_APPROVED: "true",
+        PROCESS_BUDGET_MICRO_USD: "1000000",
+        OPENAI_API_KEY: "injected-test-key",
+        TURNSTILE_SECRET_KEY: "injected-test-key",
+        TURNSTILE_SITE_KEY: "public-test-key",
+        GRANT_SIGNING_SECRET: "s".repeat(32),
+      }),
+      () => "request_test",
+      () => ({ admission: gate, provider: { interpret: async () => ({}) } }),
+    );
+    const app = createApp(runtime);
+    expect((await request(app).get("/v1/config")).body.vision.available).toBe(
+      true,
+    );
+    const value = action(),
+      identity = gate.safety(undefined).identity,
+      grant = await gate.admit(
+        value,
+        "proof",
+        identity,
+        new AbortController().signal,
+      );
+    const lease = gate.begin(value, grant.grant, identity);
+    lease.dispatch();
+    lease.finish();
+    expect((await request(app).get("/v1/config")).body.vision.available).toBe(
+      false,
+    );
+    await expect(
+      gate.admit(
+        action("another"),
+        "proof",
+        identity,
+        new AbortController().signal,
+      ),
+    ).rejects.toThrow("UNAVAILABLE");
+    expect(checks).toBe(1);
+  });
+  it("never constructs live ports until explicit approved policy and budget accompany every prerequisite", () => {
+    const factory = () => {
+      throw new Error("Live factory must remain inert");
+    };
+    const candidate = {
+      FAKE_MODE: "false",
+      PAID_DEMO_ENABLED: "true",
+      OPENAI_API_KEY: "test-key",
+      TURNSTILE_SECRET_KEY: "test-key",
+      TURNSTILE_SITE_KEY: "test-site-key",
+      GRANT_SIGNING_SECRET: "s".repeat(32),
+    };
+    expect(
+      composeRuntime(parseEnvironment(candidate), () => "request", factory)
+        .capabilities.vision.available,
+    ).toBe(false);
+    expect(
+      composeRuntime(
+        parseEnvironment({ ...candidate, LIVE_POLICY_APPROVED: "true" }),
+        () => "request",
+        factory,
+      ).capabilities.vision.available,
+    ).toBe(false);
+    expect(
+      composeRuntime(
+        parseEnvironment({
+          ...candidate,
+          PAID_DEMO_ENABLED: "false",
+          LIVE_POLICY_APPROVED: "true",
+          PROCESS_BUDGET_MICRO_USD: "1000000",
+        }),
+        () => "request",
+        factory,
+      ).capabilities.vision.available,
+    ).toBe(false);
+  });
   it("does not contact providers for liveness/readiness/config", async () => {
     expect((await request(app()).get("/v1/health")).body.service).toBe(
       "retailor-backend",

@@ -18,10 +18,13 @@ const server = createApp(runtime).listen(
   env.APP_ENV === "production" ? "0.0.0.0" : "127.0.0.1",
   () => {
     process.stdout.write(
-      `Retailor backend ready on port ${env.PORT} (${runtime.capabilities.mode}, paid disabled)\n`,
+      `Retailor backend ready on port ${env.PORT} (${runtime.capabilities.mode}, paid ${runtime.capabilities.paidEnabled ? "enabled" : "disabled"})\n`,
     );
   },
 );
+server.requestTimeout = 125_000;
+server.headersTimeout = 10_000;
+server.keepAliveTimeout = 5_000;
 server.on("error", () => {
   process.stderr.write(
     "Retailor backend failed to bind its configured port; no other process was stopped.\n",
