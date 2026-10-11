@@ -458,32 +458,6 @@
   display: grid;
   gap: 7px;
 }
-.photoForm .upload {
-  padding: 20px 12px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 12px;
-  border: 1px dashed var(--platform-control-line);
-  border-radius: 10px;
-  background: var(--platform-soft);
-  text-align: center;
-}
-.upload strong {
-  font-size: 11px;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-.upload > span {
-  font-size: 9px;
-  font-weight: 400;
-  color: var(--platform-muted);
-}
-.upload input {
-  width: 100%;
-  min-height: 44px;
-  font-size: 10px;
-}
 .formNote {
   font-size: 11px;
   line-height: 1.7;

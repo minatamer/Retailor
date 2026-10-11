@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import type { Design } from "@retailor/contracts/design";
 import { Button, Choice } from "../../components/ui/button";
@@ -11,6 +11,9 @@ import {
   type StorePresentation,
 } from "./store-composition";
 import { DashboardSpecimen } from "./dashboard-specimen";
+import { BrowserPhotoCache } from "../photos/cache";
+import { PhotoController } from "../photos/controller";
+import { MandatoryPhotoField } from "../photos/mandatory-photo-field";
 import styles from "./design-lab.module.css";
 
 const REFERENCE_PRODUCTS: readonly StorePresentation[] = [
@@ -423,25 +426,46 @@ export function DesignLab() {
   );
 }
 function PhotoFormSpecimen() {
-  const [name, setName] = useState("");
+  const [ids, setIds] = useState<string[]>([]);
+  const [controller] = useState(() => {
+    const expires = Date.now() + 7_200_000;
+    return new PhotoController({
+      expires,
+      cache: new BrowserPhotoCache(
+        `reference_${crypto.randomUUID()}`,
+        `tab_${crypto.randomUUID()}`,
+        expires,
+      ),
+    });
+  });
+  const photoState = useSyncExternalStore(
+    controller.subscribe,
+    controller.getSnapshot,
+    controller.getSnapshot,
+  );
+  useEffect(() => {
+    controller.activate();
+    return () => controller.dispose();
+  }, [controller]);
   return (
     <form
       className={styles.photoForm}
       onSubmit={(event) => event.preventDefault()}
     >
       <p className={styles.prompt}>Every great product starts with a photo.</p>
-      <label htmlFor="reference-photo" className={styles.upload}>
-        <Icon name="upload" size={27} />
-        <strong>{name || "Choose a product photo"}</strong>
-        <span>JPEG, PNG or WebP · Photo is required</span>
-        <input
-          id="reference-photo"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          required
-          onChange={(event) => setName(event.target.files?.[0]?.name ?? "")}
-        />
-      </label>
+      <MandatoryPhotoField
+        controller={controller}
+        ids={ids}
+        onChange={setIds}
+      />
+      <p className={styles.formNote} role="status">
+        {photoState.notice}
+      </p>
+      {photoState.issues.map((issue, index) => (
+        <p className={styles.formNote} key={index}>
+          {issue.message}
+        </p>
+      ))}
       <label htmlFor="reference-title">Product name</label>
       <input
         id="reference-title"
@@ -450,8 +474,8 @@ function PhotoFormSpecimen() {
         placeholder="Your new everyday favourite"
       />
       <p className={styles.formNote}>
-        Form specimen only. Validated photo handling arrives in RTL-003; product
-        creation arrives in RTL-004/014.
+        Validated photo handling is active. This remains a form specimen;
+        product creation connects in RTL-004/014.
       </p>
       <Button type="submit" disabled>
         Review product <Icon name="arrow" size={16} />
