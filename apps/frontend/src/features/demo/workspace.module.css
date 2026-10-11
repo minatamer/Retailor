@@ -534,6 +534,24 @@
   width: 100%;
   margin-top: 10px;
 }
+.designChoices {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.designChoices button {
+  font-size: 12px;
+  flex: 1;
+}
+.designDetails {
+  margin: 18px 0;
+  font-size: 12px;
+}
+.designDetails summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding-block: 14px;
+}
 .bubble {
   background: var(--platform-soft);
   padding: 18px;

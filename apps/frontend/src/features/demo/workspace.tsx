@@ -2,14 +2,18 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "../../components/ui/button";
+import { Button, Choice } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
 import { PhotoPicker, namedFiles } from "../photos/photo-picker";
 import { SAMPLE } from "../photos/sample";
 import { SessionProvider, useSession } from "../session/context";
 import type { CatalogueProcessor, ProcessStep } from "../session/controller";
 import { CatalogueReview } from "../catalogue/review";
-import { merchantStyle } from "../store-design/presets";
+import { Storefront } from "../storefront/storefront";
+import { storeItems } from "../storefront/browse";
+import type { StorePhoto } from "../storefront/gallery";
+import { TEMPLATES, PALETTES, TYPOGRAPHIES } from "../store-design/presets";
+import type { Design } from "@retailor/contracts/design";
 import { facts, allActivityScope } from "@retailor/commerce/facts";
 import { formatUsd } from "@retailor/commerce/money";
 import type { FactId } from "@retailor/contracts/facts";
@@ -203,6 +207,70 @@ function WorkspaceFlow() {
                     A quiet, photo-first look. Beautiful clothes, room to
                     breathe, and a simple wordmark.
                   </p>
+                  <div
+                    className={styles.designChoices}
+                    aria-label="Tailor template choices"
+                  >
+                    {(Object.keys(TEMPLATES) as Design["template"][]).map(
+                      (template) => (
+                        <Choice
+                          key={template}
+                          selected={state.previewDesign.template === template}
+                          onClick={() =>
+                            controller.design({
+                              ...state.previewDesign,
+                              template,
+                            })
+                          }
+                        >
+                          {TEMPLATES[template].label}
+                        </Choice>
+                      ),
+                    )}
+                  </div>
+                  <details className={styles.designDetails}>
+                    <summary>Try another colour or type</summary>
+                    <p>Colours</p>
+                    <div className={styles.designChoices}>
+                      {(Object.keys(PALETTES) as Design["theme"][]).map(
+                        (theme) => (
+                          <Choice
+                            key={theme}
+                            selected={state.previewDesign.theme === theme}
+                            onClick={() =>
+                              controller.design({
+                                ...state.previewDesign,
+                                theme,
+                              })
+                            }
+                          >
+                            {PALETTES[theme].label}
+                          </Choice>
+                        ),
+                      )}
+                    </div>
+                    <p>Typography</p>
+                    <div className={styles.designChoices}>
+                      {(
+                        Object.keys(TYPOGRAPHIES) as Design["typography"][]
+                      ).map((typography) => (
+                        <Choice
+                          key={typography}
+                          selected={
+                            state.previewDesign.typography === typography
+                          }
+                          onClick={() =>
+                            controller.design({
+                              ...state.previewDesign,
+                              typography,
+                            })
+                          }
+                        >
+                          {TYPOGRAPHIES[typography].label}
+                        </Choice>
+                      ))}
+                    </div>
+                  </details>
                   <Button onClick={() => controller.acceptDesign()}>
                     Use this look <Icon name="arrow" />
                   </Button>
@@ -310,50 +378,34 @@ function Processing({ step }: { step: ProcessStep }) {
   );
 }
 function CollectionCanvas() {
-  const { controller, state } = useSession(),
-    design =
-      state.stage === "style" ? state.previewDesign : state.acceptedDesign;
-  const products = state.graph.products.filter((product) => !product.archived);
+  const { controller, state } = useSession();
+  const items = storeItems(state.graph, controller.photos.availableIds());
+  const photos = new Map<string, StorePhoto>();
+  for (const item of items)
+    for (const id of item.photoIds) {
+      const photo = controller.photos.view(id);
+      if (photo) photos.set(id, { ...photo, id });
+    }
   return (
-    <section className={styles.canvas} style={merchantStyle(design)}>
-      <div className={styles.storeHeader}>
-        <strong>{design.name}</strong>
-        <span>Clothing, considered.</span>
-      </div>
-      <div className={styles.storeIntro}>
-        <span className={styles.eyebrow}>The collection</span>
-        <h1>{design.headline}</h1>
-        <p>{products.length} garments. Your photos, your point of view.</p>
-      </div>
-      <div className={styles.previewGrid}>
-        {(state.stage === "style" ? products.slice(0, 4) : products).map(
-          (product) => {
-            const photo = controller.photos.view(product.imageIds[0]!);
-            return (
-              <article key={product.id}>
-                <div>
-                  {photo ? (
-                    <Image
-                      src={photo.url}
-                      width={photo.photo.derivative.width}
-                      height={photo.photo.derivative.height}
-                      unoptimized
-                      alt={product.title}
-                    />
-                  ) : (
-                    <span>Photo needs repair</span>
-                  )}
-                </div>
-                <h2>{product.title}</h2>
-                <p>
-                  {formatUsd(product.variants[0]!.price)}{" "}
-                  <small>demo USD</small>
-                </p>
-              </article>
-            );
-          },
-        )}
-      </div>
+    <>
+      <Storefront
+        input={{
+          design:
+            state.stage === "style"
+              ? state.previewDesign
+              : state.acceptedDesign,
+          items,
+          photos,
+          browse: state.browse,
+          preview: state.stage === "style",
+        }}
+        actions={{
+          browse: (patch) => controller.browse(patch),
+          photoFailed: (id) => controller.photos.reportUnavailable(id),
+          owner: () =>
+            controller.go(state.stage === "style" ? "catalogue" : "dashboard"),
+        }}
+      />
       {state.stage === "storefront" && (
         <div className={styles.actionBar}>
           <Button variant="secondary" onClick={() => controller.go("style")}>
@@ -364,7 +416,7 @@ function CollectionCanvas() {
           </Button>
         </div>
       )}
-    </section>
+    </>
   );
 }
 function OwnerBaseline() {
@@ -390,9 +442,22 @@ function OwnerBaseline() {
           </h1>
           <p>Your storefront and these figures share one valid record graph.</p>
         </div>
-        <Button variant="secondary" onClick={() => controller.go("storefront")}>
-          View storefront
-        </Button>
+        <div className={styles.actionBar}>
+          {state.draft && (
+            <Button
+              variant="secondary"
+              onClick={() => controller.go("catalogue")}
+            >
+              Review or add garments
+            </Button>
+          )}
+          <Button
+            variant="secondary"
+            onClick={() => controller.go("storefront")}
+          >
+            View storefront
+          </Button>
+        </div>
       </div>
       <p className={styles.assumptions}>
         Synthetic demo activity. This development publication contains opening

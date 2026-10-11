@@ -150,6 +150,8 @@ export function merchantStyle(
     "--store-control-border": palette.controlBorder,
     "--store-focus": palette.focus,
     "--store-image": palette.image,
+    "--store-error": "#922f38",
+    "--store-error-surface": "#fff0f1",
     "--store-heading": type.heading,
     "--store-body": type.body,
     "--store-heading-weight": type.weight,
