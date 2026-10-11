@@ -12,10 +12,8 @@ export function parseUsd(input: string): MoneyResult {
   return { ok: true, value: Number(amount) };
 }
 export function formatUsd(amount: number): string {
-  if (!Number.isSafeInteger(amount) || Math.abs(amount) > MAX_MINOR_AMOUNT)
+  if (!Number.isSafeInteger(amount))
     throw new RangeError("Invalid minor amount");
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount / 100);
+  const cents = BigInt(Math.abs(amount));
+  return `${amount < 0 ? "-" : ""}$${new Intl.NumberFormat("en-US").format(cents / 100n)}.${(cents % 100n).toString().padStart(2, "0")}`;
 }

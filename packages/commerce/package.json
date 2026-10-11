@@ -10,6 +10,34 @@
     "./money": {
       "types": "./dist/money.d.ts",
       "import": "./dist/money.js"
+    },
+    "./allocation": {
+      "types": "./dist/allocation.d.ts",
+      "import": "./dist/allocation.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js"
+    },
+    "./graph": {
+      "types": "./dist/graph.d.ts",
+      "import": "./dist/graph.js"
+    },
+    "./selectors": {
+      "types": "./dist/selectors.d.ts",
+      "import": "./dist/selectors.js"
+    },
+    "./commands": {
+      "types": "./dist/commands.d.ts",
+      "import": "./dist/commands.js"
+    },
+    "./facts": {
+      "types": "./dist/facts.d.ts",
+      "import": "./dist/facts.js"
+    },
+    "./effects": {
+      "types": "./dist/effects.d.ts",
+      "import": "./dist/effects.js"
     }
   },
   "scripts": {

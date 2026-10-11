@@ -21,6 +21,7 @@ describe("exact USD amounts", () => {
   });
   it("formats bounded signed facts", () => {
     expect(formatUsd(-48000)).toBe("-$480.00");
+    expect(formatUsd(Number.MAX_SAFE_INTEGER)).toBe("$90,071,992,547,409.91");
     expect(() => formatUsd(0.1)).toThrow(RangeError);
   });
 });
