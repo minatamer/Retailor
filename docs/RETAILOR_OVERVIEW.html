@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="description" content="A concise product brief for Retailor: product photos, an AI-drafted catalogue, a demo storefront and a connected owner dashboard." />
+    <title>Retailor — the product in one glance</title>
+    <style>
+      :root{--paper:#f6f4ee;--white:#fffefb;--ink:#17212b;--muted:#56616a;--line:#d9ddd9;--blue:#244acb;--blue-soft:#e9edff;--stone:#e9e8e0;--green:#23584d;--radius:18px;--measure:1180px}
+      *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--paper);color:var(--ink);font-family:Segoe UI,Arial,sans-serif;font-size:16px;line-height:1.65}button,a,summary{-webkit-tap-highlight-color:transparent}a{color:var(--blue);text-underline-offset:4px}a:hover{text-decoration-thickness:2px}button{font:inherit}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:5px}button{cursor:pointer}h1,h2,h3,p{margin-top:0}h1,h2{font-family:Georgia,Times New Roman,serif;font-weight:400;letter-spacing:-.045em;line-height:1.08}h1{font-size:clamp(48px,6.3vw,80px);margin-bottom:24px}h2{font-size:clamp(34px,4vw,48px);margin-bottom:18px}h3{font-size:19px;line-height:1.3;letter-spacing:-.02em;margin-bottom:10px}p{margin-bottom:16px}ul{padding-left:20px;margin:0}li+li{margin-top:9px}[hidden]{display:none!important}.wrap{width:min(var(--measure),calc(100% - 64px));margin:auto}.muted{color:var(--muted)}.eyebrow{text-transform:uppercase;font-size:11px;font-weight:700;letter-spacing:.17em;color:var(--muted);margin-bottom:16px}.pill{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border:1px solid var(--line);border-radius:99px;font-size:12px;background:var(--white)}.dot{width:7px;height:7px;background:var(--blue);border-radius:50%}.skip{position:absolute;top:8px;left:8px;transform:translateY(-160%);background:var(--white);padding:10px;z-index:10}.skip:focus{transform:none}
+      .header{border-bottom:1px solid var(--line);background:rgba(246,244,238,.97)}.header-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:82px}.brand{color:var(--ink);font-family:Georgia,serif;font-size:29px;letter-spacing:-.05em;text-decoration:none;display:flex;align-items:center;gap:10px}.brand span{display:block;width:10px;height:10px;background:var(--blue);border-radius:3px}.nav{display:flex;gap:24px;align-items:center;font-size:13px}.nav a{color:var(--muted);text-decoration:none}.nav a:hover{color:var(--blue)}.nav .doc-link{color:var(--blue)}
+      .hero{padding:66px 0 58px;display:grid;grid-template-columns:1.08fr 1fr;gap:70px;align-items:center}.hero .lead{font-size:19px;color:var(--muted);max-width:540px}.hero .eyebrow{margin-top:24px}.hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:26px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 19px;border-radius:9px;border:1px solid var(--blue);font-size:14px;font-weight:600;text-decoration:none;background:var(--blue);color:white}.button.secondary{background:transparent;color:var(--blue)}.hero-note{font-size:12px;color:var(--muted);margin:16px 0 0}.story-art{background:var(--stone);border-radius:24px;padding:26px;position:relative}.art-label{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 15px}.source-row{display:flex;gap:9px}.photo{background:#faf9f5;border:1px solid #d2d5ce;border-radius:9px;width:76px;height:89px;display:grid;place-content:center;text-align:center;box-shadow:0 5px 10px #17212b08}.photo:nth-child(2){transform:rotate(-4deg)}.photo:nth-child(3){transform:rotate(4deg)}.photo svg{width:35px;height:38px;margin:auto;stroke:var(--muted);fill:none;stroke-width:1.3}.photo small{font-size:9px;margin-top:4px;color:var(--muted)}.art-transition{padding:17px 0;display:flex;align-items:center;gap:10px;color:var(--blue);font-size:12px;font-weight:600}.art-transition:before{content:"↓";font-size:22px}.catalogue-chip{border:1px solid var(--line);background:var(--white);border-radius:10px;padding:12px 14px;font-size:13px;display:flex;gap:10px;align-items:center}.chip-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:7px;color:var(--blue);background:var(--blue-soft)}.view-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mini-view{border:1px solid #d5d9d4;border-radius:12px;background:var(--white);padding:14px;min-width:0}.mini-heading{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;margin-bottom:11px}.mini-store-name{font-family:Georgia,serif;font-size:17px;letter-spacing:.08em}.mini-collection{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.mini-product{height:62px;background:#e9e4d8;border-radius:4px}.mini-product:nth-child(2){background:#cbd3dc}.mini-product:nth-child(3){background:#cec8bc}.mini-kpis{display:flex;gap:5px}.mini-kpi{height:22px;flex:1;background:var(--blue-soft);border-radius:4px}.mini-chart{display:flex;gap:6px;align-items:end;height:50px;margin-top:12px;border-bottom:1px solid var(--line)}.mini-chart span{background:var(--blue);flex:1;border-radius:3px 3px 0 0;height:var(--height)}.mini-foot{font-size:9px;color:var(--muted);margin:9px 0 0}.art-caption{font-size:10px;color:var(--muted);margin:15px 0 0}.principles{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0;gap:24px}.principle{display:flex;gap:11px;align-items:start;font-size:13px}.principle strong{display:block;font-size:14px}.principle span{color:var(--muted)}.principle-index{font-size:12px;color:var(--blue);padding-top:4px}
+      section{padding:65px 0;border-bottom:1px solid var(--line)}.section-head{display:grid;grid-template-columns:1fr 1fr;gap:70px;margin-bottom:30px;align-items:end}.section-head p{margin-bottom:3px;color:var(--muted)}.section-no{font-size:11px;letter-spacing:.14em;color:var(--blue);font-weight:700;margin-bottom:10px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.step{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:24px;position:relative}.step-number{display:block;font-family:Georgia,serif;font-size:32px;color:var(--blue);line-height:1;margin-bottom:20px}.step p{font-size:14px;color:var(--muted);margin:0}.step .type{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.09em;margin-top:18px;padding:3px 7px;border-radius:4px;background:var(--blue-soft);color:var(--blue)}.connected{display:flex;align-items:start;gap:16px;background:var(--blue-soft);border-radius:12px;padding:22px 24px;margin-top:20px}.connected-icon{font-size:26px;color:var(--blue);line-height:1.2}.connected p{margin:0;font-size:14px}.connected strong{display:block;margin-bottom:5px}
+      .perspective-switch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.perspective-switch button{border:1px solid var(--line);background:var(--white);color:var(--muted);border-radius:9px;padding:11px 19px;min-height:46px;font-size:14px;font-weight:600}.perspective-switch button[aria-pressed=true]{background:var(--ink);color:white;border-color:var(--ink)}.perspective-panel{display:grid;grid-template-columns:1fr 1fr;gap:36px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:32px}.perspective-panel h3{font-family:Georgia,serif;font-size:29px;font-weight:400}.perspective-panel p,.perspective-panel li{font-size:14px;color:var(--muted)}.scenario-card{border-radius:12px;background:var(--paper);padding:23px;border:1px solid var(--line);align-self:start}.scenario-card .eyebrow{font-size:10px;margin-bottom:13px}.scenario-card p:last-child{margin:0}.trail{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:12px;line-height:1.8}.trail span{border:1px solid var(--line);background:var(--white);border-radius:5px;padding:4px 8px}.trail b{color:var(--blue)}
+      .ai-grid,.scope-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}.ai-card{padding-top:19px;border-top:3px solid var(--blue)}.ai-card .tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}.ai-card p{font-size:14px;color:var(--muted)}.ai-card .control{font-size:12px;padding:12px 14px;background:var(--white);border:1px solid var(--line);border-radius:9px;margin-bottom:0}.trust-line{font-size:14px;color:var(--muted);margin:24px 0 0;max-width:850px}.scope-grid{grid-template-columns:1fr 1fr}.scope-card{border:1px solid var(--line);background:var(--white);padding:26px;border-radius:var(--radius)}.scope-card li{font-size:14px;color:var(--muted)}.scope-card h3{margin-bottom:19px}.scope-card.included{border-top:3px solid var(--green)}.scope-card.later{border-top:3px solid #858c92}
+      .backbone{display:grid;grid-template-columns:1.2fr 1fr;gap:35px}.backbone p{font-size:15px;color:var(--muted)}.reference-chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 20px}.reference-chips span{padding:5px 10px;background:var(--white);border:1px solid var(--line);border-radius:7px;font-size:12px}.stack-diagram{display:flex;flex-direction:column;gap:9px;background:var(--white);border:1px solid var(--line);padding:24px;border-radius:var(--radius)}.stack-box{padding:11px 14px;border:1px solid var(--line);border-radius:8px;font-size:13px}.stack-box strong{display:block}.stack-box small{color:var(--muted)}.stack-arrow{line-height:1;color:var(--blue);padding-left:13px}.stack-note{font-size:11px;color:var(--muted);margin:7px 0 0}details{margin-top:22px;border-top:1px solid var(--line);padding-top:17px}summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--blue);padding:8px 0;min-height:44px}details ul{font-size:13px;color:var(--muted);margin-top:12px}.success{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}.success div{padding-top:14px;border-top:1px solid var(--line)}.success strong{display:block;font-size:15px;margin-bottom:8px}.success p{color:var(--muted);font-size:13px;margin:0}.closing{margin-top:30px;background:var(--ink);color:var(--paper);border-radius:var(--radius);padding:28px 30px;display:flex;justify-content:space-between;align-items:center;gap:24px}.closing p{font-size:14px;color:#cbd1d5;margin:5px 0 0}.closing a{color:white;text-decoration:none;border:1px solid #6c7883;border-radius:8px;padding:10px 16px;font-size:13px;white-space:nowrap;min-height:44px}.footer{display:flex;justify-content:space-between;gap:20px;padding:24px 0 34px;font-size:11px;color:var(--muted)}.footer a{color:var(--muted)}
+      @media(min-width:1500px){.hero{padding-top:85px;padding-bottom:75px}section{padding:75px 0}}
+      @media(max-width:1000px){.hero{gap:35px}.section-head{gap:35px}.nav{gap:15px}.step{padding:20px}.perspective-panel{gap:24px}.success{grid-template-columns:repeat(2,1fr)}}
+      @media(max-width:760px){.wrap{width:calc(100% - 36px)}.header-inner{min-height:74px;flex-wrap:wrap;padding:14px 0;gap:8px}.nav{gap:15px;font-size:12px;flex-wrap:wrap}.hero{grid-template-columns:1fr;gap:30px;padding:35px 0}.hero .lead{font-size:17px}.hero .eyebrow{margin-top:18px}.story-art{max-width:540px;width:100%}.principles{grid-template-columns:1fr;gap:17px}.section-head{grid-template-columns:1fr;gap:5px}.section-head h2{margin-bottom:10px}section{padding:45px 0}.steps{grid-template-columns:repeat(2,1fr)}.perspective-panel,.backbone{grid-template-columns:1fr}.perspective-panel{padding:23px}.ai-grid{grid-template-columns:1fr;gap:25px}.scope-grid{grid-template-columns:1fr}.closing{align-items:start;flex-direction:column}.footer{flex-direction:column;gap:5px}.connected{padding:19px;gap:12px}}
+      @media(max-width:430px){.steps{grid-template-columns:1fr}.step{padding:20px;display:grid;grid-template-columns:34px 1fr;gap:0 15px}.step-number{grid-row:1/4;font-size:29px;margin:0}.step p,.step h3,.step .type{grid-column:2}.step .type{justify-self:start}.success{grid-template-columns:1fr}.story-art{padding:20px}.mini-view{padding:10px}.mini-heading{font-size:10px}.mini-store-name{font-size:15px}.mini-product{height:49px}.hero-actions .button{flex:1;white-space:nowrap}h1{font-size:48px}.nav a{min-height:32px;display:inline-flex;align-items:center}}
+      @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+      @media print{body{background:white;font-size:11pt}.wrap{width:100%}.header,.hero-actions,.perspective-switch,.footer{display:none}.hero{padding:15px 0;gap:25px}h1{font-size:38pt}h2{font-size:25pt}.story-art{padding:18px}.perspective-panel[hidden]{display:grid!important}.perspective-panel{margin-bottom:15px}section{padding:25px 0}.step,.scope-card,.ai-card,.perspective-panel,.closing{break-inside:avoid}.closing{background:#eee;color:#17212b}.closing p{color:#56616a}.closing a{color:#244acb}details ul{display:block}}
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to product brief</a>
+    <header class="header">
+      <div class="wrap header-inner">
+        <a class="brand" href="#main" aria-label="Retailor overview"><span aria-hidden="true"></span>Retailor</a>
+        <nav class="nav" aria-label="Product brief navigation">
+          <a href="#journey">The journey</a>
+          <a href="#experience">Two perspectives</a>
+          <a href="#scope">Scope</a>
+          <a class="doc-link" href="RETAILOR_DEMO_SOURCE_OF_TRUTH.md">Detailed blueprint ↗</a>
+        </nav>
+      </div>
+    </header>
+    <main id="main" class="wrap" tabindex="-1">
+      <div class="hero">
+        <div>
+          <span class="pill"><span class="dot" aria-hidden="true"></span>Product brief · 11 October 2026</span>
+          <p class="eyebrow">AI-assisted ecommerce demo</p>
+          <h1>Bring your products.<br />See your store.</h1>
+          <p class="lead">A batch of product photos becomes a drafted catalogue, a beautiful storefront and a connected owner dashboard.</p>
+          <p class="muted">One guest experience that shows what AI can do for ecommerce — from preparing the products to helping people shop and understand the store.</p>
+          <div class="hero-actions">
+            <a class="button" href="#journey">Walk through the idea <span aria-hidden="true">&nbsp;↓</span></a>
+            <a class="button secondary" href="#scope">See the scope</a>
+          </div>
+          <p class="hero-note">Documentation concept. The application has not been built yet.</p>
+        </div>
+        <div class="story-art" aria-label="Concept diagram: product photos become a catalogue shared by a storefront and an owner dashboard">
+          <p class="art-label">The whole product, at a glance</p>
+          <div class="source-row" aria-hidden="true">
+            <div class="photo"><svg viewBox="0 0 40 40"><path d="M13 5 5 11l5 9 4-3v19h13V17l4 3 5-9-9-6c-3 5-10 5-14 0Z" /></svg><small>PRODUCT</small></div>
+            <div class="photo"><svg viewBox="0 0 40 40"><path d="M12 5h17l-2 31h-8l1-20-3 20H9Z" /><path d="M12 10h17" /></svg><small>ALTERNATE</small></div>
+            <div class="photo"><svg viewBox="0 0 40 40"><rect x="7" y="10" width="26" height="21" rx="2" /><path d="m10 27 8-9 5 6 4-4 4 7" /><circle cx="26" cy="15" r="2" /></svg><small>DETAIL</small></div>
+          </div>
+          <div class="art-transition">AI drafts and groups the products</div>
+          <div class="catalogue-chip"><span class="chip-icon" aria-hidden="true">✓</span><span>One reviewable catalogue · your photos, your edits</span></div>
+          <div class="art-transition">Explore both sides of the same store</div>
+          <div class="view-cards">
+            <div class="mini-view">
+              <div class="mini-heading"><span class="mini-store-name">FORME</span><span>Storefront</span></div>
+              <div class="mini-collection" aria-hidden="true"><div class="mini-product"></div><div class="mini-product"></div><div class="mini-product"></div></div>
+              <p class="mini-foot">Browse · ask · place a demo order</p>
+            </div>
+            <div class="mini-view">
+              <div class="mini-heading"><span>Owner workspace</span><span aria-hidden="true">↗</span></div>
+              <div class="mini-kpis" aria-hidden="true"><div class="mini-kpi"></div><div class="mini-kpi"></div><div class="mini-kpi"></div></div>
+              <div class="mini-chart" aria-hidden="true"><span style="--height:35%"></span><span style="--height:66%"></span><span style="--height:48%"></span><span style="--height:84%"></span><span style="--height:62%"></span><span style="--height:95%"></span></div>
+              <p class="mini-foot">Sales · orders · stock · evidence</p>
+            </div>
+          </div>
+          <p class="art-caption">Illustrative layout, not a working store or measured sales data.</p>
+        </div>
+      </div>
+      <div class="principles" aria-label="Core product principles">
+        <div class="principle"><div class="principle-index">01</div><div><strong>Easy to enter</strong><span>No signup or required product typing.</span></div></div>
+        <div class="principle"><div class="principle-index">02</div><div><strong>AI drafts. People decide.</strong><span>Reviewable products and explicit approvals.</span></div></div>
+        <div class="principle"><div class="principle-index">03</div><div><strong>Connected, coherent demo</strong><span>The same products, orders and stock in both views.</span></div></div>
+      </div>
+
+      <section id="journey" aria-labelledby="journey-title">
+        <div class="section-head">
+          <div><p class="section-no">01 / The visitor journey</p><h2 id="journey-title">From photos to<br />a store you can explore.</h2></div>
+          <p>The landing explains the promise and offers <strong>Try demo</strong>. The sample should make the result easy to reach, with a complete guided visit in roughly five minutes.</p>
+        </div>
+        <div class="steps">
+          <article class="step"><span class="step-number">1</span><h3>Choose the photos</h3><p>Use the FORME sample collection or upload your own product images. Inspect them before processing.</p><span class="type">Sample or upload</span></article>
+          <article class="step"><span class="step-number">2</span><h3>Draft the catalogue</h3><p>AI suggests product groups, names, visible details and useful categories. Demo prices, stock and size options are clearly identified.</p><span class="type">Primary AI moment</span></article>
+          <article class="step"><span class="step-number">3</span><h3>Review or continue</h3><p>See the drafted cards and their source images. Rename, split or merge items if needed — no lengthy merchant form.</p><span class="type">Optional correction</span></article>
+          <article class="step"><span class="step-number">4</span><h3>Explore the storefront</h3><p>Browse an editorial collection, compare views, choose options and ask the shopping assistant for help.</p><span class="type">Shopper perspective</span></article>
+          <article class="step"><span class="step-number">5</span><h3>Place a demo order</h3><p>Review the bag and complete sample cost. Confirm a simulated purchase without card or personal delivery details.</p><span class="type">Real local interaction</span></article>
+          <article class="step"><span class="step-number">6</span><h3>Try the dashboard</h3><p>Find that same order, see its stock effect and inspect the figures. Explore returns, refunds, inventory and feedback.</p><span class="type">Owner perspective</span></article>
+        </div>
+        <div class="connected"><span class="connected-icon" aria-hidden="true">↔</span><p><strong>The signature connected moment</strong>Place an order in the store. Switch to the dashboard. Open the exact order and stock movement behind the changed figures. Everything belongs to one temporary workspace.</p></div>
+      </section>
+
+      <section id="experience" aria-labelledby="experience-title">
+        <div class="section-head">
+          <div><p class="section-no">02 / What people will see</p><h2 id="experience-title">A desirable store.<br />An understandable business.</h2></div>
+          <p>The landing previews both experiences and the photos-to-store transformation. Once inside, <strong>Try the dashboard</strong> and <strong>View storefront</strong> make switching obvious.</p>
+        </div>
+        <div class="perspective-switch" aria-label="Choose a perspective to read about" hidden>
+          <button type="button" aria-pressed="true" aria-controls="shopper-panel" data-perspective="shopper">Storefront</button>
+          <button type="button" aria-pressed="false" aria-controls="owner-panel" data-perspective="owner">Owner dashboard</button>
+        </div>
+        <div id="shopper-panel" class="perspective-panel" aria-labelledby="shopper-heading">
+          <div><h3 id="shopper-heading">A fashion collection worth browsing.</h3><ul><li>Strong imagery, alternate views, zoom and quick view.</li><li>Useful filters and category-appropriate size options.</li><li>A shopping assistant that uses actual catalogue products.</li><li>A clear bag, complete sample totals and demo checkout.</li></ul></div>
+          <div class="scenario-card"><p class="eyebrow">Example shopping moment</p><p>“Build a look under $150, including delivery.”</p><p>A $54 shirt, $68 trousers and $22 belt make $144 in merchandise. With $6 demo delivery, the reviewed total is <strong>$150</strong>.</p><p>The visitor can swap a piece and approve the bag. The assistant does not buy anything automatically.</p></div>
+        </div>
+        <div id="owner-panel" class="perspective-panel" aria-labelledby="owner-heading">
+          <div><h3 id="owner-heading">Useful operations behind the collection.</h3><ul><li>Sales, orders, average order value and fulfilment attention.</li><li>Charts that open their supporting records and formulas.</li><li>Separate returns, refunds and stock movements.</li><li>Synthetic feedback and an assistant that explains the evidence.</li></ul></div>
+          <div class="scenario-card"><p class="eyebrow">Example owner moment</p><p>“Why did this item's stock change?”</p><div class="trail" aria-label="Evidence trail"><span>Stock figure</span><b aria-hidden="true">→</b><span>Movement</span><b aria-hidden="true">→</b><span>Demo order</span></div><p style="margin-top:14px">The answer points to known records. A return does not automatically issue a refund, and a refund does not automatically restock an item.</p></div>
+        </div>
+      </section>
+
+      <section id="ai" aria-labelledby="ai-title">
+        <div class="section-head">
+          <div><p class="section-no">03 / Where AI earns its place</p><h2 id="ai-title">Three useful roles.<br />Clear human control.</h2></div>
+          <p>OpenAI is the intended provider. The app checks the result and calculates the business facts; the visitor controls changes and confirmations.</p>
+        </div>
+        <div class="ai-grid">
+          <article class="ai-card"><p class="tag">Create</p><h3>Catalogue agent</h3><p>Groups supplied photos and drafts product titles, categories and grounded copy. Unknown facts stay unknown.</p><p class="control">Visitor reviews the draft and opens the store.</p></article>
+          <article class="ai-card"><p class="tag">Shop</p><h3>Shopping assistant</h3><p>Compares products, suggests looks within budget and prepares a bag using current options and demo stock.</p><p class="control">Visitor approves additions and the demo order.</p></article>
+          <article class="ai-card"><p class="tag">Operate</p><h3>Owner assistant</h3><p>Explains current figures, opens supporting records and prepares improved catalogue copy from known facts.</p><p class="control">Visitor reviews edits in a real form before applying.</p></article>
+        </div>
+        <p class="trust-line"><strong>Honest by design:</strong> photographs cannot prove materials, measurements, stock or past sales. Prepared sample interpretation is labelled; live image analysis is explicit. All commerce history is synthetic.</p>
+      </section>
+
+      <section id="scope" aria-labelledby="scope-title">
+        <div class="section-head">
+          <div><p class="section-no">04 / The first build</p><h2 id="scope-title">A complete demo,<br />with a deliberate scope.</h2></div>
+          <p>The goal is to show clients a reusable ecommerce foundation and a coherent AI experience. Production integrations are separately scoped.</p>
+        </div>
+        <div class="scope-grid">
+          <article class="scope-card included"><h3>In this demo</h3><ul><li>Landing, sample/upload intake and reviewable catalogue.</li><li>Polished storefront, shopping help and simulated checkout.</li><li>Connected dashboard, orders, inventory, returns and refunds.</li><li>Inspectable figures, synthetic feedback and owner assistance.</li><li>Temporary guest recovery, JSON export and reset.</li></ul></article>
+          <article class="scope-card later"><h3>Separately scoped later</h3><ul><li>Payment processing, real refunds and shipping/carrier APIs.</li><li>Shopify or other commerce-platform integrations.</li><li>Merchant accounts, organizations and persistent business data.</li><li>Public store publishing, custom store domains and subscriptions.</li><li>Virtual try-on, generated worn photos and advanced site building.</li></ul></article>
+        </div>
+      </section>
+
+      <section id="backbone" aria-labelledby="backbone-title">
+        <div class="section-head">
+          <div><p class="section-no">05 / The delivery foundation</p><h2 id="backbone-title">The same proven<br />demo backbone.</h2></div>
+          <p>Inspired by direct exploration of ClipBuilder, ScreenPilot and Retrosum, with the framework, repository approach and deployment tool family carried forward.</p>
+        </div>
+        <div class="backbone">
+          <div>
+            <div class="reference-chips"><span>ClipBuilder</span><span>ScreenPilot</span><span>Retrosum</span></div>
+            <p><strong>One frontend. One private backend. Shared rules.</strong> The store and dashboard use the same exact commerce engine. AI processing stays behind the private API; provider keys stay off the browser.</p>
+            <p>The guest workspace has a fixed two-hour lifetime. There is no hosted business database or upload library in the first demo. Approved live processing sends selected image previews and relevant context to the provider.</p>
+            <p>Development starts with deterministic fakes and paid AI disabled. Live use is deliberately enabled, bounded and measured.</p>
+            <details><summary>Show the planned technology and folder shape</summary><ul><li><strong>Framework:</strong> Node, pnpm, strict TypeScript, Next.js/React, Express and Zod.</li><li><strong>Repository:</strong> apps/frontend, apps/backend, packages/contracts and packages/commerce; focused docs, scripts and tests.</li><li><strong>Hosting:</strong> Docker, Google Cloud Run, Artifact Registry and Secret Manager; Cloudflare for chosen domain/challenge setup.</li><li><strong>Release:</strong> unpaid quality checks and an owner-controlled immutable frontend/backend image pair.</li></ul></details>
+          </div>
+          <div class="stack-diagram" aria-label="Planned architecture: visitor to frontend to private API to OpenAI">
+            <div class="stack-box"><strong>Visitor's browser</strong><small>Photos · guest workspace · store + dashboard</small></div>
+            <div class="stack-arrow" aria-hidden="true">↓</div>
+            <div class="stack-box"><strong>Public frontend</strong><small>Next.js · same-origin private API bridge</small></div>
+            <div class="stack-arrow" aria-hidden="true">↓</div>
+            <div class="stack-box"><strong>Private backend</strong><small>Express · validation · paid-action controls</small></div>
+            <div class="stack-arrow" aria-hidden="true">↓</div>
+            <div class="stack-box"><strong>OpenAI</strong><small>Bounded catalogue and assistant requests</small></div>
+            <p class="stack-note">Proposed architecture. No services have been deployed for Retailor.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="success" aria-labelledby="success-title">
+        <div class="section-head">
+          <div><p class="section-no">06 / What a successful demo proves</p><h2 id="success-title">A result people<br />can see and trust.</h2></div>
+          <p>A complete visit should demonstrate useful AI, polished product design and connected business behavior — with clear limits and recovery.</p>
+        </div>
+        <div class="success">
+          <div><strong>Easy to understand</strong><p>The promise is clear on the landing. A sample visit fits roughly five minutes.</p></div>
+          <div><strong>Useful AI output</strong><p>The selected photos produce reviewable products; assistants use known evidence.</p></div>
+          <div><strong>Connected operations</strong><p>A demo order changes the matching stock and dashboard once, with inspectable records.</p></div>
+          <div><strong>Polished and recoverable</strong><p>Phone, keyboard and touch work. Refresh, failures, reset and expiry behave clearly.</p></div>
+        </div>
+        <div class="closing"><div><strong>Documentation now. Implementation planning next.</strong><p>The detailed blueprint defines the flows, architecture, rules and acceptance. No implementation tickets are created yet.</p></div><a href="RETAILOR_DEMO_SOURCE_OF_TRUTH.md">Read the full blueprint ↗</a></div>
+      </section>
+    </main>
+    <footer class="wrap footer"><span>Retailor · Retail, tailored to your brand.</span><span>Product planning overview · <a href="retailor.html">Original concept preview</a> · <a href="RETAILOR_DEMO_SOURCE_OF_TRUTH.md">Source of truth</a></span></footer>
+    <script>
+      const perspectiveButtons = Array.from(document.querySelectorAll('[data-perspective]'));
+      document.querySelector('.perspective-switch').hidden = false;
+      document.getElementById('owner-panel').hidden = true;
+      perspectiveButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const selected = button.dataset.perspective;
+          perspectiveButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+          document.getElementById('shopper-panel').hidden = selected !== 'shopper';
+          document.getElementById('owner-panel').hidden = selected !== 'owner';
+        });
+      });
+    </script>
+  </body>
+</html>
