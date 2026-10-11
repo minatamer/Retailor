@@ -27,10 +27,22 @@ it("requires a photo and clothing category for every product", () => {
     title: "Shirt",
     description: "",
     category: "shirts",
-    price: 5400,
-    unitCost: 2700,
     imageIds: ["photo"],
-    variants: [{ id: "small", size: "S", colour: "Cream", stock: 3 }],
+    variants: [
+      {
+        id: "small",
+        size: "S",
+        colour: "Cream",
+        sku: "SHIRT-S",
+        openingStock: 3,
+        openedAt: "2026-10-11T00:00:00.000Z",
+        price: 5400,
+        unitCost: 2700,
+        archived: false,
+      },
+    ],
+    sizingSystemId: "alpha-demo",
+    attributes: [],
     archived: false,
   };
   expect(ProductSchema.safeParse(value).success).toBe(true);

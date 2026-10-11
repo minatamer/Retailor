@@ -30,6 +30,18 @@
     "./raster": {
       "types": "./dist/raster.d.ts",
       "import": "./dist/raster.js"
+    },
+    "./commerce": {
+      "types": "./dist/commerce.d.ts",
+      "import": "./dist/commerce.js"
+    },
+    "./commands": {
+      "types": "./dist/commands.d.ts",
+      "import": "./dist/commands.js"
+    },
+    "./facts": {
+      "types": "./dist/facts.d.ts",
+      "import": "./dist/facts.js"
     }
   },
   "scripts": {
