@@ -1,6 +1,6 @@
 # RTL-007 — Deliver three complete clothing-store template families
 
-Status: **Planned — not started**\
+Status: **Locally complete — final matrix, physical/zoom and owner visual acceptance pending**\
 Planning date: **11 October 2026**\
 Milestone: **Storefront showcase**\
 Depends on: [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md), [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md)\
@@ -23,12 +23,12 @@ Dependency completion means required local behavior, owning contracts and checks
 
 ## Files and responsibility boundaries
 
-| Area | Responsibility owned here |
-| --- | --- |
-| `apps/frontend/src/features/storefront` | Three family renderers, shared shopping surfaces and product selectors |
-| `apps/frontend/src/features/store-design` | Finite bundle/theme/type mapping |
-| `apps/frontend/src/components/ui` | Stable gallery, option, card and empty-state primitives where truly shared |
-| `docs/design/STOREFRONT-LIBRARY.md` | Family rationale, capability matrix and actual visual evidence |
+| Area                                      | Responsibility owned here                                                  |
+| ----------------------------------------- | -------------------------------------------------------------------------- |
+| `apps/frontend/src/features/storefront`   | Three family renderers, shared shopping surfaces and product selectors     |
+| `apps/frontend/src/features/store-design` | Finite bundle/theme/type mapping                                           |
+| `apps/frontend/src/components/ui`         | Stable gallery, option, card and empty-state primitives where truly shared |
+| `docs/design/STOREFRONT-LIBRARY.md`       | Family rationale, capability matrix and actual visual evidence             |
 
 Paths describe future ownership. Create modules/directories only with real behavior; reuse contracts, commands, assets and session state rather than a parallel authority.
 
@@ -56,27 +56,27 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Three coherent families each implement home, collection and detail.
-- [ ] Actual current products/photos/variants drive every surface.
-- [ ] All families have equal search/filter/detail/bag integration capability.
-- [ ] Four themes and three actual type presets apply semantic states consistently.
-- [ ] Price/stock/size and unknown facts stay clear and truthful.
-- [ ] Galleries/zoom support keyboard/touch and never invent alternate photos.
-- [ ] Archive/missing-photo/empty/sold-out/no-match states have useful polished paths.
-- [ ] Changing look preserves product context, catalogue and commerce state.
-- [ ] Actual representative visual evidence is recorded and inferior combinations are corrected.
+- [x] Three coherent families each implement home, collection and detail.
+- [x] Actual current products/photos/variants drive every surface.
+- [x] All families have equal search/filter/detail/bag integration capability.
+- [x] Four themes and three actual type presets apply semantic states consistently.
+- [x] Price/stock/size and unknown facts stay clear and truthful.
+- [x] Galleries/zoom support keyboard/touch and never invent alternate photos.
+- [x] Archive/missing-photo/empty/sold-out/no-match states have useful polished paths.
+- [x] Changing look preserves product context, catalogue and commerce state.
+- [x] Actual representative visual evidence is recorded and inferior combinations are corrected.
 
 ## Focused verification and evidence
 
-| Case | Required observable evidence |
-| --- | --- |
-| Same item across all families | Identical product ID, price, photo and availability |
-| 36-look registry | Finite IDs and actual presets render without arbitrary styles |
-| Image/option edge | One photo, long label, sold-out size and missing bytes remain honest |
-| Filter comparison | Applied chips/counts match known current catalogue |
-| Responsive detail | Sticky purchase region and chat do not obscure each other |
-| Gallery/zoom | Keyboard/touch opening, navigation and focus restoration |
-| Empty store | Clear create/repair route instead of unrelated sample content |
+| Case                          | Required observable evidence                                         |
+| ----------------------------- | -------------------------------------------------------------------- |
+| Same item across all families | Identical product ID, price, photo and availability                  |
+| 36-look registry              | Finite IDs and actual presets render without arbitrary styles        |
+| Image/option edge             | One photo, long label, sold-out size and missing bytes remain honest |
+| Filter comparison             | Applied chips/counts match known current catalogue                   |
+| Responsive detail             | Sticky purchase region and chat do not obscure each other            |
+| Gallery/zoom                  | Keyboard/touch opening, navigation and focus restoration             |
+| Empty store                   | Clear create/repair route instead of unrelated sample content        |
 
 Run meaningful focused tests during iteration. At the settled implementation snapshot run the applicable root gates established by RTL-001: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm check:boundaries`, `pnpm test:unit` and `pnpm build`. Record actual commands/results and revision. UI acceptance needs real browser observations where available; DOM simulations or animation declarations alone do not prove appearance/movement. Do not add tests that merely mirror CSS or static labels.
 
@@ -101,3 +101,7 @@ No independent page mixing, freeform builder, uploaded fonts, runtime CSS genera
 Keep this outcome under `RTL-007:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-007.md` and actual check/review evidence under `docs/validation/RTL-007.md`. These are future records, not fabricated by this planning pass.
 
 Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+
+## Execution evidence — 11 October 2026
+
+All required local criteria are implemented and read-only validation pass 2 reports no actionable findings. See [the library](../design/STOREFRONT-LIBRARY.md), [validation record](../validation/RTL-007.md) and [file allocation](../commit-plans/RTL-007.md). Actual browser evidence covers 63 view/width combinations, gallery focus/navigation, filtering/recovery and the corrected owner/deep-card paths. This is local development evidence with real image bytes; paid recognition, owner aesthetics, physical/zoom and full 36-look final acceptance remain explicitly pending with their owning tickets. Bag/currency callbacks are ready for RTL-010/009 and create no fake financial effects.

@@ -1,0 +1,2508 @@
+[
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 305,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 320
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 305,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 320
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 305,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 320
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 360,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 375
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 360,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 375
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 360,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 375
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 753,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 768
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 753,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 768
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 753,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 768
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1009,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 1024
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1009,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 1024
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1009,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1024
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1265,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 1280
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1265,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 1280
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1265,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1280
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1425,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 1440
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1425,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 1440
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1425,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1440
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1905,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 1920
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1905,
+    "prices": [
+      "$68.00",
+      "$74.00"
+    ],
+    "selected": [],
+    "width": 1920
+  },
+  {
+    "family": "gallery",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1905,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1920
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 305,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 320
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": true
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": true
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": true
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": true
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 305,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 320
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 305,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 320
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 360,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 375
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": true
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": true
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": true
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": true
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 360,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 375
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 360,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 375
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 753,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 768
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": true
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": true
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": true
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": true
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 753,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 768
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 753,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 768
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1009,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 1024
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": true
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": true
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": false
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": false
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": false
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1009,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 1024
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1009,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1024
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1265,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 1280
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": true
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": true
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": true
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": true
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1265,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 1280
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1265,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1280
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1425,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 1440
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": true
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": true
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": true
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": true
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1425,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 1440
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1425,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1440
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1905,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 1920
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": true
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": true
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": true
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": true
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": true
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1905,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 1920
+  },
+  {
+    "family": "pulse",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1905,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1920
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 305,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 320
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": false
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": false
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": false
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": false
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": false
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 305,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 320
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 305,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 320
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 360,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 375
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": false
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": false
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": false
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": false
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": false
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 360,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 375
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 360,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 375
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 753,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 768
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": false
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": false
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": false
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": false
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": false
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 753,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 768
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 753,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 768
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1009,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 1024
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": false
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": false
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": false
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": false
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": false
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1009,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 1024
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1009,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1024
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1265,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 1280
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": false
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": false
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": false
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": false
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": false
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1265,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 1280
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1265,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1280
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1425,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 1440
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": false
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": false
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": false
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": false
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": false
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1425,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 1440
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1425,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1440
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      }
+    ],
+    "page": "Home",
+    "pageWidth": 1905,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00"
+    ],
+    "selected": [],
+    "width": 1920
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Wide-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Pullover hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Zip hoodie",
+        "loaded": true
+      },
+      {
+        "alt": "Everyday tee",
+        "loaded": true
+      },
+      {
+        "alt": "Boxy tee",
+        "loaded": true
+      },
+      {
+        "alt": "Button-front shirt",
+        "loaded": true
+      },
+      {
+        "alt": "Overshirt",
+        "loaded": true
+      },
+      {
+        "alt": "Tailored trousers",
+        "loaded": true
+      },
+      {
+        "alt": "Single-breasted blazer",
+        "loaded": true
+      },
+      {
+        "alt": "Knit cardigan",
+        "loaded": false
+      },
+      {
+        "alt": "Midi dress",
+        "loaded": false
+      },
+      {
+        "alt": "A-line skirt",
+        "loaded": false
+      },
+      {
+        "alt": "Resort shorts",
+        "loaded": false
+      },
+      {
+        "alt": "Swim shorts",
+        "loaded": false
+      }
+    ],
+    "page": "Collection",
+    "pageWidth": 1905,
+    "prices": [
+      "$68.00",
+      "$74.00",
+      "$64.00",
+      "$72.00",
+      "$38.00",
+      "$42.00",
+      "$54.00",
+      "$78.00",
+      "$82.00",
+      "$128.00",
+      "$86.00",
+      "$96.00",
+      "$58.00",
+      "$48.00",
+      "$44.00"
+    ],
+    "selected": [],
+    "width": 1920
+  },
+  {
+    "family": "studio",
+    "images": [
+      {
+        "alt": "Straight-leg jeans",
+        "loaded": true
+      },
+      {
+        "alt": "Straight-leg jeans, close-up",
+        "loaded": true
+      }
+    ],
+    "page": "Product",
+    "pageWidth": 1905,
+    "prices": [
+      "$68.00"
+    ],
+    "selected": [
+      "30/30"
+    ],
+    "width": 1920
+  }
+]

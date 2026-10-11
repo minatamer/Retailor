@@ -1953,7 +1953,7 @@ Record what was actually checked separately from owner reports and planned setti
 
 ## 27. Implementation sequence and ticket map
 
-The owner has authorized detailed ticket planning. The [canonical queue](tickets/README.md) contains 22 complete, reviewable outcomes with standalone context, dependencies, ownership, implementation plans, acceptance and failure/evidence matrices. All are planned; implementation is underway in fake mode; paid and hosted acceptance remain pending. The storefront design library remains an early dependency because it defines the main promise.
+The owner has authorized detailed ticket planning. The [canonical queue](tickets/README.md) contains 22 complete, reviewable outcomes with standalone context, dependencies, ownership, implementation plans, acceptance and failure/evidence matrices. RTL-001–007 have verified local implementation; remaining packets are planned. Paid, full visual/device and hosted acceptance remain pending in their named validation records. The storefront design library remains an early dependency because it defines the main promise.
 
 | Phase | Planned packets | Concrete outcome |
 | --- | --- | --- |
@@ -1971,7 +1971,7 @@ The owner has authorized detailed ticket planning. The [canonical queue](tickets
 | Linux release preparation | [RTL-021](tickets/RTL-021-package-linux-services-and-manual-release-runbook.md) | Reproducible images, fixed private bridge, concrete manual deploy and rollback plan; independent of paid evaluation. |
 | Owner-authorized hosted release | [RTL-022](tickets/RTL-022-deploy-verify-hosted-demo-and-record-rollback.md) | Exact accepted artifacts, actual private IAM/origins, HTTPS walkthrough, usage evidence and recovery readiness. |
 
-RTL-001–006 have verified local completion. RTL-007 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
+RTL-001–007 have verified local completion. RTL-008 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
 
 The first complete local path may use declared development fixtures, but public acceptance requires fresh live recognition for sample and uploads. Security and cleanup start with the first owning feature; later hardening and lifecycle packets complete the combined surface. Optional logo generation follows a polished wordmark path. Domain integrity keeps charts connected to actual products; design evidence proves that all accepted storefront choices look excellent.
 

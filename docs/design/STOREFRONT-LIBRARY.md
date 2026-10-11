@@ -1,0 +1,53 @@
+# Retailor storefront library
+
+RTL-007 local implementation, 11 October 2026. One renderer consumes the published catalogue projection, available photo views, finite design and owned browsing state. No template stores its own inventory, prices, products or sales. The public catalogue still requires fresh live recognition; all browser evidence below uses the explicitly labelled development fixture with real FORME image bytes and paid calls disabled.
+
+## Three coherent families
+
+| Family  | Home                                                                                                     | Collection                                                          | Product detail                                                                              |
+| ------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Studio  | Editorial image/copy split, category entrances, four-item opening selection                              | Balanced three-column rhythm, two columns on phones                 | Contained real photograph beside clear purchasing/options column; stacked on phones         |
+| Pulse   | Solid action-colour campaign panel, confident heading and product crop                                   | Denser four-column rhythm; three on medium widths and two on phones | Compact purchasing panel, sticky on sufficiently wide previews; natural scrolling on phones |
+| Gallery | Centered brand story and staggered product-image pairing; one-photo catalogue expands the single feature | Spacious two-column gallery                                         | Generous contained photograph and calm detail column; stacked on phones                     |
+
+Container queries use the storefront's actual width, including the narrower preview beside Tailor. A laptop viewport does not force a two-column detail into a narrow preview. Motion uses bounded opacity/transform entrances, real image interactions, hover/focus treatments and palette transitions. No animation-suppression settings were added. Native dialogs reserve viewport space and allow natural scrolling at short heights. Phone purchasing regions stay in flow rather than covering content or future chat.
+
+These are Retailor compositions, informed by the [blueprint research register](../RETAILOR_DEMO_SOURCE_OF_TRUTH.md#appendix-f--design-and-dashboard-research): editorial photo framing, campaign clarity, useful list filters and readable garment-size discovery. No brand assets, conversion guarantees or popularity rankings were imported.
+
+## Equal capabilities, actual records
+
+All three families share search, clothing category, known colour, real size label, exact USD price bounds, in-stock filters, collection/price/title sorting, removable chips, result count and clear/no-match recovery. Combined option filters must match the same variant, including stock and price. Colour placeholders never become claimed known colours. Waist/inseam labels remain distinct from alpha sizing.
+
+Current stock comes from the domain selector's opening inventory and movements. Cards use current active variant prices and available photos. Archived products leave collection results but a previously selected archived identity shows its honest unavailable detail. Missing photo bytes disable purchasing and expose the owner repair route; the workspace keeps exact photo identity for repair. With no active options, a current product still appears honestly without a purchasable price. Unknown material/care/fit facts remain unknown; draft facts are labelled awaiting confirmation.
+
+The gallery uses only actual supplied available images. One image is complete and explicitly described as one photograph. Real alternate buttons, close-up, previous/next, arrow keys, Escape, native dialog containment and focus return share the same implementation. Image geometry is reserved. Detail uses containment to inspect the actual garment; family-specific home/card crops provide visual rhythm without generating an extra photograph.
+
+Four full palettes—Ink/Paper, Cobalt/Cloud, Oxblood/Blush, Pine/Sand—and three self-hosted licensed presets—Inter, DM Serif/DM Sans, Manrope/DM Sans—use the RTL-002 tokens/fonts. Merchant scope covers canvas/surface/text/muted/action/hover/selection/borders/focus/image and independent error feedback. Disabled controls retain text/state meaning; selected and sold-out options have labels in addition to colour. Store names/headlines are bounded plain text, rendered through React without HTML injection.
+
+`Projection.browse` preserves page, product/variant identity, filters and sorting across design changes, perspective changes and eligible same-tab recovery. Older valid projections default to Home. Styling updates never invoke providers or alter graph, product IDs, historical records or the future bag. Gallery photo selection belongs to the mounted product presentation and survives palette/template updates. All family pages are one bundled template ID.
+
+## Integration handoff
+
+- RTL-008 replaces the initial Tailor choice surface with paced chat microsteps and owner preview/apply/cancel controls. The renderer is already the real preview.
+- RTL-009 connects the common money formatter and price-filter projection to a dated USD/EUR snapshot.
+- RTL-010 supplies the shared `openBag`/`addToBag(productId, variantId, quantity)` callbacks and exact domain confirmation. The renderer presently disables shopping actions without those callbacks and creates no pretend order or stock effect.
+- RTL-011/014 connect owner product create/repair operations and actual archive/stock changes. Empty/missing-photo paths already reach the owner workspace or garment review during setup.
+- RTL-017 can reuse these complete families for its authored landing transformation; runtime product photographs are not generated.
+
+## Actual browser evidence
+
+Windows local IAB, Retailor frontend 4310/backend 4311. Eighteen phone/laptop screenshots cover Home/Collection/Product for Studio Ink/Editorial, Pulse Cobalt/Manrope and Gallery Oxblood/Inter. [Viewport observations](evidence/RTL-007/viewport-observations.json) record 63 real browser views: three families × three pages × widths 320, 375, 768, 1024, 1280, 1440 and 1920. No horizontal page overflow was observed. This geometric check does not declare all compositions aesthetically approved.
+
+The same selected jeans retained $68.00, 30/30 and 10 available units through family/theme/type changes, preview acceptance and reload. Jeans filtering returned the two actual jeans with removable chips; clearing no-match search restored the actual catalogue. A 320 × 430 filter dialog remained scrollable and closed with Escape. A one-photo close-up returned focus to its opener. A separate two-image probe supplied the original F01 and a smaller PNG encoding of that same actual photograph, merged them explicitly in review, then verified thumbnail selection, arrow navigation, next action and focus return. It proves actual supplied-image interaction, not AI grouping accuracy or different camera-angle photography.
+
+| Family  | Laptop                                                                                                                                                           | Phone                                                                                                                                                         |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Studio  | [Home](evidence/RTL-007/studio-home-1280.png), [collection](evidence/RTL-007/studio-collection-1280.png), [product](evidence/RTL-007/studio-product-1280.png)    | [Home](evidence/RTL-007/studio-home-320.png), [collection](evidence/RTL-007/studio-collection-320.png), [product](evidence/RTL-007/studio-product-320.png)    |
+| Pulse   | [Home](evidence/RTL-007/pulse-home-1280.png), [collection](evidence/RTL-007/pulse-collection-1280.png), [product](evidence/RTL-007/pulse-product-1280.png)       | [Home](evidence/RTL-007/pulse-home-320.png), [collection](evidence/RTL-007/pulse-collection-320.png), [product](evidence/RTL-007/pulse-product-320.png)       |
+| Gallery | [Home](evidence/RTL-007/gallery-home-1280.png), [collection](evidence/RTL-007/gallery-collection-1280.png), [product](evidence/RTL-007/gallery-product-1280.png) | [Home](evidence/RTL-007/gallery-home-320.png), [collection](evidence/RTL-007/gallery-collection-320.png), [product](evidence/RTL-007/gallery-product-320.png) |
+
+Deep collection selections now focus the new page and smoothly bring the storefront frame into view, while look/variant changes preserve position. The owner baseline exposes the direct saved-catalogue review/photo-add route.
+
+Additional evidence: [short phone filters](evidence/RTL-007/filters-short-phone.png), [two supplied images and complete phone detail](evidence/RTL-007/two-supplied-images-320.png). Browser inspection found and corrected Pulse's cyclic image/grid sizing in the narrower setup preview, then reduced its heading scale to keep whole phrase groups readable. [Deep-card navigation after correction](evidence/RTL-007/deep-card-navigation-375.png) also records the new view at the frame start. Registry presence alone is not visual evidence.
+
+Owner visual feedback, physical touch/virtual keyboard, actual 200% zoom, the complete 36 × 3 visual matrix, all final Tailor/bag/currency/CRUD states and paid/hosted recognition remain pending in their owning tickets. RTL-019 owns final matrix/pressure acceptance. No keys, paid calls, cloud changes or sibling service changes were used for this ticket.
