@@ -21,6 +21,8 @@ import {
 } from "../catalogue/draft";
 import type { CatalogueDraft } from "../catalogue/draft";
 import { CatalogueRequestError } from "../catalogue/request-error";
+import { BrowseSchema, INITIAL_BROWSE } from "../storefront/browse";
+import type { BrowseState } from "../storefront/browse";
 import {
   INITIAL_DESIGN,
   SESSION_KEY,
@@ -122,6 +124,7 @@ export class SessionController {
       previewDesign: { ...INITIAL_DESIGN },
       presentationRevision: 0,
       fixture: this.options.fixtureAllowed,
+      browse: structuredClone(INITIAL_BROWSE),
     };
   }
   static async open(options: SessionOptions) {
@@ -584,8 +587,8 @@ export class SessionController {
       process: [],
       catalogue: ["choose"],
       style: ["catalogue", "storefront"],
-      storefront: ["style", "dashboard"],
-      dashboard: ["storefront", "style"],
+      storefront: ["style", "dashboard", "catalogue"],
+      dashboard: ["storefront", "style", "catalogue"],
     };
     if (
       !legal[state.stage].includes(stage) ||
@@ -597,6 +600,30 @@ export class SessionController {
   }
   askReset() {
     this.update({ dialog: "reset" }, false);
+  }
+  browse(patch: Partial<BrowseState>) {
+    if (
+      !this.valid() ||
+      !["style", "storefront", "dashboard"].includes(this.snapshot.state.stage)
+    )
+      return;
+    const parsed = BrowseSchema.safeParse({
+      ...this.snapshot.state.browse,
+      ...patch,
+    });
+    if (!parsed.success) {
+      this.update({ notice: "Choose valid collection filters." });
+      return;
+    }
+    const next = parsed.data;
+    if (
+      next.variantId &&
+      !this.snapshot.state.graph.products
+        .find((item) => item.id === next.productId)
+        ?.variants.some((variant) => variant.id === next.variantId)
+    )
+      return;
+    this.state({ browse: next });
   }
   closeDialog() {
     this.update({ dialog: null }, false);

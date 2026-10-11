@@ -22,6 +22,72 @@ const setup = () => {
   return env;
 };
 describe("single workspace ownership and safe recovery", () => {
+  it("opens the owner garment-review/add-photo path without replacing current commerce", async () => {
+    const env = setup(),
+      controller = await env.open();
+    await controller.photos.add([file("one")]);
+    await controller.draftCatalogue();
+    controller.publish();
+    controller.acceptDesign();
+    controller.go("dashboard");
+    const graph = controller.getSnapshot().state.graph;
+    controller.go("catalogue");
+    expect(controller.getSnapshot().state.stage).toBe("catalogue");
+    controller.go("choose");
+    expect(controller.getSnapshot().state.stage).toBe("choose");
+    expect(controller.getSnapshot().state.graph).toBe(graph);
+    expect(controller.getSnapshot().state.draft?.items).toHaveLength(1);
+  });
+  it("preserves product, variant and filters through every look and same-tab recovery without touching commerce", async () => {
+    const env = setup(),
+      controller = await env.open();
+    await controller.photos.add([file("one"), file("two")]);
+    await controller.draftCatalogue();
+    controller.publish();
+    const state = controller.getSnapshot().state,
+      product = state.graph.products[0]!;
+    controller.browse({
+      page: "product",
+      productId: product.id,
+      variantId: product.variants[1]!.id,
+      filters: {
+        ...state.browse.filters,
+        category: "jeans",
+        search: "Straight",
+      },
+      sort: "price-high",
+    });
+    const browse = controller.getSnapshot().state.browse;
+    for (const template of ["studio", "pulse", "gallery"] as const) {
+      controller.design({
+        ...state.previewDesign,
+        template,
+        theme: "cobalt",
+        typography: "modern",
+      });
+      expect(controller.getSnapshot().state.browse).toEqual(browse);
+      expect(controller.getSnapshot().state.graph).toBe(state.graph);
+    }
+    controller.acceptDesign();
+    controller.go("dashboard");
+    controller.go("storefront");
+    const restored = await env.open();
+    expect(restored.getSnapshot().state.browse).toEqual(browse);
+    expect(restored.getSnapshot().state.graph).toEqual(state.graph);
+    restored.browse({ variantId: state.graph.products[1]!.variants[0]!.id });
+    expect(restored.getSnapshot().state.browse).toEqual(browse);
+    restored.photos.reportUnavailable(product.imageIds[0]!);
+    expect(restored.getSnapshot().state.stage).toBe("storefront");
+    expect(restored.getSnapshot().missingPhotoIds).toContain(
+      product.imageIds[0],
+    );
+    expect(restored.photos.availableIds().has(product.imageIds[0]!)).toBe(
+      false,
+    );
+    await restored.repair(product.imageIds[0]!, file("one"));
+    expect(restored.getSnapshot().missingPhotoIds).toEqual([]);
+    expect(restored.getSnapshot().state.graph).toEqual(state.graph);
+  });
   it("processes and publishes a full fifteen-photo collection using the batch and per-product envelopes", async () => {
     const env = setup(),
       controller = await env.open();

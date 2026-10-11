@@ -51,6 +51,7 @@ export class PhotoController {
   private active = false;
   private heartbeatTimer: ReturnType<typeof setInterval> | undefined;
   private protectedIds = new Set<string>();
+  private failedIds = new Set<string>();
   private snapshot: PhotoSnapshot = {
     items: [],
     busy: false,
@@ -127,8 +128,19 @@ export class PhotoController {
   }
   availableIds() {
     return this.active && this.clock() < this.expires
-      ? new Set(this.entries.keys())
+      ? new Set(
+          [...this.entries.keys()].filter((id) => !this.failedIds.has(id)),
+        )
       : new Set<string>();
+  }
+  reportUnavailable(id: string) {
+    if (!this.valid() || !this.entries.has(id) || this.failedIds.has(id))
+      return;
+    this.failedIds.add(id);
+    this.update({
+      notice:
+        "A photo could not be displayed. Repair the exact original before purchasing this garment.",
+    });
   }
   require(ids: readonly string[]) {
     requireAvailablePhotos(ids, this.availableIds());
@@ -137,6 +149,7 @@ export class PhotoController {
     return this.entries.get(id);
   }
   view(id: string): PhotoView | undefined {
+    if (this.failedIds.has(id)) return undefined;
     const item = this.entries.get(id);
     return item
       ? { photo: item.photo, name: item.name, url: item.url }
@@ -276,6 +289,7 @@ export class PhotoController {
           if (!this.current(generation)) break;
           const url = this.urls.create(decoded.derivative);
           this.entries.set(id, { ...stored, url });
+          this.failedIds.delete(id);
           if (old) this.urls.revoke(old.url);
           if (select && !this.selected.includes(id)) this.selected.push(id);
           accepted.push(id);
@@ -435,6 +449,7 @@ export class PhotoController {
             name: row.name,
             url: this.urls.create(checked.derivative),
           });
+          this.failedIds.delete(row.photo.id);
         } catch {
           issues.push({
             name: row.name,
@@ -496,9 +511,10 @@ export class PhotoController {
   async repair(expectedInput: Photo, file: NamedPhoto) {
     if (!this.valid() || this.snapshot.busy) return;
     const expected = PhotoSchema.parse(expectedInput);
-    if (this.entries.has(expected.id)) return;
+    const prior = this.entries.get(expected.id);
+    if (prior && !this.failedIds.has(expected.id)) return;
     if (
-      this.entries.size >= PHOTO_LIMITS.sources ||
+      (!prior && this.entries.size >= PHOTO_LIMITS.sources) ||
       file.blob.size < 1 ||
       file.blob.size > PHOTO_LIMITS.original
     ) {
@@ -511,7 +527,10 @@ export class PhotoController {
       (sum, item) => sum + item.original.size,
       0,
     );
-    if (originals + file.blob.size > PHOTO_LIMITS.originals) {
+    if (
+      originals + file.blob.size - (prior?.original.size ?? 0) >
+      PHOTO_LIMITS.originals
+    ) {
       this.update({ notice: "Keep original photos under 40 MiB in total." });
       return;
     }
@@ -540,7 +559,7 @@ export class PhotoController {
         0,
       );
       if (
-        derivatives + decoded.derivative.size >
+        derivatives + decoded.derivative.size - (prior?.derivative.size ?? 0) >
         PHOTO_LIMITS.cachedDerivatives
       )
         throw new Error(
@@ -559,6 +578,8 @@ export class PhotoController {
         ...stored,
         url: this.urls.create(decoded.derivative),
       });
+      if (prior) this.urls.revoke(prior.url);
+      this.failedIds.delete(expected.id);
       this.update(
         {
           notice: recoverable
@@ -589,6 +610,7 @@ export class PhotoController {
     this.entries.clear();
     this.selected = [];
     this.protectedIds.clear();
+    this.failedIds.clear();
     this.update({ issues: [], progress: 0, total: 0, notice }, true);
     let cleared = true;
     await this.cache.clear().catch(() => {

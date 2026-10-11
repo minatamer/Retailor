@@ -5,6 +5,7 @@ import { PhotoSchema, PHOTO_LIMITS } from "@retailor/contracts/photos";
 import { DesignSchema } from "@retailor/contracts/design";
 import { parseGraph, serializedBytes } from "@retailor/commerce/graph";
 import { DraftSchema, parseDraft } from "../catalogue/draft";
+import { BrowseSchema, INITIAL_BROWSE } from "../storefront/browse";
 export const SESSION_KEY = "retailor.workspace.v1";
 export const SESSION_BYTES = 2 * 1024 * 1024;
 export const StageSchema = z.enum([
@@ -29,6 +30,7 @@ export const ProjectionSchema = z.strictObject({
   previewDesign: DesignSchema,
   presentationRevision: z.number().int().nonnegative().max(1_000_000),
   fixture: z.boolean(),
+  browse: BrowseSchema.default(INITIAL_BROWSE),
 });
 export type Projection = z.infer<typeof ProjectionSchema>;
 export const INITIAL_DESIGN = DesignSchema.parse({
@@ -116,6 +118,7 @@ export function serializeProjection(state: Projection, now: number) {
     previewDesign: state.previewDesign,
     presentationRevision: state.presentationRevision,
     fixture: state.fixture,
+    browse: state.browse,
   };
   const encoded = JSON.stringify(ProjectionSchema.parse(selected));
   if (serializedBytes(selected) > SESSION_BYTES)
