@@ -1,0 +1,33 @@
+:root {
+  --platform-canvas: #f5f4ef;
+  --platform-surface: #ffffff;
+  --platform-text: #202321;
+  --platform-muted: #626760;
+  --platform-action: #343bdd;
+  --platform-action-hover: #2429ac;
+  --platform-action-text: #ffffff;
+  --platform-focus: #343bdd;
+  --platform-line: #d8dcd3;
+  --platform-control-line: #858b80;
+  --platform-lime: #d6f578;
+  --platform-soft: #eeefe8;
+  --platform-selected: #eeefff;
+  --feedback-error: #a12632;
+  --feedback-error-surface: #fff0f0;
+  --feedback-success: #245a3d;
+  --feedback-success-surface: #edf6ef;
+  --feedback-attention: #755011;
+  --feedback-attention-surface: #fff4da;
+  --font-interface: "Retailor Inter", Arial, sans-serif;
+  --font-editorial: "Retailor DM Serif", Georgia, serif;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --radius: 16px;
+  --radius-small: 8px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+}

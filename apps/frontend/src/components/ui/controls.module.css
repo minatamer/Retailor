@@ -1,0 +1,66 @@
+.button {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 12px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    transform 180ms var(--ease-out),
+    background 180ms,
+    box-shadow 180ms;
+}
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+.button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+.primary {
+  background: var(--platform-action);
+  color: var(--platform-action-text);
+}
+.primary:hover:not(:disabled) {
+  background: var(--platform-action-hover);
+}
+.secondary {
+  background: var(--platform-surface);
+  border-color: var(--platform-control-line);
+  color: var(--platform-text);
+}
+.quiet {
+  background: transparent;
+  color: var(--platform-text);
+}
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.choice {
+  background: var(--platform-surface);
+  color: var(--platform-text);
+  border: 1px solid var(--platform-control-line);
+  border-radius: var(--radius-small);
+  min-height: 44px;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 180ms,
+    background 180ms,
+    transform 180ms var(--ease-out);
+}
+.choice:hover {
+  transform: translateY(-2px);
+}
+.selected {
+  border: 2px solid var(--platform-action);
+  padding: 9px 11px;
+  background: var(--platform-selected);
+}
