@@ -1,4 +1,8 @@
-# Retailor · complete product specification
+# Retailor · archived original product concept
+
+> **Superseded concept — 11 October 2026.** Use the [current detailed blueprint](RETAILOR_DEMO_SOURCE_OF_TRUTH.md) and [current visual overview](RETAILOR_OVERVIEW.html). The original exploration below is retained for context and does not define current requirements.
+>
+> **Current accepted decisions:** clothing only; three complete templates, four themes and three type presets; Tailor-led setup through inline visual CTA cards; optional name/headline/hero and three AI logos after colour/type confirmation; mandatory photos for every product and inline chat uploads; catalogue-linked fictional business records; three profit/break-even/loss scenarios; fifteen sample photo inputs with fresh live drafting; storefront-runway hero with alternatives retained; AI-generated sample photos preferred with stock sourcing researched; English/USD with optional automatic EUR storefront conversion. Owner manual design overrides remain available. [22 implementation tickets are now planned](tickets/README.md); application implementation has not started.
 
 Updated **11 October 2026** to capture the owner's revised **product photos → generated storefront → owner dashboard** flow. This replaces the earlier storefront-first entry point. Selected identity: **Retailor**. Intended domain: **tryretailor.com**, registration unconfirmed. **FORME** is the fictional clothing brand used for the sample route.
 
@@ -6,7 +10,7 @@ Retailor turns a batch of product photos into an attractive, interactive demo st
 
 The portfolio promise is **“Bring your products. See your store.”** The commercial offer remains a reusable ecommerce frontend/backend that the developer tailors to a client's branding, catalogue and store rules. The generated demo demonstrates the foundation; production checkout, verified merchandise facts and real integrations are separately scoped.
 
-[Open the companion](retailor.html#retailor/landing). It contains a brief product description, numbered flow and interactive concept views. This Markdown is the implementation reference. Job evidence and advertised rates remain in the [Upwork research folder](../../Codex/Upwork%20MCP/retailor-job-research.md), rather than becoming demo content.
+[Open the companion](retailor.html#retailor/landing). It contains a brief product description, numbered flow and interactive concept views. This archived Markdown is historical source material; the current implementation authority is the new blueprint. Job evidence and advertised rates remain in the [Upwork research folder](../../Codex/Upwork%20MCP/retailor-job-research.md), rather than becoming demo content.
 
 - [Agreed product decisions](#agreed-product-decisions)
 - [Main visitor flow](#main-visitor-flow-step-by-step)

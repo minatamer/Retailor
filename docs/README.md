@@ -1,0 +1,23 @@
+# Retailor documentation
+
+Retailor is a planned clothing-only demo built around a beautiful storefront from supplied product photos. Documentation and the 22-ticket implementation queue are prepared; application implementation and deployment have not started.
+
+## Current authority
+
+| Document | Use it for |
+| --- | --- |
+| [Detailed blueprint](RETAILOR_DEMO_SOURCE_OF_TRUTH.md) | Accepted scope, screen flow, domain rules, AI boundaries, architecture, infrastructure, limits and acceptance. |
+| [Visual HTML overview](RETAILOR_OVERVIEW.html) | Concise owner-facing product story and interactive documentation illustrations. |
+| [Implementation ticket queue](tickets/README.md) | All 22 detailed planned packets, dependencies, owner-answer traceability and execution evidence rules. |
+
+Start execution with [RTL-001](tickets/RTL-001-initialize-workspace-contracts-and-safe-runtime.md) when the owner authorizes implementation. The latest owner instruction governs conflicting historical material; tickets apply the blueprint to a specific outcome and do not own a competing product contract.
+
+## Retained source material
+
+- [Original concept Markdown](retailor.md) and [original concept preview](retailor.html) are archived exploration; their simulations do not prove real recognition or deployed behavior.
+- [ClipBuilder lessons](references/LESSONS_LEARNED_FROM_CLIPBUILDER.md), [Retrosum lessons](references/LESSONS_LEARNED_FROM_RETROSUM.md) and [portfolio build playbook](references/PORTFOLIO_DEMO_BUILD_PLAYBOOK.md) supply sibling practices. Their Retailor application notes point to current decisions.
+- Directly inspected sibling ticket examples are linked in the [queue](tickets/README.md#ticket-writing-inspiration-actually-inspected).
+
+## Future implementation records
+
+Create design, engineering, operations, validation and commit-allocation documents only when they own concrete decisions or real work. Validation must identify actual commands, snapshot/environment and unperformed external checks. Do not fill future folders with empty modules, imaginary passes, visitor uploads, provider payloads or secrets. No paid/cloud operation or Git mutation was performed to create these tickets.

@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
-    <meta name="description" content="A concise product brief for Retailor: product photos, an AI-drafted catalogue, a demo storefront and a connected owner dashboard." />
-    <title>Retailor — the product in one glance</title>
+    <meta name="description" content="Retailor: beautiful storefront templates from your products, visual styling, Tailor and a connected demo dashboard." />
+    <title>Retailor — your products, beautifully tailored</title>
     <style>
       :root{--paper:#f6f4ee;--white:#fffefb;--ink:#17212b;--muted:#56616a;--line:#d9ddd9;--blue:#244acb;--blue-soft:#e9edff;--stone:#e9e8e0;--green:#23584d;--radius:18px;--measure:1180px}
       *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--paper);color:var(--ink);font-family:Segoe UI,Arial,sans-serif;font-size:16px;line-height:1.65}button,a,summary{-webkit-tap-highlight-color:transparent}a{color:var(--blue);text-underline-offset:4px}a:hover{text-decoration-thickness:2px}button{font:inherit}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:5px}button{cursor:pointer}h1,h2,h3,p{margin-top:0}h1,h2{font-family:Georgia,Times New Roman,serif;font-weight:400;letter-spacing:-.045em;line-height:1.08}h1{font-size:clamp(48px,6.3vw,80px);margin-bottom:24px}h2{font-size:clamp(34px,4vw,48px);margin-bottom:18px}h3{font-size:19px;line-height:1.3;letter-spacing:-.02em;margin-bottom:10px}p{margin-bottom:16px}ul{padding-left:20px;margin:0}li+li{margin-top:9px}[hidden]{display:none!important}.wrap{width:min(var(--measure),calc(100% - 64px));margin:auto}.muted{color:var(--muted)}.eyebrow{text-transform:uppercase;font-size:11px;font-weight:700;letter-spacing:.17em;color:var(--muted);margin-bottom:16px}.pill{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border:1px solid var(--line);border-radius:99px;font-size:12px;background:var(--white)}.dot{width:7px;height:7px;background:var(--blue);border-radius:50%}.skip{position:absolute;top:8px;left:8px;transform:translateY(-160%);background:var(--white);padding:10px;z-index:10}.skip:focus{transform:none}
@@ -19,181 +19,214 @@
       @media(max-width:1000px){.hero{gap:35px}.section-head{gap:35px}.nav{gap:15px}.step{padding:20px}.perspective-panel{gap:24px}.success{grid-template-columns:repeat(2,1fr)}}
       @media(max-width:760px){.wrap{width:calc(100% - 36px)}.header-inner{min-height:74px;flex-wrap:wrap;padding:14px 0;gap:8px}.nav{gap:15px;font-size:12px;flex-wrap:wrap}.hero{grid-template-columns:1fr;gap:30px;padding:35px 0}.hero .lead{font-size:17px}.hero .eyebrow{margin-top:18px}.story-art{max-width:540px;width:100%}.principles{grid-template-columns:1fr;gap:17px}.section-head{grid-template-columns:1fr;gap:5px}.section-head h2{margin-bottom:10px}section{padding:45px 0}.steps{grid-template-columns:repeat(2,1fr)}.perspective-panel,.backbone{grid-template-columns:1fr}.perspective-panel{padding:23px}.ai-grid{grid-template-columns:1fr;gap:25px}.scope-grid{grid-template-columns:1fr}.closing{align-items:start;flex-direction:column}.footer{flex-direction:column;gap:5px}.connected{padding:19px;gap:12px}}
       @media(max-width:430px){.steps{grid-template-columns:1fr}.step{padding:20px;display:grid;grid-template-columns:34px 1fr;gap:0 15px}.step-number{grid-row:1/4;font-size:29px;margin:0}.step p,.step h3,.step .type{grid-column:2}.step .type{justify-self:start}.success{grid-template-columns:1fr}.story-art{padding:20px}.mini-view{padding:10px}.mini-heading{font-size:10px}.mini-store-name{font-size:15px}.mini-product{height:49px}.hero-actions .button{flex:1;white-space:nowrap}h1{font-size:48px}.nav a{min-height:32px;display:inline-flex;align-items:center}}
-      @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
       @media print{body{background:white;font-size:11pt}.wrap{width:100%}.header,.hero-actions,.perspective-switch,.footer{display:none}.hero{padding:15px 0;gap:25px}h1{font-size:38pt}h2{font-size:25pt}.story-art{padding:18px}.perspective-panel[hidden]{display:grid!important}.perspective-panel{margin-bottom:15px}section{padding:25px 0}.step,.scope-card,.ai-card,.perspective-panel,.closing{break-inside:avoid}.closing{background:#eee;color:#17212b}.closing p{color:#56616a}.closing a{color:#244acb}details ul{display:block}}
-    </style>
+
+/* Product direction revision: vibrant platform, finite visual storefront library. */
+:root{--paper:#faf9f2;--blue:#2846c4;--lime:#ddfa7b}h1,h2{font-family:Segoe UI,Arial,sans-serif;font-weight:650;letter-spacing:-.06em}h1 em{font-style:normal;color:var(--blue)}.brand{font-family:Segoe UI,Arial,sans-serif;font-weight:750}.story-art{background:var(--blue);color:white;padding:23px;border-radius:26px}.art-label,.art-caption{color:#e1e8ff}.runway-window{background:#f6f3e9;border-radius:13px;overflow:hidden;color:#172323}.runway-nav{display:flex;justify-content:space-between;padding:13px 17px;border-bottom:1px solid #17232320;font-size:10px}.runway-nav strong{font-size:18px;letter-spacing:.12em}.runway-scene{display:grid;grid-template-columns:.9fr 1.1fr;gap:17px;align-items:center;padding:24px 20px;min-height:270px;animation:runway-mood 14s ease-in-out infinite}.runway-scene h3{font:normal 38px/1 Georgia,serif;letter-spacing:-.055em}.runway-scene p{font-size:10px}.garment{display:grid;place-items:center;background:#e5e8d7;min-height:210px;border-radius:90px 90px 10px 10px}.garment svg{width:145px;height:180px;filter:drop-shadow(0 8px 5px #17232320);animation:garment-drift 7s ease-in-out infinite}.runway-window .store-action{background:#172323}.runway-foot{padding:12px 16px;font-size:10px;display:flex;justify-content:space-between;border-top:1px solid #17232320}.art-caption{font-size:11px}.step.star{background:var(--lime);border-color:#c0d773}.step.star p{color:#3c4934}.steps{grid-template-columns:repeat(4,1fr)}.step-number{font-family:Segoe UI,Arial,sans-serif;font-size:14px;font-weight:700}.design-studio{display:grid;grid-template-columns:250px 1fr;background:white;border:1px solid var(--line);border-radius:22px;overflow:hidden}.design-controls{padding:23px;border-right:1px solid var(--line)}fieldset{border:0;padding:0;margin:0 0 21px;min-width:0}legend{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}.choices{display:grid;gap:7px}.choices button{border:1px solid var(--line);background:white;border-radius:8px;padding:9px 11px;font-size:12px;min-height:44px;text-align:left;transition:background .2s,transform .2s}.choices button:hover{background:var(--paper);transform:translateX(2px)}.choices button[aria-pressed=true]{border-color:var(--blue);box-shadow:inset 3px 0 var(--blue);background:var(--blue-soft)}.choices button strong{display:block;font-size:13px}.choices button small{font-size:10px;color:var(--muted)}.swatch{display:inline-flex;vertical-align:middle;margin-right:7px;border:1px solid #17232320;border-radius:99px;overflow:hidden}.swatch i{width:15px;height:16px;background:var(--swatch)}.type-choices button:nth-child(2){font-family:Georgia,serif;font-size:16px}.type-choices button:nth-child(3){font-weight:800;letter-spacing:.035em}.preview-area{padding:22px;background:#f0f2eb;min-width:0}.preview-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px}.preview-tabs button{padding:7px 11px;border:1px solid var(--line);background:white;border-radius:7px;font-size:11px;min-height:40px}.preview-tabs button[aria-pressed=true]{background:var(--ink);color:white;border-color:var(--ink)}.store-preview{--store-bg:#faf8f2;--store-surface:#ece8dc;--store-ink:#202523;--store-accent:#202523;--store-type:Segoe UI,Arial,sans-serif;--store-weight:600;background:var(--store-bg);color:var(--store-ink);border-radius:12px;min-height:435px;overflow:hidden;box-shadow:0 5px 18px #17232309;transition:background .3s,color .3s}.store-nav{padding:15px 20px;display:flex;justify-content:space-between;border-bottom:1px solid #17232320;font-size:10px}.store-nav strong{font:700 16px var(--store-type);letter-spacing:.13em}.store-page{padding:22px}.store-page h3{font-family:var(--store-type);font-weight:var(--store-weight);font-size:34px;letter-spacing:-.05em;line-height:1.05}.store-page p{font-size:11px}.store-hero,.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:center}.store-action{display:inline-block;padding:8px 11px;background:var(--store-accent);color:white;font-size:10px;border-radius:4px}.product-art{background:var(--store-surface);display:grid;place-items:center;border-radius:7px;min-height:185px}.product-art svg{width:100px;height:145px;filter:drop-shadow(0 8px 4px #17232315)}.store-foot{display:flex;justify-content:space-between;font-size:10px;margin:19px 0 11px}.product-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.product-row .product-art{min-height:115px}.product-row .product-art svg{width:55px;height:83px}.product-name{display:flex;justify-content:space-between;gap:5px;font-size:9px!important;margin:8px 0 0}.product-name b{font-weight:500;white-space:nowrap}.collection-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.collection-grid .product-art{min-height:135px}.filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 18px}.filter-chips span{padding:4px 9px;border:1px solid #17232330;border-radius:99px;font-size:9px}.detail-grid>.product-art{min-height:310px}.detail-grid>.product-art svg{width:140px;height:220px}.detail-price{font-size:21px!important;font-weight:600}.size-row{display:flex;gap:5px;margin:16px 0}.size-row span{padding:5px 9px;border:1px solid #17232330;font-size:10px;border-radius:4px}.store-preview[data-layout=pulse] .store-hero{grid-template-columns:1fr;gap:12px}.store-preview[data-layout=pulse] .store-copy{display:flex;align-items:center;justify-content:space-between;gap:17px}.store-preview[data-layout=pulse] .store-copy h3{text-transform:uppercase;font-size:38px;max-width:235px}.store-preview[data-layout=pulse] .store-hero>.product-art{min-height:130px;border-radius:0}.store-preview[data-layout=pulse] .store-hero>.product-art svg{height:115px}.store-preview[data-layout=pulse] .collection-grid{grid-template-columns:repeat(3,1fr);gap:8px}.store-preview[data-layout=pulse] .collection-grid .product-art{min-height:120px}.store-preview[data-layout=pulse] .detail-grid{gap:13px}.store-preview[data-layout=pulse] .detail-grid h3{text-transform:uppercase;font-size:30px}.store-preview[data-layout=gallery] .store-hero{direction:rtl;grid-template-columns:1.25fr 1fr}.store-preview[data-layout=gallery] .store-hero>*{direction:ltr}.store-preview[data-layout=gallery] .product-art{border-radius:0;min-height:215px}.store-preview[data-layout=gallery] .product-row .product-art{min-height:130px}.store-preview[data-layout=gallery] .collection-grid{gap:23px}.store-preview[data-layout=gallery] .collection-grid .product-art{min-height:165px}.store-preview[data-layout=gallery] .detail-grid{grid-template-columns:1.3fr 1fr}.tailor-caption{display:flex;justify-content:flex-end;margin-top:13px}.tailor-bubble{max-width:350px;background:white;padding:12px 15px;border:1px solid #cbd5be;border-radius:13px 13px 3px 13px;font-size:11px;box-shadow:0 5px 12px #17232308}.tailor-bubble strong{display:block;color:var(--blue);margin-bottom:3px}.preview-status{font-size:11px;color:var(--muted);margin:11px 0 0;min-height:18px}.design-contract,.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:23px;margin-top:25px}.design-contract strong,.metric-grid strong{display:block;font-size:15px;margin-bottom:6px}.design-contract p,.metric-grid p{font-size:13px;color:var(--muted);margin:0}.note{font-size:11px;color:var(--muted)}.tailor-intro{display:grid;grid-template-columns:1fr 1fr;gap:35px}.conversation{background:#eaf0db;padding:25px;border-radius:20px}.conversation .name{font-size:13px;font-weight:700}.chat-message{background:white;border-radius:11px;padding:12px 15px;font-size:13px;margin-bottom:10px;max-width:92%}.chat-message.user{margin-left:auto;background:var(--ink);color:white}.tool-chip{display:inline-block;padding:3px 7px;border:1px solid #becbad;border-radius:99px;font-size:10px;margin-top:8px}.tailor-list div{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px}.tailor-list strong{font-size:14px}.tailor-list p{font-size:13px;color:var(--muted);margin:5px 0 0}.dashboard-illustration{background:white;border:1px solid var(--line);border-radius:22px;padding:27px}.dash-header{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:20px;flex-wrap:wrap}.dash-header .pill{font-size:10px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.kpi{background:var(--paper);border:1px solid var(--line);padding:15px;border-radius:11px}.kpi span{display:block;font-size:10px;color:var(--muted);margin-bottom:7px}.kpi strong{font-size:25px;letter-spacing:-.04em}.kpi small{display:block;font-size:9px;color:var(--muted)}.dash-body{display:grid;grid-template-columns:1.3fr 1fr;gap:25px;margin-top:25px}.chart-title{font-size:13px;font-weight:600}.chart{height:160px;display:flex;align-items:end;gap:12px;padding-top:30px;border-bottom:1px solid var(--line)}.chart button{height:var(--bar);flex:1;background:var(--blue);border:0;border-radius:7px 7px 0 0;position:relative;min-height:35px;transform-origin:bottom;animation:bar-in .65s both;transition:background .2s,transform .2s}.chart button:nth-child(2n){background:#6479d9}.chart button:hover,.chart button:focus-visible,.chart button[aria-pressed=true]{background:#214f3f;transform:translateY(-3px)}.chart button span{position:absolute;top:-28px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;opacity:0;color:var(--ink)}.chart button:hover span,.chart button:focus-visible span,.chart button[aria-pressed=true] span{opacity:1}.chart-labels{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;text-align:center;font-size:9px;color:var(--muted);margin-top:9px}.evidence{background:var(--blue-soft);border:1px solid #dbe1ff;border-radius:12px;padding:18px}.evidence h3{font-size:15px}.evidence p{font-size:12px;color:var(--muted)}.evidence .amount{font-size:25px;color:var(--ink);margin-bottom:8px}.evidence dl{display:grid;grid-template-columns:1fr auto;gap:5px 13px;font-size:11px;margin:0}.evidence dd{margin:0;font-variant-numeric:tabular-nums}.evidence small{display:block;margin-top:12px;font-size:10px;color:var(--muted)}table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}th,td{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line)}td{font-variant-numeric:tabular-nums}.defs{position:absolute;width:0;height:0;overflow:hidden}
+@keyframes runway-mood{0%,100%{background:#f6f3e9}40%{background:#eaf1d6}70%{background:#f5e4e1}}@keyframes garment-drift{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-7px) rotate(1deg)}}@keyframes bar-in{from{transform:scaleY(.3);opacity:.5}to{transform:scaleY(1);opacity:1}}
+@media(max-width:1000px){.steps{grid-template-columns:repeat(3,1fr)}.design-studio{grid-template-columns:225px 1fr}.preview-area{padding:18px}.design-controls{padding:19px}}
+@media(max-width:760px){.steps{grid-template-columns:repeat(2,1fr)}.design-studio{grid-template-columns:1fr}.design-controls{border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.design-controls fieldset{margin:0}.design-controls .note{grid-column:1/-1}.design-contract,.metric-grid,.tailor-intro,.dash-body{grid-template-columns:1fr;gap:18px}.dashboard-illustration{padding:20px}.runway-scene{min-height:250px}.garment svg{width:125px}}
+@media(max-width:480px){.steps{grid-template-columns:1fr}.design-controls{grid-template-columns:1fr;gap:18px}.choices{grid-template-columns:repeat(3,1fr)}.palette-choices{grid-template-columns:repeat(2,1fr)}.choices button{text-align:center;padding:9px;font-size:11px}.choices button[aria-pressed=true]{box-shadow:inset 0 -3px var(--blue)}.swatch{display:flex;width:max-content;margin:0 auto 5px}.store-page{padding:17px}.store-nav{padding:14px 17px}.store-hero,.detail-grid{gap:13px}.store-page h3{font-size:27px}.store-preview[data-layout=pulse] .store-copy h3{font-size:29px}.product-art{min-height:170px}.product-row{gap:7px}.product-name{font-size:8px!important;flex-direction:column;gap:2px}.detail-grid h3{font-size:24px!important}.detail-grid>.product-art{min-height:235px}.detail-grid>.product-art svg{width:90px;height:165px}.kpis{grid-template-columns:repeat(2,1fr)}.runway-scene h3{font-size:33px}.garment{min-height:190px}.table-wrap{overflow-x:auto}}
+@media print{.design-controls,.preview-tabs{display:none}.design-studio{grid-template-columns:1fr}.store-page[hidden]{display:block!important;border-top:1px solid #ddd}.dashboard-illustration,.conversation{break-inside:avoid}.story-art{background:#eee;color:var(--ink)}.art-label,.art-caption{color:var(--muted)}}
+
+
+.tailor-setup{background:#f2f4ef;border:1px solid #d9dfd2;border-radius:20px;padding:20px;align-self:start}.tailor-setup .name{font-size:14px;font-weight:800;color:#263729}.tailor-setup .chat-message{margin:14px 0;border-radius:14px;background:#fff;padding:15px;color:#263729;line-height:1.5}.tailor-setup fieldset{border:0;padding:0;margin:12px 0}.chat-progress{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0}.chat-progress button,.logo-actions button{border:1px solid #bdc8b7;border-radius:10px;padding:10px;background:white;color:#263729;cursor:pointer;font:inherit;font-size:12px}.chat-progress [aria-pressed="true"]{background:#243b30;color:#fff}.chat-cta{border:0;background:#2846c4;color:#fff;padding:12px 15px;border-radius:12px;font:inherit;font-size:13px;cursor:pointer;transition:transform .2s}.chat-cta:hover{transform:translateY(-2px)}.logo-actions{display:flex;gap:8px;flex-wrap:wrap}.photo-card{border:1px dashed #a7b799}.currency-note{background:#fff7e4;border:1px solid #e4d7b9;border-radius:20px;padding:24px;margin:20px 0 48px}.currency-note p{margin:8px 0 0;max-width:780px;font-size:14px;line-height:1.7}.scenario-controls{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.scenario-controls button{font:inherit;border:1px solid #bdc8b7;border-radius:12px;padding:12px 16px;background:#fff;color:#263729;cursor:pointer}.scenario-controls [aria-pressed="true"]{background:#243b30;color:#fff}.type-choices small{display:block;font-size:10px;font-family:Arial,sans-serif;margin-top:5px;font-weight:400}.chat-step[hidden],#logo-offer[hidden]{display:none}
+</style>
   </head>
   <body>
-    <a class="skip" href="#main">Skip to product brief</a>
-    <header class="header">
-      <div class="wrap header-inner">
-        <a class="brand" href="#main" aria-label="Retailor overview"><span aria-hidden="true"></span>Retailor</a>
-        <nav class="nav" aria-label="Product brief navigation">
-          <a href="#journey">The journey</a>
-          <a href="#experience">Two perspectives</a>
-          <a href="#scope">Scope</a>
-          <a class="doc-link" href="RETAILOR_DEMO_SOURCE_OF_TRUTH.md">Detailed blueprint ↗</a>
-        </nav>
-      </div>
-    </header>
-    <main id="main" class="wrap" tabindex="-1">
-      <div class="hero">
-        <div>
-          <span class="pill"><span class="dot" aria-hidden="true"></span>Product brief · 11 October 2026</span>
-          <p class="eyebrow">AI-assisted ecommerce demo</p>
-          <h1>Bring your products.<br />See your store.</h1>
-          <p class="lead">A batch of product photos becomes a drafted catalogue, a beautiful storefront and a connected owner dashboard.</p>
-          <p class="muted">One guest experience that shows what AI can do for ecommerce — from preparing the products to helping people shop and understand the store.</p>
-          <div class="hero-actions">
-            <a class="button" href="#journey">Walk through the idea <span aria-hidden="true">&nbsp;↓</span></a>
-            <a class="button secondary" href="#scope">See the scope</a>
-          </div>
-          <p class="hero-note">Documentation concept. The application has not been built yet.</p>
-        </div>
-        <div class="story-art" aria-label="Concept diagram: product photos become a catalogue shared by a storefront and an owner dashboard">
-          <p class="art-label">The whole product, at a glance</p>
-          <div class="source-row" aria-hidden="true">
-            <div class="photo"><svg viewBox="0 0 40 40"><path d="M13 5 5 11l5 9 4-3v19h13V17l4 3 5-9-9-6c-3 5-10 5-14 0Z" /></svg><small>PRODUCT</small></div>
-            <div class="photo"><svg viewBox="0 0 40 40"><path d="M12 5h17l-2 31h-8l1-20-3 20H9Z" /><path d="M12 10h17" /></svg><small>ALTERNATE</small></div>
-            <div class="photo"><svg viewBox="0 0 40 40"><rect x="7" y="10" width="26" height="21" rx="2" /><path d="m10 27 8-9 5 6 4-4 4 7" /><circle cx="26" cy="15" r="2" /></svg><small>DETAIL</small></div>
-          </div>
-          <div class="art-transition">AI drafts and groups the products</div>
-          <div class="catalogue-chip"><span class="chip-icon" aria-hidden="true">✓</span><span>One reviewable catalogue · your photos, your edits</span></div>
-          <div class="art-transition">Explore both sides of the same store</div>
-          <div class="view-cards">
-            <div class="mini-view">
-              <div class="mini-heading"><span class="mini-store-name">FORME</span><span>Storefront</span></div>
-              <div class="mini-collection" aria-hidden="true"><div class="mini-product"></div><div class="mini-product"></div><div class="mini-product"></div></div>
-              <p class="mini-foot">Browse · ask · place a demo order</p>
-            </div>
-            <div class="mini-view">
-              <div class="mini-heading"><span>Owner workspace</span><span aria-hidden="true">↗</span></div>
-              <div class="mini-kpis" aria-hidden="true"><div class="mini-kpi"></div><div class="mini-kpi"></div><div class="mini-kpi"></div></div>
-              <div class="mini-chart" aria-hidden="true"><span style="--height:35%"></span><span style="--height:66%"></span><span style="--height:48%"></span><span style="--height:84%"></span><span style="--height:62%"></span><span style="--height:95%"></span></div>
-              <p class="mini-foot">Sales · orders · stock · evidence</p>
-            </div>
-          </div>
-          <p class="art-caption">Illustrative layout, not a working store or measured sales data.</p>
-        </div>
-      </div>
-      <div class="principles" aria-label="Core product principles">
-        <div class="principle"><div class="principle-index">01</div><div><strong>Easy to enter</strong><span>No signup or required product typing.</span></div></div>
-        <div class="principle"><div class="principle-index">02</div><div><strong>AI drafts. People decide.</strong><span>Reviewable products and explicit approvals.</span></div></div>
-        <div class="principle"><div class="principle-index">03</div><div><strong>Connected, coherent demo</strong><span>The same products, orders and stock in both views.</span></div></div>
-      </div>
-
-      <section id="journey" aria-labelledby="journey-title">
-        <div class="section-head">
-          <div><p class="section-no">01 / The visitor journey</p><h2 id="journey-title">From photos to<br />a store you can explore.</h2></div>
-          <p>The landing explains the promise and offers <strong>Try demo</strong>. The sample should make the result easy to reach, with a complete guided visit in roughly five minutes.</p>
-        </div>
-        <div class="steps">
-          <article class="step"><span class="step-number">1</span><h3>Choose the photos</h3><p>Use the FORME sample collection or upload your own product images. Inspect them before processing.</p><span class="type">Sample or upload</span></article>
-          <article class="step"><span class="step-number">2</span><h3>Draft the catalogue</h3><p>AI suggests product groups, names, visible details and useful categories. Demo prices, stock and size options are clearly identified.</p><span class="type">Primary AI moment</span></article>
-          <article class="step"><span class="step-number">3</span><h3>Review or continue</h3><p>See the drafted cards and their source images. Rename, split or merge items if needed — no lengthy merchant form.</p><span class="type">Optional correction</span></article>
-          <article class="step"><span class="step-number">4</span><h3>Explore the storefront</h3><p>Browse an editorial collection, compare views, choose options and ask the shopping assistant for help.</p><span class="type">Shopper perspective</span></article>
-          <article class="step"><span class="step-number">5</span><h3>Place a demo order</h3><p>Review the bag and complete sample cost. Confirm a simulated purchase without card or personal delivery details.</p><span class="type">Real local interaction</span></article>
-          <article class="step"><span class="step-number">6</span><h3>Try the dashboard</h3><p>Find that same order, see its stock effect and inspect the figures. Explore returns, refunds, inventory and feedback.</p><span class="type">Owner perspective</span></article>
-        </div>
-        <div class="connected"><span class="connected-icon" aria-hidden="true">↔</span><p><strong>The signature connected moment</strong>Place an order in the store. Switch to the dashboard. Open the exact order and stock movement behind the changed figures. Everything belongs to one temporary workspace.</p></div>
-      </section>
-
-      <section id="experience" aria-labelledby="experience-title">
-        <div class="section-head">
-          <div><p class="section-no">02 / What people will see</p><h2 id="experience-title">A desirable store.<br />An understandable business.</h2></div>
-          <p>The landing previews both experiences and the photos-to-store transformation. Once inside, <strong>Try the dashboard</strong> and <strong>View storefront</strong> make switching obvious.</p>
-        </div>
-        <div class="perspective-switch" aria-label="Choose a perspective to read about" hidden>
-          <button type="button" aria-pressed="true" aria-controls="shopper-panel" data-perspective="shopper">Storefront</button>
-          <button type="button" aria-pressed="false" aria-controls="owner-panel" data-perspective="owner">Owner dashboard</button>
-        </div>
-        <div id="shopper-panel" class="perspective-panel" aria-labelledby="shopper-heading">
-          <div><h3 id="shopper-heading">A fashion collection worth browsing.</h3><ul><li>Strong imagery, alternate views, zoom and quick view.</li><li>Useful filters and category-appropriate size options.</li><li>A shopping assistant that uses actual catalogue products.</li><li>A clear bag, complete sample totals and demo checkout.</li></ul></div>
-          <div class="scenario-card"><p class="eyebrow">Example shopping moment</p><p>“Build a look under $150, including delivery.”</p><p>A $54 shirt, $68 trousers and $22 belt make $144 in merchandise. With $6 demo delivery, the reviewed total is <strong>$150</strong>.</p><p>The visitor can swap a piece and approve the bag. The assistant does not buy anything automatically.</p></div>
-        </div>
-        <div id="owner-panel" class="perspective-panel" aria-labelledby="owner-heading">
-          <div><h3 id="owner-heading">Useful operations behind the collection.</h3><ul><li>Sales, orders, average order value and fulfilment attention.</li><li>Charts that open their supporting records and formulas.</li><li>Separate returns, refunds and stock movements.</li><li>Synthetic feedback and an assistant that explains the evidence.</li></ul></div>
-          <div class="scenario-card"><p class="eyebrow">Example owner moment</p><p>“Why did this item's stock change?”</p><div class="trail" aria-label="Evidence trail"><span>Stock figure</span><b aria-hidden="true">→</b><span>Movement</span><b aria-hidden="true">→</b><span>Demo order</span></div><p style="margin-top:14px">The answer points to known records. A return does not automatically issue a refund, and a refund does not automatically restock an item.</p></div>
-        </div>
-      </section>
-
-      <section id="ai" aria-labelledby="ai-title">
-        <div class="section-head">
-          <div><p class="section-no">03 / Where AI earns its place</p><h2 id="ai-title">Three useful roles.<br />Clear human control.</h2></div>
-          <p>OpenAI is the intended provider. The app checks the result and calculates the business facts; the visitor controls changes and confirmations.</p>
-        </div>
-        <div class="ai-grid">
-          <article class="ai-card"><p class="tag">Create</p><h3>Catalogue agent</h3><p>Groups supplied photos and drafts product titles, categories and grounded copy. Unknown facts stay unknown.</p><p class="control">Visitor reviews the draft and opens the store.</p></article>
-          <article class="ai-card"><p class="tag">Shop</p><h3>Shopping assistant</h3><p>Compares products, suggests looks within budget and prepares a bag using current options and demo stock.</p><p class="control">Visitor approves additions and the demo order.</p></article>
-          <article class="ai-card"><p class="tag">Operate</p><h3>Owner assistant</h3><p>Explains current figures, opens supporting records and prepares improved catalogue copy from known facts.</p><p class="control">Visitor reviews edits in a real form before applying.</p></article>
-        </div>
-        <p class="trust-line"><strong>Honest by design:</strong> photographs cannot prove materials, measurements, stock or past sales. Prepared sample interpretation is labelled; live image analysis is explicit. All commerce history is synthetic.</p>
-      </section>
-
-      <section id="scope" aria-labelledby="scope-title">
-        <div class="section-head">
-          <div><p class="section-no">04 / The first build</p><h2 id="scope-title">A complete demo,<br />with a deliberate scope.</h2></div>
-          <p>The goal is to show clients a reusable ecommerce foundation and a coherent AI experience. Production integrations are separately scoped.</p>
-        </div>
-        <div class="scope-grid">
-          <article class="scope-card included"><h3>In this demo</h3><ul><li>Landing, sample/upload intake and reviewable catalogue.</li><li>Polished storefront, shopping help and simulated checkout.</li><li>Connected dashboard, orders, inventory, returns and refunds.</li><li>Inspectable figures, synthetic feedback and owner assistance.</li><li>Temporary guest recovery, JSON export and reset.</li></ul></article>
-          <article class="scope-card later"><h3>Separately scoped later</h3><ul><li>Payment processing, real refunds and shipping/carrier APIs.</li><li>Shopify or other commerce-platform integrations.</li><li>Merchant accounts, organizations and persistent business data.</li><li>Public store publishing, custom store domains and subscriptions.</li><li>Virtual try-on, generated worn photos and advanced site building.</li></ul></article>
-        </div>
-      </section>
-
-      <section id="backbone" aria-labelledby="backbone-title">
-        <div class="section-head">
-          <div><p class="section-no">05 / The delivery foundation</p><h2 id="backbone-title">The same proven<br />demo backbone.</h2></div>
-          <p>Inspired by direct exploration of ClipBuilder, ScreenPilot and Retrosum, with the framework, repository approach and deployment tool family carried forward.</p>
-        </div>
-        <div class="backbone">
-          <div>
-            <div class="reference-chips"><span>ClipBuilder</span><span>ScreenPilot</span><span>Retrosum</span></div>
-            <p><strong>One frontend. One private backend. Shared rules.</strong> The store and dashboard use the same exact commerce engine. AI processing stays behind the private API; provider keys stay off the browser.</p>
-            <p>The guest workspace has a fixed two-hour lifetime. There is no hosted business database or upload library in the first demo. Approved live processing sends selected image previews and relevant context to the provider.</p>
-            <p>Development starts with deterministic fakes and paid AI disabled. Live use is deliberately enabled, bounded and measured.</p>
-            <details><summary>Show the planned technology and folder shape</summary><ul><li><strong>Framework:</strong> Node, pnpm, strict TypeScript, Next.js/React, Express and Zod.</li><li><strong>Repository:</strong> apps/frontend, apps/backend, packages/contracts and packages/commerce; focused docs, scripts and tests.</li><li><strong>Hosting:</strong> Docker, Google Cloud Run, Artifact Registry and Secret Manager; Cloudflare for chosen domain/challenge setup.</li><li><strong>Release:</strong> unpaid quality checks and an owner-controlled immutable frontend/backend image pair.</li></ul></details>
-          </div>
-          <div class="stack-diagram" aria-label="Planned architecture: visitor to frontend to private API to OpenAI">
-            <div class="stack-box"><strong>Visitor's browser</strong><small>Photos · guest workspace · store + dashboard</small></div>
-            <div class="stack-arrow" aria-hidden="true">↓</div>
-            <div class="stack-box"><strong>Public frontend</strong><small>Next.js · same-origin private API bridge</small></div>
-            <div class="stack-arrow" aria-hidden="true">↓</div>
-            <div class="stack-box"><strong>Private backend</strong><small>Express · validation · paid-action controls</small></div>
-            <div class="stack-arrow" aria-hidden="true">↓</div>
-            <div class="stack-box"><strong>OpenAI</strong><small>Bounded catalogue and assistant requests</small></div>
-            <p class="stack-note">Proposed architecture. No services have been deployed for Retailor.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="success" aria-labelledby="success-title">
-        <div class="section-head">
-          <div><p class="section-no">06 / What a successful demo proves</p><h2 id="success-title">A result people<br />can see and trust.</h2></div>
-          <p>A complete visit should demonstrate useful AI, polished product design and connected business behavior — with clear limits and recovery.</p>
-        </div>
-        <div class="success">
-          <div><strong>Easy to understand</strong><p>The promise is clear on the landing. A sample visit fits roughly five minutes.</p></div>
-          <div><strong>Useful AI output</strong><p>The selected photos produce reviewable products; assistants use known evidence.</p></div>
-          <div><strong>Connected operations</strong><p>A demo order changes the matching stock and dashboard once, with inspectable records.</p></div>
-          <div><strong>Polished and recoverable</strong><p>Phone, keyboard and touch work. Refresh, failures, reset and expiry behave clearly.</p></div>
-        </div>
-        <div class="closing"><div><strong>Documentation now. Implementation planning next.</strong><p>The detailed blueprint defines the flows, architecture, rules and acceptance. No implementation tickets are created yet.</p></div><a href="RETAILOR_DEMO_SOURCE_OF_TRUTH.md">Read the full blueprint ↗</a></div>
-      </section>
-    </main>
-    <footer class="wrap footer"><span>Retailor · Retail, tailored to your brand.</span><span>Product planning overview · <a href="retailor.html">Original concept preview</a> · <a href="RETAILOR_DEMO_SOURCE_OF_TRUTH.md">Source of truth</a></span></footer>
-    <script>
-      const perspectiveButtons = Array.from(document.querySelectorAll('[data-perspective]'));
-      document.querySelector('.perspective-switch').hidden = false;
-      document.getElementById('owner-panel').hidden = true;
-      perspectiveButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-          const selected = button.dataset.perspective;
-          perspectiveButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
-          document.getElementById('shopper-panel').hidden = selected !== 'shopper';
-          document.getElementById('owner-panel').hidden = selected !== 'owner';
-        });
+<svg class="defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="garment-shirt" viewBox="0 0 160 190"><path fill="#f8f6ec" stroke="#7c8777" stroke-width="1.7" d="M50 24 17 45 3 88l30 12 15-29v108h65V71l15 29 29-12-14-43-33-21-17 12H67Z"/><path fill="#d9e0cc" stroke="#7c8777" stroke-width="1.4" d="m50 24 17 12 13 17-15 8-16-24m61-13L93 36 80 53l15 8 16-24"/><path d="M80 53v123m-16-89h-12v23h15m30-23h12v23H97" stroke="#a4af98" fill="none"/><circle cx="85" cy="80" r="1.5" fill="#7c8777"/><circle cx="85" cy="105" r="1.5" fill="#7c8777"/><circle cx="85" cy="130" r="1.5" fill="#7c8777"/><circle cx="85" cy="155" r="1.5" fill="#7c8777"/></symbol>
+<symbol id="garment-jeans" viewBox="0 0 160 190"><path fill="#49647e" stroke="#2a435c" stroke-width="2" d="M39 15h83l7 165-41 3-9-119-9 119-40-3Z"/><path d="M39 29h83M80 16v42M44 36l15 13m57-13-16 13M80 63l-7 7" stroke="#b9c1b5" stroke-width="1.5" fill="none"/></symbol>
+<symbol id="garment-tee" viewBox="0 0 160 190"><path fill="#d8b4a2" stroke="#986f5c" stroke-width="1.7" d="M53 30 17 48 7 89l33 11 11-23v101h60V77l11 23 32-11-11-41-35-18c-10 18-44 18-55 0Z"/><path d="M55 31c9 28 44 28 52 0m-55 138h58" stroke="#b28976" fill="none" stroke-width="2"/></symbol>
+</defs></svg>
+<a class="skip" href="#main">Skip to product brief</a>
+<header class="header"><div class="wrap header-inner"><a class="brand" href="#main"><span aria-hidden="true"></span>Retailor</a><nav class="nav" aria-label="Overview navigation"><a href="#journey">The flow</a><a href="#design">The storefront</a><a href="#tailor">Tailor</a><a href="#dashboard">Dashboard</a><a class="doc-link" href="RETAILOR_DEMO_SOURCE_OF_TRUTH.md">Full blueprint ↗</a></nav></div></header>
+<main class="wrap" id="main" tabindex="-1">
+<div class="hero"><div><span class="pill">Product direction · 11 October 2026</span><p class="eyebrow">Your products. Your brand. Your moment.</p><h1>Bring your products.<br /><em>See your store.</em></h1><p class="lead">Give us your clothing photos. We’ll help you turn them into an ultra-smooth storefront—and make it feel like yours.</p><p class="muted">Beautiful templates, researched colour and typography choices inside Tailor’s chat. The storefront is the star; the connected dashboard proves there's substance behind the style.</p><div class="hero-actions"><a class="button" href="#design">See the design experience ↓</a><a class="button secondary" href="#journey">Walk the flow</a></div><p class="hero-note">Documentation concept. 22 implementation tickets planned; the application is not built yet.</p></div><div class="story-art"><p class="art-label">The storefront is the showcase</p><div class="runway-window"><div class="runway-nav"><strong>FORME</strong><span>Collection &nbsp; / &nbsp; Bag (0)</span></div><div class="runway-scene"><div><h3>Good things.<br />Your way.</h3><p>Products you brought.<br />A store you'd be proud to launch.</p><span class="store-action">Explore the collection ↗</span></div><div class="garment"><svg role="img" aria-label="Illustration of a cream shirt"><use href="#garment-shirt" /></svg></div></div><div class="runway-foot"><span>Editorial</span><span>Bold</span><span>Gallery</span><span>One collection</span></div></div><p class="art-caption">First landing direction to try: a storefront runway transforming one collection through complete brand looks. The blueprint also retains a lookbook reveal and before/after concept for visual feedback.</p></div></div>
+<div class="principles"><div class="principle"><div><strong>Storefront first</strong><span>Every template, palette and type option must be excellent.</span></div></div><div class="principle"><div><strong>One smooth setup</strong><span>Upload, review and style with Tailor on one progressive demo page.</span></div></div><div class="principle"><div><strong>Connected throughout</strong><span>Products, shopping, Tailor and dashboard share one workspace.</span></div></div></div>
+<section id="journey"><div class="section-head"><div><p class="section-no">01 / The core flow</p><h2>From products<br />to a store you love.</h2></div><p>Retrosum inspires the pacing: simple expanding panels, graceful loading and animated transitions. One continuous page, with helpful buttons inside Tailor’s chat. You can complete setup without typing.</p></div><div class="steps">
+<article class="step"><span class="step-number">01</span><h3>Bring the products</h3><p>Try 15 sample clothing photos or upload yours. Clothes only: casual, formal, semi-formal and beachwear.</p></article>
+<article class="step"><span class="step-number">02</span><h3>AI drafts the catalogue</h3><p>Fresh live processing for sample and uploads. Draft names, categories and descriptions; keep uncertain facts unknown.</p></article>
+<article class="step"><span class="step-number">03</span><h3>Review the draft</h3><p>Beautiful product cards with compact optional edits. Demo prices, sizes and stock are explained clearly.</p></article>
+<article class="step star"><span class="step-number">04 / New core step</span><h3>Make it your own</h3><p>Tailor’s chat cards guide template, colours and type. Your store changes live. Then optionally generate three logos.</p></article>
+<article class="step star"><span class="step-number">05 / The main showcase</span><h3>Explore your storefront</h3><p>Enjoy all three pages. Ask Tailor for jeans, compare photos and fill the bag. Choose USD or automatically converted EUR.</p></article>
+<article class="step"><span class="step-number">06</span><h3>Place a demo order</h3><p>Review the exact price and stock effect. Simulate a purchase without real payment or shipping details.</p></article>
+<article class="step"><span class="step-number">07</span><h3>Try being the owner</h3><p>Inspect interactive charts, create photo-backed products and explore healthy-profit, break-even or heavy-loss scenarios.</p></article>
+<article class="step"><span class="step-number">Same temporary session</span><h3>Explore, export, reset</h3><p>Style changes and view switches preserve the store. Download a bounded demo export or start fresh.</p></article>
+</div><p class="note" style="margin-top:20px"><strong>Sample photo plan:</strong> 15 garments—jeans, hoodies, tees, shirts, tailoring, knitwear, a dress, skirt and beachwear. Original AI-generated photography is preferred; licensed Pexels/Unsplash stock is the researched alternative. Final photo assets still need to be produced and reviewed. Either source goes through fresh live catalogue drafting.</p><div class="connected"><p><strong>The proof: one change, visible everywhere.</strong>Create a jacket, place an order or issue a demo refund. The storefront, stock, charts and Tailor's explanations reflect the same records.</p></div></section>
+<section id="design"><div class="section-head"><div><p class="section-no">02 / The storefront is king</p><h2>A few choices.<br />Every one beautiful.</h2></div><p>Accepted library: three complete templates, four researched palettes and three typography presets. Each template owns the home, collection and product detail layout as one coherent idea.</p></div>
+<div class="design-studio"><div class="design-controls tailor-setup" id="design-controls">
+<p class="name">✦ Tailor · Your setup conversation</p><p class="note">Enlarged here for the overview. In the app, Tailor opens from the lower-right corner.</p>
+<div class="chat-message">Your products are ready. Let’s make this storefront yours. No typing needed—choose inside our conversation and watch your preview.</div>
+<div class="chat-progress" role="group" aria-label="Tailor setup steps"><button type="button" data-stage="template" aria-pressed="true">1 · Layout</button><button type="button" data-stage="palette" aria-pressed="false">2 · Colour</button><button type="button" data-stage="type" aria-pressed="false">3 · Type</button></div>
+<div id="chat-step-template" class="chat-step"><div class="chat-message">Which complete look feels like your brand?</div><fieldset><legend>Choose a three-page template</legend><div class="choices"><button type="button" data-choice="layout" data-value="studio" aria-pressed="true" aria-controls="store-preview"><strong>Studio</strong><small>Editorial · balanced · everyday</small></button><button type="button" data-choice="layout" data-value="pulse" aria-pressed="false" aria-controls="store-preview"><strong>Pulse</strong><small>Bold · compact · energetic</small></button><button type="button" data-choice="layout" data-value="gallery" aria-pressed="false" aria-controls="store-preview"><strong>Gallery</strong><small>Spacious · premium · image-led</small></button></div></fieldset><button class="chat-cta" type="button" data-next="palette">Use this template →</button></div>
+<div id="chat-step-palette" class="chat-step"><div class="chat-message">Now choose a colour mood. Every option is curated.</div><fieldset><legend>Choose a colour theme</legend><div class="choices palette-choices"><button type="button" data-choice="palette" data-value="ink" aria-pressed="true" aria-controls="store-preview"><span class="swatch" aria-hidden="true"><i style="--swatch:#faf8f2"></i><i style="--swatch:#202523"></i></span>Ink / Paper</button><button type="button" data-choice="palette" data-value="cobalt" aria-pressed="false" aria-controls="store-preview"><span class="swatch" aria-hidden="true"><i style="--swatch:#f5f7ff"></i><i style="--swatch:#2846c4"></i></span>Cobalt / Cloud</button><button type="button" data-choice="palette" data-value="oxblood" aria-pressed="false" aria-controls="store-preview"><span class="swatch" aria-hidden="true"><i style="--swatch:#fff0ed"></i><i style="--swatch:#742936"></i></span>Oxblood / Blush</button><button type="button" data-choice="palette" data-value="pine" aria-pressed="false" aria-controls="store-preview"><span class="swatch" aria-hidden="true"><i style="--swatch:#f6f1e5"></i><i style="--swatch:#235442"></i></span>Pine / Sand</button></div></fieldset><button class="chat-cta" type="button" data-next="type">Use these colours →</button></div>
+<div id="chat-step-type" class="chat-step"><div class="chat-message">And the finishing touch: your typography.</div><fieldset><legend>Choose a type personality</legend><div class="choices type-choices"><button type="button" data-choice="type" data-value="modern" aria-pressed="true" aria-controls="store-preview">Modern <small>Inter</small></button><button type="button" data-choice="type" data-value="editorial" aria-pressed="false" aria-controls="store-preview">Editorial <small>DM Serif + DM Sans</small></button><button type="button" data-choice="type" data-value="expressive" aria-pressed="false" aria-controls="store-preview">Expressive <small>Manrope + DM Sans</small></button></div></fieldset><button class="chat-cta" type="button" data-next="finish">Use this typography →</button></div>
+<div class="chat-message" id="logo-offer" hidden><strong>Your colours and type are set.</strong><p>Keep the beautiful text wordmark, or optionally ask AI for three logo choices based on these selections.</p><div class="logo-actions"><button type="button" id="keep-wordmark">Keep my wordmark</button><button type="button" id="explain-logos">Generate 3 logos</button></div><p class="note" id="logo-explanation" aria-live="polite">Overview only: this page never calls AI. The app will show three image candidates to review.</p></div>
+<p class="preview-status" id="chat-status" aria-live="polite">Start with a complete template. Confirm colour and type to reveal the optional logo step.</p><p class="note">Drawn garments and system-font approximations in this overview. Final templates use real accepted photos and bundled fonts.</p></div>
+<div class="preview-area"><div class="preview-tabs" id="preview-tabs" role="group" aria-label="Preview page"><button type="button" data-page="home" aria-pressed="true" aria-controls="page-home">Home</button><button type="button" data-page="collection" aria-pressed="false" aria-controls="page-collection">Collection</button><button type="button" data-page="product" aria-pressed="false" aria-controls="page-product">Product</button></div>
+<div class="store-preview" id="store-preview" data-layout="studio"><div class="store-nav"><strong>FORME</strong><span>Collection &nbsp; / &nbsp; Bag</span></div>
+<div class="store-page" id="page-home"><div class="store-hero"><div class="store-copy"><div><p>THE EVERYDAY COLLECTION</p><h3>Made for<br />your everyday.</h3></div><div><p>Considered pieces.<br />A little more you.</p><span class="store-action">Shop the collection ↗</span></div></div><div class="product-art"><svg role="img" aria-label="Cream shirt illustration"><use href="#garment-shirt" /></svg></div></div><div class="store-foot"><span>Collection highlights</span><span>Explore all ↗</span></div><div class="product-row"><div><div class="product-art"><svg aria-hidden="true"><use href="#garment-shirt" /></svg></div><p class="product-name"><span>Everyday shirt</span><b>$54</b></p></div><div><div class="product-art"><svg aria-hidden="true"><use href="#garment-jeans" /></svg></div><p class="product-name"><span>Straight jeans</span><b>$68</b></p></div><div><div class="product-art"><svg aria-hidden="true"><use href="#garment-tee" /></svg></div><p class="product-name"><span>Essential tee</span><b>$38</b></p></div></div></div>
+<div class="store-page" id="page-collection"><h3>The collection.</h3><div class="filter-chips"><span>All products ✓</span><span>Category</span><span>Price</span><span>Size</span></div><div class="collection-grid"><div><div class="product-art"><svg aria-hidden="true"><use href="#garment-shirt" /></svg></div><p class="product-name"><span>Everyday shirt</span><b>$54</b></p></div><div><div class="product-art"><svg aria-hidden="true"><use href="#garment-jeans" /></svg></div><p class="product-name"><span>Straight jeans</span><b>$68</b></p></div><div><div class="product-art"><svg aria-hidden="true"><use href="#garment-tee" /></svg></div><p class="product-name"><span>Essential tee</span><b>$38</b></p></div><div><div class="product-art"><svg aria-hidden="true"><use href="#garment-shirt" /></svg></div><p class="product-name"><span>Relaxed overshirt</span><b>$78</b></p></div></div></div>
+<div class="store-page" id="page-product"><div class="detail-grid"><div class="product-art"><svg role="img" aria-label="Straight blue jeans illustration"><use href="#garment-jeans" /></svg></div><div><p>FORME / THE COLLECTION</p><h3>Straight<br />jeans.</h3><p class="detail-price">$68</p><p>A clear product story with simple options and a beautiful gallery.</p><div class="size-row" aria-label="Illustrated demo sizes"><span>S</span><span>M</span><span>L</span></div><span class="store-action">Add to demo bag</span><p class="note" style="margin-top:12px">Illustration only · demo price and sizes</p></div></div></div>
+</div><p class="preview-status" id="preview-status" aria-live="polite">Studio · Ink / Paper · Modern · Home preview</p></div></div>
+<div class="design-contract"><div><strong>Super visual, in real time</strong><p>The actual demo previews your photo-backed catalogue. Chat choices preserve products, bag and sales history.</p></div><div><strong>Curated, never overwhelming</strong><p>Optional name, headline and supplied hero image add ownership. Manual design overrides are available in the owner dashboard.</p></div><div><strong>Research, then visual review</strong><p>Inter, DM Serif Display / DM Sans and Manrope / DM Sans are candidates. Colour conveys mood; no palette guarantees purchases.</p></div></div><p class="note" style="margin-top:18px">The full blueprint links builder, fashion-brand, font and usability research. The library count is accepted. All 36 combinations must pass visual review on all three page types; final names and visual tokens can be refined.</p></section>
+<section id="tailor"><div class="section-head"><div><p class="section-no">03 / Meet the copilot</p><h2>Tailor does more<br />than ask questions.</h2></div><p>A friendly lower-right companion leads setup, finds clothes and explains the business. Inline cards, buttons and forms let visitors act without typing everything.</p></div><div class="tailor-intro"><div class="conversation"><p class="name">✦ Tailor · Shopping example</p><div class="chat-message user">Show me the jeans under $80.</div><div class="chat-message">Here's the jeans collection. I've applied the category and price filters for you.<br /><span class="tool-chip">Jeans ×</span> <span class="tool-chip">Under $80 ×</span></div><div class="chat-message user">And on the owner's side?</div><div class="chat-message">I can explain charts, give tours and help manage products. To create one, you’ll upload a clothing photo right here, then review its details.</div><div class="chat-message photo-card"><strong>＋ Add a product photo · required</strong><p>Upload a clothing photo here, review the preview and product details, then create it.</p><small>No photo, no product. The dashboard follows the same rule.</small></div></div><div class="tailor-list"><div><strong>Welcome, style and tour</strong><p>A brief introduction as the store preview appears; optional soft blur clears before styling. Choose through visual chat cards, explain presets and replay tours.</p></div><div><strong>Find, compare and shop</strong><p>Apply real filters immediately, open products, answer supported questions and propose a reviewed outfit or bag.</p></div><div><strong>Understand the business</strong><p>Summarize the period, explain KPIs and trace a chart point to exact synthetic records.</p></div><div><strong>Create and manage</strong><p>Owner Tailor prepares photo-backed product CRUD, demo orders, stock, returns, refunds and expenses in inline editable forms. Consequential changes use editable forms and confirmation.</p></div></div></div></section>
+<section id="dashboard"><div class="section-head"><div><p class="section-no">04 / A beautiful owner view</p><h2>Numbers you can<br />touch and understand.</h2></div><p>Smooth animated charts with hover, tap and click details. Retrosum inspires the hierarchy: a clear period, a few headline facts, meaningful charts and the records behind every number.</p></div>
+<div class="scenario-controls" id="scenario-controls" role="group" aria-label="Illustrative business scenario"><button type="button" data-scenario="profit" aria-pressed="true">Healthy profit</button><button type="button" data-scenario="balanced" aria-pressed="false">Near break-even</button><button type="button" data-scenario="loss" aria-pressed="false">Heavy loss</button></div><p class="note">Compare three illustrations over the same clothing orders. Here only the disclosed operating expense changes. In the app, each scenario creates coherent linked activity and clearly reviews the replacement.</p>
+<div class="dashboard-illustration"><div class="dash-header"><strong>FORME / Owner overview</strong><span class="pill">Illustrative clothing orders · synthetic activity · USD</span></div><div class="kpis"><div class="kpi"><span>Net merchandise sales</span><strong id="kpi-sales">$572</strong><small>6-day illustration</small></div><div class="kpi"><span>Included orders</span><strong id="kpi-orders">8</strong><small>Eight illustrative clothing orders</small></div><div class="kpi"><span>Average order value</span><strong id="kpi-aov">$71.50</strong><small>$572 ÷ 8 orders</small></div><div class="kpi"><span>Simulated result</span><strong id="kpi-result">$200</strong><small id="kpi-scenario">Healthy profit · costs and expenses disclosed</small></div></div><div class="dash-body"><div><p class="chart-title">Net sales by day · hover or click a bar</p><div class="chart" id="sales-chart" role="group" aria-label="Illustrative daily sales; select a day for details"><button type="button" data-day="0" style="--bar:40%" aria-label="Day 1: $54 net sales" aria-controls="chart-evidence" aria-pressed="false"><span>$54</span></button><button type="button" data-day="1" style="--bar:78%" aria-label="Day 2: $106 net sales" aria-controls="chart-evidence" aria-pressed="false"><span>$106</span></button><button type="button" data-day="2" style="--bar:57%" aria-label="Day 3: $78 net sales" aria-controls="chart-evidence" aria-pressed="false"><span>$78</span></button><button type="button" data-day="3" style="--bar:90%" aria-label="Day 4: $122 net sales" aria-controls="chart-evidence" aria-pressed="false"><span>$122</span></button><button type="button" data-day="4" style="--bar:56%" aria-label="Day 5: $76 net sales" aria-controls="chart-evidence" aria-pressed="false"><span>$76</span></button><button type="button" data-day="5" style="--bar:100%" aria-label="Day 6: $136 net sales" aria-controls="chart-evidence" aria-pressed="true"><span>$136</span></button></div><div class="chart-labels" aria-hidden="true"><span>Day 1</span><span>Day 2</span><span>Day 3</span><span>Day 4</span><span>Day 5</span><span>Day 6</span></div></div><div class="evidence" id="chart-evidence" aria-live="polite"><h3 id="evidence-title">Day 6 / What happened?</h3><p class="amount" id="evidence-sales">$136 net sales</p><p id="evidence-summary">One demo order: two jeans at $68 each. An operating expense was posted that day.</p><dl><dt>Sold product cost</dt><dd id="evidence-cost">$68</dd><dt>Operating expenses</dt><dd id="evidence-expense">$86</dd><dt>Simulated result</dt><dd id="evidence-result">−$18</dd></dl><small id="evidence-records">Illustrative records: O-08 / F01 jeans; E-01 operating expense. A negative day has an explainable cause.</small></div></div><details open><summary>Exact clothing orders behind this illustration</summary><div class="table-wrap"><table><thead><tr><th scope="col">Day</th><th scope="col">Clothes sold</th><th scope="col">Sales</th><th scope="col">Orders</th><th scope="col">Cost</th><th scope="col">Expenses</th><th scope="col">Result</th></tr></thead><tbody id="scenario-table"><tr><th scope="row">1</th><td>F07 shirt</td><td>$54</td><td>1</td><td>$27</td><td>$0</td><td>$27</td></tr><tr><th scope="row">2</th><td>F01 jeans + F05 tee</td><td>$106</td><td>2</td><td>$53</td><td>$0</td><td>$53</td></tr><tr><th scope="row">3</th><td>F08 overshirt</td><td>$78</td><td>1</td><td>$39</td><td>$0</td><td>$39</td></tr><tr><th scope="row">4</th><td>F07 shirt + F01 jeans</td><td>$122</td><td>2</td><td>$61</td><td>$0</td><td>$61</td></tr><tr><th scope="row">5</th><td>2 × F05 tee</td><td>$76</td><td>1</td><td>$38</td><td>$0</td><td>$38</td></tr><tr><th scope="row">6</th><td>2 × F01 jeans</td><td>$136</td><td>1</td><td>$68</td><td>$86</td><td>−$18</td></tr></tbody></table></div><p class="note" id="scenario-equation">Demo prices match the planned sample: shirt $54, jeans $68, tee $38, overshirt $78. Illustrative unit cost is half the selling price; no delivery, discounts or refunds in this small example. Totals: $572 sales − $286 sold cost − $86 expenses = $200 result.</p></details></div>
+<div class="metric-grid"><div><strong>Sales, conversion and customers</strong><p>Sales and result trends, orders, AOV, a clearly synthetic shopping funnel and fictional new/repeat buyer cohorts.</p></div><div><strong>Products, stock and returns</strong><p>Top items, low-stock attention, movements, return reasons, refund value and linked product feedback.</p></div><div><strong>Costs and losses with causes</strong><p>Disclosed demo unit costs, operating expenses and inventory writeoffs. Negative results stay visible and explainable.</p></div></div><p class="note" style="margin-top:18px">The actual app derives charts from one commerce engine. This chart is a documentation illustration, not an implemented analytics system. Intended animations remain visible; no animation-off or render-off setting.</p></section>
+<div class="currency-note"><strong>English. USD at the source. EUR when shoppers choose it.</strong><p>Storefront prices, filters, Tailor budgets and the bag convert automatically from one dated reference rate. The owner’s financial view stays USD. If a usable rate is unavailable, the storefront clearly keeps USD.</p></div>
+<section id="scope"><div class="section-head"><div><p class="section-no">05 / Big impact, bounded demo</p><h2>Useful without<br />production plumbing.</h2></div><p>Yes—CRUD works in browser memory, with bounded recovery during the temporary session. No database is needed for this demo's connected product and business records.</p></div><div class="scope-grid"><div class="scope-card included"><h3>Inside the demo</h3><ul><li>Clothing photos, fresh live AI draft, compact review and Tailor-led styling.</li><li>Three complete templates, four themes, three type presets; optional three-logo generation.</li><li>Home, collection, detail, bag and fake orders; USD with automatic EUR display.</li><li>Product CRUD through dashboard and Tailor; linked history uses archival.</li><li>Order drafts, fulfilment, discounts, returns, refunds and stock changes.</li><li>Three coherent profit/loss scenarios with synthetic traffic, costs and expenses tied to your catalogue.</li><li>Two-hour guest workspace, local recovery, export and reset.</li></ul></div><div class="scope-card later"><h3>Beyond this first demo</h3><ul><li>Real payments, carriers, Shopify, advertising or analytics APIs.</li><li>Accounts, hosted database or cross-device persistence.</li><li>Real customer PII or public merchant-store publishing.</li><li>Freeform page building, colour picking or uploaded fonts.</li><li>Bookkeeping, tax filings or supplier systems.</li><li>Unsupported fit or guaranteed-conversion claims.</li></ul></div></div></section>
+<section id="backbone"><div class="section-head"><div><p class="section-no">06 / The proven backbone</p><h2>The same foundation.<br />A new experience.</h2></div><p>ClipBuilder, ScreenPilot and Retrosum provide the architecture and delivery discipline. Retrosum is the closest reference for smooth setup, exact charts and assistant-to-form interactions.</p></div><div class="backbone"><div><p>One browser workspace owns products, accepted design, fictional activity and Tailor conversations. A shared commerce engine owns calculations and reviewed changes.</p><p>The backend handles live catalogue recognition, typed Tailor and optional logo requests. Chat buttons, browsing and photo-backed manual product operations work without another model call. A fixed reference-data adapter converts USD storefront prices into EUR. Development starts with deterministic fakes and paid calls disabled.</p><div class="reference-chips"><span>ClipBuilder</span><span>ScreenPilot</span><span>Retrosum</span></div><p class="note">Manual cloud release, explicit limits, clear sources and no hidden retries. Models, budgets and deployment settings are settled before live release.</p></div><div class="stack-diagram"><div class="stack-box"><strong>Next.js + React</strong><small>One-page setup · template renderer · dashboard · Tailor</small></div><div class="stack-box"><strong>Shared TypeScript contracts + commerce</strong><small>Money · stock · costs · cohorts · commands · facts</small></div><div class="stack-box"><strong>Express + OpenAI</strong><small>Live image interpretation · Tailor · optional logos · reference FX</small></div><div class="stack-box"><strong>Sibling deployment family</strong><small>pnpm · Docker · Cloud Run · Artifact Registry · Secret Manager · Cloudflare</small></div></div></div></section>
+<div class="closing"><div><strong>The goal: “These are my products. This could be my brand.”</strong><p>A beautiful store, a helpful Tailor and a convincing business demo. The eleven product decisions are reflected here. The 22 detailed tickets now plan the build, visual evidence and asset preparation. Implementation has not started.</p></div><a href="RETAILOR_DEMO_SOURCE_OF_TRUTH.md">Read the complete blueprint ↗</a><a href="tickets/README.md">See the 22-ticket plan ↗</a></div>
+</main><footer class="wrap footer"><span>Retailor · Owner direction incorporated 11 October 2026</span><span>Illustrative visuals. Final application still to be built.</span></footer>
+<noscript><p class="wrap note">JavaScript is off: all three storefront illustrations and the exact dashboard table remain available.</p></noscript>
+<script>
+(() => {
+  'use strict';
+  const preview = document.getElementById('store-preview');
+  const status = document.getElementById('preview-status');
+  const selection = {layout:'studio',palette:'ink',type:'modern',page:'home'};
+  const layouts = {studio:'Studio',pulse:'Pulse',gallery:'Gallery'};
+  const palettes = {
+    ink:{name:'Ink / Paper',bg:'#faf8f2',surface:'#ece8dc',ink:'#202523',accent:'#202523'},
+    cobalt:{name:'Cobalt / Cloud',bg:'#f5f7ff',surface:'#e2e8ff',ink:'#182855',accent:'#2846c4'},
+    oxblood:{name:'Oxblood / Blush',bg:'#fff0ed',surface:'#f0dcd5',ink:'#43232a',accent:'#742936'},
+    pine:{name:'Pine / Sand',bg:'#f6f1e5',surface:'#e4e6d1',ink:'#243b30',accent:'#235442'}
+  };
+  const types = {modern:{name:'Modern',family:"'Segoe UI',Arial,sans-serif",weight:'600'},editorial:{name:'Editorial',family:'Georgia,serif',weight:'400'},expressive:{name:'Expressive',family:"'Arial Black',Arial,sans-serif",weight:'800'}};
+  const pages = {home:document.getElementById('page-home'),collection:document.getElementById('page-collection'),product:document.getElementById('page-product')};
+  function describe() {status.textContent = `${layouts[selection.layout]} · ${palettes[selection.palette].name} · ${types[selection.type].name} · ${selection.page[0].toUpperCase()+selection.page.slice(1)} preview`;}
+  function animatePreview() {
+    if (typeof preview.animate === 'function') {
+      preview.getAnimations().forEach(animation => animation.cancel());
+      preview.animate([{opacity:.82,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:320,easing:'ease-out'});
+    }
+  }
+  document.getElementById('design-controls').addEventListener('click',event => {
+    const button = event.target.closest('button[data-choice]');
+    if (!button) return;
+    const kind = button.dataset.choice, value = button.dataset.value;
+    const dictionaries = {layout:layouts,palette:palettes,type:types};
+    if (!Object.hasOwn(dictionaries,kind) || !Object.hasOwn(dictionaries[kind],value)) return;
+    selection[kind] = value;
+    document.querySelectorAll(`button[data-choice="${kind}"]`).forEach(item => item.setAttribute('aria-pressed',String(item === button)));
+    preview.dataset.layout = selection.layout;
+    const palette = palettes[selection.palette], type = types[selection.type];
+    for (const [token,colour] of Object.entries({bg:palette.bg,surface:palette.surface,ink:palette.ink,accent:palette.accent})) preview.style.setProperty(`--store-${token}`,colour);
+    preview.style.setProperty('--store-type',type.family);
+    preview.style.setProperty('--store-weight',type.weight);
+    describe(); animatePreview();
+  });
+  const setupSteps = {template:document.getElementById('chat-step-template'),palette:document.getElementById('chat-step-palette'),type:document.getElementById('chat-step-type')};
+  const confirmed = {palette:false,type:false};
+  const logoOffer = document.getElementById('logo-offer');
+  function showStep(stage) {
+    if (!Object.hasOwn(setupSteps,stage)) return;
+    logoOffer.hidden = true;
+    Object.entries(setupSteps).forEach(([name,element]) => {element.hidden = name !== stage;});
+    document.querySelectorAll('button[data-stage]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.stage === stage)));
+    document.getElementById('chat-status').textContent = {template:'Choose a complete template in Tailor’s chat.',palette:'Preview a colour mood, then confirm it.',type:'Choose typography. The logo offer follows confirmed colour and type.'}[stage];
+  }
+  showStep('template');
+  document.getElementById('design-controls').addEventListener('click',event => {
+    const choice = event.target.closest('button[data-choice]');
+    if (choice && (choice.dataset.choice === 'palette' || choice.dataset.choice === 'type')) {
+      confirmed[choice.dataset.choice] = false;
+      logoOffer.hidden = true;
+    }
+    const stage = event.target.closest('button[data-stage]');
+    if (stage) {showStep(stage.dataset.stage); return;}
+    const next = event.target.closest('button[data-next]');
+    if (!next) return;
+    if (next.dataset.next === 'palette') showStep('palette');
+    if (next.dataset.next === 'type') {confirmed.palette = true; showStep('type');}
+    if (next.dataset.next === 'finish') {
+      confirmed.type = true;
+      if (!confirmed.palette) {showStep('palette'); return;}
+      Object.values(setupSteps).forEach(element => {element.hidden = true;});
+      document.querySelectorAll('button[data-stage]').forEach(button => button.setAttribute('aria-pressed','false'));
+      logoOffer.hidden = false;
+      document.getElementById('chat-status').textContent = 'Look ready. Optional name, headline and supplied hero image can be refined in the app. Manual styling remains in the owner dashboard.';
+    }
+  });
+  document.getElementById('keep-wordmark').addEventListener('click',() => {
+    document.getElementById('logo-explanation').textContent = 'FORME’s text wordmark is ready. In the app, Enter my store accepts the look and starts exploring.';
+  });
+  document.getElementById('explain-logos').addEventListener('click',() => {
+    if (!confirmed.palette || !confirmed.type) return;
+    document.getElementById('logo-explanation').textContent = `In the app: one approved AI request creates three logo choices for FORME, using ${palettes[selection.palette].name} and ${types[selection.type].name}. Choose one or keep the wordmark. This overview makes no AI call.`;
+  });
+  Object.entries(pages).forEach(([name,page]) => {page.hidden = name !== selection.page;});
+  document.getElementById('preview-tabs').addEventListener('click',event => {
+    const button = event.target.closest('button[data-page]');
+    if (!button || !Object.hasOwn(pages,button.dataset.page)) return;
+    selection.page = button.dataset.page;
+    Object.entries(pages).forEach(([name,page]) => {page.hidden = name !== selection.page;});
+    document.querySelectorAll('button[data-page]').forEach(item => item.setAttribute('aria-pressed',String(item === button)));
+    describe(); animatePreview();
+  });
+  const days = [
+    {sales:54,cost:27,orders:1,items:'F07 shirt',detail:'one shirt at $54',records:'O-01'},
+    {sales:106,cost:53,orders:2,items:'F01 jeans + F05 tee',detail:'jeans at $68 and a tee at $38',records:'O-02, O-03'},
+    {sales:78,cost:39,orders:1,items:'F08 overshirt',detail:'one overshirt at $78',records:'O-04'},
+    {sales:122,cost:61,orders:2,items:'F07 shirt + F01 jeans',detail:'a shirt at $54 and jeans at $68',records:'O-05, O-06'},
+    {sales:76,cost:38,orders:1,items:'2 × F05 tee',detail:'two tees at $38 each',records:'O-07'},
+    {sales:136,cost:68,orders:1,items:'2 × F01 jeans',detail:'two jeans at $68 each',records:'O-08'}
+  ];
+  const scenarios = {profit:{name:'Healthy profit',expense:86},balanced:{name:'Near break-even',expense:282},loss:{name:'Heavy loss',expense:766}};
+  let activeScenario = 'profit', activeDay = 5;
+  const money = value => `${value < 0 ? '−' : ''}$${Math.abs(value).toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(value)?0:2,maximumFractionDigits:2})}`;
+  function showEvidence(index) {
+    const day = days[index], expense = index === 5 ? scenarios[activeScenario].expense : 0;
+    activeDay = index;
+    document.querySelectorAll('button[data-day]').forEach(item => item.setAttribute('aria-pressed',String(Number(item.dataset.day) === index)));
+    document.getElementById('evidence-title').textContent = `Day ${index+1} / What happened?`;
+    document.getElementById('evidence-sales').textContent = `${money(day.sales)} net sales`;
+    document.getElementById('evidence-summary').textContent = `${day.orders === 1 ? 'One demo order' : 'Two demo orders'}: ${day.detail}.${expense ? ' An operating expense was posted that day.' : ''}`;
+    document.getElementById('evidence-cost').textContent = money(day.cost);
+    document.getElementById('evidence-expense').textContent = money(expense);
+    document.getElementById('evidence-result').textContent = money(day.sales-day.cost-expense);
+    document.getElementById('evidence-records').textContent = `Illustrative records: ${day.records} / ${day.items}${expense ? '; E-01 operating expense' : ''}.`;
+  }
+  function showScenario(key) {
+    if (!Object.hasOwn(scenarios,key)) return;
+    activeScenario = key;
+    const scenario = scenarios[key], sales = days.reduce((sum,day) => sum+day.sales,0), cost = days.reduce((sum,day) => sum+day.cost,0), orders = days.reduce((sum,day) => sum+day.orders,0);
+    document.querySelectorAll('button[data-scenario]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.scenario === key)));
+    document.getElementById('kpi-sales').textContent = money(sales);
+    document.getElementById('kpi-orders').textContent = String(orders);
+    document.getElementById('kpi-aov').textContent = money(sales/orders);
+    document.getElementById('kpi-result').textContent = money(sales-cost-scenario.expense);
+    document.getElementById('kpi-scenario').textContent = `${scenario.name} · costs and expenses disclosed`;
+    document.getElementById('scenario-equation').textContent = `Demo prices match the planned sample: shirt $54, jeans $68, tee $38, overshirt $78. Illustrative unit cost is half the selling price; no delivery, discounts or refunds here. ${money(sales)} sales − ${money(cost)} sold cost − ${money(scenario.expense)} expenses = ${money(sales-cost-scenario.expense)} result.`;
+    const body = document.getElementById('scenario-table');
+    body.replaceChildren();
+    days.forEach((day,index) => {
+      const row = document.createElement('tr'), expense = index === 5 ? scenario.expense : 0;
+      [String(index+1),day.items,money(day.sales),String(day.orders),money(day.cost),money(expense),money(day.sales-day.cost-expense)].forEach((value,column) => {
+        const cell = document.createElement(column === 0 ? 'th' : 'td');
+        if (column === 0) cell.scope = 'row';
+        cell.textContent = value; row.appendChild(cell);
       });
-    </script>
-  </body>
+      body.appendChild(row);
+    });
+    showEvidence(activeDay);
+  }
+  document.getElementById('scenario-controls').addEventListener('click',event => {
+    const button = event.target.closest('button[data-scenario]');
+    if (button) showScenario(button.dataset.scenario);
+  });
+  document.getElementById('sales-chart').addEventListener('click',event => {
+    const button = event.target.closest('button[data-day]');
+    if (!button) return;
+    const index = Number(button.dataset.day);
+    if (Number.isInteger(index) && index >= 0 && index < days.length) showEvidence(index);
+  });
+  showScenario('profit');
+})();
+</script>
+</body>
 </html>

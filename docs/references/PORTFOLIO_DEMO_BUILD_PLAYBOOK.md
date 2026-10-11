@@ -1,5 +1,7 @@
 # Portfolio Demo Build Playbook
 
+> **Retailor application note — 11 October 2026:** this is an imported sibling reference, not Retailor’s product contract. Apply the [current Retailor blueprint](../RETAILOR_DEMO_SOURCE_OF_TRUTH.md): clothing only, live 15-photo sample drafting, Tailor-led CTA styling, required product photos/chat uploads, optional three-logo branch after colour/type, three catalogue-linked business scenarios and USD/EUR storefront display. Historical free-sample, assistant/editor, asset, currency or motion settings in the source project do not override these accepted decisions. Retailor implementation work is planned in the [22-ticket queue](../tickets/README.md); no tickets are defined by this historical reference.
+
 > **ClipBuilder scope note:** This is a reusable methodology document, not the
 > ClipBuilder product contract. Generic editor examples do not apply to
 > ClipBuilder. Its locked demo flow exposes candidate selection, automatic clip
