@@ -20,6 +20,7 @@ import {
   excludeSource,
 } from "../catalogue/draft";
 import type { CatalogueDraft } from "../catalogue/draft";
+import { CatalogueRequestError } from "../catalogue/request-error";
 import {
   INITIAL_DESIGN,
   SESSION_KEY,
@@ -30,6 +31,7 @@ import {
 import type { Projection, Stage } from "./projection";
 export type ProcessStep =
   | "Checking photos"
+  | "Approving this request"
   | "Drafting products"
   | "Validating catalogue"
   | "Preparing your preview";
@@ -39,6 +41,10 @@ export interface CatalogueProcessor {
     photos: Photo[];
     operationId: string;
     inputRevision: number;
+    workspaceId: string;
+    createdAt: string;
+    expiresAt: string;
+    derivatives: ReadonlyMap<string, Blob>;
     signal: AbortSignal;
     step(value: ProcessStep): void;
   }): Promise<CatalogueDraft>;
@@ -412,9 +418,19 @@ export class SessionController {
         (id) => this.photos.get(id)!.photo,
       );
       const operationId = this.id();
-      this.update({ processStep: "Drafting products" });
+      if (processor.mode === "development-fixture")
+        this.update({ processStep: "Drafting products" });
       const response = await processor.interpret({
         photos,
+        workspaceId,
+        createdAt: this.snapshot.state.graph.createdAt,
+        expiresAt: this.snapshot.state.graph.expiresAt,
+        derivatives: new Map(
+          photos.map((photo) => [
+            photo.id,
+            this.photos.get(photo.id)!.derivative,
+          ]),
+        ),
         inputRevision,
         operationId,
         signal: operation.signal,
@@ -443,11 +459,13 @@ export class SessionController {
         { draft, stage: "catalogue" },
         "Your photo-backed draft is ready. Corrections are local and never rerun processing.",
       );
-    } catch {
+    } catch (error) {
       if (current())
         this.state(
           { stage: "choose" },
-          "The catalogue could not be completed. Your photos are kept; a new attempt requires your instruction.",
+          error instanceof CatalogueRequestError
+            ? `${error.message} A new attempt requires your instruction.`
+            : "The catalogue could not be completed. Your photos are kept; a new attempt requires your instruction.",
         );
     } finally {
       if (this.operation === operation) this.operation = undefined;

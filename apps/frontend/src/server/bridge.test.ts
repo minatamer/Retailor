@@ -13,6 +13,72 @@ function ports() {
   };
 }
 describe("fixed bounded private bridge", () => {
+  it("forwards only a bounded safety cookie on admitted writes and reissues fixed attributes", async () => {
+    const io = ports(),
+      cookie = `retailor_safety=abc.${"a".repeat(64)}`;
+    io.fetch.mockResolvedValue(
+      Response.json(
+        {
+          schemaVersion: 1,
+          operationId: "operation",
+          grant: "grant",
+          expiresAt: "2026-10-11T22:00:00.000Z",
+        },
+        { headers: { "Set-Cookie": `${cookie}; Path=/; Domain=evil.example` } },
+      ),
+    );
+    const result = await forward(
+      new Request("http://x", {
+        method: "POST",
+        headers: {
+          Origin: config.FRONTEND_ORIGIN,
+          "Content-Type": "application/json",
+          Cookie: `other=private; ${cookie}`,
+          Authorization: "Bearer client-secret",
+        },
+        body: "{}",
+      }),
+      "admission",
+      config,
+      io,
+    );
+    expect(result.status).toBe(200);
+    const sent = new Headers(io.fetch.mock.calls[0]![1]!.headers);
+    expect(sent.get("cookie")).toBe(cookie);
+    expect(sent.has("authorization")).toBe(false);
+    expect(result.headers.get("set-cookie")).toBe(
+      `${cookie}; Path=/api/retailor/v1; HttpOnly; SameSite=Strict; Max-Age=7200`,
+    );
+  });
+  it("rejects malformed recognition results and arbitrary upstream cookies", async () => {
+    for (const path of ["admission", "catalogue/interpret"] as const) {
+      const io = ports();
+      io.fetch.mockResolvedValue(
+        Response.json(
+          { arbitrary: "unsafe" },
+          { headers: { "Set-Cookie": "other=secret" } },
+        ),
+      );
+      const result = await forward(
+        new Request("http://x", {
+          method: "POST",
+          headers: {
+            Origin: config.FRONTEND_ORIGIN,
+            "Content-Type":
+              path === "admission"
+                ? "application/json"
+                : "multipart/form-data; boundary=x",
+          },
+          body: "{}",
+        }),
+        path,
+        config,
+        io,
+      );
+      expect(result.status).toBe(502);
+      expect(result.headers.has("set-cookie")).toBe(false);
+    }
+  });
   it("forwards only the configured target and strips client secrets", async () => {
     const io = ports();
     const result = await forward(

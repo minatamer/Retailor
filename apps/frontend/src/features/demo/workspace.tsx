@@ -260,6 +260,7 @@ function WorkspaceFlow() {
 }
 const PROCESS_STEPS: ProcessStep[] = [
   "Checking photos",
+  "Approving this request",
   "Drafting products",
   "Validating catalogue",
   "Preparing your preview",

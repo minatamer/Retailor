@@ -7,6 +7,10 @@ import {
   ReadinessSchema,
   CapabilitiesSchema,
 } from "@retailor/contracts/api";
+import {
+  AdmissionResultSchema,
+  RecognitionResultSchema,
+} from "@retailor/contracts/recognition";
 import { z } from "zod";
 const origin = z
   .string()
@@ -56,14 +60,21 @@ class LimitError extends Error {}
 export async function readBounded(
   body: ReadableStream<Uint8Array> | null,
   limit: number,
+  signal?: AbortSignal,
 ): Promise<Uint8Array> {
   if (!body) return new Uint8Array();
   const reader = body.getReader();
   const chunks: Uint8Array[] = [];
   let size = 0;
+  const abort = () => {
+    void reader.cancel().catch(() => undefined);
+  };
+  signal?.addEventListener("abort", abort, { once: true });
   try {
+    signal?.throwIfAborted();
     for (;;) {
       const next = await reader.read();
+      signal?.throwIfAborted();
       if (next.done) break;
       size += next.value.byteLength;
       if (size > limit) {
@@ -73,6 +84,7 @@ export async function readBounded(
       chunks.push(next.value);
     }
   } finally {
+    signal?.removeEventListener("abort", abort);
     reader.releaseLock();
   }
   const bytes = new Uint8Array(size);
@@ -141,6 +153,23 @@ export async function forward(
     const headers = new Headers({ Accept: "application/json" });
     if (type) headers.set("Content-Type", type);
     if (request.method !== "GET") headers.set("Origin", config.FRONTEND_ORIGIN);
+    if (path === "admission" || path === "catalogue/interpret") {
+      const cookie = request.headers.get("cookie") ?? "";
+      const values =
+        cookie.length <= 4096
+          ? cookie
+              .split(";")
+              .map((value) => value.trim())
+              .filter((value) => value.startsWith("retailor_safety="))
+          : [];
+      if (
+        values.length === 1 &&
+        /^retailor_safety=[A-Za-z0-9_-]{1,1900}\.[a-f0-9]{64}$/u.test(
+          values[0]!,
+        )
+      )
+        headers.set("Cookie", values[0]!);
+    }
     if (config.APP_ENV === "production")
       headers.set(
         "Authorization",
@@ -169,7 +198,11 @@ export async function forward(
       )
     )
       return fail("UPSTREAM_FAILED", 502);
-    const bytes = await readBounded(response.body, policy.responseLimit);
+    const bytes = await readBounded(
+      response.body,
+      policy.responseLimit,
+      signal,
+    );
     const parsed: unknown = JSON.parse(new TextDecoder().decode(bytes));
     if (!response.ok && path !== "ready") {
       const error = PublicErrorSchema.safeParse(parsed);
@@ -183,15 +216,33 @@ export async function forward(
           ? ReadinessSchema
           : path === "config"
             ? CapabilitiesSchema
-            : null;
+            : path === "admission"
+              ? AdmissionResultSchema
+              : path === "catalogue/interpret"
+                ? RecognitionResultSchema
+                : null;
     const validated = schema?.safeParse(parsed);
     if (validated && !validated.success) return fail("UPSTREAM_FAILED", 502);
+    const outputHeaders = new Headers({
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+    });
+    if (path === "admission") {
+      const cookie = response.headers.get("set-cookie")?.split(";")[0];
+      if (cookie) {
+        if (
+          !/^retailor_safety=[A-Za-z0-9_-]{1,1900}\.[a-f0-9]{64}$/u.test(cookie)
+        )
+          return fail("UPSTREAM_FAILED", 502);
+        outputHeaders.set(
+          "Set-Cookie",
+          `${cookie}; Path=/api/retailor/v1; HttpOnly; SameSite=Strict; Max-Age=7200${config.FRONTEND_ORIGIN.startsWith("https:") ? "; Secure" : ""}`,
+        );
+      }
+    }
     return Response.json(validated?.success ? validated.data : parsed, {
       status: response.status,
-      headers: {
-        "Cache-Control": "no-store",
-        "X-Content-Type-Options": "nosniff",
-      },
+      headers: outputHeaders,
     });
   } catch (error) {
     if (requestTooLarge || error instanceof LimitError)
