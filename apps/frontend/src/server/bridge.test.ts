@@ -1,0 +1,196 @@
+import { describe, it, expect, vi } from "vitest";
+import { forward, parseBridgeConfig } from "./bridge";
+const config = parseBridgeConfig({ APP_ENV: "test" });
+function ports() {
+  return {
+    fetch: vi.fn<typeof fetch>(async () =>
+      Response.json({ schemaVersion: 1, ready: true, mode: "fake" }),
+    ),
+    authorization: vi.fn(
+      async (_audience: string, _signal: AbortSignal) => "Bearer identity",
+    ),
+    requestId: () => "req_test",
+  };
+}
+describe("fixed bounded private bridge", () => {
+  it("forwards only the configured target and strips client secrets", async () => {
+    const io = ports();
+    const result = await forward(
+      new Request("http://127.0.0.1:4310/api/retailor/v1/ready", {
+        headers: { Authorization: "Bearer hostile", Cookie: "secret" },
+      }),
+      "ready",
+      config,
+      io,
+    );
+    expect(result.status).toBe(200);
+    expect(io.fetch.mock.calls[0]?.[0]).toBe("http://127.0.0.1:4311/v1/ready");
+    const init = io.fetch.mock.calls[0]?.[1];
+    expect(new Headers(init?.headers).has("authorization")).toBe(false);
+    expect(new Headers(init?.headers).has("cookie")).toBe(false);
+    expect(io.authorization).not.toHaveBeenCalled();
+  });
+  it("rejects arbitrary paths, method and cross-origin writes before fetch", async () => {
+    const io = ports();
+    expect(
+      (
+        await forward(
+          new Request("http://x"),
+          "https://foreign.example",
+          config,
+          io,
+        )
+      ).status,
+    ).toBe(404);
+    expect(
+      (
+        await forward(
+          new Request("http://x", { method: "POST" }),
+          "health",
+          config,
+          io,
+        )
+      ).status,
+    ).toBe(405);
+    expect(
+      (
+        await forward(
+          new Request("http://x", {
+            method: "POST",
+            headers: {
+              origin: "https://foreign.example",
+              "content-type": "application/json",
+            },
+            body: "{}",
+          }),
+          "admission",
+          config,
+          io,
+        )
+      ).status,
+    ).toBe(403);
+    expect(io.fetch).not.toHaveBeenCalled();
+  });
+  it("bounds actual upstream bytes and hides failures", async () => {
+    const io = ports();
+    io.fetch.mockImplementation(
+      async () =>
+        new Response("x".repeat(9000), {
+          headers: { "content-type": "application/json" },
+        }),
+    );
+    expect(
+      (await forward(new Request("http://x"), "health", config, io)).status,
+    ).toBe(413);
+    io.fetch.mockRejectedValue(new Error("private_key_sentinel"));
+    const result = await forward(new Request("http://x"), "health", config, io);
+    expect(result.status).toBe(503);
+    expect(await result.text()).not.toContain("private_key_sentinel");
+  });
+  it("rejects invalid private production destination", () => {
+    expect(() =>
+      parseBridgeConfig({
+        APP_ENV: "production",
+        BACKEND_ORIGIN: "http://127.0.0.1:4311",
+      }),
+    ).toThrow();
+  });
+});
+
+it("rejects private fields in public capability output", async () => {
+  const io = ports();
+  io.fetch.mockImplementation(async () =>
+    Response.json({
+      schemaVersion: 1,
+      mode: "fake",
+      paidEnabled: false,
+      OPENAI_API_KEY: "private_key_sentinel",
+    }),
+  );
+  const result = await forward(new Request("http://x"), "config", config, io);
+  expect(result.status).toBe(502);
+  expect(await result.text()).not.toContain("private_key_sentinel");
+});
+it("authenticates hosted forwarding using the owned abort signal", async () => {
+  const io = ports();
+  const hosted = parseBridgeConfig({
+    APP_ENV: "production",
+    FRONTEND_ORIGIN: "https://store.example",
+    BACKEND_ORIGIN: "https://backend.example",
+    BACKEND_AUDIENCE: "https://backend.example",
+  });
+  expect(
+    (await forward(new Request("https://store.example"), "ready", hosted, io))
+      .status,
+  ).toBe(200);
+  expect(io.authorization.mock.calls[0]?.[0]).toBe(hosted.BACKEND_AUDIENCE);
+  expect(io.authorization.mock.calls[0]?.[1]).toBeInstanceOf(AbortSignal);
+  expect(
+    new Headers(io.fetch.mock.calls[0]?.[1]?.headers).get("authorization"),
+  ).toBe("Bearer identity");
+});
+
+it("rebuilds upstream public errors from fixed visitor copy", async () => {
+  const io = ports();
+  io.fetch.mockImplementation(async () =>
+    Response.json(
+      {
+        schemaVersion: 1,
+        error: {
+          code: "UNAVAILABLE",
+          message: "private_key_sentinel",
+          requestId: "req_test",
+          retry: "deliberate",
+        },
+      },
+      { status: 503 },
+    ),
+  );
+  const result = await forward(new Request("http://x"), "config", config, io);
+  expect(result.status).toBe(503);
+  expect(await result.text()).not.toContain("private_key_sentinel");
+});
+
+it("rejects actual chunked request bytes when the upstream wraps stream errors", async () => {
+  const io = ports();
+  io.fetch.mockImplementation(async (_url, init) => {
+    try {
+      await new Response(init?.body).arrayBuffer();
+    } catch (error) {
+      throw new TypeError("Transport failed", { cause: error });
+    }
+    return Response.json({});
+  });
+  const input = new Request("http://x", {
+    method: "POST",
+    headers: {
+      origin: config.FRONTEND_ORIGIN,
+      "content-type": "application/json",
+    },
+    body: "x".repeat(70000),
+  });
+  const result = await forward(input, "admission", config, io);
+  expect(result.status).toBe(413);
+  expect((await result.json()).error.code).toBe("TOO_LARGE");
+});
+
+it("preserves the response limit category even when upstream cancellation rejects", async () => {
+  const io = ports();
+  io.fetch.mockImplementation(
+    async () =>
+      new Response(
+        new ReadableStream({
+          start(controller) {
+            controller.enqueue(new Uint8Array(9000));
+          },
+          cancel() {
+            throw new Error("Closed upstream");
+          },
+        }),
+        { headers: { "content-type": "application/json" } },
+      ),
+  );
+  expect(
+    (await forward(new Request("http://x"), "health", config, io)).status,
+  ).toBe(413);
+});

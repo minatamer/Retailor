@@ -1,0 +1,40 @@
+{
+  "name": "retailor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=24.19.0 <25",
+    "pnpm": "11.25.0"
+  },
+  "scripts": {
+    "build:shared": "pnpm --filter @retailor/contracts build && pnpm --filter @retailor/commerce build",
+    "build": "pnpm build:shared && pnpm --filter @retailor/backend build && pnpm --filter @retailor/frontend build",
+    "dev:backend": "pnpm build:shared && pnpm --filter @retailor/backend dev",
+    "dev:frontend": "pnpm build:shared && pnpm --filter @retailor/frontend dev",
+    "start:backend": "pnpm --filter @retailor/backend start",
+    "start:frontend": "pnpm --filter @retailor/frontend start",
+    "format": "prettier --write apps packages scripts test *.json *.mjs *.ts .github",
+    "format:check": "prettier --check apps packages scripts test *.json *.mjs *.ts .github",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "pnpm build:shared && pnpm -r --sort typecheck && tsc --noEmit -p tsconfig.tests.json",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "test:unit": "pnpm build:shared && vitest run",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm test:unit && pnpm build"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@next/eslint-plugin-next": "16.4.0",
+    "@types/node": "24.19.0",
+    "@types/supertest": "7.2.1",
+    "eslint": "10.12.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "prettier": "3.9.10",
+    "supertest": "7.3.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1",
+    "vitest": "5.0.3",
+    "globals": "17.12.0"
+  }
+}

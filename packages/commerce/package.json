@@ -1,0 +1,22 @@
+{
+  "name": "@retailor/commerce",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./money": {
+      "types": "./dist/money.d.ts",
+      "import": "./dist/money.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@retailor/contracts": "workspace:*"
+  }
+}
