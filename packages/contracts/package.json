@@ -42,6 +42,14 @@
     "./facts": {
       "types": "./dist/facts.d.ts",
       "import": "./dist/facts.js"
+    },
+    "./catalogue": {
+      "types": "./dist/catalogue.d.ts",
+      "import": "./dist/catalogue.js"
+    },
+    "./recognition": {
+      "types": "./dist/recognition.d.ts",
+      "import": "./dist/recognition.js"
     }
   },
   "scripts": {
