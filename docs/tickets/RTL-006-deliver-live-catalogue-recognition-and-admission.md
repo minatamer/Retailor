@@ -1,6 +1,6 @@
 # RTL-006 — Deliver live catalogue recognition and action-bound admission
 
-Status: **Planned — not started**\
+Status: **Locally complete — paid/account/hosted evidence pending**\
 Planning date: **11 October 2026**\
 Milestone: **Live drafting**\
 Depends on: [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md)\
@@ -58,15 +58,15 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Sample and uploads use one production live-recognition path.
-- [ ] Protected paid dispatch occurs only after validated action-bound admission.
-- [ ] Actual derivative hashes/bytes/counts and multipart caps are independently enforced.
-- [ ] Every attempt makes at most one model call with zero automatic retries.
-- [ ] Output/source relationships and mandatory product photos are reconciled before review.
-- [ ] Unknown/unsupported facts and non-clothing inputs are handled honestly.
-- [ ] Failures retain usable photos without generic or prepared public success.
-- [ ] Stale/reset/cancel outcomes cannot apply and replay cannot charge twice.
-- [ ] Capabilities/log/errors expose only safe truthful information.
+- [x] Sample and uploads use one production live-recognition path.
+- [x] Protected paid dispatch occurs only after validated action-bound admission.
+- [x] Actual derivative hashes/bytes/counts and multipart caps are independently enforced.
+- [x] Every attempt makes at most one model call with zero automatic retries.
+- [x] Output/source relationships and mandatory product photos are reconciled before review.
+- [x] Unknown/unsupported facts and non-clothing inputs are handled honestly.
+- [x] Failures retain usable photos without generic or prepared public success.
+- [x] Stale/reset/cancel outcomes cannot apply and replay cannot charge twice.
+- [x] Capabilities/log/errors expose only safe truthful information.
 
 ## Focused verification and evidence
 
@@ -105,4 +105,8 @@ No file library, server upload cache, automatic repair/retry, model-generated ex
 
 Keep this outcome under `RTL-006:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-006.md` and actual check/review evidence under `docs/validation/RTL-006.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Checked local criteria are supported by the actual completion evidence below; external acceptance remains separate. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+
+## Actual local completion
+
+Shared source contracts, exact admitted transport, owned image workers, zero-retry Responses adapter and deliberate public integration are implemented. [Actual gates, three read-only validation passes and browser evidence](../validation/RTL-006.md) record 161 passing tests, both builds and final No actionable findings. All nine boxes describe required local behavior, not paid quality/usage or real challenge acceptance. [Recognition policy](../engineering/RECOGNITION.md) and [independent actual-image expectations](../evaluation/catalogue/README.md) retain every external prerequisite; committed configuration stays fake, paid-off, policy-off and budget zero. RTL-007 is next.

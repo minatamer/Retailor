@@ -4,7 +4,7 @@
 **Prepared:** 11 October 2026.\
 **Product:** Retailor. **Sample clothing brand:** FORME.\
 **Companion:** [Retailor product overview](RETAILOR_OVERVIEW.html).\
-**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–005 locally complete, next eligible packet RTL-006; owner visual/zoom evidence remains pending.\
+**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–006 locally complete, next eligible packet RTL-007; owner visual/zoom evidence remains pending.\
 **Signature promise:** **Bring your products. See your store.**\
 **Owner decisions incorporated:** all eleven answers on clothing-only scope, researched presets, Tailor-led setup, optional logos, mandatory photos, catalogue integrity, three scenarios, live sample processing, runway direction, image sourcing and USD/EUR; 11 October 2026.
 
@@ -775,7 +775,7 @@ Prepare fifteen distinct primary garment photos; optional alternate views bring 
 | F14 | Resort shorts | Beige, beach/casual shape | $48 | Side/detail |
 | F15 | Swim shorts | Pine, obvious swim-short silhouette | $44 | Rear view |
 
-**Asset status after RTL-003:** fifteen independently generated, visually reviewed primary clothing photos and a byte-only manifest are shipped. [Actual provenance, exact byte totals and browser evidence](research/FORME-PHOTOS.md) identify the accepted files; no unverified alternate is shipped. These are prepared inputs, not a ready catalogue. Fresh live interpretation remains unverified until RTL-006/020 receive keys and authorized paid-run evidence.
+**Asset status after RTL-003:** fifteen independently generated, visually reviewed primary clothing photos and a byte-only manifest are shipped. [Actual provenance, exact byte totals and browser evidence](research/FORME-PHOTOS.md) identify the accepted files; no unverified alternate is shipped. These are prepared inputs, not a ready catalogue. The admitted RTL-006 adapter is locally verified; fresh paid interpretation remains unverified until RTL-020 receives keys and authorized paid-run evidence.
 
 Preferred path: create original AI-generated garment photography offline before release. Use a consistent neutral studio background, similar lighting, high-resolution garment detail, crop-safe margins and no third-party marks. Each primary image depicts one identifiable garment. Avoid collages, illegible fabric labels, made-up certification text and impossible geometry. Optional alternate views must represent the same garment; reject inconsistent stitching, pockets, cut or colour. Do not infer exact fibre, measurements or manufacturing claims from an attractive generated photo. Describe sample imagery as generated demo photography.
 
@@ -1514,7 +1514,7 @@ This task does not create or inspect secret files. When implementation needs own
 | --- | --- | --- |
 | Frontend server | `APP_ENV`, `BACKEND_ORIGIN`, `BACKEND_AUDIENCE`, `FRONTEND_ORIGIN`, injected `PORT` | Private fixed destination; no browser exposure |
 | Backend core | `APP_ENV`, `PORT`, `FRONTEND_ORIGIN`, `APP_REVISION` | Validate exact origins and deployment identity |
-| Backend mode | `FAKE_MODE=true`, `PAID_DEMO_ENABLED=false` | Committed defaults; master paid-off wins |
+| Backend mode | `FAKE_MODE=true`, `PAID_DEMO_ENABLED=false`; `LIVE_POLICY_APPROVED=false`, `PROCESS_BUDGET_MICRO_USD=0` | Committed defaults; master paid-off wins. Vision needs explicit reviewed policy, account/budget and admission prerequisites; a process allowance is not an account-wide quota. |
 | Backend provider | `OPENAI_API_KEY`, reviewed vision/text/image model policy; `LOGO_GENERATION_ENABLED=false` initially | Secret key backend only; optional logos require independently accepted policy; master paid-off wins |
 | Backend public data | Fixed ECB-provider USD/EUR endpoint and reviewed freshness/cache policy | No user-controlled destination or API credential |
 | Backend admission | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `GRANT_SIGNING_SECRET` | Only the site key may be public capability data |
@@ -1971,7 +1971,7 @@ The owner has authorized detailed ticket planning. The [canonical queue](tickets
 | Linux release preparation | [RTL-021](tickets/RTL-021-package-linux-services-and-manual-release-runbook.md) | Reproducible images, fixed private bridge, concrete manual deploy and rollback plan; independent of paid evaluation. |
 | Owner-authorized hosted release | [RTL-022](tickets/RTL-022-deploy-verify-hosted-demo-and-record-rollback.md) | Exact accepted artifacts, actual private IAM/origins, HTTPS walkthrough, usage evidence and recovery readiness. |
 
-RTL-001–005 have verified local completion. RTL-006 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
+RTL-001–006 have verified local completion. RTL-007 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
 
 The first complete local path may use declared development fixtures, but public acceptance requires fresh live recognition for sample and uploads. Security and cleanup start with the first owning feature; later hardening and lifecycle packets complete the combined surface. Optional logo generation follows a polished wordmark path. Domain integrity keeps charts connected to actual products; design evidence proves that all accepted storefront choices look excellent.
 

@@ -1,8 +1,8 @@
 # Retailor implementation tickets
 
-**Status:** 22 implementation packets; RTL-001 complete, RTL-002 locally implemented with visual evidence pending, RTL-003 locally implemented with follow-on evidence pending, RTL-004 and RTL-005 complete, 17 planned.\
+**Status:** 22 implementation packets; RTL-001 complete, RTL-002 locally implemented with visual evidence pending, RTL-003 locally implemented with follow-on evidence pending, RTL-004 and RTL-005 complete, RTL-006 locally implemented with paid/account evidence pending, 16 planned.\
 **Prepared:** 11 October 2026.\
-**Next eligible packet:** [RTL-006](RTL-006-deliver-live-catalogue-recognition-and-admission.md).\
+**Next eligible packet:** [RTL-007](RTL-007-deliver-three-complete-clothing-store-templates.md).\
 **Product authority:** [Retailor blueprint](../RETAILOR_DEMO_SOURCE_OF_TRUTH.md).\
 **Quick product view:** [HTML overview](../RETAILOR_OVERVIEW.html).
 
@@ -33,7 +33,7 @@ All dependencies are direct prerequisites; transitive dependencies are resolved 
 | [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md) | Prepare fifteen clothing photos and the bounded upload pipeline | [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md), [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md) | Local complete; follow-on evidence pending |
 | [RTL-004](RTL-004-build-exact-commerce-commands-and-fact-engine.md) | Build exact commerce commands, invariants and metric facts | [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md) | Complete |
 | [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md) | Build the one-page workspace, catalogue review and recovery | [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md), [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-004](RTL-004-build-exact-commerce-commands-and-fact-engine.md) | Complete |
-| [RTL-006](RTL-006-deliver-live-catalogue-recognition-and-admission.md) | Deliver live catalogue recognition and action-bound admission | [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md) | Planned |
+| [RTL-006](RTL-006-deliver-live-catalogue-recognition-and-admission.md) | Deliver live catalogue recognition and action-bound admission | [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md) | Locally complete; paid/account/hosted evidence pending |
 | [RTL-007](RTL-007-deliver-three-complete-clothing-store-templates.md) | Deliver three complete clothing-store template families | [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md), [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md) | Planned |
 | [RTL-008](RTL-008-deliver-tailor-chat-led-styling-and-owner-overrides.md) | Deliver Tailor-led styling and owner design overrides | [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md), [RTL-007](RTL-007-deliver-three-complete-clothing-store-templates.md) | Planned |
 | [RTL-009](RTL-009-deliver-automatic-usd-eur-storefront-pricing.md) | Deliver exact automatic USD/EUR storefront pricing | [RTL-004](RTL-004-build-exact-commerce-commands-and-fact-engine.md), [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md), [RTL-007](RTL-007-deliver-three-complete-clothing-store-templates.md) | Planned |
@@ -53,7 +53,7 @@ All dependencies are direct prerequisites; transitive dependencies are resolved 
 
 ## Selection, dependencies and status
 
-Under the current execution authorization, select the lowest numbered **Planned** packet whose required dependencies actually exist and have the necessary verified local behavior. RTL-001, RTL-004 and RTL-005 are complete; RTL-002 and RTL-003 have verified local completion with separately tracked visual/live evidence. **RTL-006** is the next eligible packet. Eligibility does not authorize parallel agents or new chats. Do not claim a dependency passed because a ticket exists, its boxes were edited or a similarly named commit appeared.
+Under the current execution authorization, select the lowest numbered **Planned** packet whose required dependencies actually exist and have the necessary verified local behavior. RTL-001, RTL-004 and RTL-005 are complete; RTL-002, RTL-003 and RTL-006 have verified local completion with separately tracked visual/live/account evidence. **RTL-007** is the next eligible packet. Eligibility does not authorize parallel agents or new chats. Do not claim a dependency passed because a ticket exists, its boxes were edited or a similarly named commit appeared.
 
 A dependency may be locally implemented while a separately named owner-visual, paid or hosted check remains pending. That verified local behavior can support independent local follow-on work, provided pending capabilities stay clearly unavailable and their acceptance remains tracked. Public release must wait for required actual live and hosted evidence. In particular, RTL-021 packaging preparation does not depend on RTL-020's paid run; RTL-022 requires both.
 
