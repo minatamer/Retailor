@@ -94,6 +94,24 @@ import {
   serializeProjection,
 } from "./projection";
 import type { Projection, Stage } from "./projection";
+import {
+  ASSISTANT_LIMITS,
+  AssistantPayloadSchema,
+  AssistantResultSchema,
+  assistantFence,
+} from "@retailor/contracts/assistant";
+import type {
+  AssistantResult,
+  AssistantNavigation,
+  AssistantRole,
+} from "@retailor/contracts/assistant";
+import { appendMessage, replyCurrent } from "../assistants/conversation";
+import type { ChatMessage } from "../assistants/conversation";
+import { currentAssistantContext, roleOf } from "../assistants/context";
+import { localReply } from "../assistants/local";
+import type { LocalShortcut } from "../assistants/local";
+import { assistantRequester } from "../assistants/request";
+import type { AssistantRequester } from "../assistants/request";
 export type ProcessStep =
   | "Checking photos"
   | "Approving this request"
@@ -115,6 +133,7 @@ export interface CatalogueProcessor {
   }): Promise<CatalogueDraft>;
 }
 interface SessionOptions {
+  assistantRequest?: AssistantRequester;
   signal?: AbortSignal;
   fixtureAllowed: boolean;
   processor?: CatalogueProcessor;
@@ -137,6 +156,10 @@ export type ScenarioReview = ReturnType<typeof generateScenario> & {
   photoWitness: string;
 };
 export interface SessionSnapshot {
+  assistantDraft: string;
+  assistantBusy: boolean;
+  assistantNotice: string;
+  tour: { role: AssistantRole; index: number } | null;
   dialog: "reset" | "rebuild" | "leave-design" | null;
   state: Projection;
   notice: string;
@@ -177,6 +200,7 @@ export class SessionController {
   private currencyOperation: AbortController | undefined;
   private currencyGeneration = 0;
   private operation: AbortController | undefined;
+  private assistantOperation: AbortController | undefined;
   private active = true;
   private recovering = false;
   private resetting = false;
@@ -191,6 +215,10 @@ export class SessionController {
     this.owner = this.id();
     options.signal?.addEventListener("abort", this.aborted, { once: true });
     this.snapshot = {
+      assistantDraft: "",
+      assistantBusy: false,
+      assistantNotice: "",
+      tour: null,
       dialog: null,
       state: this.fresh(),
       notice: "",
@@ -245,6 +273,7 @@ export class SessionController {
       ownerSearch: "",
       ownerPage: 0,
       dashboard: structuredClone(INITIAL_DASHBOARD),
+      conversation: [],
     };
   }
   static async open(options: SessionOptions) {
@@ -261,6 +290,24 @@ export class SessionController {
   };
   private update(patch: Partial<SessionSnapshot>, persist = true) {
     const state = patch.state ?? this.snapshot.state;
+    if (
+      this.assistantOperation &&
+      (state.graph.revision !== this.snapshot.state.graph.revision ||
+        state.graph.scenarioId !== this.snapshot.state.graph.scenarioId ||
+        state.graph.workspaceId !== this.snapshot.state.graph.workspaceId ||
+        roleOf(state) !== roleOf(this.snapshot.state))
+    ) {
+      this.assistantOperation.abort();
+      this.assistantOperation = undefined;
+      patch = {
+        ...patch,
+        assistantBusy: false,
+        assistantNotice:
+          "The workspace changed. Send again with the current view.",
+      };
+    }
+    if (state.stage !== this.snapshot.state.stage)
+      patch = { ...patch, tour: null, assistantDraft: "" };
     this.snapshot = {
       ...this.snapshot,
       ...patch,
@@ -1591,6 +1638,9 @@ export class SessionController {
     return true;
   }
   private cancelOperation() {
+    this.assistantOperation?.abort();
+    this.assistantOperation = undefined;
+    this.snapshot = { ...this.snapshot, assistantBusy: false };
     this.cancelCurrencyRequest();
     this.generation++;
     this.operation?.abort();
@@ -2109,6 +2159,339 @@ export class SessionController {
     if (this.valid())
       this.state({ setup: { ...this.snapshot.state.setup, expanded } });
   }
+  assistantContext() {
+    return currentAssistantContext(
+      this.snapshot.state,
+      this.photos.availableIds(),
+    );
+  }
+  assistantInput(value: string) {
+    if (this.valid() && value.length <= ASSISTANT_LIMITS.promptChars)
+      this.update({ assistantDraft: value }, false);
+  }
+  private saveAssistant(result: AssistantResult) {
+    const message: ChatMessage = {
+      id: this.id(),
+      role: result.role,
+      author: "assistant",
+      text: result.reply.text,
+      at: new Date(this.clock()).toISOString(),
+      scenarioId: result.fence.scenarioId,
+      result,
+      restored: false,
+    };
+    this.state({
+      conversation: appendMessage(this.snapshot.state.conversation, message),
+    });
+  }
+  private assistantNavigation(navigation: AssistantNavigation | null) {
+    if (!navigation) return;
+    const state = this.snapshot.state;
+    if (navigation.kind === "filter" && roleOf(state) === "shopper")
+      this.browse(
+        {
+          page: "collection",
+          filters: {
+            search: navigation.query,
+            category: navigation.category,
+            minPrice: navigation.minimum,
+            maxPrice: navigation.maximum,
+            colour: null,
+            size: null,
+            available: true,
+          },
+        },
+        selectedScope(state.currency),
+      );
+    else if (navigation.kind === "open-product")
+      this.browse({
+        page: "product",
+        productId: navigation.productId,
+        variantId: null,
+      });
+    else if (navigation.kind === "owner-view" && roleOf(state) === "owner")
+      this.ownerNavigate(navigation.view);
+    else if (navigation.kind === "tour" && roleOf(state) === navigation.role)
+      this.startTour();
+  }
+  tailorShortcut(shortcut: LocalShortcut) {
+    if (
+      !this.valid() ||
+      !["style", "storefront", "dashboard"].includes(this.snapshot.state.stage)
+    )
+      return;
+    const context = this.assistantContext(),
+      reply = localReply(context, shortcut);
+    this.assistantNavigation(reply.navigation);
+    this.saveAssistant(
+      AssistantResultSchema.parse({
+        schemaVersion: 1,
+        mode: this.options.fixtureAllowed ? "fake" : "live",
+        operationId: this.id(),
+        role: context.role,
+        fence: assistantFence(this.assistantContext()),
+        reply,
+        sensitivity: {
+          currency: context.role === "shopper",
+          scope: reply.references.some((r) => r.kind === "fact"),
+          design: context.role === "creator",
+          filters: false,
+        },
+      }),
+    );
+  }
+  async sendAssistant() {
+    if (
+      !this.valid() ||
+      this.snapshot.assistantBusy ||
+      !["style", "storefront", "dashboard"].includes(this.snapshot.state.stage)
+    )
+      return;
+    const prompt = this.snapshot.assistantDraft.trim();
+    if (!prompt || prompt.length > ASSISTANT_LIMITS.promptChars) return;
+    const context = this.assistantContext(),
+      role = context.role,
+      operationId = this.id(),
+      owner = new AbortController();
+    const history = this.snapshot.state.conversation
+      .filter(
+        (m) =>
+          m.role === role &&
+          m.scenarioId === context.graph.scenarioId &&
+          !m.restored,
+      )
+      .slice(-ASSISTANT_LIMITS.recentMessages)
+      .map((m) => ({ role: m.author, text: m.text }));
+    const payload = AssistantPayloadSchema.parse({
+      schemaVersion: 1,
+      mode: this.options.fixtureAllowed ? "fake" : "live",
+      operationId,
+      context,
+      prompt,
+      history,
+    });
+    this.assistantOperation = owner;
+    this.update({
+      assistantBusy: true,
+      assistantDraft: "",
+      assistantNotice: "",
+      state: freeze({
+        ...this.snapshot.state,
+        conversation: appendMessage(this.snapshot.state.conversation, {
+          id: this.id(),
+          role,
+          author: "user",
+          text: prompt,
+          at: new Date(this.clock()).toISOString(),
+          scenarioId: context.graph.scenarioId,
+          result: null,
+          restored: false,
+        }),
+      }),
+    });
+    try {
+      const result = AssistantResultSchema.parse(
+        await (this.options.assistantRequest ?? assistantRequester())(
+          payload,
+          owner.signal,
+        ),
+      );
+      if (
+        owner.signal.aborted ||
+        this.assistantOperation !== owner ||
+        !this.valid()
+      )
+        return;
+      if (
+        result.operationId !== operationId ||
+        result.mode !== payload.mode ||
+        !replyCurrent(result, this.assistantContext())
+      ) {
+        this.update(
+          {
+            assistantNotice:
+              "That answer belongs to an earlier view. Send again with your current choices.",
+          },
+          false,
+        );
+        return;
+      }
+      this.assistantOperation = undefined;
+      this.assistantNavigation(result.reply.navigation);
+      this.saveAssistant({
+        ...result,
+        fence: assistantFence(this.assistantContext()),
+      });
+    } catch (error) {
+      if (!owner.signal.aborted && this.assistantOperation === owner)
+        this.update(
+          {
+            assistantNotice:
+              error instanceof CatalogueRequestError
+                ? error.message
+                : "Tailor couldn’t complete that answer. Your messages and local controls are still here.",
+          },
+          false,
+        );
+    } finally {
+      if (this.assistantOperation === owner) {
+        this.assistantOperation = undefined;
+        this.update({ assistantBusy: false }, false);
+      } else if (!owner.signal.aborted)
+        this.update({ assistantBusy: false }, false);
+      owner.abort();
+    }
+  }
+  cancelAssistant() {
+    this.assistantOperation?.abort();
+    this.assistantOperation = undefined;
+    this.update(
+      {
+        assistantBusy: false,
+        assistantNotice: "Request cancelled. Your local controls are ready.",
+      },
+      false,
+    );
+  }
+  currentAssistantMessage(id: string) {
+    const m = this.snapshot.state.conversation.find((m) => m.id === id);
+    return m?.result &&
+      !m.restored &&
+      replyCurrent(m.result, this.assistantContext())
+      ? m
+      : null;
+  }
+  openAssistantReference(id: string, index: number) {
+    if (!this.valid()) return;
+    const ref =
+      this.currentAssistantMessage(id)?.result?.reply.references[index];
+    if (!ref) return;
+    if (ref.kind === "product") {
+      if (roleOf(this.snapshot.state) === "owner") {
+        this.ownerNavigate("products");
+        this.ownerSearch(
+          this.snapshot.state.graph.products.find((p) => p.id === ref.productId)
+            ?.title ?? "",
+        );
+      } else
+        this.browse({
+          page: "product",
+          productId: ref.productId,
+          variantId: null,
+        });
+    } else if (ref.kind === "variant") {
+      const p = this.snapshot.state.graph.products.find((p) =>
+        p.variants.some((v) => v.id === ref.variantId),
+      );
+      if (!p) return;
+      if (roleOf(this.snapshot.state) === "owner") {
+        this.openDashboardEvidence({
+          kind: "inventory",
+          variantId: ref.variantId,
+        });
+      } else
+        this.browse({
+          page: "product",
+          productId: p.id,
+          variantId: ref.variantId,
+        });
+    } else if (ref.kind === "fact")
+      this.openDashboardEvidence(
+        ref.day
+          ? { kind: "day", day: ref.day, factId: ref.factId }
+          : ref.productId &&
+              (ref.factId === "product_net_contribution" ||
+                ref.factId === "net_units")
+            ? { kind: "product", productId: ref.productId, factId: ref.factId }
+            : { kind: "metric", factId: ref.factId },
+      );
+    else {
+      this.openDashboardEvidence({
+        kind: "metric",
+        factId: "operating_result",
+      });
+      this.openDashboardSource(`${ref.recordKind}:${ref.recordId}`);
+    }
+  }
+  prepareAssistantProposal(id: string) {
+    if (!this.valid()) return;
+    const proposal = this.currentAssistantMessage(id)?.result?.reply.proposal;
+    if (!proposal) return;
+    if (proposal.kind === "operation") {
+      if (this.snapshot.ownerForm?.dirty.length) {
+        this.update(
+          {
+            assistantNotice:
+              "Your current draft has edits. Finish or close it before opening this proposal.",
+          },
+          false,
+        );
+        return;
+      }
+      this.openOwnerOperation(
+        proposal.operation,
+        proposal.targetId ?? undefined,
+      );
+      const formId = this.snapshot.ownerForm?.id;
+      if (formId)
+        for (const [field, value] of Object.entries(proposal.prefill))
+          if (value !== null && ["title", "category", "note"].includes(field))
+            this.editOwnerField(
+              field as "title" | "category" | "note",
+              value,
+              "suggestion",
+              formId,
+            );
+    } else if (proposal.kind === "bag") {
+      const p = this.snapshot.state.graph.products.find((p) =>
+        p.variants.some((v) => v.id === proposal.variantId),
+      );
+      if (p)
+        this.browse({
+          page: "product",
+          productId: p.id,
+          variantId: proposal.variantId,
+        });
+      this.update(
+        {
+          assistantNotice:
+            "Review this exact option, price and quantity on the product page before adding it to your bag.",
+        },
+        false,
+      );
+    } else if (proposal.kind === "design") {
+      if (roleOf(this.snapshot.state) === "owner") this.beginOwnerDesign();
+      const design = this.snapshot.state.previewDesign;
+      this.design({
+        ...design,
+        template: proposal.template ?? design.template,
+        theme: proposal.theme ?? design.theme,
+        typography: proposal.typography ?? design.typography,
+      });
+    } else if (proposal.kind === "logo-offer") {
+      if (roleOf(this.snapshot.state) === "owner") this.beginOwnerDesign();
+      this.prepareLogo();
+    } else this.prepareScenario(proposal.preset);
+  }
+  startTour() {
+    if (this.valid())
+      this.update(
+        { tour: { role: roleOf(this.snapshot.state), index: 0 } },
+        false,
+      );
+  }
+  tourStep(index: number) {
+    if (
+      this.snapshot.tour &&
+      Number.isInteger(index) &&
+      index >= 0 &&
+      index < 9
+    )
+      this.update({ tour: { ...this.snapshot.tour, index } }, false);
+  }
+  finishTour() {
+    this.update({ tour: null }, false);
+  }
   stylingStep(step: SetupStep) {
     const state = this.snapshot.state;
     if (
@@ -2373,6 +2756,10 @@ export class SessionController {
     this.unlistenPhotos?.();
     this.unlistenPhotos = undefined;
     this.update({
+      assistantDraft: "",
+      assistantBusy: false,
+      assistantNotice: "",
+      tour: null,
       ready: false,
       sampleBusy: false,
       dialog: null,

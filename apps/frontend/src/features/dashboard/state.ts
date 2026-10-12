@@ -12,9 +12,7 @@ export const DashboardTargetSchema = z.discriminatedUnion("kind", [
   z.strictObject({
     kind: z.literal("day"),
     day: z.iso.date(),
-    factId: z
-      .enum(["net_sales", "operating_result", "included_orders", "aov"])
-      .optional(),
+    factId: FactIdSchema.optional(),
   }),
   z.strictObject({
     kind: z.literal("product"),

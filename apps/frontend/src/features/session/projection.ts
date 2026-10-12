@@ -9,6 +9,7 @@ import { DashboardStateSchema, INITIAL_DASHBOARD } from "../dashboard/state";
 import { ScenarioInfoSchema } from "@retailor/contracts/scenarios";
 import { ShoppingSchema, INITIAL_SHOPPING } from "../bag/state";
 import { z } from "zod";
+import { ConversationSchema } from "../assistants/conversation";
 import { GraphSchema, TimestampSchema } from "@retailor/contracts/commerce";
 import { IdSchema } from "@retailor/contracts/core";
 import { PhotoSchema, PHOTO_LIMITS } from "@retailor/contracts/photos";
@@ -62,6 +63,7 @@ export const ProjectionSchema = z.strictObject({
   ownerSearch: z.string().max(100).default(""),
   ownerPage: z.number().int().min(0).max(16).default(0),
   dashboard: DashboardStateSchema.default(INITIAL_DASHBOARD),
+  conversation: ConversationSchema.default([]),
 });
 export type Projection = z.infer<typeof ProjectionSchema>;
 export const INITIAL_DESIGN = DesignSchema.parse({
@@ -173,6 +175,10 @@ export function restoreProjection(
   return {
     ...state,
     graph,
+    conversation: state.conversation.map((message) => ({
+      ...message,
+      restored: true,
+    })),
     setup: reconcileSetup(state.setup, state.previewDesign),
     stage: state.stage === "process" ? ("choose" as const) : state.stage,
   };
@@ -204,6 +210,7 @@ export function serializeProjection(state: Projection, now: number) {
     ownerSearch: state.ownerSearch,
     ownerPage: state.ownerPage,
     dashboard: state.dashboard,
+    conversation: state.conversation,
   };
   const encoded = JSON.stringify(ProjectionSchema.parse(selected));
   if (serializedBytes(selected) > SESSION_BYTES)

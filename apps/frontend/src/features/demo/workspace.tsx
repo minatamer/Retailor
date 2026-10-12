@@ -8,6 +8,7 @@ import { PhotoPicker, namedFiles } from "../photos/photo-picker";
 import { SAMPLE } from "../photos/sample";
 import { SessionProvider, useSession } from "../session/context";
 import type { CatalogueProcessor, ProcessStep } from "../session/controller";
+import type { AssistantRequester } from "../assistants/request";
 import { CatalogueReview } from "../catalogue/review";
 import { Storefront } from "../storefront/storefront";
 import { storeItems } from "../storefront/browse";
@@ -22,14 +23,17 @@ import styles from "./workspace.module.css";
 export function Workspace({
   fixtureAllowed,
   processor,
+  assistantRequest,
 }: {
   fixtureAllowed: boolean;
   processor?: CatalogueProcessor;
+  assistantRequest?: AssistantRequester;
 }) {
   return (
     <SessionProvider
       fixtureAllowed={fixtureAllowed}
       {...(processor ? { processor } : {})}
+      {...(assistantRequest ? { assistantRequest } : {})}
     >
       <WorkspaceFlow />
     </SessionProvider>

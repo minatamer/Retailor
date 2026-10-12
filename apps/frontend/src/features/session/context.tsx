@@ -9,15 +9,18 @@ import {
 import type { ReactNode } from "react";
 import { SessionController } from "./controller";
 import type { CatalogueProcessor } from "./controller";
+import type { AssistantRequester } from "../assistants/request";
 const SessionContext = createContext<SessionController | null>(null);
 export function SessionProvider({
   children,
   fixtureAllowed,
   processor,
+  assistantRequest,
 }: {
   children: ReactNode;
   fixtureAllowed: boolean;
   processor?: CatalogueProcessor;
+  assistantRequest?: AssistantRequester;
 }) {
   const [controller, setController] = useState<SessionController | null>(null);
   useEffect(() => {
@@ -38,6 +41,7 @@ export function SessionProvider({
         fixtureAllowed,
         signal: opening.signal,
         ...(processor ? { processor } : {}),
+        ...(assistantRequest ? { assistantRequest } : {}),
         ...(storage ? { storage } : {}),
       }).then((value) => {
         if (disposed || current !== generation) {
@@ -74,7 +78,7 @@ export function SessionProvider({
       window.removeEventListener("pageshow", shown);
       document.removeEventListener("visibilitychange", active);
     };
-  }, [fixtureAllowed, processor]);
+  }, [fixtureAllowed, processor, assistantRequest]);
   if (!controller)
     return (
       <main className="foundation">
