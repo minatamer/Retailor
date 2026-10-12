@@ -1,6 +1,6 @@
 # RTL-014 — Deliver Tailor inline photo CRUD and reviewed operations
 
-Status: **Planned — not started**\
+Status: **Implemented locally — live quality and final physical/owner checks pending**\
 Planning date: **11 October 2026**\
 Milestone: **Copilot operations**\
 Depends on: [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-011](RTL-011-deliver-three-scenarios-and-owner-operations.md), [RTL-013](RTL-013-deliver-grounded-tailor-conversation-tools-and-tours.md)\
@@ -57,16 +57,18 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Tailor renders real editable owner operation forms inside chat.
-- [ ] Every product create includes a required validated photo picker.
-- [ ] Dashboard/chat share one draft/form/effect/command authority.
-- [ ] Missing/ambiguous core fields use concise grouped clarification.
-- [ ] Animated fill remains interruptible and preserves dirty fields/focus.
-- [ ] Confirmation recomputes current effect and adds zero model calls.
-- [ ] Duplicate/stale/expired proposals cannot mutate twice.
-- [ ] Posted history and archive/return/refund distinctions remain accurate.
-- [ ] Results link to actual records and only eligible latest Undo is enabled.
-- [ ] Reset/refresh/navigation clears executable choreography safely.
+- [x] Tailor renders real editable owner operation forms inside chat.
+- [x] Every product create includes a required validated photo picker.
+- [x] Dashboard/chat share one draft/form/effect/command authority.
+- [x] Missing/ambiguous core fields use concise grouped clarification.
+- [x] Animated fill remains interruptible and preserves dirty fields/focus.
+- [x] Confirmation recomputes current effect and adds zero model calls.
+- [x] Duplicate/stale/expired proposals cannot mutate twice.
+- [x] Posted history and archive/return/refund distinctions remain accurate.
+- [x] Results link to actual records and only eligible latest Undo is enabled.
+- [x] Reset/refresh/navigation clears executable choreography safely.
+
+Local evidence: [validation](../validation/RTL-014.md), [operation behavior](../engineering/TAILOR-OPERATIONS.md), [file allocation](../commit-plans/RTL-014.md). Live natural-language/visual classification quality remains RTL-020; physical/device/zoom/owner quality remains RTL-019. Upload semantics include explicit human clothing review, never a decoder-only classification claim.
 
 ## Focused verification and evidence
 
@@ -105,4 +107,4 @@ No photo-free product, invented image URL, generated product-photo substitute, g
 
 Keep this outcome under `RTL-014:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-014.md` and actual check/review evidence under `docs/validation/RTL-014.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Local acceptance is checked above against the recorded implementation; external checks remain pending. Ticket creation itself grants no additional execution, paid or cloud authority. Follow the user’s actual execution authorization.

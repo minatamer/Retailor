@@ -1,0 +1,296 @@
+[
+  {
+    "width": 320,
+    "height": 430,
+    "buttons": [
+      {
+        "height": 44.1875,
+        "text": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "text": "Open full form",
+        "width": 198
+      },
+      {
+        "height": 44.1875,
+        "text": "Post this demo expense",
+        "width": 198
+      },
+      {
+        "height": 44.1875,
+        "text": "Back to editable fields",
+        "width": 198
+      }
+    ],
+    "clientWidth": 305,
+    "form": {
+      "left": 29,
+      "right": 261,
+      "width": 232
+    },
+    "formCount": 1,
+    "innerHeight": 430,
+    "innerWidth": 320,
+    "scrollWidth": 305,
+    "shell": {
+      "bottom": 418,
+      "left": 12,
+      "right": 293,
+      "top": 168.609375
+    }
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "buttons": [
+      {
+        "height": 44.1875,
+        "text": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "text": "Open full form",
+        "width": 253
+      },
+      {
+        "height": 44.1875,
+        "text": "Post this demo expense",
+        "width": 253
+      },
+      {
+        "height": 44.1875,
+        "text": "Back to editable fields",
+        "width": 253
+      }
+    ],
+    "clientWidth": 360,
+    "form": {
+      "left": 29,
+      "right": 316,
+      "width": 287
+    },
+    "formCount": 1,
+    "innerHeight": 812,
+    "innerWidth": 375,
+    "scrollWidth": 360,
+    "shell": {
+      "bottom": 800,
+      "left": 12,
+      "right": 348,
+      "top": 329.046875
+    }
+  },
+  {
+    "width": 768,
+    "height": 1024,
+    "buttons": [
+      {
+        "height": 44.1875,
+        "text": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "text": "Open full form",
+        "width": 301
+      },
+      {
+        "height": 44.1875,
+        "text": "Post this demo expense",
+        "width": 301
+      },
+      {
+        "height": 44.1875,
+        "text": "Back to editable fields",
+        "width": 301
+      }
+    ],
+    "clientWidth": 753,
+    "form": {
+      "left": 366,
+      "right": 701,
+      "width": 335
+    },
+    "formCount": 1,
+    "innerHeight": 1024,
+    "innerWidth": 768,
+    "scrollWidth": 753,
+    "shell": {
+      "bottom": 1012,
+      "left": 345,
+      "right": 737,
+      "top": 418.09375
+    }
+  },
+  {
+    "width": 1024,
+    "height": 600,
+    "buttons": [
+      {
+        "height": 44.1875,
+        "text": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "text": "Open full form",
+        "width": 301
+      },
+      {
+        "height": 44.1875,
+        "text": "Post this demo expense",
+        "width": 301
+      },
+      {
+        "height": 44.1875,
+        "text": "Back to editable fields",
+        "width": 301
+      }
+    ],
+    "clientWidth": 1009,
+    "form": {
+      "left": 618,
+      "right": 953,
+      "width": 335
+    },
+    "formCount": 1,
+    "innerHeight": 600,
+    "innerWidth": 1024,
+    "scrollWidth": 1009,
+    "shell": {
+      "bottom": 580,
+      "left": 597,
+      "right": 989,
+      "top": 112
+    }
+  },
+  {
+    "width": 1280,
+    "height": 900,
+    "buttons": [
+      {
+        "height": 44.1875,
+        "text": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "text": "Open full form",
+        "width": 301
+      },
+      {
+        "height": 44.1875,
+        "text": "Post this demo expense",
+        "width": 301
+      },
+      {
+        "height": 44.1875,
+        "text": "Back to editable fields",
+        "width": 301
+      }
+    ],
+    "clientWidth": 1265,
+    "form": {
+      "left": 874,
+      "right": 1209,
+      "width": 335
+    },
+    "formCount": 1,
+    "innerHeight": 900,
+    "innerWidth": 1280,
+    "scrollWidth": 1265,
+    "shell": {
+      "bottom": 880,
+      "left": 853,
+      "right": 1245,
+      "top": 178
+    }
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "buttons": [
+      {
+        "height": 44.1875,
+        "text": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "text": "Open full form",
+        "width": 301
+      },
+      {
+        "height": 44.1875,
+        "text": "Post this demo expense",
+        "width": 301
+      },
+      {
+        "height": 44.1875,
+        "text": "Back to editable fields",
+        "width": 301
+      }
+    ],
+    "clientWidth": 1425,
+    "form": {
+      "left": 1034,
+      "right": 1369,
+      "width": 335
+    },
+    "formCount": 1,
+    "innerHeight": 900,
+    "innerWidth": 1440,
+    "scrollWidth": 1425,
+    "shell": {
+      "bottom": 880,
+      "left": 1013,
+      "right": 1405,
+      "top": 178
+    }
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "buttons": [
+      {
+        "height": 44.1875,
+        "text": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "text": "Open full form",
+        "width": 301
+      },
+      {
+        "height": 44.1875,
+        "text": "Post this demo expense",
+        "width": 301
+      },
+      {
+        "height": 44.1875,
+        "text": "Back to editable fields",
+        "width": 301
+      }
+    ],
+    "clientWidth": 1905,
+    "form": {
+      "left": 1514,
+      "right": 1849,
+      "width": 335
+    },
+    "formCount": 1,
+    "innerHeight": 1080,
+    "innerWidth": 1920,
+    "scrollWidth": 1905,
+    "shell": {
+      "bottom": 1060,
+      "left": 1493,
+      "right": 1885,
+      "top": 217.609375
+    }
+  }
+]

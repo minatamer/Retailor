@@ -1,0 +1,16 @@
+{
+  "ancestors": [],
+  "controls": [
+    {
+      "left": 63,
+      "right": 227,
+      "scroll": 173,
+      "tag": "INPUT",
+      "width": 162
+    }
+  ],
+  "form": {
+    "scroll": 230,
+    "width": 230
+  }
+}
