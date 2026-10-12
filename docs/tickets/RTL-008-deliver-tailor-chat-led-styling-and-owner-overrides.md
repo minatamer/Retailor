@@ -1,6 +1,6 @@
 # RTL-008 — Deliver Tailor-led styling and owner design overrides
 
-Status: **Planned — not started**\
+Status: **Locally implemented — physical device/keyboard, zoom and owner visual acceptance tracked in RTL-019**\
 Planning date: **11 October 2026**\
 Milestone: **Signature setup**\
 Depends on: [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md), [RTL-007](RTL-007-deliver-three-complete-clothing-store-templates.md)\
@@ -23,12 +23,12 @@ Dependency completion means required local behavior, owning contracts and checks
 
 ## Files and responsibility boundaries
 
-| Area | Responsibility owned here |
-| --- | --- |
-| `apps/frontend/src/features/assistants` | Tailor shell, creator microsteps, inline cards and finite actions |
-| `apps/frontend/src/features/store-design` | Accepted/preview design, confirmation and brand fields |
-| `apps/frontend/src/features/demo and operations` | Style integration and owner manual Design panel |
-| `docs/engineering/TAILOR-SETUP.md` | Microstep, confirmation, focus and recovery contract |
+| Area                                             | Responsibility owned here                                         |
+| ------------------------------------------------ | ----------------------------------------------------------------- |
+| `apps/frontend/src/features/assistants`          | Tailor shell, creator microsteps, inline cards and finite actions |
+| `apps/frontend/src/features/store-design`        | Accepted/preview design, confirmation and brand fields            |
+| `apps/frontend/src/features/demo and operations` | Style integration and owner manual Design panel                   |
+| `docs/engineering/TAILOR-SETUP.md`               | Microstep, confirmation, focus and recovery contract              |
 
 Paths describe future ownership. Create modules/directories only with real behavior; reuse contracts, commands, assets and session state rather than a parallel authority.
 
@@ -56,28 +56,28 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Primary styling controls live inside Tailor’s conversation.
-- [ ] A visitor completes setup without a free-text prompt or model call.
-- [ ] Actual products update instantly across all three preview surfaces.
-- [ ] Template/colour/type use explicit confirmations and compact recap/change controls.
-- [ ] Brief introduction never leaves the comparison preview blurred.
-- [ ] Optional name/headline/hero and excellent text wordmark are supported.
-- [ ] Logo offer appears only after confirmed colour and type; reveal causes zero dispatch.
-- [ ] Owner manual Design uses the same presets/commands with Apply/Cancel.
-- [ ] Style changes preserve bag, stock, IDs and scenario.
-- [ ] Restore, rapid selection, dirty fields and phone keyboard remain safe.
+- [x] Primary styling controls live inside Tailor’s conversation.
+- [x] A visitor completes setup without a free-text prompt or model call.
+- [x] Actual products update instantly across all three preview surfaces.
+- [x] Template/colour/type use explicit confirmations and compact recap/change controls.
+- [x] Brief introduction never leaves the comparison preview blurred.
+- [x] Optional name/headline/hero and excellent text wordmark are supported.
+- [x] Logo offer appears only after confirmed colour and type; reveal causes zero dispatch.
+- [x] Owner manual Design uses the same presets/commands with Apply/Cancel.
+- [x] Style changes preserve bag, stock, IDs and scenario.
+- [x] Restore, rapid selection, dirty fields and phone keyboard remain safe.
 
 ## Focused verification and evidence
 
-| Case | Required observable evidence |
-| --- | --- |
-| No-typing full setup | Native cards/CTAs reach accepted storefront with zero provider count |
-| Logo gate | Defaults/type-only do not unlock; colour plus type confirmation does |
-| Preview identity | Same current product on home/list/detail before and after style change |
-| Rapid/back/change selection | Latest look settles and recap accurately reflects confirmation state |
-| Owner override/cancel | Same registry and accepted/preview distinction |
-| Collapse/blur/phone keyboard | Visible preview, useful resume launcher and no focus theft |
-| Refresh/reset | No stale executable logo/choice action or regenerated catalogue |
+| Case                         | Required observable evidence                                           |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| No-typing full setup         | Native cards/CTAs reach accepted storefront with zero provider count   |
+| Logo gate                    | Defaults/type-only do not unlock; colour plus type confirmation does   |
+| Preview identity             | Same current product on home/list/detail before and after style change |
+| Rapid/back/change selection  | Latest look settles and recap accurately reflects confirmation state   |
+| Owner override/cancel        | Same registry and accepted/preview distinction                         |
+| Collapse/blur/phone keyboard | Visible preview, useful resume launcher and no focus theft             |
+| Refresh/reset                | No stale executable logo/choice action or regenerated catalogue        |
 
 Run meaningful focused tests during iteration. At the settled implementation snapshot run the applicable root gates established by RTL-001: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm check:boundaries`, `pnpm test:unit` and `pnpm build`. Record actual commands/results and revision. UI acceptance needs real browser observations where available; DOM simulations or animation declarations alone do not prove appearance/movement. Do not add tests that merely mirror CSS or static labels.
 
@@ -103,4 +103,4 @@ No separate manual onboarding tray, freeform colour/font/page controls, required
 
 Keep this outcome under `RTL-008:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-008.md` and actual check/review evidence under `docs/validation/RTL-008.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. The local criteria above are backed by [execution and validation evidence](../validation/RTL-008.md) and [Tailor setup contract](../engineering/TAILOR-SETUP.md). Physical virtual-keyboard/touch, native zoom, full design matrix and owner visual acceptance remain explicitly pending in RTL-019. Live conversation/tours and actual logo generation retain RTL-013/015 scope. Two read-only validation passes ended with no actionable findings after independently verified fixes; all settled gates passed with 176 tests. The owner has authorized the recorded file allocation and three ticket-prefixed commits; no paid call, push or cloud publication occurred.

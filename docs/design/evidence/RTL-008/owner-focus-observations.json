@@ -1,0 +1,18 @@
+{
+  "beforeFix": {
+    "open": "BODY",
+    "cancel": "BODY"
+  },
+  "afterFix": {
+    "open": {
+      "id": "owner-design-title",
+      "tag": "H2"
+    },
+    "apply": {
+      "button": "Edit store design",
+      "tag": "BUTTON"
+    },
+    "cancel": "Edit store design button"
+  },
+  "keyboardChoice": "Gallery Space → aria-pressed true"
+}

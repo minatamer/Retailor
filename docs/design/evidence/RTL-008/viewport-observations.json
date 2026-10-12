@@ -1,0 +1,332 @@
+[
+  {
+    "clientWidth": 305,
+    "focused": "Find your voice.",
+    "height": 430,
+    "panel": {
+      "bottom": 418,
+      "height": 249.390625,
+      "left": 12,
+      "right": 293,
+      "top": 168.609375,
+      "width": 281,
+      "x": 12,
+      "y": 168.609375
+    },
+    "scrollWidth": 305,
+    "specimenFonts": [
+      "\"Retailor Inter\", Arial, sans-serif",
+      "\"Retailor DM Serif\", Georgia, serif",
+      "\"Retailor Manrope\", Arial, sans-serif"
+    ],
+    "store": {
+      "bottom": 1715.8125,
+      "height": 1697.03125,
+      "left": 14,
+      "right": 273.0625,
+      "top": 18.78125,
+      "width": 259.0625,
+      "x": 14,
+      "y": 18.78125
+    },
+    "storeFilter": "none",
+    "width": 320
+  },
+  {
+    "clientWidth": 360,
+    "focused": "Find your voice.",
+    "height": 667,
+    "panel": {
+      "bottom": 655,
+      "height": 386.859375,
+      "left": 12,
+      "right": 348,
+      "top": 268.140625,
+      "width": 336,
+      "x": 12,
+      "y": 268.140625
+    },
+    "scrollWidth": 360,
+    "specimenFonts": [
+      "\"Retailor Inter\", Arial, sans-serif",
+      "\"Retailor DM Serif\", Georgia, serif",
+      "\"Retailor Manrope\", Arial, sans-serif"
+    ],
+    "store": {
+      "bottom": 1611,
+      "height": 1645.8125,
+      "left": 14,
+      "right": 346,
+      "top": -34.8125,
+      "width": 332,
+      "x": 14,
+      "y": -34.8125
+    },
+    "storeFilter": "none",
+    "width": 375
+  },
+  {
+    "clientWidth": 375,
+    "focused": "Find your voice.",
+    "height": 844,
+    "panel": {
+      "bottom": 832,
+      "height": 489.515625,
+      "left": 12,
+      "right": 363,
+      "top": 342.484375,
+      "width": 351,
+      "x": 12,
+      "y": 342.484375
+    },
+    "scrollWidth": 375,
+    "specimenFonts": [
+      "\"Retailor Inter\", Arial, sans-serif",
+      "\"Retailor DM Serif\", Georgia, serif",
+      "\"Retailor Manrope\", Arial, sans-serif"
+    ],
+    "store": {
+      "bottom": 1592.21875,
+      "height": 1627.03125,
+      "left": 14,
+      "right": 361,
+      "top": -34.8125,
+      "width": 347,
+      "x": 14,
+      "y": -34.8125
+    },
+    "storeFilter": "none",
+    "width": 390
+  },
+  {
+    "clientWidth": 415,
+    "focused": "Find your voice.",
+    "height": 932,
+    "panel": {
+      "bottom": 920,
+      "height": 540.546875,
+      "left": 12,
+      "right": 403,
+      "top": 379.453125,
+      "width": 391,
+      "x": 12,
+      "y": 379.453125
+    },
+    "scrollWidth": 415,
+    "specimenFonts": [
+      "\"Retailor Inter\", Arial, sans-serif",
+      "\"Retailor DM Serif\", Georgia, serif",
+      "\"Retailor Manrope\", Arial, sans-serif"
+    ],
+    "store": {
+      "bottom": 1600.125,
+      "height": 1634.9375,
+      "left": 14,
+      "right": 401,
+      "top": -34.8125,
+      "width": 387,
+      "x": 14,
+      "y": -34.8125
+    },
+    "storeFilter": "none",
+    "width": 430
+  },
+  {
+    "clientWidth": 753,
+    "focused": "Find your voice.",
+    "height": 1024,
+    "panel": {
+      "bottom": 1012,
+      "height": 593.90625,
+      "left": 345,
+      "right": 737,
+      "top": 418.09375,
+      "width": 392,
+      "x": 345,
+      "y": 418.09375
+    },
+    "scrollWidth": 753,
+    "specimenFonts": [
+      "\"Retailor Inter\", Arial, sans-serif",
+      "\"Retailor DM Serif\", Georgia, serif",
+      "\"Retailor Manrope\", Arial, sans-serif"
+    ],
+    "store": {
+      "bottom": 1899.109375,
+      "height": 1913.328125,
+      "left": 30.71875,
+      "right": 722.265625,
+      "top": -14.21875,
+      "width": 691.546875,
+      "x": 30.71875,
+      "y": -14.21875
+    },
+    "storeFilter": "none",
+    "width": 768
+  },
+  {
+    "clientWidth": 1009,
+    "focused": "Find your voice.",
+    "height": 768,
+    "panel": {
+      "bottom": 748,
+      "height": 599.03125,
+      "left": 597,
+      "right": 989,
+      "top": 148.96875,
+      "width": 392,
+      "x": 597,
+      "y": 148.96875
+    },
+    "scrollWidth": 1009,
+    "specimenFonts": [
+      "\"Retailor Inter\", Arial, sans-serif",
+      "\"Retailor DM Serif\", Georgia, serif",
+      "\"Retailor Manrope\", Arial, sans-serif"
+    ],
+    "store": {
+      "bottom": 1753.546875,
+      "height": 1767.765625,
+      "left": 40.953125,
+      "right": 594.1875,
+      "top": -14.21875,
+      "width": 553.234375,
+      "x": 40.953125,
+      "y": -14.21875
+    },
+    "storeFilter": "none",
+    "width": 1024
+  },
+  {
+    "clientWidth": 1265,
+    "focused": "Find your voice.",
+    "height": 720,
+    "panel": {
+      "bottom": 700,
+      "height": 561.59375,
+      "left": 853,
+      "right": 1245,
+      "top": 138.40625,
+      "width": 392,
+      "x": 853,
+      "y": 138.40625
+    },
+    "scrollWidth": 1265,
+    "specimenFonts": [
+      "\"Retailor Inter\", Arial, sans-serif",
+      "\"Retailor DM Serif\", Georgia, serif",
+      "\"Retailor Manrope\", Arial, sans-serif"
+    ],
+    "store": {
+      "bottom": 1135.21875,
+      "height": 1149.4375,
+      "left": 51.203125,
+      "right": 800.0625,
+      "top": -14.21875,
+      "width": 748.859375,
+      "x": 51.203125,
+      "y": -14.21875
+    },
+    "storeFilter": "none",
+    "width": 1280
+  },
+  {
+    "clientWidth": 1351,
+    "focused": "Find your voice.",
+    "height": 768,
+    "panel": {
+      "bottom": 748,
+      "height": 599.03125,
+      "left": 939,
+      "right": 1331,
+      "top": 148.96875,
+      "width": 392,
+      "x": 939,
+      "y": 148.96875
+    },
+    "scrollWidth": 1351,
+    "specimenFonts": [
+      "\"Retailor Inter\", Arial, sans-serif",
+      "\"Retailor DM Serif\", Georgia, serif",
+      "\"Retailor Manrope\", Arial, sans-serif"
+    ],
+    "store": {
+      "bottom": 1067.40625,
+      "height": 1081.625,
+      "left": 54.640625,
+      "right": 882.359375,
+      "top": -14.21875,
+      "width": 827.71875,
+      "x": 54.640625,
+      "y": -14.21875
+    },
+    "storeFilter": "none",
+    "width": 1366
+  },
+  {
+    "clientWidth": 1905,
+    "focused": "Find your voice.",
+    "height": 1080,
+    "panel": {
+      "bottom": 1060,
+      "height": 842.390625,
+      "left": 1493,
+      "right": 1885,
+      "top": 217.609375,
+      "width": 392,
+      "x": 1493,
+      "y": 217.609375
+    },
+    "scrollWidth": 1905,
+    "specimenFonts": [
+      "\"Retailor Inter\", Arial, sans-serif",
+      "\"Retailor DM Serif\", Georgia, serif",
+      "\"Retailor Manrope\", Arial, sans-serif"
+    ],
+    "store": {
+      "bottom": 1103.484375,
+      "height": 1102.703125,
+      "left": 232.5,
+      "right": 1258.5,
+      "top": 0.78125,
+      "width": 1026,
+      "x": 232.5,
+      "y": 0.78125
+    },
+    "storeFilter": "none",
+    "width": 1920
+  },
+  {
+    "clientWidth": 829,
+    "focused": "Find your voice.",
+    "height": 390,
+    "panel": {
+      "bottom": 378,
+      "height": 366,
+      "left": 421,
+      "right": 813,
+      "top": 12,
+      "width": 392,
+      "x": 421,
+      "y": 12
+    },
+    "scrollWidth": 829,
+    "specimenFonts": [
+      "\"Retailor Inter\", Arial, sans-serif",
+      "\"Retailor DM Serif\", Georgia, serif",
+      "\"Retailor Manrope\", Arial, sans-serif"
+    ],
+    "store": {
+      "bottom": 1131.5,
+      "height": 1145.71875,
+      "left": 33.765625,
+      "right": 735.8125,
+      "top": -14.21875,
+      "width": 702.046875,
+      "x": 33.765625,
+      "y": -14.21875
+    },
+    "storeFilter": "none",
+    "width": 844
+  }
+]
