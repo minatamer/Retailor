@@ -80,3 +80,17 @@ export function refundable(graph: CommerceGraph, orderId: string) {
         : order.tax - exactSum(refunds.map((item) => item.tax)),
   };
 }
+
+/** Financial disposition is independent of fulfilment and physical returns. */
+export function orderFinancialState(graph: CommerceGraph, orderId: string) {
+  const order = orderOf(graph, orderId);
+  if (order.state === "cancelled") return "Cancelled";
+  if (!graph.refunds.some((refund) => refund.orderId === orderId))
+    return "Unadjusted";
+  const remaining = refundable(graph, orderId);
+  return remaining.delivery > 0 ||
+    remaining.tax > 0 ||
+    remaining.lines.some((line) => line.amount > 0)
+    ? "Partially refunded"
+    : "Fully refunded";
+}

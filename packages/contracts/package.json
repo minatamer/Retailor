@@ -54,6 +54,10 @@
     "./currency": {
       "types": "./dist/currency.d.ts",
       "import": "./dist/currency.js"
+    },
+    "./scenarios": {
+      "types": "./dist/scenarios.d.ts",
+      "import": "./dist/scenarios.js"
     }
   },
   "scripts": {
