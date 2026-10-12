@@ -27,6 +27,7 @@ import type {
   DashboardTarget,
 } from "../dashboard/state";
 import { previewCommand } from "@retailor/commerce/effects";
+import { animatePrefill, prefillFields } from "../assistants/operation-prefill";
 import { USD_SCOPE } from "@retailor/contracts/currency";
 import {
   openOwnerForm,
@@ -172,6 +173,13 @@ export interface SessionSnapshot {
   currencyBusy: boolean;
   currencyNotice: string;
   ownerForm: OwnerForm | null;
+  ownerSurface: "dashboard" | "tailor";
+  ownerFilling: OwnerField | null;
+  ownerResult: {
+    receiptId: string;
+    type: OwnerOperationType;
+    effect: OwnerReview["effect"];
+  } | null;
   ownerReview: OwnerReview | null;
   ownerNotice: string;
   ownerPhotoBusy: boolean;
@@ -201,6 +209,7 @@ export class SessionController {
   private currencyGeneration = 0;
   private operation: AbortController | undefined;
   private assistantOperation: AbortController | undefined;
+  private cancelPrefill: (() => void) | undefined;
   private active = true;
   private recovering = false;
   private resetting = false;
@@ -231,6 +240,9 @@ export class SessionController {
       currencyBusy: false,
       currencyNotice: "",
       ownerForm: null,
+      ownerSurface: "dashboard",
+      ownerFilling: null,
+      ownerResult: null,
       ownerReview: null,
       ownerNotice: "",
       ownerPhotoBusy: false,
@@ -290,6 +302,16 @@ export class SessionController {
   };
   private update(patch: Partial<SessionSnapshot>, persist = true) {
     const state = patch.state ?? this.snapshot.state;
+    if (
+      state.graph.revision !== this.snapshot.state.graph.revision ||
+      state.stage !== this.snapshot.state.stage ||
+      state.ownerView !== this.snapshot.state.ownerView ||
+      state.graph.scenarioId !== this.snapshot.state.graph.scenarioId
+    ) {
+      this.cancelPrefill?.();
+      this.cancelPrefill = undefined;
+      patch = { ...patch, ownerFilling: null };
+    }
     if (
       this.assistantOperation &&
       (state.graph.revision !== this.snapshot.state.graph.revision ||
@@ -640,6 +662,8 @@ export class SessionController {
   ownerNavigate(view: OwnerView) {
     if (!this.ownerAllowed() || !OwnerViewSchema.safeParse(view).success)
       return;
+    this.stopOwnerPrefill();
+    this.update({ ownerReview: null }, false);
     this.state({
       ownerView: view,
       ownerSearch: "",
@@ -755,6 +779,7 @@ export class SessionController {
   }
   openOwnerOperation(type: OwnerOperationType, targetId?: string) {
     if (!this.ownerAllowed()) return;
+    this.stopOwnerPrefill();
     this.photos.cancel();
     try {
       this.update(
@@ -766,6 +791,8 @@ export class SessionController {
             this.id,
           ),
           ownerReview: null,
+          ownerSurface: "dashboard",
+          ownerResult: null,
           ownerPhotoBusy: false,
           ownerNotice: "",
           scenarioReview: null,
@@ -781,12 +808,24 @@ export class SessionController {
     }
   }
   closeOwnerOperation() {
+    this.stopOwnerPrefill();
     this.photos.cancel();
     this.update(
       { ownerForm: null, ownerReview: null, ownerPhotoBusy: false },
       false,
     );
     this.protectDesignPhotos();
+  }
+  stopOwnerPrefill() {
+    this.cancelPrefill?.();
+    this.cancelPrefill = undefined;
+    if (this.snapshot.ownerFilling) this.update({ ownerFilling: null }, false);
+  }
+  moveOwnerForm(surface: "dashboard" | "tailor") {
+    if (!this.ownerAllowed() || !this.snapshot.ownerForm) return;
+    this.stopOwnerPrefill();
+    this.update({ ownerSurface: surface }, false);
+    this.toggleTailor(surface === "tailor");
   }
   editOwnerField(
     field: OwnerField,
@@ -895,6 +934,7 @@ export class SessionController {
     this.protectDesignPhotos();
   }
   async uploadOwnerPhoto(file: NamedPhoto) {
+    this.stopOwnerPrefill();
     if (
       !this.ownerAllowed() ||
       !this.snapshot.ownerForm ||
@@ -922,7 +962,9 @@ export class SessionController {
         this.update(
           {
             ownerNotice:
-              photos.getSnapshot().notice || "Choose a valid clothing photo.",
+              photos.getSnapshot().issues[0]?.message ??
+              photos.getSnapshot().notice ??
+              "Choose a valid clothing photo.",
           },
           false,
         );
@@ -985,6 +1027,7 @@ export class SessionController {
       this.snapshot.ownerPhotoBusy
     )
       return;
+    this.stopOwnerPrefill();
     try {
       const state = this.snapshot.state,
         form = this.snapshot.ownerForm,
@@ -1046,6 +1089,7 @@ export class SessionController {
       this.snapshot.ownerForm?.id !== review.formId
     )
       return;
+    const type = this.snapshot.ownerForm.type;
     const result = this.applyCommerce(review.command);
     if (!result.ok) {
       this.update({ ownerReview: null, ownerNotice: result.message }, false);
@@ -1054,6 +1098,11 @@ export class SessionController {
     this.closeOwnerOperation();
     this.update(
       {
+        ownerResult: {
+          receiptId: result.receipt.id,
+          type,
+          effect: review.effect,
+        },
         ownerNotice:
           "Applied once to this demo. Current records and storefront now reflect the reviewed effect.",
       },
@@ -1638,6 +1687,7 @@ export class SessionController {
     return true;
   }
   private cancelOperation() {
+    this.stopOwnerPrefill();
     this.assistantOperation?.abort();
     this.assistantOperation = undefined;
     this.snapshot = { ...this.snapshot, assistantBusy: false };
@@ -2156,6 +2206,7 @@ export class SessionController {
     ]);
   }
   toggleTailor(expanded: boolean) {
+    if (!expanded) this.stopOwnerPrefill();
     if (this.valid())
       this.state({ setup: { ...this.snapshot.state.setup, expanded } });
   }
@@ -2413,11 +2464,27 @@ export class SessionController {
       this.openDashboardSource(`${ref.recordKind}:${ref.recordId}`);
     }
   }
-  prepareAssistantProposal(id: string) {
+  prepareAssistantProposal(id: string, targetId?: string) {
     if (!this.valid()) return;
-    const proposal = this.currentAssistantMessage(id)?.result?.reply.proposal;
+    const message = this.currentAssistantMessage(id);
+    const proposal = message?.result?.reply.proposal;
     if (!proposal) return;
-    if (proposal.kind === "operation") {
+    if (
+      proposal.kind === "operation" ||
+      proposal.kind === "operation-choices"
+    ) {
+      if (!message || this.clock() - Date.parse(message.at) >= 120_000) {
+        this.update(
+          { assistantNotice: "This proposal expired. Ask for a fresh draft." },
+          false,
+        );
+        return;
+      }
+      if (
+        proposal.kind === "operation-choices" &&
+        (!targetId || !proposal.targetIds.includes(targetId))
+      )
+        return;
       if (this.snapshot.ownerForm?.dirty.length) {
         this.update(
           {
@@ -2430,18 +2497,31 @@ export class SessionController {
       }
       this.openOwnerOperation(
         proposal.operation,
-        proposal.targetId ?? undefined,
+        proposal.kind === "operation"
+          ? (proposal.targetId ?? undefined)
+          : targetId,
       );
-      const formId = this.snapshot.ownerForm?.id;
-      if (formId)
-        for (const [field, value] of Object.entries(proposal.prefill))
-          if (value !== null && ["title", "category", "note"].includes(field))
-            this.editOwnerField(
-              field as "title" | "category" | "note",
-              value,
-              "suggestion",
-              formId,
-            );
+      const form = this.snapshot.ownerForm;
+      if (form) {
+        const fields = prefillFields(form, proposal.prefill);
+        this.update({ ownerSurface: "tailor", assistantNotice: "" }, false);
+        this.toggleTailor(true);
+        const graph = this.snapshot.state.graph;
+        this.cancelPrefill = animatePrefill(
+          fields,
+          (field, value) => {
+            if (
+              !this.ownerAllowed() ||
+              this.snapshot.ownerForm?.id !== form.id ||
+              this.snapshot.state.graph !== graph
+            )
+              return false;
+            this.editOwnerField(field, value, "suggestion", form.id);
+            return true;
+          },
+          (field) => this.update({ ownerFilling: field }, false),
+        );
+      }
     } else if (proposal.kind === "bag") {
       const p = this.snapshot.state.graph.products.find((p) =>
         p.variants.some((v) => v.id === proposal.variantId),
@@ -2767,6 +2847,9 @@ export class SessionController {
       currencyBusy: false,
       currencyNotice: "",
       ownerForm: null,
+      ownerSurface: "dashboard",
+      ownerFilling: null,
+      ownerResult: null,
       ownerReview: null,
       ownerNotice: "",
       ownerPhotoBusy: false,

@@ -244,7 +244,11 @@ export function editOwnerField(
   origin: "human" | "suggestion" = "human",
 ): OwnerForm {
   if (origin === "suggestion" && form.dirty.includes(field)) return form;
-  if (form.fields[field] === value) return form;
+  if (
+    form.fields[field] === value &&
+    (origin === "suggestion" || form.dirty.includes(field))
+  )
+    return form;
   return OwnerFormSchema.parse({
     ...form,
     fields: { ...form.fields, [field]: value },
