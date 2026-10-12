@@ -1,0 +1,140 @@
+[
+  {
+    "controls": [
+      {
+        "height": 44.1875,
+        "label": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "label": "Issue a demo refund",
+        "width": 239
+      },
+      {
+        "height": 44.1875,
+        "label": "Back to editable fields",
+        "width": 239
+      }
+    ],
+    "documentOverflow": 0,
+    "height": 430,
+    "panelOverflow": 0,
+    "width": 320
+  },
+  {
+    "controls": [
+      {
+        "height": 44.1875,
+        "label": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "label": "Issue a demo refund",
+        "width": 309
+      },
+      {
+        "height": 44.1875,
+        "label": "Back to editable fields",
+        "width": 309
+      }
+    ],
+    "documentOverflow": 0,
+    "height": 844,
+    "panelOverflow": 0,
+    "width": 390
+  },
+  {
+    "controls": [
+      {
+        "height": 44.1875,
+        "label": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "label": "Issue a demo refund",
+        "width": 316.734375
+      },
+      {
+        "height": 44.1875,
+        "label": "Back to editable fields",
+        "width": 316.75
+      }
+    ],
+    "documentOverflow": 0,
+    "height": 1024,
+    "panelOverflow": 0,
+    "width": 768
+  },
+  {
+    "controls": [
+      {
+        "height": 44.1875,
+        "label": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "label": "Issue a demo refund",
+        "width": 426.8125
+      },
+      {
+        "height": 44.1875,
+        "label": "Back to editable fields",
+        "width": 426.828125
+      }
+    ],
+    "documentOverflow": 0,
+    "height": 768,
+    "panelOverflow": 0,
+    "width": 1024
+  },
+  {
+    "controls": [
+      {
+        "height": 44.1875,
+        "label": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "label": "Issue a demo refund",
+        "width": 223.5625
+      },
+      {
+        "height": 44.1875,
+        "label": "Back to editable fields",
+        "width": 223.5625
+      }
+    ],
+    "documentOverflow": 0,
+    "height": 900,
+    "panelOverflow": 0,
+    "width": 1280
+  },
+  {
+    "controls": [
+      {
+        "height": 44.1875,
+        "label": "Cancel form",
+        "width": 118.59375
+      },
+      {
+        "height": 44.1875,
+        "label": "Issue a demo refund",
+        "width": 287.296875
+      },
+      {
+        "height": 44.1875,
+        "label": "Back to editable fields",
+        "width": 287.3125
+      }
+    ],
+    "documentOverflow": 0,
+    "height": 1080,
+    "panelOverflow": 0,
+    "width": 1920
+  }
+]

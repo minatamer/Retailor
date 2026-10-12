@@ -1,6 +1,6 @@
 # RTL-011 — Deliver three business scenarios and owner operations
 
-Status: **Planned — not started**\
+Status: **Implemented locally — final physical/zoom/owner visual acceptance pending in RTL-019**\
 Planning date: **11 October 2026**\
 Milestone: **Owner operations**\
 Depends on: [RTL-004](RTL-004-build-exact-commerce-commands-and-fact-engine.md), [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md), [RTL-010](RTL-010-connect-shopping-bag-and-simulated-orders.md)\
@@ -63,16 +63,16 @@ Each register shows origin, relevant timestamp basis and linked records. Costs/s
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Owner registers/forms operate the current storefront graph.
-- [ ] All product creates require actual validated photos; linked removals archive.
-- [ ] Order/expense drafts and immutable posted lifecycle are clearly distinguished.
-- [ ] Returns/refunds/restock/cost/writeoff effects follow exact independent rules.
-- [ ] Three actual coherent scenario generators use only current catalogue IDs.
-- [ ] Seeded costs/traffic/history are visibly synthetic and source-linked.
-- [ ] Scenario replacement reviews activity/stock loss and preserves catalogue/design/photos.
-- [ ] Prices and explicit unit-cost edits are not overwritten to force a result.
-- [ ] Bag/pending proposals/old chats reconcile against new identity.
-- [ ] Forms expose reusable typed seams for Tailor, including last-product recovery.
+- [x] Owner registers/forms operate the current storefront graph.
+- [x] All product creates require actual validated photos; linked removals archive.
+- [x] Order/expense drafts and immutable posted lifecycle are clearly distinguished.
+- [x] Returns/refunds/restock/cost/writeoff effects follow exact independent rules.
+- [x] Three actual coherent scenario generators use only current catalogue IDs.
+- [x] Seeded costs/traffic/history are visibly synthetic and source-linked.
+- [x] Scenario replacement reviews activity/stock loss and preserves catalogue/design/photos.
+- [x] Prices and explicit unit-cost edits are not overwritten to force a result.
+- [x] Bag/pending proposals/old chats reconcile against new identity.
+- [x] Forms expose reusable typed seams for Tailor, including last-product recovery.
 
 ## Focused verification and evidence
 
@@ -112,4 +112,4 @@ No arbitrary sales editor, cash-flow/bookkeeping/tax product, scenario builder, 
 
 Keep this outcome under `RTL-011:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-011.md` and actual check/review evidence under `docs/validation/RTL-011.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Local criteria above are verified in [RTL-011 validation](../validation/RTL-011.md), including the read-only review loop and actual browser observations. Physical/native-zoom/owner visual checks remain pending in RTL-019. No paid or hosted acceptance belongs to this packet. Ticket creation alone does not authorize Git mutations, paid runtime providers or cloud publication. Follow the user’s actual execution authorization when work starts.
