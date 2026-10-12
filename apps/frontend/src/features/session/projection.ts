@@ -5,6 +5,7 @@ import {
 } from "@retailor/contracts/currency";
 import { validateSnapshot } from "@retailor/commerce/currency";
 import { OwnerViewSchema } from "../operations/state";
+import { DashboardStateSchema, INITIAL_DASHBOARD } from "../dashboard/state";
 import { ScenarioInfoSchema } from "@retailor/contracts/scenarios";
 import { ShoppingSchema, INITIAL_SHOPPING } from "../bag/state";
 import { z } from "zod";
@@ -60,6 +61,7 @@ export const ProjectionSchema = z.strictObject({
   ownerView: OwnerViewSchema.default("overview"),
   ownerSearch: z.string().max(100).default(""),
   ownerPage: z.number().int().min(0).max(16).default(0),
+  dashboard: DashboardStateSchema.default(INITIAL_DASHBOARD),
 });
 export type Projection = z.infer<typeof ProjectionSchema>;
 export const INITIAL_DESIGN = DesignSchema.parse({
@@ -201,6 +203,7 @@ export function serializeProjection(state: Projection, now: number) {
     ownerView: state.ownerView,
     ownerSearch: state.ownerSearch,
     ownerPage: state.ownerPage,
+    dashboard: state.dashboard,
   };
   const encoded = JSON.stringify(ProjectionSchema.parse(selected));
   if (serializedBytes(selected) > SESSION_BYTES)

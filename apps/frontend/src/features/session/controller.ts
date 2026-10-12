@@ -14,6 +14,18 @@ import type {
   ScenarioInfo,
 } from "@retailor/contracts/scenarios";
 import { ScenarioPresetSchema } from "@retailor/contracts/scenarios";
+import {
+  INITIAL_DASHBOARD,
+  DashboardPeriodSchema,
+  DashboardSeriesSchema,
+  DashboardTargetSchema,
+  dashboardRecord,
+} from "../dashboard/state";
+import type {
+  DashboardPeriod,
+  DashboardSeries,
+  DashboardTarget,
+} from "../dashboard/state";
 import { previewCommand } from "@retailor/commerce/effects";
 import { USD_SCOPE } from "@retailor/contracts/currency";
 import {
@@ -232,6 +244,7 @@ export class SessionController {
       ownerView: "overview",
       ownerSearch: "",
       ownerPage: 0,
+      dashboard: structuredClone(INITIAL_DASHBOARD),
     };
   }
   static async open(options: SessionOptions) {
@@ -586,6 +599,88 @@ export class SessionController {
       ownerPage: 0,
       presentationRevision: this.snapshot.state.presentationRevision + 1,
     });
+  }
+  setDashboardPeriod(period: DashboardPeriod) {
+    if (
+      !this.ownerAllowed() ||
+      !DashboardPeriodSchema.safeParse(period).success
+    )
+      return;
+    this.state({
+      dashboard: {
+        ...this.snapshot.state.dashboard,
+        period,
+        source: null,
+        page: 0,
+      },
+      presentationRevision: this.snapshot.state.presentationRevision + 1,
+    });
+  }
+  setDashboardSeries(series: DashboardSeries) {
+    if (
+      !this.ownerAllowed() ||
+      !DashboardSeriesSchema.safeParse(series).success
+    )
+      return;
+    this.state({
+      dashboard: {
+        ...this.snapshot.state.dashboard,
+        series,
+        source: null,
+        page: 0,
+      },
+      presentationRevision: this.snapshot.state.presentationRevision + 1,
+    });
+  }
+  pinDashboard(target: DashboardTarget) {
+    if (!this.ownerAllowed()) return;
+    const parsed = DashboardTargetSchema.safeParse(target);
+    if (parsed.success)
+      this.state({
+        dashboard: { ...this.snapshot.state.dashboard, pinned: parsed.data },
+      });
+  }
+  openDashboardEvidence(target: DashboardTarget) {
+    if (!this.ownerAllowed()) return;
+    const parsed = DashboardTargetSchema.safeParse(target);
+    if (parsed.success)
+      this.state({
+        dashboard: {
+          ...this.snapshot.state.dashboard,
+          target: parsed.data,
+          pinned: parsed.data,
+          source: null,
+          page: 0,
+        },
+      });
+  }
+  openDashboardSource(reference: string | null) {
+    if (!this.ownerAllowed() || !this.snapshot.state.dashboard.target) return;
+    if (reference && !dashboardRecord(this.snapshot.state.graph, reference))
+      return;
+    this.state({
+      dashboard: { ...this.snapshot.state.dashboard, source: reference },
+    });
+  }
+  closeDashboardEvidence() {
+    if (this.valid())
+      this.state({
+        dashboard: {
+          ...this.snapshot.state.dashboard,
+          target: null,
+          source: null,
+        },
+      });
+  }
+  setDashboardEvidencePage(page: number) {
+    if (
+      !this.ownerAllowed() ||
+      !Number.isInteger(page) ||
+      page < 0 ||
+      page > 40
+    )
+      return;
+    this.state({ dashboard: { ...this.snapshot.state.dashboard, page } });
   }
   ownerSearch(value: string) {
     if (!this.ownerAllowed() || value.length > 100) return;
@@ -991,6 +1086,12 @@ export class SessionController {
         graph: review.graph,
         ownerPage: 0,
         scenario: review.info,
+        dashboard: {
+          ...state.dashboard,
+          target: null,
+          pinned: null,
+          source: null,
+        },
         shopping: structuredClone(INITIAL_SHOPPING),
         orderDisplays: [],
       }),
@@ -1732,6 +1833,13 @@ export class SessionController {
         {
           graph,
           scenario: composed.info,
+          dashboard: {
+            ...state.dashboard,
+            target: null,
+            pinned: null,
+            source: null,
+            page: 0,
+          },
           stage: "style",
           orderDisplays: [],
           shopping: structuredClone(INITIAL_SHOPPING),
