@@ -140,13 +140,14 @@ describe("one accepted currency display snapshot", () => {
     expect(restored.getSnapshot().state.graph).toEqual(after.graph);
   });
   it("converts source prices, clears monetary bounds explicitly and reuses the same quote through USD/EUR/refresh", async () => {
-    const { env, controller, getter, graph } = await openStore();
+    const { env, controller, getter } = await openStore();
     controller.browse({
       filters: {
         ...controller.getSnapshot().state.browse.filters,
         maxPrice: 10000,
       },
     });
+    const graph = controller.getSnapshot().state.graph;
     await controller.selectCurrency("EUR");
     const state = controller.getSnapshot().state,
       scope = selectedScope(state.currency);
@@ -258,12 +259,13 @@ describe("one accepted currency display snapshot", () => {
     expect(controller.getSnapshot().currencyNotice).toContain("unavailable");
   });
   it("drops corrupt persisted currency data without losing catalogue records or retaining price bounds", async () => {
-    const { env, controller, graph } = await openStore();
+    const { env, controller } = await openStore();
     await controller.selectCurrency("EUR");
     controller.filterDisplayBudget(
       3400,
       selectedScope(controller.getSnapshot().state.currency),
     );
+    const graph = controller.getSnapshot().state.graph;
     const saved = JSON.parse(env.storage.getItem(SESSION_KEY)!);
     saved.currency.acceptedSnapshot.rateDecimal = "0";
     env.storage.setItem(SESSION_KEY, JSON.stringify(saved));

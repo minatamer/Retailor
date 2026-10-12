@@ -4,6 +4,7 @@ import {
   OrderDisplaySchema,
 } from "@retailor/contracts/currency";
 import { validateSnapshot } from "@retailor/commerce/currency";
+import { ShoppingSchema, INITIAL_SHOPPING } from "../bag/state";
 import { z } from "zod";
 import { GraphSchema, TimestampSchema } from "@retailor/contracts/commerce";
 import { IdSchema } from "@retailor/contracts/core";
@@ -52,6 +53,7 @@ export const ProjectionSchema = z.strictObject({
   designEditing: z.boolean().default(false),
   currency: CurrencyPreferenceSchema.default(INITIAL_CURRENCY),
   orderDisplays: z.array(OrderDisplaySchema).max(30).default([]),
+  shopping: ShoppingSchema.default(INITIAL_SHOPPING),
 });
 export type Projection = z.infer<typeof ProjectionSchema>;
 export const INITIAL_DESIGN = DesignSchema.parse({
@@ -131,6 +133,34 @@ export function restoreProjection(
     )
   )
     throw new Error("Saved confirmation currency does not match orders");
+  if (
+    (state.shopping.lastActivityAt &&
+      (Date.parse(state.shopping.lastActivityAt) > now ||
+        Date.parse(state.shopping.lastActivityAt) <
+          Date.parse(graph.createdAt))) ||
+    (state.shopping.visitId &&
+      !graph.traffic.some(
+        (item) =>
+          item.id === state.shopping.visitId &&
+          item.actor === "shopper" &&
+          item.origin === "guest_action",
+      )) ||
+    (state.shopping.buyerId &&
+      !graph.buyers.some(
+        (item) => item.id === state.shopping.buyerId && item.fictional,
+      )) ||
+    (state.shopping.draftId &&
+      !graph.orderDrafts.some(
+        (item) =>
+          item.id === state.shopping.draftId && item.actor === "shopper",
+      )) ||
+    (state.shopping.lastOrderId &&
+      !graph.orders.some(
+        (item) =>
+          item.id === state.shopping.lastOrderId && item.actor === "shopper",
+      ))
+  )
+    throw new Error("Saved shopping references need repair");
   return {
     ...state,
     graph,
@@ -159,6 +189,7 @@ export function serializeProjection(state: Projection, now: number) {
     designEditing: state.designEditing,
     currency: state.currency,
     orderDisplays: state.orderDisplays,
+    shopping: state.shopping,
   };
   const encoded = JSON.stringify(ProjectionSchema.parse(selected));
   if (serializedBytes(selected) > SESSION_BYTES)

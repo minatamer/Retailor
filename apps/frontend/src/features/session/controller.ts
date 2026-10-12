@@ -8,10 +8,14 @@ import type { Currency, CurrencyScope } from "@retailor/contracts/currency";
 import { validateSnapshot } from "@retailor/commerce/currency";
 import { requestCurrencyQuote } from "../currency/request";
 import { selectedScope } from "../currency/display";
+import { INITIAL_SHOPPING, SHOPPER_INACTIVITY_MS } from "../bag/state";
+import type { CheckoutReview } from "../bag/state";
+import { bagEntries, bagWitness, bagTotals } from "../bag/quote";
 import { DesignSchema } from "@retailor/contracts/design";
 import type { Design } from "@retailor/contracts/design";
 import type { CommerceGraph } from "@retailor/contracts/commerce";
 import type { Photo } from "@retailor/contracts/photos";
+import { CommandSchema } from "@retailor/contracts/commands";
 import type { CommerceCommand } from "@retailor/contracts/commands";
 import type { ProductInput } from "@retailor/contracts/product";
 import { applyCommand } from "@retailor/commerce/commands";
@@ -100,6 +104,10 @@ export interface SessionSnapshot {
   heroBusy: boolean;
   currencyBusy: boolean;
   currencyNotice: string;
+  bagOpen: boolean;
+  bagReceiptId: string | null;
+  bagNotice: string;
+  checkoutReview: CheckoutReview | null;
   preparedLogo: {
     designRevision: number;
     name: string;
@@ -145,6 +153,10 @@ export class SessionController {
       heroBusy: false,
       currencyBusy: false,
       currencyNotice: "",
+      bagOpen: false,
+      bagReceiptId: null,
+      bagNotice: "",
+      checkoutReview: null,
       preparedLogo: null,
     };
   }
@@ -173,6 +185,7 @@ export class SessionController {
       designEditing: false,
       currency: structuredClone(INITIAL_CURRENCY),
       orderDisplays: [],
+      shopping: structuredClone(INITIAL_SHOPPING),
     };
   }
   static async open(options: SessionOptions) {
@@ -393,6 +406,14 @@ export class SessionController {
           }
         : {}),
     });
+    if (changed)
+      this.update(
+        {
+          checkoutReview: null,
+          bagNotice: "Currency changed. Review the displayed order again.",
+        },
+        false,
+      );
     this.update(
       {
         currencyNotice: changed
@@ -509,6 +530,400 @@ export class SessionController {
       page: "collection",
       filters: { ...state.browse.filters, minPrice: null, maxPrice: maximum },
     });
+  }
+  private shoppingAllowed() {
+    return (
+      this.valid() &&
+      this.snapshot.state.stage === "storefront" &&
+      this.snapshot.state.hasAcceptedLook &&
+      !this.snapshot.state.designEditing
+    );
+  }
+  private makeCommand<T extends CommerceCommand["type"]>(
+    graph: CommerceGraph,
+    type: T,
+    payload: Extract<CommerceCommand, { type: T }>["payload"],
+  ): Extract<CommerceCommand, { type: T }> {
+    const at = new Date(this.clock()).toISOString();
+    return CommandSchema.parse({
+      id: this.id(),
+      workspaceId: graph.workspaceId,
+      scenarioId: graph.scenarioId,
+      expectedRevision: graph.revision,
+      at,
+      expiresAt: new Date(
+        Math.min(this.clock() + 120_000, Date.parse(graph.expiresAt)),
+      ).toISOString(),
+      origin: "guest_action",
+      type,
+      payload,
+    }) as Extract<CommerceCommand, { type: T }>;
+  }
+  /** One owned command path. No caller can replace the graph or bypass command validation. */
+  applyCommerce(command: CommerceCommand) {
+    if (
+      !this.valid() ||
+      !["storefront", "dashboard"].includes(this.snapshot.state.stage) ||
+      this.snapshot.state.designEditing
+    )
+      return {
+        ok: false as const,
+        message: "Return to your accepted store or owner workspace.",
+      };
+    if (command.type === "placeOrder")
+      return {
+        ok: false as const,
+        message: "Review the order before placing it.",
+      };
+    const result = applyCommand(this.snapshot.state.graph, command, {
+      now: new Date(this.clock()).toISOString(),
+      availablePhotoIds: this.photos.availableIds(),
+    });
+    if (result.ok) {
+      this.update({
+        checkoutReview: null,
+        bagNotice: this.snapshot.state.graph.bag.some(
+          (line) =>
+            !result.graph.bag.some((next) => next.variantId === line.variantId),
+        )
+          ? "An unavailable garment was removed from the bag. Review the remaining selections; no substitute was chosen."
+          : this.snapshot.bagNotice,
+        state: freeze({
+          ...this.snapshot.state,
+          graph: result.graph,
+          shopping: {
+            ...this.snapshot.state.shopping,
+            draftId: result.graph.orderDrafts.some(
+              (draft) => draft.id === this.snapshot.state.shopping.draftId,
+            )
+              ? this.snapshot.state.shopping.draftId
+              : null,
+          },
+        }),
+      });
+    } else this.update({ bagNotice: result.message }, false);
+    return result;
+  }
+  private shopper(
+    stage: "visit" | "engaged" | "bag" | "checkout",
+    productId?: string,
+  ) {
+    if (!this.shoppingAllowed()) return false;
+    let graph = this.snapshot.state.graph;
+    const shopping = { ...this.snapshot.state.shopping };
+    const apply = (command: CommerceCommand) => {
+      const result = applyCommand(graph, command, {
+        now: new Date(this.clock()).toISOString(),
+        availablePhotoIds: this.photos.availableIds(),
+      });
+      if (!result.ok) {
+        this.update({ bagNotice: result.message }, false);
+        return false;
+      }
+      graph = result.graph;
+      return true;
+    };
+    const previous = graph.traffic.find((item) => item.id === shopping.visitId);
+    if (
+      !previous ||
+      this.clock() - Date.parse(shopping.lastActivityAt ?? previous.lastAt) >=
+        SHOPPER_INACTIVITY_MS
+    ) {
+      const visitId = this.id();
+      if (
+        !apply(
+          this.makeCommand(graph, "addTraffic", {
+            sessions: [
+              {
+                id: visitId,
+                actor: "shopper",
+                origin: "guest_action",
+                startedAt: new Date(this.clock()).toISOString(),
+                lastAt: new Date(this.clock()).toISOString(),
+                productIds: [],
+              },
+            ],
+          }),
+        )
+      )
+        return false;
+      shopping.visitId = visitId;
+    }
+    const visit = graph.traffic.find((item) => item.id === shopping.visitId)!;
+    const reached =
+      stage === "visit" ||
+      (stage === "engaged"
+        ? !!visit.engagedAt
+        : stage === "bag"
+          ? !!visit.bagAt
+          : !!visit.checkoutAt);
+    // Refresh graph activity at most once per minute; exact inactivity uses the owned lastActivityAt.
+    if (
+      !reached ||
+      (productId && !visit.productIds.includes(productId)) ||
+      this.clock() - Date.parse(visit.lastAt) >= 60_000
+    ) {
+      if (
+        !apply(
+          this.makeCommand(graph, "touchTraffic", {
+            sessionId: visit.id,
+            stage,
+            ...(productId ? { productId } : {}),
+          }),
+        )
+      )
+        return false;
+    }
+    shopping.lastActivityAt = new Date(this.clock()).toISOString();
+    this.state({ graph, shopping });
+    return true;
+  }
+  openBag() {
+    if (!this.shopper(this.snapshot.state.graph.bag.length ? "bag" : "visit"))
+      return;
+    this.update(
+      {
+        bagOpen: true,
+        bagReceiptId: this.snapshot.state.graph.bag.length
+          ? null
+          : this.snapshot.state.shopping.lastOrderId,
+        checkoutReview: null,
+        bagNotice: "",
+      },
+      false,
+    );
+  }
+  closeBag() {
+    this.update({ bagOpen: false, checkoutReview: null }, false);
+  }
+  editBag() {
+    this.update({ checkoutReview: null }, false);
+  }
+  addToBag(productId: string, variantId: string, quantity: number) {
+    if (!this.shoppingAllowed()) return;
+    const graph = this.snapshot.state.graph;
+    if (
+      !graph.products
+        .find((item) => item.id === productId)
+        ?.variants.some((item) => item.id === variantId)
+    )
+      return;
+    const combined =
+      (graph.bag.find((line) => line.variantId === variantId)?.quantity ?? 0) +
+      quantity;
+    if (!Number.isInteger(quantity) || quantity < 1 || combined > 5) {
+      this.update(
+        {
+          bagOpen: true,
+          bagReceiptId: null,
+          bagNotice: "Keep each option to five units or fewer.",
+        },
+        false,
+      );
+      return;
+    }
+    if (!this.shopper("bag", productId)) return;
+    const result = this.applyCommerce(
+      this.makeCommand(this.snapshot.state.graph, "setBagLine", {
+        variantId,
+        quantity: combined,
+      }),
+    );
+    if (result.ok)
+      this.update(
+        {
+          bagOpen: true,
+          bagReceiptId: null,
+          bagNotice:
+            "Added to your bag. Stock updates only when you place a demo order.",
+        },
+        false,
+      );
+  }
+  setBagQuantity(variantId: string, quantity: number) {
+    if (
+      !this.shoppingAllowed() ||
+      !this.snapshot.state.graph.bag.some(
+        (line) => line.variantId === variantId,
+      )
+    )
+      return;
+    if (!Number.isInteger(quantity) || quantity < 0 || quantity > 5) return;
+    const result = this.applyCommerce(
+      this.makeCommand(this.snapshot.state.graph, "setBagLine", {
+        variantId,
+        quantity,
+      }),
+    );
+    if (result.ok)
+      this.update(
+        {
+          bagNotice: quantity
+            ? "Bag updated. Review current prices before placing your order."
+            : "Garment removed from your bag.",
+        },
+        false,
+      );
+  }
+  reviewBag(discount = 0) {
+    if (!this.shoppingAllowed()) return;
+    const entries = bagEntries(
+      this.snapshot.state.graph,
+      this.photos.availableIds(),
+    );
+    if (!entries.length || entries.some((row) => row.unavailable)) {
+      this.update(
+        {
+          checkoutReview: null,
+          bagNotice:
+            "Review unavailable garments before ordering. No stock has been deducted.",
+        },
+        false,
+      );
+      return;
+    }
+    let totals;
+    try {
+      totals = bagTotals(entries, discount);
+    } catch {
+      this.update(
+        {
+          checkoutReview: null,
+          bagNotice: "This demo discount or amount needs review.",
+        },
+        false,
+      );
+      return;
+    }
+    if (!this.shopper("checkout", entries[0]!.productId ?? undefined)) return;
+    let graph = this.snapshot.state.graph;
+    const shopping = { ...this.snapshot.state.shopping };
+    const apply = (command: CommerceCommand) => {
+      const result = applyCommand(graph, command, {
+        now: new Date(this.clock()).toISOString(),
+        availablePhotoIds: this.photos.availableIds(),
+      });
+      if (!result.ok) {
+        this.update({ checkoutReview: null, bagNotice: result.message }, false);
+        return false;
+      }
+      graph = result.graph;
+      return true;
+    };
+    if (!shopping.buyerId) {
+      const buyerId = this.id();
+      if (
+        !apply(
+          this.makeCommand(graph, "addBuyers", {
+            buyers: [
+              {
+                id: buyerId,
+                label: "Demo shopper",
+                origin: "guest_action",
+                fictional: true,
+              },
+            ],
+          }),
+        )
+      )
+        return;
+      shopping.buyerId = buyerId;
+    }
+    const draftId = shopping.draftId ?? this.id();
+    if (
+      !apply(
+        this.makeCommand(graph, "saveOrderDraft", {
+          id: draftId,
+          actor: "shopper",
+          buyerId: shopping.buyerId!,
+          trafficId: shopping.visitId!,
+          lines: entries.map((row) => ({
+            variantId: row.variantId,
+            quantity: row.quantity,
+          })),
+          discount: totals.discount,
+          delivery: totals.delivery,
+          tax: totals.tax,
+        }),
+      )
+    )
+      return;
+    shopping.draftId = draftId;
+    const review: CheckoutReview = {
+      command: this.makeCommand(graph, "placeOrder", {
+        draftId,
+        orderId: this.id(),
+      }),
+      scope: selectedScope(this.snapshot.state.currency),
+      witness: bagWitness(graph, this.photos.availableIds()),
+      discount,
+    };
+    this.update({
+      state: freeze({ ...this.snapshot.state, graph, shopping }),
+      checkoutReview: freeze(review),
+      bagNotice:
+        "Review your exact total and selected options. No stock has been deducted.",
+    });
+  }
+  placeReviewed(review: CheckoutReview) {
+    if (!this.shoppingAllowed()) return;
+    const state = this.snapshot.state;
+    // A previously successful click returns the same local confirmation without replaying any effect.
+    const recorded = state.orderDisplays.find(
+      (item) => item.orderId === review.command.payload.orderId,
+    );
+    if (
+      recorded &&
+      state.graph.receipts.some((item) => item.id === review.command.id) &&
+      state.graph.orders.some((item) => item.id === recorded.orderId)
+    )
+      return recorded.orderId;
+    if (
+      this.snapshot.checkoutReview !== review ||
+      review.command.expectedRevision !== state.graph.revision ||
+      review.witness !== bagWitness(state.graph, this.photos.availableIds()) ||
+      JSON.stringify(review.scope) !==
+        JSON.stringify(selectedScope(state.currency)) ||
+      this.clock() >= Date.parse(review.command.expiresAt)
+    ) {
+      this.update(
+        {
+          checkoutReview: null,
+          bagNotice:
+            "Your bag, stock, prices or currency changed. Review the current order again; no purchase was placed.",
+        },
+        false,
+      );
+      return;
+    }
+    const result = applyCommand(state.graph, review.command, {
+      now: new Date(this.clock()).toISOString(),
+      availablePhotoIds: this.photos.availableIds(),
+    });
+    if (!result.ok) {
+      this.update({ checkoutReview: null, bagNotice: result.message }, false);
+      return;
+    }
+    this.update({
+      state: freeze({
+        ...state,
+        graph: result.graph,
+        shopping: {
+          ...state.shopping,
+          draftId: null,
+          lastOrderId: review.command.payload.orderId,
+        },
+        orderDisplays: [
+          ...state.orderDisplays,
+          { orderId: review.command.payload.orderId, scope: review.scope },
+        ],
+      }),
+      checkoutReview: null,
+      bagReceiptId: review.command.payload.orderId,
+      bagNotice:
+        "Demo order placed. Your stock and owner figures now reflect this exact order.",
+    });
+    return review.command.payload.orderId;
   }
   rememberOrderDisplay(orderId: string, scope: CurrencyScope) {
     if (!this.valid()) return;
@@ -805,7 +1220,12 @@ export class SessionController {
       else if (draft.mode !== "development-fixture")
         throw new Error("Scenario composition unavailable");
       this.state(
-        { graph, stage: "style", orderDisplays: [] },
+        {
+          graph,
+          stage: "style",
+          orderDisplays: [],
+          shopping: structuredClone(INITIAL_SHOPPING),
+        },
         "Catalogue accepted. This is your local demo; no website was published externally.",
       );
       this.protectDesignPhotos();
@@ -851,7 +1271,16 @@ export class SessionController {
     }
     this.cancelOperation();
     this.photos.cancel();
-    this.update({ heroBusy: false, preparedLogo: null }, false);
+    this.update(
+      {
+        heroBusy: false,
+        preparedLogo: null,
+        bagOpen: false,
+        bagReceiptId: null,
+        checkoutReview: null,
+      },
+      false,
+    );
     this.state({
       stage,
       designEditing: false,
@@ -927,6 +1356,14 @@ export class SessionController {
       !this.snapshot.state.graph.products
         .find((item) => item.id === next.productId)
         ?.variants.some((variant) => variant.id === next.variantId)
+    )
+      return;
+    if (
+      this.shoppingAllowed() &&
+      !this.shopper(
+        next.page === "product" ? "engaged" : "visit",
+        next.page === "product" ? (next.productId ?? undefined) : undefined,
+      )
     )
       return;
     this.state({
@@ -1015,7 +1452,16 @@ export class SessionController {
         presentationRevision: this.snapshot.state.presentationRevision + 1,
       });
       this.protectDesignPhotos();
-      this.update({ heroBusy: false, preparedLogo: null }, false);
+      this.update(
+        {
+          heroBusy: false,
+          preparedLogo: null,
+          bagOpen: false,
+          bagReceiptId: null,
+          checkoutReview: null,
+        },
+        false,
+      );
     }
   }
   private protectDesignPhotos() {
@@ -1304,6 +1750,10 @@ export class SessionController {
       heroBusy: false,
       currencyBusy: false,
       currencyNotice: "",
+      bagOpen: false,
+      bagReceiptId: null,
+      bagNotice: "",
+      checkoutReview: null,
       preparedLogo: null,
     });
     const previous = this.photos;
