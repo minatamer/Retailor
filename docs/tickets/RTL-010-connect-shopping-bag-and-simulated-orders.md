@@ -1,6 +1,6 @@
 # RTL-010 — Connect shopping, the bag and simulated orders
 
-Status: **Planned — not started**\
+Status: **Locally complete — connected shopping verified; physical/zoom/owner visual evidence pending RTL-019**\
 Planning date: **11 October 2026**\
 Milestone: **Connected shopping**\
 Depends on: [RTL-004](RTL-004-build-exact-commerce-commands-and-fact-engine.md), [RTL-007](RTL-007-deliver-three-complete-clothing-store-templates.md), [RTL-008](RTL-008-deliver-tailor-chat-led-styling-and-owner-overrides.md), [RTL-009](RTL-009-deliver-automatic-usd-eur-storefront-pricing.md)\
@@ -23,12 +23,12 @@ Dependency completion means required local behavior, owning contracts and checks
 
 ## Files and responsibility boundaries
 
-| Area | Responsibility owned here |
-| --- | --- |
-| `apps/frontend/src/features/bag` | Bag state, effect review and demo checkout |
+| Area                                    | Responsibility owned here                                    |
+| --------------------------------------- | ------------------------------------------------------------ |
+| `apps/frontend/src/features/bag`        | Bag state, effect review and demo checkout                   |
 | `apps/frontend/src/features/storefront` | Available variant selection and actual shopping entry points |
-| `apps/frontend/src/features/session` | Shopper-stage records and receipt/quote recovery integration |
-| `docs/engineering/SHOPPING.md` | Bag, quote, traffic and simulated purchase behavior |
+| `apps/frontend/src/features/session`    | Shopper-stage records and receipt/quote recovery integration |
+| `docs/engineering/SHOPPING.md`          | Bag, quote, traffic and simulated purchase behavior          |
 
 Paths describe future ownership. Create modules/directories only with real behavior; reuse contracts, commands, assets and session state rather than a parallel authority.
 
@@ -56,27 +56,27 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] All families share usable variant selection and a bounded real bag.
-- [ ] Price/quantity/stock are validated against the current graph at placement.
-- [ ] Checkout clearly simulates a purchase and collects no real PII/payment details.
-- [ ] One placed order creates one coherent stock/economic effect.
-- [ ] USD/EUR bag components and confirmation reconcile from the same quote.
-- [ ] Archived/missing-photo/sold-out/stale items recover without substitution.
-- [ ] Nested local traffic excludes owner/designer activity and counts one conversion per session.
-- [ ] Refresh/duplicate actions cannot replay placement.
-- [ ] The actual order reference and stock result are available to owner views.
+- [x] All families share usable variant selection and a bounded real bag.
+- [x] Price/quantity/stock are validated against the current graph at placement.
+- [x] Checkout clearly simulates a purchase and collects no real PII/payment details.
+- [x] One placed order creates one coherent stock/economic effect.
+- [x] USD/EUR bag components and confirmation reconcile from the same quote.
+- [x] Archived/missing-photo/sold-out/stale items recover without substitution.
+- [x] Nested local traffic excludes owner/designer activity and counts one conversion per session.
+- [x] Refresh/duplicate actions cannot replay placement.
+- [x] The actual order reference and stock result are available to owner views.
 
 ## Focused verification and evidence
 
-| Case | Required observable evidence |
-| --- | --- |
-| Two shirts with discount | Exact allocated cents, delivery total and once-only deduction |
-| Concurrent stock/price change | Corrected bag review, no stale order |
-| Duplicate Place action | Same command receipt and no second stock movement |
-| EUR confirmation | Displayed components sum; canonical USD snapshot unchanged |
-| Photo/archive failure | Affected item unavailable and selections recover usefully |
-| Traffic repetition | Repeated bag clicks/orders count stages once; owner view excluded |
-| Refresh after success | Receipt returns without placement/provider replay |
+| Case                          | Required observable evidence                                      |
+| ----------------------------- | ----------------------------------------------------------------- |
+| Two shirts with discount      | Exact allocated cents, delivery total and once-only deduction     |
+| Concurrent stock/price change | Corrected bag review, no stale order                              |
+| Duplicate Place action        | Same command receipt and no second stock movement                 |
+| EUR confirmation              | Displayed components sum; canonical USD snapshot unchanged        |
+| Photo/archive failure         | Affected item unavailable and selections recover usefully         |
+| Traffic repetition            | Repeated bag clicks/orders count stages once; owner view excluded |
+| Refresh after success         | Receipt returns without placement/provider replay                 |
 
 Run meaningful focused tests during iteration. At the settled implementation snapshot run the applicable root gates established by RTL-001: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm check:boundaries`, `pnpm test:unit` and `pnpm build`. Record actual commands/results and revision. UI acceptance needs real browser observations where available; DOM simulations or animation declarations alone do not prove appearance/movement. Do not add tests that merely mirror CSS or static labels.
 
@@ -101,4 +101,8 @@ No real payment/carrier/tax integration, real address/contact collection, checko
 
 Keep this outcome under `RTL-010:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-010.md` and actual check/review evidence under `docs/validation/RTL-010.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All required local criteria now have evidence in the validation record; physical/device/zoom acceptance remains separately pending. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+
+## Executed completion
+
+12 October 2026: [Validation and actual browser evidence](../validation/RTL-010.md) records 207 passing tests, all settled root gates and a clean final read-only third pass after the independently reproduced amount-limit repair. [Shopping behavior](../engineering/SHOPPING.md) owns exact review, traffic and recovery semantics. Four cohesive commits follow [the allocation](../commit-plans/RTL-010.md). RTL-011 is next.
