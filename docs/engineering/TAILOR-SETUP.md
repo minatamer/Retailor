@@ -46,7 +46,7 @@ CSS entrance, hover/focus and native smooth scrolling provide motion. No timers 
 
 Only allow-listed bounded setup/design fields serialize. An eligible projection preserves confirmed exact IDs, dirty fields, accepted/preview separation and browse context. Obsolete finite design IDs are repaired to their accepted default with an explicit recovery notice, while valid commerce/photo metadata remains intact. Other malformed/unknown projection data stays rejected. A repaired style is not silently confirmed.
 
-The three-logo intent contains only current design revision, name, confirmed colour/type and candidate count 3. It is ephemeral, clears on design/navigation/reset and never serializes or dispatches. The current UI truthfully explains that generation is not connected yet. Selecting a preset, hovering, revealing or confirming the offer causes no paid call.
+The three-logo preparation contains only current design revision, name, confirmed colour/type and candidate count 3. It is ephemeral, clears on design/navigation/reset and never serializes or dispatches by itself. RTL-015 connects the separately approved bounded batch, reviewed candidate previews in actual headers, separate temporary logo bytes and wordmark fallback; see [logo policy](LOGOS.md) and [actual validation](../validation/RTL-015.md). Selecting a preset, hovering or revealing/preparing the offer causes no generation call. Explicit batch approval is the only generation action.
 
 ## Verification
 
