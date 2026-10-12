@@ -90,6 +90,179 @@ const named = (value: string) => ({
   blob: new Blob([value], { type: "image/jpeg" }),
 });
 describe("owned photo selection and partial recovery", () => {
+  it("overlaps cached verification while restoring only ordered current rows", async () => {
+    const cache = new MemoryCache(),
+      seed = setup(processed, cache).controller;
+    await seed.add([named("one"), named("two"), named("three")]);
+    const expected = seed.descriptors();
+    seed.dispose();
+    const jobs: { task: DecodeTask; resolve(value: ProcessedPhoto): void }[] =
+      [];
+    const { controller } = setup(
+      (task) =>
+        new Promise((resolve) => {
+          jobs.push({ task, resolve });
+        }),
+      cache,
+    );
+    const recovery = controller.recover(
+      expected.map((photo) => photo.id),
+      expected,
+    );
+    await vi.waitFor(() => expect(jobs).toHaveLength(2));
+    jobs[1]!.resolve(await processed(jobs[1]!.task));
+    await Promise.resolve();
+    expect(controller.availableIds().size).toBe(0);
+    expect(jobs).toHaveLength(2);
+    jobs[0]!.resolve(await processed(jobs[0]!.task));
+    await vi.waitFor(() => expect(jobs).toHaveLength(3));
+    expect([...controller.availableIds()]).toEqual(["photo_1", "photo_2"]);
+    jobs[2]!.resolve(await processed(jobs[2]!.task));
+    await recovery;
+    expect(controller.getSnapshot().items.map((item) => item.name)).toEqual([
+      "one.jpg",
+      "two.jpg",
+      "three.jpg",
+    ]);
+    expect(controller.getSnapshot().notice).toContain(
+      "No processing request was repeated",
+    );
+  });
+  it("overlaps two decodes, commits reversed completions in selection order and does not buffer queued photos", async () => {
+    const jobs: {
+      task: DecodeTask;
+      signal: AbortSignal;
+      resolve(value: ProcessedPhoto): void;
+    }[] = [];
+    const decode: PhotoDecoder = (task, signal) =>
+      new Promise((resolve) => {
+        jobs.push({ task, signal, resolve });
+      });
+    const { controller } = setup(decode),
+      pending = controller.add([named("one"), named("two"), named("three")]);
+    await vi.waitFor(() => expect(jobs).toHaveLength(2));
+    jobs[1]!.resolve(await processed(jobs[1]!.task));
+    await Promise.resolve();
+    expect(controller.getSnapshot().items).toEqual([]);
+    expect(jobs).toHaveLength(2);
+    jobs[0]!.resolve(await processed(jobs[0]!.task));
+    await vi.waitFor(() => expect(jobs).toHaveLength(3));
+    expect(controller.getSnapshot().items.map((item) => item.name)).toEqual([
+      "one.jpg",
+      "two.jpg",
+    ]);
+    jobs[2]!.resolve(await processed(jobs[2]!.task));
+    await pending;
+    expect(controller.getSnapshot().items.map((item) => item.name)).toEqual([
+      "one.jpg",
+      "two.jpg",
+      "three.jpg",
+    ]);
+    expect(controller.getSnapshot()).toMatchObject({
+      progress: 3,
+      total: 3,
+      busy: false,
+    });
+  });
+  it("preserves the first duplicate identity even when the later duplicate finishes first", async () => {
+    const jobs: { task: DecodeTask; resolve(value: ProcessedPhoto): void }[] =
+      [];
+    const { controller, created } = setup(
+      (task) =>
+        new Promise((resolve) => {
+          jobs.push({ task, resolve });
+        }),
+    );
+    const pending = controller.add([named("same"), named("same")]);
+    await vi.waitFor(() => expect(jobs).toHaveLength(2));
+    jobs[1]!.resolve(await processed(jobs[1]!.task));
+    jobs[0]!.resolve(await processed(jobs[0]!.task));
+    expect(await pending).toEqual(["photo_1", "photo_1"]);
+    expect(controller.getSnapshot().items.map((item) => item.photo.id)).toEqual(
+      ["photo_1"],
+    );
+    expect(created).toHaveLength(1);
+  });
+  it("cancels all pending slots, retains a committed photo and never starts queued work", async () => {
+    const jobs: {
+      task: DecodeTask;
+      signal: AbortSignal;
+      resolve(value: ProcessedPhoto): void;
+    }[] = [];
+    const { controller, created, cache } = setup(
+      (task, signal) =>
+        new Promise((resolve) => {
+          jobs.push({ task, signal, resolve });
+        }),
+    );
+    const pending = controller.add([
+      named("one"),
+      named("two"),
+      named("three"),
+      named("four"),
+      named("five"),
+    ]);
+    await vi.waitFor(() => expect(jobs).toHaveLength(2));
+    jobs[0]!.resolve(await processed(jobs[0]!.task));
+    await vi.waitFor(() => expect(jobs).toHaveLength(3));
+    controller.cancel();
+    expect(jobs.slice(1).every((job) => job.signal.aborted)).toBe(true);
+    for (const job of jobs.slice(1)) job.resolve(await processed(job.task));
+    expect(await pending).toEqual([]);
+    expect(jobs).toHaveLength(3);
+    expect(created).toHaveLength(1);
+    expect(controller.getSnapshot().items.map((item) => item.name)).toEqual([
+      "one.jpg",
+    ]);
+    expect((await cache.read()).photos).toHaveLength(1);
+  });
+  it("waits for a failed source reservation before decoding the later photo that fits the exact remaining original budget", async () => {
+    let seeding = true;
+    const jobs: {
+      task: DecodeTask;
+      resolve(value: ProcessedPhoto): void;
+      reject(error: Error): void;
+    }[] = [];
+    const { controller } = setup((task) =>
+      seeding
+        ? processed(task)
+        : new Promise((resolve, reject) => {
+            jobs.push({ task, resolve, reject });
+          }),
+    );
+    const large = (size: number, index: number) => ({
+      name: `fill_${index}.jpg`,
+      blob: new Blob([new Uint8Array(size - 1), String(index)]),
+    });
+    await controller.add(
+      Array.from({ length: 10 }, (_, index) =>
+        large(index === 9 ? 2 * 1024 * 1024 : PHOTO_LIMITS.original, index),
+      ),
+    );
+    expect(
+      controller
+        .descriptors()
+        .reduce((sum, photo) => sum + photo.source.bytes, 0),
+    ).toBe(38 * 1024 * 1024);
+    seeding = false;
+    const pending = controller.add([
+      large(2 * 1024 * 1024, 1),
+      large(2 * 1024 * 1024, 2),
+    ]);
+    await vi.waitFor(() => expect(jobs).toHaveLength(1));
+    jobs[0]!.reject(new Error("Invalid source pixels"));
+    await vi.waitFor(() => expect(jobs).toHaveLength(2));
+    jobs[1]!.resolve(await processed(jobs[1]!.task));
+    await pending;
+    expect(
+      controller
+        .descriptors()
+        .reduce((sum, photo) => sum + photo.source.bytes, 0),
+    ).toBe(PHOTO_LIMITS.originals);
+    expect(
+      controller.getSnapshot().issues.map((issue) => issue.message),
+    ).toEqual(["Invalid source pixels"]);
+  });
   it("reports failed reset cleanup honestly and ignores late remove notices", async () => {
     const cache = new MemoryCache(),
       first = setup(processed, cache).controller;
@@ -207,6 +380,7 @@ describe("owned photo selection and partial recovery", () => {
     };
     const { controller, cache, created } = setup(decode);
     const pending = controller.add([named("one")]);
+    await vi.waitFor(() => expect(captured).toBeDefined());
     await controller.reset();
     finish!(await processed(captured!));
     expect(await pending).toEqual([]);

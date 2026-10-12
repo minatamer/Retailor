@@ -14,6 +14,8 @@ export const PHOTO_LIMITS = Object.freeze({
   cachedDerivatives: 24 * 1024 * 1024,
   originCache: 80 * 1024 * 1024,
   decodeMs: 10_000,
+  localProcessingConcurrency: 2,
+  activeDecodePixels: 24_000_000,
 });
 export const HashSchema = z.string().regex(/^[a-f0-9]{64}$/u);
 export const DerivativeSchema = ImageSchema.refine(

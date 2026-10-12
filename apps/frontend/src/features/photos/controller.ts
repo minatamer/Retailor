@@ -9,6 +9,7 @@ import { CacheConflict } from "./cache";
 import type { PhotoCache, StoredPhoto } from "./cache";
 import { decodePhoto } from "./decode";
 import type { PhotoDecoder } from "./decode";
+import { orderedPhotoProcessing } from "./ordered-processing";
 export interface NamedPhoto {
   blob: Blob;
   name: string;
@@ -211,12 +212,15 @@ export class PhotoController {
       });
     this.update({ busy: true, progress: 0, total: inputs.length, issues: [] });
     try {
-      for (let index = 0; index < inputs.length; index++) {
-        if (!this.current(generation)) break;
-        const input = inputs[index]!;
-        const old = replaceId ? this.entries.get(replaceId) : undefined;
-        const name = input.name.slice(0, 120);
-        try {
+      await orderedPhotoProcessing(
+        inputs.length,
+        operation.signal,
+        async (index, signal) => {
+          if (!this.current(generation))
+            throw new Error("Selection cancelled.");
+          const input = inputs[index]!;
+          const old = replaceId ? this.entries.get(replaceId) : undefined;
+          const name = input.name.slice(0, 120);
           if (select && this.selected.length >= PHOTO_LIMITS.selection && !old)
             throw new Error(
               "Your selection already has 24 photos. Remove one to add another.",
@@ -237,84 +241,139 @@ export class PhotoController {
           const id = replaceId ?? this.id();
           const decoded = await this.decode(
             { id, original: input.blob },
-            operation.signal,
+            signal,
           );
-          if (!this.current(generation)) break;
-          const duplicate = [...this.entries.values()].find(
-            (item) =>
-              item.photo.source.hash === decoded.photo.source.hash ||
-              item.photo.derivative.hash === decoded.photo.derivative.hash,
-          );
-          if (duplicate) {
-            if (select && !this.selected.includes(duplicate.photo.id))
-              this.selected.push(duplicate.photo.id);
+          return { decoded, id, name, old };
+        },
+        async (index, result) => {
+          if (!this.current(generation)) return;
+          const name = inputs[index]!.name.slice(0, 120);
+          try {
+            if (!result.ok) throw result.error;
+            const { decoded, id, old } = result.value;
+            const checked = PhotoSchema.parse(decoded.photo);
+            const originals =
+              [...this.entries.values()].reduce(
+                (sum, row) => sum + row.original.size,
+                0,
+              ) - (old?.original.size ?? 0);
+            if (
+              checked.id !== id ||
+              decoded.original.size !== checked.source.bytes ||
+              decoded.derivative.size !== checked.derivative.bytes ||
+              decoded.original.size > PHOTO_LIMITS.original ||
+              originals + decoded.original.size > PHOTO_LIMITS.originals
+            )
+              throw new Error(
+                "Decoded photo exceeds its original-byte envelope.",
+              );
+            const duplicate = [...this.entries.values()].find(
+              (item) =>
+                item.photo.source.hash === decoded.photo.source.hash ||
+                item.photo.derivative.hash === decoded.photo.derivative.hash,
+            );
+            if (duplicate) {
+              if (select && !this.selected.includes(duplicate.photo.id))
+                this.selected.push(duplicate.photo.id);
+              issues.push({
+                name,
+                message:
+                  "These exact photo bytes are already here. Kept one copy.",
+              });
+              accepted.push(duplicate.photo.id);
+              this.update({}, true);
+              return;
+            }
+            const stored: StoredPhoto = { ...decoded, name };
+            const derivatives =
+              [...this.entries.values()].reduce(
+                (sum, item) => sum + item.derivative.size,
+                0,
+              ) - (old?.derivative.size ?? 0);
+            const selectedBytes =
+              this.selected.reduce(
+                (sum, photoId) =>
+                  sum + this.entries.get(photoId)!.derivative.size,
+                0,
+              ) - (old?.derivative.size ?? 0);
+            if (
+              derivatives + decoded.derivative.size >
+                PHOTO_LIMITS.cachedDerivatives ||
+              (select &&
+                selectedBytes + decoded.derivative.size >
+                  PHOTO_LIMITS.derivatives)
+            )
+              throw new Error(
+                "The photo previews are full. Remove an unused photo first.",
+              );
+            let recovery = true;
+            try {
+              await this.cache.put(stored);
+            } catch (error) {
+              if (error instanceof CacheConflict) throw error;
+              recovery = false;
+            }
+            if (!this.current(generation)) return;
+            const url = this.urls.create(decoded.derivative);
+            this.entries.set(id, { ...stored, url });
+            this.failedIds.delete(id);
+            if (old) this.urls.revoke(old.url);
+            if (select && !this.selected.includes(id)) this.selected.push(id);
+            accepted.push(id);
+            this.update(
+              {
+                notice: recovery
+                  ? "Photo checked. Originals stay local; only inspected previews are used for processing."
+                  : "Photo ready in memory. Temporary storage is unavailable, so refreshing may lose this photo.",
+              },
+              true,
+            );
+          } catch (error) {
+            if (!this.current(generation)) return;
             issues.push({
               name,
               message:
-                "These exact photo bytes are already here. Kept one copy.",
+                error instanceof Error
+                  ? error.message
+                  : "Unable to read this photo.",
             });
-            accepted.push(duplicate.photo.id);
-            this.update({}, true);
-            continue;
+          } finally {
+            if (this.current(generation))
+              this.update({ progress: index + 1, issues: issues.slice(0, 25) });
           }
-          const stored: StoredPhoto = { ...decoded, name };
-          const derivatives =
+        },
+        (pending, next) => {
+          const old = replaceId ? this.entries.get(replaceId) : undefined;
+          const originals =
             [...this.entries.values()].reduce(
-              (sum, item) => sum + item.derivative.size,
+              (sum, row) => sum + row.original.size,
               0,
-            ) - (old?.derivative.size ?? 0);
-          const selectedBytes =
-            this.selected.reduce(
-              (sum, photoId) =>
-                sum + this.entries.get(photoId)!.derivative.size,
-              0,
-            ) - (old?.derivative.size ?? 0);
-          if (
-            derivatives + decoded.derivative.size >
-              PHOTO_LIMITS.cachedDerivatives ||
-            (select &&
-              selectedBytes + decoded.derivative.size >
-                PHOTO_LIMITS.derivatives)
-          )
-            throw new Error(
-              "The photo previews are full. Remove an unused photo first.",
-            );
-          let recovery = true;
-          try {
-            await this.cache.put(stored);
-          } catch (error) {
-            if (error instanceof CacheConflict) throw error;
-            recovery = false;
-          }
-          if (!this.current(generation)) break;
-          const url = this.urls.create(decoded.derivative);
-          this.entries.set(id, { ...stored, url });
-          this.failedIds.delete(id);
-          if (old) this.urls.revoke(old.url);
-          if (select && !this.selected.includes(id)) this.selected.push(id);
-          accepted.push(id);
-          this.update(
-            {
-              notice: recovery
-                ? "Photo checked. Originals stay local; only inspected previews are used for processing."
-                : "Photo ready in memory. Temporary storage is unavailable, so refreshing may lose this photo.",
-            },
-            true,
+            ) - (old?.original.size ?? 0);
+          const pendingBytes = pending.reduce(
+            (sum, index) => sum + inputs[index]!.blob.size,
+            0,
           );
-        } catch (error) {
-          if (!this.current(generation)) break;
-          issues.push({
-            name,
-            message:
-              error instanceof Error
-                ? error.message
-                : "Unable to read this photo.",
-          });
-        } finally {
-          if (this.current(generation))
-            this.update({ progress: index + 1, issues: issues.slice(0, 25) });
-        }
-      }
+          return (
+            this.current(generation) &&
+            originals + pendingBytes + inputs[next]!.blob.size <=
+              PHOTO_LIMITS.originals &&
+            this.entries.size + pending.length + 1 - (old ? 1 : 0) <=
+              PHOTO_LIMITS.sources &&
+            (!select ||
+              this.selected.length + pending.length + 1 - (old ? 1 : 0) <=
+                PHOTO_LIMITS.selection)
+          );
+        },
+      );
+    } catch (error) {
+      if (this.current(generation) && !operation.signal.aborted)
+        issues.push({
+          name: "Selection",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Unable to check this selection.",
+        });
     } finally {
       if (this.current(generation)) {
         this.operation = undefined;
@@ -407,12 +466,14 @@ export class PhotoController {
             "Some saved photo bytes are unavailable. Your valid photos are kept; reselect the missing ones.",
         });
       this.update({ total: rows.length, progress: 0 });
-      for (let index = 0; index < rows.length; index++) {
-        if (!this.current(generation)) break;
-        const row = rows[index]!;
-        try {
+      await orderedPhotoProcessing(
+        rows.length,
+        operation.signal,
+        async (index, signal) => {
+          if (!this.current(generation)) throw new Error("Recovery cancelled.");
+          const row = rows[index]!;
           const expectation = expected.get(row.photo.id);
-          if (expectedPhotos && !expectation) continue;
+          if (expectedPhotos && !expectation) return null;
           if (
             expectation &&
             (expectation.source.hash !== row.photo.source.hash ||
@@ -439,26 +500,77 @@ export class PhotoController {
             throw new Error("Recovered cache exceeds the photo envelope.");
           const checked = await this.decode(
             { id: row.photo.id, original: row.original, existing: row },
-            operation.signal,
+            signal,
           );
-          if (!this.current(generation)) break;
-          const old = this.entries.get(row.photo.id);
-          if (old) this.urls.revoke(old.url);
-          this.entries.set(row.photo.id, {
-            ...checked,
-            name: row.name,
-            url: this.urls.create(checked.derivative),
-          });
-          this.failedIds.delete(row.photo.id);
-        } catch {
-          issues.push({
-            name: row.name,
-            message:
-              "Saved photo bytes are unavailable. Reselect the exact photo to repair this item.",
-          });
-        }
-        if (this.current(generation)) this.update({ progress: index + 1 });
-      }
+          return { row, checked };
+        },
+        async (index, result) => {
+          if (!this.current(generation)) return;
+          const row = rows[index]!;
+          try {
+            if (!result.ok) throw result.error;
+            if (!result.value) return;
+            const { checked } = result.value;
+            const metadata = PhotoSchema.parse(checked.photo),
+              prior = this.entries.get(row.photo.id);
+            const totals = [...this.entries.values()].reduce(
+              (sum, item) => ({
+                original: sum.original + item.original.size,
+                derivative: sum.derivative + item.derivative.size,
+              }),
+              { original: 0, derivative: 0 },
+            );
+            if (
+              metadata.id !== row.photo.id ||
+              checked.original.size !== metadata.source.bytes ||
+              checked.derivative.size !== metadata.derivative.bytes ||
+              totals.original +
+                checked.original.size -
+                (prior?.original.size ?? 0) >
+                PHOTO_LIMITS.originals ||
+              totals.derivative +
+                checked.derivative.size -
+                (prior?.derivative.size ?? 0) >
+                PHOTO_LIMITS.cachedDerivatives
+            )
+              throw new Error("Recovered cache exceeds its envelope.");
+            const old = this.entries.get(row.photo.id);
+            if (old) this.urls.revoke(old.url);
+            this.entries.set(row.photo.id, {
+              ...checked,
+              name: row.name,
+              url: this.urls.create(checked.derivative),
+            });
+            this.failedIds.delete(row.photo.id);
+          } catch {
+            if (!this.current(generation)) return;
+            issues.push({
+              name: row.name,
+              message:
+                "Saved photo bytes are unavailable. Reselect the exact photo to repair this item.",
+            });
+          } finally {
+            if (this.current(generation)) this.update({ progress: index + 1 });
+          }
+        },
+        (pending, next) => {
+          const bytes = [...this.entries.values()].reduce(
+            (sum, row) => sum + row.original.size,
+            0,
+          );
+          return (
+            this.current(generation) &&
+            bytes +
+              pending.reduce(
+                (sum, index) => sum + rows[index]!.original.size,
+                0,
+              ) +
+              rows[next]!.original.size <=
+              PHOTO_LIMITS.originals &&
+            this.entries.size + pending.length + 1 <= PHOTO_LIMITS.sources
+          );
+        },
+      );
       if (!this.current(generation)) return;
       this.selected = (selectedIds ?? rows.map((row) => row.photo.id))
         .filter((id) => this.entries.has(id))

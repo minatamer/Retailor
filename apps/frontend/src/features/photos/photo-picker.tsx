@@ -60,8 +60,7 @@ export function PhotoPicker({
       {state.busy && (
         <div className={styles.progress} role="status">
           <span className={styles.spinner} />
-          Checking photo {Math.min(state.progress + 1, state.total)} of{" "}
-          {state.total}
+          Checking your photos · {state.progress} of {state.total} checked
           <Button variant="quiet" onClick={() => controller.cancel()}>
             Cancel
           </Button>
