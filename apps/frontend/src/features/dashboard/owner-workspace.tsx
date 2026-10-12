@@ -1,18 +1,17 @@
 "use client";
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { formatUsd } from "@retailor/commerce/money";
-import { facts, allActivityScope } from "@retailor/commerce/facts";
 import {
   stockOf,
   refundable,
   orderFinancialState,
 } from "@retailor/commerce/selectors";
 import { SCENARIO_LABELS } from "@retailor/commerce/scenarios";
-import type { FactId } from "@retailor/contracts/facts";
 import { Button } from "../../components/ui/button";
 import { useSession } from "../session/context";
 import { FormShell } from "../operations/form-shell";
+import { DashboardOverview } from "./overview";
 import type { OwnerOperationType, OwnerView } from "../operations/state";
 import { GarmentImage } from "../storefront/gallery";
 import styles from "./owner-workspace.module.css";
@@ -64,15 +63,6 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
     controller.browse({ page: "product", productId: id, variantId: null });
     controller.go("storefront");
   };
-  const cards: [FactId, string][] = [
-    ["net_sales", "Net merchandise"],
-    ["included_orders", "Placed orders"],
-    ["available_stock", "Available units"],
-    ["sold_cost", "Sold cost"],
-    ["expenses", "Operating expenses"],
-    ["operating_result", "Demo result"],
-  ];
-  const metrics = useMemo(() => facts(graph, allActivityScope(graph)), [graph]);
   const products = graph.products.filter((p) =>
       matches(p.title, p.category, p.id),
     ),
@@ -152,53 +142,7 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
           <h2 id="owner-register-heading" ref={heading} tabIndex={-1}>
             {VIEWS.find((v) => v.id === view)?.label}
           </h2>
-          {view === "overview" ? (
-            <>
-              <div className={styles.metrics}>
-                {cards.map(([id, label]) => {
-                  const fact = metrics.find((f) => f.factId === id)!;
-                  return (
-                    <article key={id}>
-                      <span>{label}</span>
-                      <strong>
-                        {fact.value === null
-                          ? "Unavailable"
-                          : fact.unit === "usd-cents"
-                            ? formatUsd(fact.value)
-                            : fact.value.toLocaleString("en-US")}
-                      </strong>
-                      <small>{fact.formula}</small>
-                    </article>
-                  );
-                })}
-              </div>
-              <p className={styles.note}>
-                {state.scenario
-                  ? `${SCENARIO_LABELS[state.scenario.preset]} · Synthetic 28-day activity. Active options began with 20 demo units; current stock follows actual movements. Current prices and future unit costs remain editable.`
-                  : "Opening inventory and local demo actions; no seeded business story has been selected for this restored workspace."}
-              </p>
-              <div className={styles.shortcuts}>
-                <Button
-                  variant="secondary"
-                  onClick={() => controller.ownerNavigate("orders")}
-                >
-                  Inspect actual orders
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => controller.ownerNavigate("inventory")}
-                >
-                  Review stock & costs
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => controller.ownerNavigate("expenses")}
-                >
-                  Trace operating expenses
-                </Button>
-              </div>
-            </>
-          ) : null}
+          {view === "overview" ? <DashboardOverview /> : null}
           {!["overview", "design", "returns", "expenses"].includes(view) && (
             <label className={styles.search}>
               <span>Find a current record</span>
