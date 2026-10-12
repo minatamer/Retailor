@@ -47,6 +47,9 @@ export function Storefront({
   const picked = items.find((item) => item.product.id === browse.productId);
   const first = current.find((item) => item.photoIds.length) ?? current[0];
   const price = input.formatPrice ?? formatUsd;
+  const suppliedHero = design.heroPhotoId
+    ? input.photos.get(design.heroPhotoId)
+    : undefined;
   const body = useRef<HTMLDivElement>(null),
     frame = useRef<HTMLDivElement>(null);
   const previous = useRef(`${browse.page}:${browse.productId ?? ""}`);
@@ -145,13 +148,23 @@ export function Storefront({
                   </div>
                   <button
                     className={styles.heroPhoto}
-                    onClick={() => select(first.product.id)}
-                    aria-label={`Discover ${first.product.title}`}
+                    onClick={() =>
+                      suppliedHero ? openCollection() : select(first.product.id)
+                    }
+                    aria-label={
+                      suppliedHero
+                        ? "Explore the collection"
+                        : `Discover ${first.product.title}`
+                    }
                   >
-                    {photoFor(first, input) ? (
+                    {(suppliedHero ?? photoFor(first, input)) ? (
                       <GarmentImage
-                        photo={photoFor(first, input)!}
-                        title={first.product.title}
+                        photo={(suppliedHero ?? photoFor(first, input))!}
+                        title={
+                          suppliedHero
+                            ? `Supplied hero image for ${design.name}`
+                            : first.product.title
+                        }
                         eager
                         onFailure={actions.photoFailed}
                       />
@@ -159,7 +172,9 @@ export function Storefront({
                       <span>Photo needs repair</span>
                     )}
                     <span className={styles.heroPhotoLabel}>
-                      {first.product.title}
+                      {suppliedHero
+                        ? "Your collection, your world"
+                        : first.product.title}
                       <Icon name="arrow" />
                     </span>
                   </button>

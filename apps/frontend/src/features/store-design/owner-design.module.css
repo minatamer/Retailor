@@ -1,0 +1,85 @@
+.panel {
+  border: 1px solid var(--platform-line);
+  border-radius: 24px;
+  padding: clamp(18px, 3vw, 36px);
+  margin: 32px 0;
+  background: var(--platform-surface);
+}
+.panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.panel header span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--platform-action);
+}
+.panel h2 {
+  font-family: var(--font-editorial);
+  font-weight: 400;
+  font-size: clamp(28px, 3vw, 44px);
+  letter-spacing: -0.04em;
+  margin: 10px 0;
+}
+.panel p {
+  font-size: 13px;
+  color: var(--platform-muted);
+  line-height: 1.6;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.controls,
+.preview {
+  min-width: 0;
+  scroll-margin-top: 14px;
+}
+.controls {
+  position: sticky;
+  top: 14px;
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tabs button {
+  min-height: 44px;
+  font-size: 11px;
+  padding-inline: 12px;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.previewNotice {
+  background: var(--platform-selected);
+  padding: 14px;
+  border-radius: 12px;
+}
+.note {
+  font-size: 11px !important;
+}
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .controls {
+    position: static;
+  }
+}
+
+@media (max-height: 760px) {
+  .controls {
+    position: static;
+  }
+}

@@ -1,11 +1,11 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
 import styles from "./controls.module.css";
 export function Button({
   className = "",
   variant = "primary",
   type = "button",
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & {
+}: ComponentProps<"button"> & {
   variant?: "primary" | "secondary" | "quiet";
 }) {
   return (
@@ -20,7 +20,7 @@ export function Choice({
   selected,
   className = "",
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { selected: boolean }) {
+}: ComponentProps<"button"> & { selected: boolean }) {
   return (
     <button
       {...props}

@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button, Choice } from "../../components/ui/button";
+import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
 import { PhotoPicker, namedFiles } from "../photos/photo-picker";
 import { SAMPLE } from "../photos/sample";
@@ -12,8 +12,8 @@ import { CatalogueReview } from "../catalogue/review";
 import { Storefront } from "../storefront/storefront";
 import { storeItems } from "../storefront/browse";
 import type { StorePhoto } from "../storefront/gallery";
-import { TEMPLATES, PALETTES, TYPOGRAPHIES } from "../store-design/presets";
-import type { Design } from "@retailor/contracts/design";
+import { Tailor } from "../assistants/tailor";
+import { OwnerDesign } from "../store-design/owner-design";
 import { facts, allActivityScope } from "@retailor/commerce/facts";
 import { formatUsd } from "@retailor/commerce/money";
 import type { FactId } from "@retailor/contracts/facts";
@@ -48,7 +48,9 @@ function WorkspaceFlow() {
   const heading = useRef<HTMLDivElement>(null);
   useEffect(() => {
     heading.current?.focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (state.stage === "style")
+      heading.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
   }, [state.stage]);
   const step =
     state.stage === "choose"
@@ -187,101 +189,14 @@ function WorkspaceFlow() {
           {state.stage === "process" && <Processing step={processStep} />}
           {state.stage === "catalogue" && <CatalogueReview />}
           {(state.stage === "style" || state.stage === "storefront") && (
-            <div className={state.stage === "style" ? styles.styleLayout : ""}>
+            <div
+              className={
+                state.stage === "style" && state.setup.expanded
+                  ? styles.styleLayout
+                  : ""
+              }
+            >
               <CollectionCanvas />
-              {state.stage === "style" && (
-                <aside className={styles.tailor}>
-                  <span className={styles.tailorMark}>
-                    <Icon name="sparkle" /> Tailor
-                  </span>
-                  <h2>
-                    Hey, your collection
-                    <br />
-                    is ready.
-                  </h2>
-                  <p>
-                    Let’s make this storefront yours. We’ve started with Studio,
-                    Ink / Paper and an editorial type pairing.
-                  </p>
-                  <p className={styles.bubble}>
-                    A quiet, photo-first look. Beautiful clothes, room to
-                    breathe, and a simple wordmark.
-                  </p>
-                  <div
-                    className={styles.designChoices}
-                    aria-label="Tailor template choices"
-                  >
-                    {(Object.keys(TEMPLATES) as Design["template"][]).map(
-                      (template) => (
-                        <Choice
-                          key={template}
-                          selected={state.previewDesign.template === template}
-                          onClick={() =>
-                            controller.design({
-                              ...state.previewDesign,
-                              template,
-                            })
-                          }
-                        >
-                          {TEMPLATES[template].label}
-                        </Choice>
-                      ),
-                    )}
-                  </div>
-                  <details className={styles.designDetails}>
-                    <summary>Try another colour or type</summary>
-                    <p>Colours</p>
-                    <div className={styles.designChoices}>
-                      {(Object.keys(PALETTES) as Design["theme"][]).map(
-                        (theme) => (
-                          <Choice
-                            key={theme}
-                            selected={state.previewDesign.theme === theme}
-                            onClick={() =>
-                              controller.design({
-                                ...state.previewDesign,
-                                theme,
-                              })
-                            }
-                          >
-                            {PALETTES[theme].label}
-                          </Choice>
-                        ),
-                      )}
-                    </div>
-                    <p>Typography</p>
-                    <div className={styles.designChoices}>
-                      {(
-                        Object.keys(TYPOGRAPHIES) as Design["typography"][]
-                      ).map((typography) => (
-                        <Choice
-                          key={typography}
-                          selected={
-                            state.previewDesign.typography === typography
-                          }
-                          onClick={() =>
-                            controller.design({
-                              ...state.previewDesign,
-                              typography,
-                            })
-                          }
-                        >
-                          {TYPOGRAPHIES[typography].label}
-                        </Choice>
-                      ))}
-                    </div>
-                  </details>
-                  <Button onClick={() => controller.acceptDesign()}>
-                    Use this look <Icon name="arrow" />
-                  </Button>
-                  <Button
-                    variant="quiet"
-                    onClick={() => controller.go("catalogue")}
-                  >
-                    Back to my garments
-                  </Button>
-                </aside>
-              )}
             </div>
           )}
           {state.stage === "dashboard" && <OwnerBaseline />}
@@ -322,6 +237,7 @@ function WorkspaceFlow() {
         A clothing demo, made with Retailor. USD is the editable money
         authority. No real payment or shipping.
       </footer>
+      <Tailor />
       <WorkspaceDialog />
     </main>
   );
@@ -381,29 +297,25 @@ function CollectionCanvas() {
   const { controller, state } = useSession();
   const items = storeItems(state.graph, controller.photos.availableIds());
   const photos = new Map<string, StorePhoto>();
-  for (const item of items)
-    for (const id of item.photoIds) {
-      const photo = controller.photos.view(id);
-      if (photo) photos.set(id, { ...photo, id });
-    }
+  for (const id of controller.photos.availableIds()) {
+    const photo = controller.photos.view(id);
+    if (photo) photos.set(id, { ...photo, id });
+  }
+  const preview = state.stage === "style" || state.designEditing;
   return (
     <>
       <Storefront
         input={{
-          design:
-            state.stage === "style"
-              ? state.previewDesign
-              : state.acceptedDesign,
+          design: preview ? state.previewDesign : state.acceptedDesign,
           items,
           photos,
           browse: state.browse,
-          preview: state.stage === "style",
+          preview,
         }}
         actions={{
           browse: (patch) => controller.browse(patch),
           photoFailed: (id) => controller.photos.reportUnavailable(id),
-          owner: () =>
-            controller.go(state.stage === "style" ? "catalogue" : "dashboard"),
+          owner: () => controller.go(preview ? "catalogue" : "dashboard"),
         }}
       />
       {state.stage === "storefront" && (
@@ -459,6 +371,7 @@ function OwnerBaseline() {
           </Button>
         </div>
       </div>
+      <OwnerDesign preview={<CollectionCanvas />} />
       <p className={styles.assumptions}>
         Synthetic demo activity. This development publication contains opening
         inventory and no authored sales history.
@@ -508,26 +421,35 @@ function WorkspaceDialog() {
       }}
     >
       <h2 id="workspace-confirm-title">
-        {dialog === "rebuild"
-          ? "Rebuild this local demo?"
-          : "Start a fresh collection?"}
+        {dialog === "leave-design"
+          ? "Leave this design preview?"
+          : dialog === "rebuild"
+            ? "Rebuild this local demo?"
+            : "Start a fresh collection?"}
       </h2>
       <p>
-        {dialog === "rebuild"
-          ? "This replaces existing synthetic activity with a new scenario identity. Your accepted look and photos are kept."
-          : "This clears this workspace’s saved metadata, owned photos and local records. Other tabs and repositories are preserved."}
+        {dialog === "leave-design"
+          ? "You have changed this look. Discard the preview to leave, or keep editing. Your accepted storefront and commerce records are preserved."
+          : dialog === "rebuild"
+            ? "This replaces existing synthetic activity with a new scenario identity. Your accepted look and photos are kept."
+            : "This clears this workspace’s saved metadata, owned photos and local records. Other tabs and repositories are preserved."}
       </p>
       <div>
         <Button variant="secondary" onClick={() => controller.closeDialog()}>
-          Keep my collection
+          {dialog === "leave-design" ? "Keep editing" : "Keep my collection"}
         </Button>
         <Button
           onClick={() => {
-            if (dialog === "rebuild") controller.publish(true);
+            if (dialog === "leave-design") controller.discardDesignAndLeave();
+            else if (dialog === "rebuild") controller.publish(true);
             else void controller.reset();
           }}
         >
-          {dialog === "rebuild" ? "Rebuild demo" : "Reset this demo"}
+          {dialog === "leave-design"
+            ? "Discard preview and leave"
+            : dialog === "rebuild"
+              ? "Rebuild demo"
+              : "Reset this demo"}
         </Button>
       </div>
     </dialog>
