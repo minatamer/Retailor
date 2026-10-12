@@ -6,7 +6,8 @@ import type {
 import type { MetricFact } from "@retailor/contracts/facts";
 import { facts } from "@retailor/commerce/facts";
 import { dashboardFacts } from "@retailor/commerce/dashboard";
-import { stockOf, refundable } from "@retailor/commerce/selectors";
+import { stockOf } from "@retailor/commerce/selectors";
+import { operationEligible } from "./operations.js";
 import { deny } from "../security/errors.js";
 import type { PreparedAssistantContext } from "./context.js";
 import { assistantRecord } from "./tools.js";
@@ -70,65 +71,19 @@ export function proposalValid(
         stockOf(g, v.id) >= proposal.quantity
       );
     }
-    case "operation": {
-      if (role !== "owner") return false;
-      const id = proposal.targetId,
-        type = proposal.operation;
-      if (type === "createProduct") return id === null;
-      if (type === "saveOrderDraft")
-        return id === null || g.orderDrafts.some((d) => d.id === id);
-      if (type === "saveExpenseDraft")
-        return id === null || g.expenseDrafts.some((d) => d.id === id);
-      if (!id) return false;
-      if (type === "updateProduct" || type === "removeProduct")
-        return g.products.some((p) => p.id === id);
-      if (["deleteOrderDraft", "placeOrder"].includes(type))
-        return g.orderDrafts.some((d) => d.id === id);
-      if (["postExpense", "deleteExpenseDraft"].includes(type))
-        return g.expenseDrafts.some((d) => d.id === id);
-      if (["correctExpense", "voidExpense"].includes(type))
-        return (
-          g.expenses.some((e) => e.id === id && e.kind === "posting") &&
-          !g.expenses.some((e) => e.kind === "void" && e.parentId === id)
-        );
-      if (["adjustStock", "writeoffStock", "setUnitCost"].includes(type))
-        return g.products.some((p) => p.variants.some((v) => v.id === id));
-      if (type === "undo")
-        return g.receipts.at(-1)?.id === id && !!g.receipts.at(-1)?.undo;
-      const order = g.orders.find((o) => o.id === id);
-      if (type === "cancelOrder")
-        return (
-          order?.state === "placed" &&
-          !g.refunds.some((r) => r.orderId === id) &&
-          !g.returns.some((r) => r.orderId === id)
-        );
-      if (type === "advanceOrder")
-        return order?.state === "placed" || order?.state === "shipped";
-      if (type === "requestReturn")
-        return !!order?.shippedAt && order.state !== "cancelled";
-      if (type === "issueRefund") {
-        if (!order || order.state === "cancelled") return false;
-        const remaining = refundable(g, id);
-        return (
-          remaining.delivery > 0 ||
-          remaining.tax > 0 ||
-          remaining.lines.some((l) => l.amount > 0)
-        );
-      }
-      const returned = g.returns.find((r) => r.id === id);
-      if (type === "advanceReturn")
-        return (
-          returned?.state === "requested" || returned?.state === "received"
-        );
-      if (type === "receiveReturn") return returned?.state === "approved";
-      if (type === "restockReturn")
-        return (
-          !!returned?.receivedAt &&
-          !returned.restockedAt &&
-          returned.lines.some((l) => l.restockable.length > 0)
-        );
-      return false;
-    }
+    case "operation":
+      return (
+        role === "owner" &&
+        operationEligible(g, proposal.operation, proposal.targetId)
+      );
+    case "operation-choices":
+      return (
+        role === "owner" &&
+        new Set(proposal.targetIds).size === proposal.targetIds.length &&
+        proposal.targetIds.every((id) =>
+          operationEligible(g, proposal.operation, id),
+        )
+      );
   }
 }
 /** Free prose is connective, not monetary authority. Exact values render from registered references. */

@@ -7,6 +7,7 @@ import type {
 import { CategorySchema } from "@retailor/contracts/product";
 import { executeAssistantTool } from "./tools.js";
 import { AssistantToolArgumentsSchema } from "@retailor/contracts/assistant";
+import { fixtureOperation, operationTargets } from "./operations.js";
 /** Development examples are a finite grammar over current evidence, never a live failure fallback. */
 export function fixtureAssistant(): AssistantProvider {
   return {
@@ -86,6 +87,36 @@ export function fixtureAssistant(): AssistantProvider {
                 .slice(0, 6)
                 .map((v) => ({ kind: "variant", variantId: v.id }));
             }
+          } else if (c.role === "owner" && fixtureOperation(prompt)) {
+            const intent = fixtureOperation(prompt)!;
+            args.operation = intent.operation;
+            args.query = intent.query;
+            args.prefill = intent.prefill;
+            const tokens = new Set(
+              (prompt.match(/[a-z0-9_-]+/g) ?? []).filter(
+                (token) => /[_-]/.test(token) && /\d/.test(token),
+              ),
+            );
+            for (const match of prompt.matchAll(
+              /\b(?:reference|ref|id)\s*[:=]?\s*([a-z0-9_-]+)/g,
+            ))
+              tokens.add(match[1]!);
+            const named = operationTargets(
+              prepared.graph,
+              intent.operation,
+              "",
+            ).filter((row) => tokens.has(row.id.toLowerCase()));
+            if (named.length === 1) args.recordId = named[0]!.id;
+            const preparedOperation = executeAssistantTool(
+              prepared,
+              "prepareOperation",
+              args,
+            );
+            proposal = preparedOperation.proposal;
+            text =
+              proposal?.kind === "operation-choices"
+                ? "Development example: choose the exact current record below. If it is missing, refine your request or open its owner register. Nothing has changed."
+                : "Development example: let us prepare an editable draft together. Review the required photo, current values and exact effects before confirming.";
           } else if (
             c.role === "owner" &&
             /summary|profit|loss|negative|result|sales|explain|dashboard/.test(
@@ -109,19 +140,6 @@ export function fixtureAssistant(): AssistantProvider {
                 day: c.selectedDay,
                 productId: null,
               }));
-          } else if (
-            c.role === "owner" &&
-            /create|new|add/.test(prompt) &&
-            /product|jeans|hoodie|shirt/.test(prompt)
-          ) {
-            text =
-              "Development example: open an editable product draft. A validated available photo and reviewed options are required before creation.";
-            proposal = {
-              kind: "operation",
-              operation: "createProduct",
-              targetId: null,
-              prefill: { title: null, category: null, note: null },
-            };
           } else if (c.role === "creator") {
             text =
               "Development example: each template pairs its home, collection and product pages. Try the visual choices here, then choose a palette and typography. Logo generation is optional after those choices.";

@@ -18,6 +18,7 @@ import { displayMinor } from "@retailor/commerce/currency";
 import { stockOf } from "@retailor/commerce/selectors";
 import { deny } from "../security/errors.js";
 import type { PreparedAssistantContext } from "./context.js";
+import { operationEligible, operationTargets } from "./operations.js";
 
 export const ROLE_TOOLS: Record<
   PreparedAssistantContext["payload"]["context"]["role"],
@@ -318,9 +319,38 @@ export function executeAssistantTool(
       ]);
     }
     case "prepareOperation": {
-      only(args, ["operation", "recordId", "prefill"]);
+      only(args, ["operation", "recordId", "prefill", "query"]);
       if (!args.operation) return deny("INVALID_INPUT", 400);
-      // Exact target resolution is completed by the grounding validator before any proposal is returned.
+      if (!args.recordId && !operationEligible(graph, args.operation, null)) {
+        const matches = operationTargets(
+          graph,
+          args.operation,
+          args.query ?? "",
+        );
+        return result(
+          {
+            matches: matches.length,
+            choices: matches.slice(0, 6),
+            policy:
+              "Choose an exact target locally; never select the first match automatically. Refine the query if more choices exist.",
+          },
+          [],
+          null,
+          {
+            kind: "operation-choices",
+            operation: args.operation,
+            targetIds: matches.slice(0, 6).map((r) => r.id),
+            moreMatches: matches.length > 6,
+            prefill: args.prefill ?? {
+              title: null,
+              category: null,
+              note: null,
+            },
+          },
+        );
+      }
+      if (!operationEligible(graph, args.operation, args.recordId))
+        return deny("STALE", 409);
       return result(
         {
           policy:

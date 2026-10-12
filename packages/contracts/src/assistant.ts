@@ -207,6 +207,13 @@ export const AssistantProposalSchema = z.discriminatedUnion("kind", [
     prefill: PrefillSchema,
   }),
   z.strictObject({
+    kind: z.literal("operation-choices"),
+    operation: OwnerOperationSchema,
+    targetIds: z.array(IdSchema).max(6),
+    moreMatches: z.boolean(),
+    prefill: PrefillSchema,
+  }),
+  z.strictObject({
     kind: z.literal("bag"),
     variantId: IdSchema,
     quantity: z.number().int().min(1).max(5),
