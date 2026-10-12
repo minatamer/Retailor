@@ -13,6 +13,53 @@ function ports() {
   };
 }
 describe("fixed bounded private bridge", () => {
+  it("validates the fixed public quote and rejects currency query overrides without fetching", async () => {
+    const io = ports();
+    io.fetch.mockResolvedValue(
+      Response.json({
+        schemaVersion: 1,
+        snapshotId: "fx_test",
+        base: "USD",
+        quote: "EUR",
+        rateDecimal: "0.5",
+        rateDate: "2026-10-09",
+        fetchedAt: "2026-10-12T08:00:00.000Z",
+        sourceId: "frankfurter-ecb-v2",
+      }),
+    );
+    const good = await forward(
+      new Request("http://x/api/retailor/v1/currency/usd-eur"),
+      "currency/usd-eur",
+      config,
+      io,
+    );
+    expect(good.status).toBe(200);
+    expect((await good.json()).quote).toBe("EUR");
+    expect(io.fetch.mock.calls[0]![0]).toBe(
+      "http://127.0.0.1:4311/v1/currency/usd-eur",
+    );
+    const overridden = await forward(
+      new Request(
+        "http://x/api/retailor/v1/currency/usd-eur?url=https://foreign.example",
+      ),
+      "currency/usd-eur",
+      config,
+      io,
+    );
+    expect(overridden.status).toBe(400);
+    expect(io.fetch).toHaveBeenCalledTimes(1);
+    io.fetch.mockResolvedValue(Response.json({ unexpected: true }));
+    expect(
+      (
+        await forward(
+          new Request("http://x/api/retailor/v1/currency/usd-eur"),
+          "currency/usd-eur",
+          config,
+          io,
+        )
+      ).status,
+    ).toBe(502);
+  });
   it("forwards only a bounded safety cookie on admitted writes and reissues fixed attributes", async () => {
     const io = ports(),
       cookie = `retailor_safety=abc.${"a".repeat(64)}`;

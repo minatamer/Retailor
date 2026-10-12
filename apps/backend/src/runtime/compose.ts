@@ -7,6 +7,8 @@ import {
 import { turnstile } from "../security/turnstile.js";
 import { openAiCatalogue } from "../catalogue/provider.js";
 import type { RecognitionRuntime } from "../catalogue/routes.js";
+import { CurrencyService } from "../currency/service.js";
+import { ecbCurrency, fixtureCurrency } from "../currency/provider.js";
 export interface Runtime {
   capabilities: Capabilities;
   ready: boolean;
@@ -14,6 +16,7 @@ export interface Runtime {
   revision: string;
   frontendOrigin: string;
   recognition?: RecognitionRuntime;
+  currency?: CurrencyService;
 }
 export function composeRuntime(
   env: Environment,
@@ -31,6 +34,13 @@ export function composeRuntime(
     }),
     provider: openAiCatalogue(environment.OPENAI_API_KEY),
   }),
+  currencyFactory: (environment: Environment) => CurrencyService = (
+    environment,
+  ) =>
+    new CurrencyService(
+      environment.FAKE_MODE ? fixtureCurrency() : ecbCurrency(),
+      environment.FAKE_MODE,
+    ),
 ): Runtime {
   const mode = env.FAKE_MODE ? "fake" : "live";
   const unavailable = {
@@ -51,11 +61,13 @@ export function composeRuntime(
     !!env.TURNSTILE_SECRET_KEY &&
     !!env.TURNSTILE_SITE_KEY;
   const recognition = enabled ? recognitionFactory(env) : undefined;
+  const currency = currencyFactory(env);
   return {
     ready: env.FAKE_MODE || enabled,
     revision: env.APP_REVISION,
     frontendOrigin: env.FRONTEND_ORIGIN,
     requestId,
+    currency,
     ...(recognition ? { recognition } : {}),
     get capabilities(): Capabilities {
       const available = enabled && !!recognition?.admission.hasBudget();
@@ -71,7 +83,7 @@ export function composeRuntime(
             : unavailable,
         tailor: unavailable,
         logos: unavailable,
-        eur: { available: false, reason: "not-implemented" },
+        eur: { available: true, reason: env.FAKE_MODE ? "fixture" : "ready" },
       };
     },
   };

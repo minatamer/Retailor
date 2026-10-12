@@ -11,6 +11,7 @@ import {
   AdmissionResultSchema,
   RecognitionResultSchema,
 } from "@retailor/contracts/recognition";
+import { FxSnapshotSchema } from "@retailor/contracts/currency";
 import { z } from "zod";
 const origin = z
   .string()
@@ -128,6 +129,8 @@ export async function forward(
     });
   if (!isApiRoute(path)) return fail("NOT_FOUND", 404);
   const policy = API_ROUTES[path];
+  if (path === "currency/usd-eur" && new URL(request.url).search)
+    return fail("INVALID_INPUT", 400);
   if (request.method !== policy.method) return fail("NOT_FOUND", 405);
   if (
     request.method !== "GET" &&
@@ -216,11 +219,13 @@ export async function forward(
           ? ReadinessSchema
           : path === "config"
             ? CapabilitiesSchema
-            : path === "admission"
-              ? AdmissionResultSchema
-              : path === "catalogue/interpret"
-                ? RecognitionResultSchema
-                : null;
+            : path === "currency/usd-eur"
+              ? FxSnapshotSchema
+              : path === "admission"
+                ? AdmissionResultSchema
+                : path === "catalogue/interpret"
+                  ? RecognitionResultSchema
+                  : null;
     const validated = schema?.safeParse(parsed);
     if (validated && !validated.success) return fail("UPSTREAM_FAILED", 502);
     const outputHeaders = new Headers({

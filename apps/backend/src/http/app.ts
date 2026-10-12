@@ -3,6 +3,7 @@ import type { ErrorRequestHandler, Express } from "express";
 import { publicError } from "@retailor/contracts/api";
 import type { Runtime } from "../runtime/compose.js";
 import { recognitionRoutes } from "../catalogue/routes.js";
+import { currencyRoutes } from "../currency/routes.js";
 import { OperationFailure } from "../security/errors.js";
 export function createApp(runtime: Runtime): Express {
   const app = express();
@@ -38,6 +39,7 @@ export function createApp(runtime: Runtime): Express {
     res.json(runtime.capabilities);
   });
   recognitionRoutes(app, runtime.recognition, runtime.frontendOrigin);
+  currencyRoutes(app, runtime.currency);
   app.use((_req, res) => {
     res.status(404).json(publicError("NOT_FOUND", res.locals.requestId));
   });
