@@ -1,11 +1,11 @@
-import OpenAI from "openai";
+import type OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import {
   ModelCatalogueSchema,
   RECOGNITION_LIMITS,
 } from "@retailor/contracts/recognition";
 import type { CatalogueAction } from "@retailor/contracts/recognition";
-import { boundedBytes } from "../security/bounded.js";
+import { responsesClient } from "../providers/responses-client.js";
 import { deny } from "../security/errors.js";
 
 export const CATALOGUE_PROMPT_VERSION = "catalogue-evidence-v1";
@@ -23,30 +23,12 @@ export function openAiCatalogue(
   apiKey: string,
   fetcher: typeof fetch = fetch,
 ): CatalogueProvider {
-  const client = new OpenAI({
+  const client = responsesClient(
     apiKey,
-    baseURL: "https://api.openai.com/v1",
-    organization: null,
-    project: null,
-    maxRetries: 0,
-    timeout: RECOGNITION_LIMITS.providerMs,
-    logLevel: "off",
-    fetchOptions: { redirect: "error" },
-    fetch: async (url, init) => {
-      if (String(url) !== "https://api.openai.com/v1/responses")
-        return deny("UPSTREAM_FAILED", 502);
-      const response = await fetcher(url, { ...init, redirect: "error" });
-      const bytes = await boundedBytes(
-        response,
-        RECOGNITION_LIMITS.response,
-        init?.signal ?? AbortSignal.abort(),
-      );
-      return new Response(bytes, {
-        status: response.status,
-        headers: { "Content-Type": "application/json" },
-      });
-    },
-  });
+    RECOGNITION_LIMITS.response,
+    RECOGNITION_LIMITS.providerMs,
+    fetcher,
+  );
   return {
     async interpret(action, images, signal, usage) {
       const timerOwner = new AbortController(),

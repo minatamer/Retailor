@@ -9,6 +9,10 @@ import { openAiCatalogue } from "../catalogue/provider.js";
 import type { RecognitionRuntime } from "../catalogue/routes.js";
 import { CurrencyService } from "../currency/service.js";
 import { ecbCurrency, fixtureCurrency } from "../currency/provider.js";
+import type { AssistantRuntime } from "../assistants/routes.js";
+import type { AssistantProvider } from "../assistants/provider.js";
+import { fixtureAssistant } from "../assistants/fake.js";
+import { openAiAssistant } from "../providers/assistant.js";
 export interface Runtime {
   capabilities: Capabilities;
   ready: boolean;
@@ -17,6 +21,7 @@ export interface Runtime {
   frontendOrigin: string;
   recognition?: RecognitionRuntime;
   currency?: CurrencyService;
+  assistant?: AssistantRuntime;
 }
 export function composeRuntime(
   env: Environment,
@@ -41,6 +46,12 @@ export function composeRuntime(
       environment.FAKE_MODE ? fixtureCurrency() : ecbCurrency(),
       environment.FAKE_MODE,
     ),
+  assistantFactory: (environment: Environment) => AssistantProvider = (
+    environment,
+  ) =>
+    environment.FAKE_MODE
+      ? fixtureAssistant()
+      : openAiAssistant(environment.OPENAI_API_KEY),
 ): Runtime {
   const mode = env.FAKE_MODE ? "fake" : "live";
   const unavailable = {
@@ -62,6 +73,14 @@ export function composeRuntime(
     !!env.TURNSTILE_SITE_KEY;
   const recognition = enabled ? recognitionFactory(env) : undefined;
   const currency = currencyFactory(env);
+  const assistant: AssistantRuntime | undefined =
+    env.FAKE_MODE || recognition
+      ? {
+          mode,
+          provider: assistantFactory(env),
+          ...(recognition ? { admission: recognition.admission } : {}),
+        }
+      : undefined;
   return {
     ready: env.FAKE_MODE || enabled,
     revision: env.APP_REVISION,
@@ -69,6 +88,7 @@ export function composeRuntime(
     requestId,
     currency,
     ...(recognition ? { recognition } : {}),
+    ...(assistant ? { assistant } : {}),
     get capabilities(): Capabilities {
       const available = enabled && !!recognition?.admission.hasBudget();
       return {
@@ -81,7 +101,11 @@ export function composeRuntime(
           : env.FAKE_MODE
             ? { available: false, reason: "paid-disabled" }
             : unavailable,
-        tailor: unavailable,
+        tailor: env.FAKE_MODE
+          ? { available: true, reason: "fixture" }
+          : enabled
+            ? { available, reason: available ? "ready" : "unavailable" }
+            : unavailable,
         logos: unavailable,
         eur: { available: true, reason: env.FAKE_MODE ? "fixture" : "ready" },
       };

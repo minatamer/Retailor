@@ -5,12 +5,18 @@ import {
   RECOGNITION_LIMITS,
 } from "@retailor/contracts/recognition";
 import type { CatalogueAction } from "@retailor/contracts/recognition";
+import {
+  parseAssistantAction,
+  ASSISTANT_LIMITS,
+} from "@retailor/contracts/assistant";
+import { parsePaidAction } from "./paid-action.js";
+import type { PaidAction } from "./paid-action.js";
 import { deny } from "./errors.js";
 
 export interface ChallengeVerifier {
   verify(
     proof: string,
-    action: "catalogue",
+    action: "catalogue" | "assistant",
     signal: AbortSignal,
   ): Promise<boolean>;
 }
@@ -40,6 +46,7 @@ type Workspace = {
   created: number;
   expires: number;
   attempts: number;
+  turns: number;
   operations: Map<string, Attempt>;
   admitted: boolean;
 };
@@ -137,9 +144,9 @@ export class PaidAdmission {
     }
   }
   private action(input: unknown) {
-    let value: CatalogueAction;
+    let value: PaidAction;
     try {
-      value = parseCatalogueAction(input);
+      value = parsePaidAction(input);
     } catch {
       return deny("INVALID_INPUT", 400);
     }
@@ -149,7 +156,7 @@ export class PaidAdmission {
     // Key order is established by the shared strict parser. No raw content/hash is logged.
     return { value, digest: this.mac(JSON.stringify(value)) };
   }
-  private workspace(action: CatalogueAction) {
+  private workspace(action: PaidAction) {
     let state = this.workspaces.get(action.workspaceId);
     if (!state) {
       if (this.workspaces.size >= 256) return deny("BUSY", 429);
@@ -157,6 +164,7 @@ export class PaidAdmission {
         created: Date.parse(action.createdAt),
         expires: Date.parse(action.expiresAt),
         attempts: 0,
+        turns: 0,
         operations: new Map(),
         admitted: false,
       };
@@ -169,17 +177,20 @@ export class PaidAdmission {
       return deny("FORBIDDEN", 403);
     return state;
   }
-  private rate(identity: string) {
+  private rate(identity: string, action: PaidAction["action"]) {
     const now = this.clock(),
-      local = this.rates.get(identity) ?? [],
+      key = `${action}:${identity}`,
+      local = (this.rates.get(key) ?? []).filter(
+        (at) => at > now - (action === "assistant" ? 60_000 : 600_000),
+      ),
       global = this.rates.get("global") ?? [];
     if (
-      local.length >= 2 ||
+      local.length >= (action === "assistant" ? 6 : 2) ||
       global.filter((at) => at > now - 60_000).length >= 12 ||
-      (this.rates.size >= 1024 && !this.rates.has(identity))
+      (this.rates.size >= 1024 && !this.rates.has(key))
     )
       return deny("BUSY", 429);
-    this.rates.set(identity, [...local, now]);
+    this.rates.set(key, [...local, now]);
     this.rates.set("global", [...global, now].slice(-120));
   }
   async admit(
@@ -197,12 +208,14 @@ export class PaidAdmission {
     const existing = this.workspaces.get(value.workspaceId);
     if (
       existing &&
-      (existing.attempts >= 2 ||
+      ((value.action === "assistant"
+        ? existing.turns >= ASSISTANT_LIMITS.turns
+        : existing.attempts >= RECOGNITION_LIMITS.attempts) ||
         existing.operations.has(value.operationId) ||
         existing.operations.size >= 24)
     )
       return deny("FORBIDDEN", 403);
-    this.rate(safety);
+    this.rate(safety, value.action);
     const state = this.workspace(value);
     const attempt: Attempt = {
       digest,
@@ -211,7 +224,7 @@ export class PaidAdmission {
     };
     state.operations.set(value.operationId, attempt);
     try {
-      if (!(await this.options.challenge.verify(proof, "catalogue", signal)))
+      if (!(await this.options.challenge.verify(proof, value.action, signal)))
         return deny("FORBIDDEN", 403);
       signal.throwIfAborted();
       if (this.clock() >= attempt.until) return deny("FORBIDDEN", 403);
@@ -249,6 +262,24 @@ export class PaidAdmission {
   /** Reserve before allocating image buffers. Any rejected body consumes its grant,
    * but only dispatch spends an attempt. Release pre-dispatch reservation on failure. */
   begin(input: unknown, grant: string, safety: string) {
+    let action: CatalogueAction;
+    try {
+      action = parseCatalogueAction(input);
+    } catch {
+      return deny("INVALID_INPUT", 400);
+    }
+    return { ...this.beginAction(action, grant, safety), action };
+  }
+  beginAssistant(input: unknown, grant: string, safety: string) {
+    let action;
+    try {
+      action = parseAssistantAction(input);
+    } catch {
+      return deny("INVALID_INPUT", 400);
+    }
+    return { ...this.beginAction(action, grant, safety), action };
+  }
+  private beginAction(input: PaidAction, grant: string, safety: string) {
     this.sweep();
     const { value, digest } = this.action(input),
       parsed = ClaimsSchema.safeParse(this.unseal(grant));
@@ -271,7 +302,12 @@ export class PaidAdmission {
       claims.until !== attempt.until
     )
       return deny("FORBIDDEN", 403);
-    if (!state || state.attempts >= RECOGNITION_LIMITS.attempts)
+    if (
+      !state ||
+      (value.action === "assistant"
+        ? state.turns >= ASSISTANT_LIMITS.turns
+        : state.attempts >= RECOGNITION_LIMITS.attempts)
+    )
       return deny("FORBIDDEN", 403);
     const reserve = CATALOGUE_RESERVE_MICRO_USD; // Provisional allowance, not an actual price claim.
     if (!this.hasBudget()) return deny("UNAVAILABLE", 503);
@@ -294,7 +330,8 @@ export class PaidAdmission {
           this.clock() >= state.expires
         )
           return deny("FORBIDDEN", 403);
-        state.attempts++;
+        if (value.action === "assistant") state.turns++;
+        else state.attempts++;
         dispatched = true;
         attempt.status = "dispatched";
       },

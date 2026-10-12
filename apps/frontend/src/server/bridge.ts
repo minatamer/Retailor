@@ -12,6 +12,7 @@ import {
   RecognitionResultSchema,
 } from "@retailor/contracts/recognition";
 import { FxSnapshotSchema } from "@retailor/contracts/currency";
+import { AssistantResultSchema } from "@retailor/contracts/assistant";
 import { z } from "zod";
 const origin = z
   .string()
@@ -225,7 +226,9 @@ export async function forward(
                 ? AdmissionResultSchema
                 : path === "catalogue/interpret"
                   ? RecognitionResultSchema
-                  : null;
+                  : path.startsWith("assistant/")
+                    ? AssistantResultSchema
+                    : null;
     const validated = schema?.safeParse(parsed);
     if (validated && !validated.success) return fail("UPSTREAM_FAILED", 502);
     const outputHeaders = new Headers({

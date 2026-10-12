@@ -4,6 +4,8 @@ import { publicError } from "@retailor/contracts/api";
 import type { Runtime } from "../runtime/compose.js";
 import { recognitionRoutes } from "../catalogue/routes.js";
 import { currencyRoutes } from "../currency/routes.js";
+import { assistantRoutes } from "../assistants/routes.js";
+import { admissionRoutes } from "../security/admission-routes.js";
 import { OperationFailure } from "../security/errors.js";
 export function createApp(runtime: Runtime): Express {
   const app = express();
@@ -38,7 +40,9 @@ export function createApp(runtime: Runtime): Express {
   app.get("/v1/config", (_req, res) => {
     res.json(runtime.capabilities);
   });
-  recognitionRoutes(app, runtime.recognition, runtime.frontendOrigin);
+  admissionRoutes(app, runtime.recognition?.admission, runtime.frontendOrigin);
+  recognitionRoutes(app, runtime.recognition);
+  assistantRoutes(app, runtime.assistant);
   currencyRoutes(app, runtime.currency);
   app.use((_req, res) => {
     res.status(404).json(publicError("NOT_FOUND", res.locals.requestId));

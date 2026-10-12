@@ -2,8 +2,110 @@ import { describe, expect, it, vi } from "vitest";
 import { PaidAdmission } from "./admission.js";
 import { action } from "../../../../test/fixtures/recognition.js";
 import { turnstile } from "./turnstile.js";
+import type { AssistantAction } from "@retailor/contracts/assistant";
 describe("action-bound one-use paid admission", () => {
   const secret = "s".repeat(32);
+  const textAction = (
+    operationId: string,
+    created: number,
+    role: AssistantAction["role"] = "owner",
+  ): AssistantAction => ({
+    schemaVersion: 1,
+    action: "assistant",
+    mode: "live",
+    role,
+    workspaceId: "workspace",
+    operationId,
+    scenarioId: "story",
+    dataRevision: 0,
+    createdAt: new Date(created).toISOString(),
+    expiresAt: new Date(created + 7200000).toISOString(),
+    disclosureVersion: "tailor-context-v1",
+    digest: "a".repeat(64),
+  });
+  it("binds text roles/digests, shares catalogue capacity and caps combined text dispatches", async () => {
+    const start = Date.now();
+    let now = start;
+    const verify = vi.fn(
+        async (_proof: string, _action: "catalogue" | "assistant") => true,
+      ),
+      gate = new PaidAdmission({
+        secret,
+        budgetMicroUsd: 20000000,
+        clock: () => now,
+        challenge: { verify },
+      });
+    const safety = gate.safety(undefined).identity,
+      signal = new AbortController().signal;
+    const vision = action("workspace", "vision", start),
+      approval = await gate.admit(vision, "proof", safety, signal),
+      lease = gate.begin(vision, approval.grant, safety);
+    const text = textAction("first", start),
+      admitted = await gate.admit(text, "proof", safety, signal);
+    expect(verify.mock.calls.at(-1)?.[1]).toBe("assistant");
+    expect(() =>
+      gate.beginAssistant({ ...text, role: "shopper" }, admitted.grant, safety),
+    ).toThrow("FORBIDDEN");
+    expect(() =>
+      gate.beginAssistant(
+        { ...text, digest: "b".repeat(64) },
+        admitted.grant,
+        safety,
+      ),
+    ).toThrow("FORBIDDEN");
+    expect(() => gate.beginAssistant(text, admitted.grant, safety)).toThrow(
+      "BUSY",
+    );
+    lease.finish();
+    const first = gate.beginAssistant(text, admitted.grant, safety);
+    first.dispatch();
+    first.finish();
+    for (let i = 1; i < 12; i++) {
+      now += 60001;
+      const value = textAction(
+          `turn_${i}`,
+          start,
+          i % 2 ? "creator" : "shopper",
+        ),
+        grant = await gate.admit(value, "proof", safety, signal),
+        owned = gate.beginAssistant(value, grant.grant, safety);
+      owned.dispatch();
+      owned.finish();
+    }
+    now += 60001;
+    await expect(
+      gate.admit(textAction("over", start), "proof", safety, signal),
+    ).rejects.toThrow("FORBIDDEN");
+    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 12000000 });
+  });
+  it("limits text challenges to six per minute without consuming catalogue challenge allowance", async () => {
+    const now = Date.now(),
+      verify = vi.fn(async () => true),
+      gate = new PaidAdmission({
+        secret,
+        budgetMicroUsd: 20000000,
+        clock: () => now,
+        challenge: { verify },
+      }),
+      safety = gate.safety(undefined).identity,
+      signal = new AbortController().signal;
+    for (let i = 0; i < 6; i++)
+      await gate.admit(textAction(`text_${i}`, now), "proof", safety, signal);
+    await expect(
+      gate.admit(textAction("text_over", now), "proof", safety, signal),
+    ).rejects.toThrow("BUSY");
+    expect(
+      (
+        await gate.admit(
+          action("workspace", "vision", now),
+          "proof",
+          safety,
+          signal,
+        )
+      ).grant,
+    ).toBeTruthy();
+    expect(verify).toHaveBeenCalledTimes(7);
+  });
   it("does not let repeated invalid challenges exhaust the workspace ledger", async () => {
     const start = Date.now();
     let now = start;
