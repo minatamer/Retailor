@@ -9,6 +9,7 @@ import { SAMPLE } from "../photos/sample";
 import { SessionProvider, useSession } from "../session/context";
 import type { CatalogueProcessor, ProcessStep } from "../session/controller";
 import type { AssistantRequester } from "../assistants/request";
+import type { LogoRequester } from "../logos/request";
 import { CatalogueReview } from "../catalogue/review";
 import { Storefront } from "../storefront/storefront";
 import { storeItems } from "../storefront/browse";
@@ -24,16 +25,19 @@ export function Workspace({
   fixtureAllowed,
   processor,
   assistantRequest,
+  logoRequest,
 }: {
   fixtureAllowed: boolean;
   processor?: CatalogueProcessor;
   assistantRequest?: AssistantRequester;
+  logoRequest?: LogoRequester;
 }) {
   return (
     <SessionProvider
       fixtureAllowed={fixtureAllowed}
       {...(processor ? { processor } : {})}
       {...(assistantRequest ? { assistantRequest } : {})}
+      {...(logoRequest ? { logoRequest } : {})}
     >
       <WorkspaceFlow />
     </SessionProvider>
@@ -317,6 +321,15 @@ function CollectionCanvas() {
       <Storefront
         input={{
           design: preview ? state.previewDesign : state.acceptedDesign,
+          ...(controller.logoUrl(
+            (preview ? state.previewDesign : state.acceptedDesign).logoId,
+          )
+            ? {
+                logoUrl: controller.logoUrl(
+                  (preview ? state.previewDesign : state.acceptedDesign).logoId,
+                )!,
+              }
+            : {}),
           items,
           photos,
           browse: state.browse,
@@ -332,6 +345,7 @@ function CollectionCanvas() {
           browse: (patch, expectedCurrency) =>
             controller.browse(patch, expectedCurrency),
           photoFailed: (id) => controller.photos.reportUnavailable(id),
+          logoFailed: (id) => controller.logoUnavailable(id),
           ...(!preview
             ? {
                 openBag: () => controller.openBag(),

@@ -1,11 +1,19 @@
 import { createHash } from "node:crypto";
 import type { PhotoCache, StoredPhoto } from "../src/features/photos/cache";
+import type { StoredLogo } from "../src/features/photos/cache";
 import { PhotoController } from "../src/features/photos/controller";
 import type { DecodeTask, ProcessedPhoto } from "../src/features/photos/decode";
 import { SessionController } from "../src/features/session/controller";
 import type { CatalogueProcessor } from "../src/features/session/controller";
 import { developmentDraft } from "../src/features/catalogue/development-fixture";
 export class MemoryCache implements PhotoCache {
+  logos: StoredLogo[] = [];
+  async putLogos(rows: readonly StoredLogo[]) {
+    this.logos = [...rows];
+  }
+  async readLogos() {
+    return this.logos;
+  }
   rows = new Map<string, StoredPhoto>();
   async put(row: StoredPhoto) {
     this.rows.set(row.photo.id, row);
@@ -18,6 +26,7 @@ export class MemoryCache implements PhotoCache {
   }
   async clear() {
     this.rows.clear();
+    this.logos = [];
   }
   async heartbeat() {}
   async close() {}

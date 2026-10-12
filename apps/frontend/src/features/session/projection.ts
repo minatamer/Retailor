@@ -10,6 +10,7 @@ import { ScenarioInfoSchema } from "@retailor/contracts/scenarios";
 import { ShoppingSchema, INITIAL_SHOPPING } from "../bag/state";
 import { z } from "zod";
 import { ConversationSchema } from "../assistants/conversation";
+import { INITIAL_LOGOS, LogoStateSchema } from "../logos/state";
 import { GraphSchema, TimestampSchema } from "@retailor/contracts/commerce";
 import { IdSchema } from "@retailor/contracts/core";
 import { PhotoSchema, PHOTO_LIMITS } from "@retailor/contracts/photos";
@@ -64,6 +65,7 @@ export const ProjectionSchema = z.strictObject({
   ownerPage: z.number().int().min(0).max(16).default(0),
   dashboard: DashboardStateSchema.default(INITIAL_DASHBOARD),
   conversation: ConversationSchema.default([]),
+  logos: LogoStateSchema.default(INITIAL_LOGOS),
 });
 export type Projection = z.infer<typeof ProjectionSchema>;
 export const INITIAL_DESIGN = DesignSchema.parse({
@@ -93,6 +95,17 @@ export function restoreProjection(
   )
     throw new Error("This saved workspace is unavailable or expired.");
   const photos = new Map(state.photos.map((photo) => [photo.id, photo]));
+  if (
+    state.logos.candidates.some(
+      (candidate) =>
+        (candidate.mode === "fake" && !fixtureAllowed) ||
+        Date.parse(candidate.generatedAt) < Date.parse(graph.createdAt) ||
+        Date.parse(candidate.generatedAt) > now,
+    )
+  )
+    throw new Error(
+      "Saved logos do not belong to this temporary mode or lifetime.",
+    );
   if (
     state.photos.reduce((sum, photo) => sum + photo.source.bytes, 0) >
       PHOTO_LIMITS.originals ||
@@ -211,6 +224,7 @@ export function serializeProjection(state: Projection, now: number) {
     ownerPage: state.ownerPage,
     dashboard: state.dashboard,
     conversation: state.conversation,
+    logos: state.logos,
   };
   const encoded = JSON.stringify(ProjectionSchema.parse(selected));
   if (serializedBytes(selected) > SESSION_BYTES)

@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { USD_SCOPE } from "@retailor/contracts/currency";
@@ -36,11 +37,13 @@ export interface StorefrontInput {
   currency?: CurrencyScope;
   currencyControl?: ReactNode;
   bagCount?: number;
+  logoUrl?: string;
 }
 export interface StorefrontActions {
   browse(patch: Partial<BrowseState>, expectedCurrency?: CurrencyScope): void;
   owner(): void;
   photoFailed(id: string): void;
+  logoFailed?: (id: string) => void;
   openBag?: () => void;
   addToBag?: (productId: string, variantId: string, quantity: number) => void;
 }
@@ -101,9 +104,22 @@ export function Storefront({
         <header className={styles.header}>
           <button
             className={styles.wordmark}
+            aria-label={`${design.name} home`}
             onClick={() => actions.browse({ page: "home" })}
           >
-            {design.name}
+            {input.logoUrl && design.logoId ? (
+              <Image
+                unoptimized
+                width={180}
+                height={42}
+                className={styles.logo}
+                src={input.logoUrl}
+                alt=""
+                onError={() => actions.logoFailed?.(design.logoId!)}
+              />
+            ) : (
+              design.name
+            )}
           </button>
           <nav aria-label="Store pages">
             {(["home", "collection", "product"] as const).map((page) => (

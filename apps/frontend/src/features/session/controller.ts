@@ -56,6 +56,14 @@ import type { ProductInput } from "@retailor/contracts/product";
 import { applyCommand } from "@retailor/commerce/commands";
 import { emptyGraph, freeze } from "@retailor/commerce/graph";
 import { BrowserPhotoCache, CacheConflict } from "../photos/cache";
+import {
+  LogoContextSchema,
+  LogoResultSchema,
+  type LogoContext,
+} from "@retailor/contracts/brand";
+import { INITIAL_LOGOS, sameLogoContext } from "../logos/state";
+import { LogoAssets, type LogoVerifier } from "../logos/controller";
+import { logoRequester, type LogoRequester } from "../logos/request";
 import type { PhotoCache } from "../photos/cache";
 import { PhotoController } from "../photos/controller";
 import type { NamedPhoto } from "../photos/controller";
@@ -134,6 +142,8 @@ export interface CatalogueProcessor {
   }): Promise<CatalogueDraft>;
 }
 interface SessionOptions {
+  logoRequest?: LogoRequester;
+  logoVerify?: LogoVerifier;
   assistantRequest?: AssistantRequester;
   signal?: AbortSignal;
   fixtureAllowed: boolean;
@@ -157,6 +167,8 @@ export type ScenarioReview = ReturnType<typeof generateScenario> & {
   photoWitness: string;
 };
 export interface SessionSnapshot {
+  logoBusy: boolean;
+  logoNotice: string;
   assistantDraft: string;
   assistantBusy: boolean;
   assistantNotice: string;
@@ -209,6 +221,8 @@ export class SessionController {
   private currencyGeneration = 0;
   private operation: AbortController | undefined;
   private assistantOperation: AbortController | undefined;
+  private logoOperation: AbortController | undefined;
+  private logoAssets: LogoAssets | undefined;
   private cancelPrefill: (() => void) | undefined;
   private active = true;
   private recovering = false;
@@ -224,6 +238,8 @@ export class SessionController {
     this.owner = this.id();
     options.signal?.addEventListener("abort", this.aborted, { once: true });
     this.snapshot = {
+      logoBusy: false,
+      logoNotice: "",
       assistantDraft: "",
       assistantBusy: false,
       assistantNotice: "",
@@ -286,6 +302,7 @@ export class SessionController {
       ownerPage: 0,
       dashboard: structuredClone(INITIAL_DASHBOARD),
       conversation: [],
+      logos: structuredClone(INITIAL_LOGOS),
     };
   }
   static async open(options: SessionOptions) {
@@ -302,6 +319,27 @@ export class SessionController {
   };
   private update(patch: Partial<SessionSnapshot>, persist = true) {
     const state = patch.state ?? this.snapshot.state;
+    if (
+      this.logoOperation &&
+      (state.previewDesign.revision !==
+        this.snapshot.state.previewDesign.revision ||
+        state.previewDesign.name !== this.snapshot.state.previewDesign.name ||
+        state.previewDesign.theme !== this.snapshot.state.previewDesign.theme ||
+        state.previewDesign.typography !==
+          this.snapshot.state.previewDesign.typography ||
+        state.graph.workspaceId !== this.snapshot.state.graph.workspaceId ||
+        state.stage !== this.snapshot.state.stage)
+    ) {
+      this.logoOperation.abort();
+      this.logoOperation = undefined;
+      patch = {
+        ...patch,
+        logoBusy: false,
+        preparedLogo: null,
+        logoNotice:
+          "The look changed. Earlier logo results cannot attach to it. Your wordmark is ready.",
+      };
+    }
     if (
       state.graph.revision !== this.snapshot.state.graph.revision ||
       state.stage !== this.snapshot.state.stage ||
@@ -383,7 +421,9 @@ export class SessionController {
           raw !== null &&
           "stage" in raw &&
           raw.stage === "process";
-        this.snapshot.state = restored;
+        this.snapshot.state = restored.designEditing
+          ? { ...restored, ownerView: "design" }
+          : restored;
         if (
           recoverCurrency(raw, this.clock(), this.options.fixtureAllowed)
             .repaired
@@ -464,6 +504,47 @@ export class SessionController {
       this.options.photos?.(cache, expires) ??
       new PhotoController({ cache, expires });
     this.photos.activate();
+    this.logoAssets = new LogoAssets(cache, this.options.logoVerify);
+    const recoveredLogos = await this.logoAssets.recover(
+      this.snapshot.state.logos.candidates,
+      this.options.signal ?? new AbortController().signal,
+    );
+    if (!this.active) {
+      this.logoAssets.dispose();
+      return;
+    }
+    const availableLogoIds = new Set(recoveredLogos.map((c) => c.id));
+    const lostLogo = Boolean(
+      this.snapshot.state.acceptedDesign.logoId &&
+      !availableLogoIds.has(this.snapshot.state.acceptedDesign.logoId),
+    );
+    this.snapshot.state = {
+      ...this.snapshot.state,
+      logos: {
+        ...this.snapshot.state.logos,
+        candidates: recoveredLogos,
+        reviewed: [],
+      },
+      acceptedDesign: {
+        ...this.snapshot.state.acceptedDesign,
+        logoId: availableLogoIds.has(
+          this.snapshot.state.acceptedDesign.logoId ?? "",
+        )
+          ? this.snapshot.state.acceptedDesign.logoId
+          : null,
+      },
+      previewDesign: {
+        ...this.snapshot.state.previewDesign,
+        logoId: availableLogoIds.has(
+          this.snapshot.state.previewDesign.logoId ?? "",
+        )
+          ? this.snapshot.state.previewDesign.logoId
+          : null,
+      },
+    };
+    if (lostLogo)
+      this.snapshot.logoNotice =
+        "Temporary logo bytes are unavailable. Your storefront uses its wordmark; no generation was repeated.";
     this.recovering = true;
     if (this.snapshot.state.photos.length)
       await this.photos.recover(
@@ -1687,6 +1768,7 @@ export class SessionController {
     return true;
   }
   private cancelOperation() {
+    this.cancelLogos(false);
     this.stopOwnerPrefill();
     this.assistantOperation?.abort();
     this.assistantOperation = undefined;
@@ -2295,6 +2377,7 @@ export class SessionController {
     if (
       !this.valid() ||
       this.snapshot.assistantBusy ||
+      this.snapshot.logoBusy ||
       !["style", "storefront", "dashboard"].includes(this.snapshot.state.stage)
     )
       return;
@@ -2679,13 +2762,19 @@ export class SessionController {
     const state = this.snapshot.state;
     if (
       !this.valid() ||
-      state.stage !== "style" ||
+      !(
+        state.stage === "style" ||
+        (state.stage === "dashboard" && state.designEditing)
+      ) ||
       !designConfirmed(state.setup, state.previewDesign) ||
-      !state.setup.brandConfirmed
+      (state.stage === "style" && !state.setup.brandConfirmed)
     )
       return;
+    this.cancelLogos(false);
     this.state({
+      previewDesign: { ...state.previewDesign, logoId: null },
       setup: { ...state.setup, wordmarkKept: true, step: "summary" },
+      presentationRevision: state.presentationRevision + 1,
     });
     this.update({ preparedLogo: null }, false);
   }
@@ -2694,19 +2783,308 @@ export class SessionController {
     if (
       !this.valid() ||
       !["style", "dashboard"].includes(state.stage) ||
+      (state.stage === "dashboard" && !state.designEditing) ||
       !logoEligible(state.setup, state.previewDesign)
     )
       return;
-    const design = state.previewDesign;
+    const context = this.logoContext();
+    if (!context) {
+      this.update(
+        {
+          logoNotice:
+            "Choose a readable store name of up to 40 characters before generating directions.",
+        },
+        false,
+      );
+      return;
+    }
     this.update(
       {
         preparedLogo: {
-          designRevision: design.revision,
-          name: design.name,
-          theme: design.theme,
-          typography: design.typography,
+          designRevision: context.designRevision,
+          name: context.name,
+          theme: context.theme,
+          typography: context.typography,
           candidates: 3,
         },
+        ...(state.stage === "style"
+          ? {
+              state: freeze({
+                ...state,
+                setup: {
+                  ...state.setup,
+                  step: "logo" as const,
+                  expanded: true,
+                },
+              }),
+            }
+          : {}),
+      },
+      false,
+    );
+  }
+  confirmOwnerLogoLook() {
+    const state = this.snapshot.state;
+    if (!this.valid() || state.stage !== "dashboard" || !state.designEditing)
+      return;
+    this.state({
+      setup: {
+        ...state.setup,
+        template: state.previewDesign.template,
+        theme: state.previewDesign.theme,
+        typography: state.previewDesign.typography,
+        brandConfirmed: true,
+      },
+    });
+  }
+  private logoContext(): LogoContext | null {
+    const state = this.snapshot.state,
+      design = state.previewDesign;
+    if (
+      !logoEligible(state.setup, design) ||
+      !(
+        state.stage === "style" ||
+        (state.stage === "dashboard" && state.designEditing)
+      )
+    )
+      return null;
+    const parsed = LogoContextSchema.safeParse({
+      name: design.name,
+      theme: design.theme,
+      typography: design.typography,
+      designRevision: design.revision,
+      themeConfirmed: true,
+      typographyConfirmed: true,
+    });
+    return parsed.success ? parsed.data : null;
+  }
+  logoUrl(id: string | null | undefined) {
+    return this.logoAssets?.url(id);
+  }
+  cancelLogos(notice = true) {
+    const wasBusy = Boolean(this.logoOperation);
+    this.logoOperation?.abort();
+    this.logoOperation = undefined;
+    if (wasBusy)
+      this.update(
+        {
+          logoBusy: false,
+          ...(notice
+            ? {
+                logoNotice:
+                  "Request cancelled. Its provider outcome may be unknown; your wordmark and previous choices remain.",
+              }
+            : {}),
+        },
+        false,
+      );
+  }
+  async generateLogos() {
+    const prepared = this.snapshot.preparedLogo,
+      context = this.logoContext(),
+      state = this.snapshot.state,
+      assets = this.logoAssets;
+    if (
+      !this.valid() ||
+      !prepared ||
+      !context ||
+      !assets ||
+      this.operation ||
+      this.snapshot.assistantBusy ||
+      this.snapshot.logoBusy ||
+      state.logos.batches >= 2 ||
+      JSON.stringify({
+        name: prepared.name,
+        theme: prepared.theme,
+        typography: prepared.typography,
+        designRevision: prepared.designRevision,
+        themeConfirmed: true,
+        typographyConfirmed: true,
+      }) !== JSON.stringify(context)
+    )
+      return;
+    const owner = new AbortController(),
+      workspaceId = state.graph.workspaceId,
+      operationId = this.id();
+    this.logoOperation = owner;
+    this.update(
+      {
+        logoBusy: true,
+        logoNotice:
+          "Preparing three separate directions. Your storefront stays usable.",
+      },
+      false,
+    );
+    const current = () =>
+      this.active &&
+      this.logoOperation === owner &&
+      !owner.signal.aborted &&
+      this.clock() < Date.parse(this.snapshot.state.graph.expiresAt) &&
+      this.snapshot.state.graph.workspaceId === workspaceId &&
+      Boolean(
+        this.logoContext() && sameLogoContext(this.logoContext()!, context),
+      );
+    let sent = false;
+    try {
+      const result = LogoResultSchema.parse(
+        await (this.options.logoRequest ?? logoRequester())(
+          {
+            mode: state.fixture ? "fake" : "live",
+            workspaceId,
+            operationId,
+            createdAt: state.graph.createdAt,
+            expiresAt: state.graph.expiresAt,
+            context,
+          },
+          owner.signal,
+          () => {
+            if (sent || !current()) throw new Error("Stale logo dispatch");
+            sent = true;
+            this.state({
+              logos: {
+                ...this.snapshot.state.logos,
+                batches: this.snapshot.state.logos.batches + 1,
+              },
+            });
+          },
+        ),
+      );
+      if (!current()) return;
+      if (
+        !sent ||
+        result.workspaceId !== workspaceId ||
+        result.operationId !== operationId ||
+        result.mode !== (state.fixture ? "fake" : "live") ||
+        !sameLogoContext(result.context, context)
+      )
+        throw new Error("Invalid logo context");
+      const rows = await assets.prepare(result, owner.signal);
+      if (!current()) return;
+      const persisted = await assets.commit(rows, owner.signal);
+      if (!current()) return;
+      const latest = this.snapshot.state;
+      this.state({
+        logos: {
+          ...latest.logos,
+          candidates: rows.map((row) => row.metadata),
+          reviewed: [],
+        },
+        previewDesign: { ...latest.previewDesign, logoId: null },
+        acceptedDesign: { ...latest.acceptedDesign, logoId: null },
+        setup: { ...latest.setup, wordmarkKept: false },
+        presentationRevision: latest.presentationRevision + 1,
+      });
+      this.update(
+        {
+          preparedLogo: null,
+          logoNotice: persisted
+            ? "Three directions are ready. Review the name and small-header preview before choosing."
+            : "Three directions are ready in this tab. Browser storage is unavailable; refresh will use the wordmark.",
+        },
+        false,
+      );
+    } catch (error) {
+      if (current())
+        this.update(
+          {
+            logoNotice:
+              error instanceof CatalogueRequestError
+                ? `${error.message} Your wordmark remains ready.`
+                : "The logo batch could not be completed. Your wordmark and previous choices remain. Retry only if you choose.",
+          },
+          false,
+        );
+    } finally {
+      if (this.logoOperation === owner) {
+        this.logoOperation = undefined;
+        this.update({ logoBusy: false }, false);
+      }
+      owner.abort();
+    }
+  }
+  reviewLogo(id: string, reviewed: boolean) {
+    const context = this.logoContext(),
+      logos = this.snapshot.state.logos,
+      candidate = logos.candidates.find((c) => c.id === id);
+    if (
+      !this.valid() ||
+      !context ||
+      !candidate ||
+      !sameLogoContext(candidate.context, context) ||
+      !this.logoUrl(id)
+    )
+      return;
+    this.state({
+      logos: {
+        ...logos,
+        reviewed: reviewed
+          ? [...new Set([...logos.reviewed, id])]
+          : logos.reviewed.filter((value) => value !== id),
+      },
+    });
+  }
+  previewLogo(id: string) {
+    const context = this.logoContext(),
+      state = this.snapshot.state,
+      candidate = state.logos.candidates.find((c) => c.id === id);
+    if (
+      !this.valid() ||
+      !context ||
+      !candidate ||
+      !sameLogoContext(candidate.context, context) ||
+      !this.logoUrl(id)
+    )
+      return;
+    this.state({
+      previewDesign: { ...state.previewDesign, logoId: id },
+      setup: { ...state.setup, wordmarkKept: false },
+      presentationRevision: state.presentationRevision + 1,
+    });
+  }
+  useLogo(id: string) {
+    const state = this.snapshot.state,
+      context = this.logoContext(),
+      candidate = state.logos.candidates.find((c) => c.id === id);
+    if (
+      !this.valid() ||
+      !context ||
+      state.previewDesign.logoId !== id ||
+      !state.logos.reviewed.includes(id) ||
+      !candidate ||
+      !sameLogoContext(candidate.context, context) ||
+      !this.logoUrl(id)
+    )
+      return;
+    this.state({
+      setup: { ...state.setup, wordmarkKept: true, step: "summary" },
+    });
+    this.update({ preparedLogo: null }, false);
+  }
+  logoUnavailable(id: string) {
+    this.logoAssets?.unavailable(id);
+    const state = this.snapshot.state;
+    this.state({
+      acceptedDesign: {
+        ...state.acceptedDesign,
+        logoId:
+          state.acceptedDesign.logoId === id
+            ? null
+            : state.acceptedDesign.logoId,
+      },
+      previewDesign: {
+        ...state.previewDesign,
+        logoId:
+          state.previewDesign.logoId === id ? null : state.previewDesign.logoId,
+      },
+      logos: {
+        ...state.logos,
+        reviewed: state.logos.reviewed.filter((value) => value !== id),
+      },
+    });
+    this.update(
+      {
+        logoNotice:
+          "That temporary mark is unavailable. Your wordmark remains ready.",
       },
       false,
     );
@@ -2719,7 +3097,7 @@ export class SessionController {
     )
       return;
     this.cancelDesign();
-    this.state({ designEditing: true });
+    this.state({ designEditing: true, ownerView: "design" });
   }
   applyOwnerDesign() {
     const state = this.snapshot.state;
@@ -2833,6 +3211,7 @@ export class SessionController {
     if (!this.active || this.resetting) return;
     this.resetting = true;
     this.cancelOperation();
+    this.logoAssets?.dispose();
     this.unlistenPhotos?.();
     this.unlistenPhotos = undefined;
     this.update({
@@ -2884,6 +3263,7 @@ export class SessionController {
     this.unlistenPhotos?.();
     if (this.timer) clearInterval(this.timer);
     this.photos?.dispose();
+    this.logoAssets?.dispose();
     this.listeners.clear();
   }
 }

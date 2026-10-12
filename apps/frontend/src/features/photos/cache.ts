@@ -2,10 +2,22 @@ import { z } from "zod";
 import { IdSchema } from "@retailor/contracts/core";
 import { PhotoSchema, PHOTO_LIMITS } from "@retailor/contracts/photos";
 import type { ProcessedPhoto } from "./decode";
+import { LOGO_LIMITS, LogoMetadataSchema } from "@retailor/contracts/brand";
+import type { LogoMetadata } from "@retailor/contracts/brand";
+export interface StoredLogo {
+  metadata: LogoMetadata;
+  blob: Blob;
+}
+export interface LogoCache {
+  putLogos(values: readonly StoredLogo[]): Promise<void>;
+  readLogos(): Promise<StoredLogo[]>;
+}
 export interface StoredPhoto extends ProcessedPhoto {
   name: string;
 }
 export interface PhotoCache {
+  putLogos?: LogoCache["putLogos"];
+  readLogos?: LogoCache["readLogos"];
   put(value: StoredPhoto): Promise<void>;
   read(): Promise<{ photos: StoredPhoto[]; missingIds: string[] }>;
   remove(id: string): Promise<void>;
@@ -34,6 +46,13 @@ const LeaseSchema = z.strictObject({
     .nonnegative()
     .max(PHOTO_LIMITS.cachedDerivatives),
   count: z.number().int().nonnegative().max(PHOTO_LIMITS.sources),
+  logoBytes: z
+    .number()
+    .int()
+    .nonnegative()
+    .max(LOGO_LIMITS.cacheBytes)
+    .default(0),
+  logoCount: z.number().int().nonnegative().max(3).default(0),
 });
 type Lease = z.infer<typeof LeaseSchema>;
 type Row = StoredPhoto & { key: string; workspace: string };
@@ -49,7 +68,7 @@ async function transaction<T>(
   mode: IDBTransactionMode,
   run: (tx: IDBTransaction) => Promise<T>,
 ) {
-  const tx = db.transaction(["workspaces", "photos"], mode);
+  const tx = db.transaction(["workspaces", "photos", "logos"], mode);
   const done = new Promise<void>((resolve, reject) => {
     tx.oncomplete = () => resolve();
     tx.onerror = tx.onabort = () =>
@@ -100,7 +119,7 @@ export class BrowserPhotoCache implements PhotoCache {
       .then(
         () =>
           new Promise<IDBDatabase>((resolve, reject) => {
-            const opening = indexedDB.open("retailor-photos-v1", 1);
+            const opening = indexedDB.open("retailor-photos-v1", 2);
             let settled = false;
             const deadline = setTimeout(() => {
               settled = true;
@@ -108,11 +127,18 @@ export class BrowserPhotoCache implements PhotoCache {
             }, 3000);
             opening.onupgradeneeded = () => {
               const db = opening.result;
-              db.createObjectStore("workspaces", { keyPath: "id" });
-              db.createObjectStore("photos", { keyPath: "key" }).createIndex(
-                "workspace",
-                "workspace",
-              );
+              if (!db.objectStoreNames.contains("workspaces"))
+                db.createObjectStore("workspaces", { keyPath: "id" });
+              if (!db.objectStoreNames.contains("photos"))
+                db.createObjectStore("photos", { keyPath: "key" }).createIndex(
+                  "workspace",
+                  "workspace",
+                );
+              if (!db.objectStoreNames.contains("logos"))
+                db.createObjectStore("logos", { keyPath: "key" }).createIndex(
+                  "workspace",
+                  "workspace",
+                );
             };
             opening.onblocked = opening.onerror = () => {
               clearTimeout(deadline);
@@ -180,6 +206,10 @@ export class BrowserPhotoCache implements PhotoCache {
           tx.objectStore("photos").index("workspace").getAllKeys(lease.id),
         );
         for (const key of keys) tx.objectStore("photos").delete(key);
+        const logoKeys = await request(
+          tx.objectStore("logos").index("workspace").getAllKeys(lease.id),
+        );
+        for (const key of logoKeys) tx.objectStore("logos").delete(key);
         store.delete(lease.id);
       }
     }
@@ -207,6 +237,8 @@ export class BrowserPhotoCache implements PhotoCache {
             originals: current?.originals ?? 0,
             derivatives: current?.derivatives ?? 0,
             count: current?.count ?? 0,
+            logoBytes: current?.logoBytes ?? 0,
+            logoCount: current?.logoCount ?? 0,
           };
     this.fence = lease.fence;
     store.put(lease);
@@ -260,6 +292,17 @@ export class BrowserPhotoCache implements PhotoCache {
       totals.derivatives !== lease.derivatives
     )
       throw new Error("Invalid cache counters.");
+    const logoRows: unknown[] = await request(
+      tx.objectStore("logos").index("workspace").getAll(this.workspace, 4),
+    );
+    if (
+      logoRows.length !== lease.logoCount ||
+      logoRows.length > 3 ||
+      logoRows
+        .map((row) => this.storedLogo(row))
+        .reduce((sum, row) => sum + row.blob.size, 0) !== lease.logoBytes
+    )
+      throw new Error("Invalid logo cache counters.");
   }
   put(value: StoredPhoto) {
     return this.serial(async () =>
@@ -291,12 +334,17 @@ export class BrowserPhotoCache implements PhotoCache {
         const others = leases
           .map((input) => LeaseSchema.parse(input))
           .filter((item) => item.id !== this.workspace)
-          .reduce((sum, item) => sum + item.originals + item.derivatives, 0);
+          .reduce(
+            (sum, item) =>
+              sum + item.originals + item.derivatives + item.logoBytes,
+            0,
+          );
         if (
           originals > PHOTO_LIMITS.originals ||
           derivatives > PHOTO_LIMITS.cachedDerivatives ||
           count > PHOTO_LIMITS.sources ||
-          others + originals + derivatives > PHOTO_LIMITS.originCache
+          others + originals + derivatives + lease.logoBytes >
+            PHOTO_LIMITS.originCache
         )
           throw new Error("Temporary cache is full.");
         store.put({
@@ -396,11 +444,130 @@ export class BrowserPhotoCache implements PhotoCache {
             .getAllKeys(this.workspace),
         );
         for (const key of keys) tx.objectStore("photos").delete(key);
+        const logoKeys = await request(
+          tx.objectStore("logos").index("workspace").getAllKeys(this.workspace),
+        );
+        for (const key of logoKeys) tx.objectStore("logos").delete(key);
         tx.objectStore("workspaces").put({
           ...lease,
           originals: 0,
           derivatives: 0,
           count: 0,
+          logoBytes: 0,
+          logoCount: 0,
+        });
+      }),
+    );
+  }
+  private storedLogo(input: unknown): StoredLogo {
+    if (
+      !input ||
+      typeof input !== "object" ||
+      !("metadata" in input) ||
+      !("blob" in input) ||
+      !("workspace" in input) ||
+      !("key" in input)
+    )
+      throw new Error("Unavailable cached logo.");
+    const metadata = LogoMetadataSchema.parse(input.metadata);
+    if (
+      input.workspace !== this.workspace ||
+      input.key !== `${this.workspace}:${metadata.id}` ||
+      !(input.blob instanceof Blob) ||
+      input.blob.type !== "image/png" ||
+      input.blob.size !== metadata.bytes
+    )
+      throw new Error("Unavailable cached logo.");
+    return { metadata, blob: input.blob };
+  }
+  readLogos() {
+    return this.serial(async () =>
+      transaction(await this.open(), "readwrite", async (tx) => {
+        const lease = await this.owned(tx),
+          store = tx.objectStore("logos");
+        const rows: unknown[] = await request(
+          store.index("workspace").getAll(this.workspace, 4),
+        );
+        const logos: StoredLogo[] = [];
+        for (const row of rows) {
+          try {
+            logos.push(this.storedLogo(row));
+          } catch {
+            /* A damaged optional set falls back as a whole. */
+          }
+        }
+        const valid =
+          logos.length === 3 &&
+          rows.length === 3 &&
+          new Set(logos.map((row) => row.metadata.id)).size === 3 &&
+          new Set(logos.map((row) => row.metadata.hash)).size === 3;
+        if (!valid) {
+          const keys = await request(
+            store.index("workspace").getAllKeys(this.workspace),
+          );
+          for (const key of keys) store.delete(key);
+        }
+        tx.objectStore("workspaces").put({
+          ...lease,
+          logoCount: valid ? 3 : 0,
+          logoBytes: valid
+            ? logos.reduce((sum, row) => sum + row.blob.size, 0)
+            : 0,
+        });
+        return valid ? logos : [];
+      }),
+    );
+  }
+  putLogos(values: readonly StoredLogo[]) {
+    return this.serial(async () =>
+      transaction(await this.open(), "readwrite", async (tx) => {
+        if (
+          values.length !== 3 ||
+          new Set(values.map((row) => row.metadata.id)).size !== 3 ||
+          new Set(values.map((row) => row.metadata.hash)).size !== 3
+        )
+          throw new Error("A logo set needs three distinct candidates.");
+        const normalized = values.map((row) =>
+          this.storedLogo({
+            ...row,
+            workspace: this.workspace,
+            key: `${this.workspace}:${row.metadata.id}`,
+          }),
+        );
+        const bytes = normalized.reduce((sum, row) => sum + row.blob.size, 0),
+          lease = await this.owned(tx);
+        await this.assertTotals(tx, lease);
+        const leases: unknown[] = await request(
+          tx.objectStore("workspaces").getAll(undefined, 65),
+        );
+        const others = leases
+          .map((row) => LeaseSchema.parse(row))
+          .filter((row) => row.id !== this.workspace)
+          .reduce(
+            (sum, row) => sum + row.originals + row.derivatives + row.logoBytes,
+            0,
+          );
+        if (
+          bytes > LOGO_LIMITS.cacheBytes ||
+          others + lease.originals + lease.derivatives + bytes >
+            PHOTO_LIMITS.originCache
+        )
+          throw new Error("Temporary cache is full.");
+        const store = tx.objectStore("logos"),
+          keys = await request(
+            store.index("workspace").getAllKeys(this.workspace),
+          );
+        for (const key of keys) store.delete(key);
+        for (const row of normalized)
+          store.put({
+            ...row,
+            workspace: this.workspace,
+            key: `${this.workspace}:${row.metadata.id}`,
+          });
+        tx.objectStore("workspaces").put({
+          ...lease,
+          logoCount: 3,
+          logoBytes: bytes,
         });
       }),
     );

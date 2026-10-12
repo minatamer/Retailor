@@ -3,10 +3,83 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { BrowserPhotoCache, CacheConflict } from "./cache";
 import type { StoredPhoto } from "./cache";
 import { PHOTO_LIMITS } from "@retailor/contracts/photos";
+import type { StoredLogo } from "./cache";
+function logos(prefix: string, bytes = 10): StoredLogo[] {
+  return [1, 2, 3].map((index) => ({
+    metadata: {
+      id: `${prefix}_${index}`,
+      hash: String(index).repeat(64),
+      mime: "image/png",
+      bytes,
+      width: 10,
+      height: 10,
+      context: {
+        name: "West",
+        theme: "ink",
+        typography: "inter",
+        designRevision: 1,
+        themeConfirmed: true,
+        typographyConfirmed: true,
+      },
+      generatedAt: "2026-10-12T18:00:00.000Z",
+      mode: "fake",
+    },
+    blob: new Blob([new Uint8Array(bytes)], { type: "image/png" }),
+  }));
+}
+it("separates logo rows, atomically replaces three candidates, and clears only owned assets", async () => {
+  const first = cache("first_workspace", "owner"),
+    second = cache("second_workspace", "owner");
+  await first.put(row("garment"));
+  await first.putLogos(logos("first"));
+  await second.putLogos(logos("second"));
+  expect((await first.read()).photos.map((row) => row.photo.id)).toEqual([
+    "garment",
+  ]);
+  await expect(first.putLogos(logos("partial").slice(0, 2))).rejects.toThrow(
+    "three",
+  );
+  expect((await first.readLogos()).map((row) => row.metadata.id)).toEqual([
+    "first_1",
+    "first_2",
+    "first_3",
+  ]);
+  await first.putLogos(logos("replacement"));
+  expect((await first.readLogos()).map((row) => row.metadata.id)).toEqual([
+    "replacement_1",
+    "replacement_2",
+    "replacement_3",
+  ]);
+  await first.clear();
+  expect(await first.readLogos()).toEqual([]);
+  expect((await second.readLogos()).map((row) => row.metadata.id)).toEqual([
+    "second_1",
+    "second_2",
+    "second_3",
+  ]);
+});
+it("includes logos in the shared 80-MiB origin envelope", async () => {
+  const first = cache("first_workspace", "owner"),
+    second = cache("second_workspace", "owner");
+  for (let i = 0; i < 10; i++)
+    await first.put(
+      row(`first_${i}`, PHOTO_LIMITS.original, PHOTO_LIMITS.derivative),
+    );
+  for (let i = 0; i < 6; i++)
+    await second.put(
+      row(`second_${i}`, PHOTO_LIMITS.original, PHOTO_LIMITS.derivative),
+    );
+  await first.putLogos(logos("first", 1048576));
+  await expect(second.putLogos(logos("second", 1048576))).rejects.toThrow(
+    "full",
+  );
+  expect(await second.readLogos()).toEqual([]);
+  expect(await first.readLogos()).toHaveLength(3);
+});
 const caches: BrowserPhotoCache[] = [];
 async function alterCache(change: (tx: IDBTransaction) => Promise<void>) {
   const db = await new Promise<IDBDatabase>((resolve, reject) => {
-    const opening = indexedDB.open("retailor-photos-v1", 1);
+    const opening = indexedDB.open("retailor-photos-v1");
     opening.onsuccess = () => resolve(opening.result);
     opening.onerror = () => reject(new Error("open"));
   });

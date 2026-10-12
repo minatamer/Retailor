@@ -4,12 +4,13 @@ import Script from "next/script";
 import { Workspace } from "./workspace";
 import { liveProcessor } from "../catalogue/live-processor";
 import { assistantRequester } from "../assistants/request";
+import { logoRequester } from "../logos/request";
 import { CatalogueRequestError } from "../catalogue/request-error";
 import { Button } from "../../components/ui/button";
 import styles from "./workspace.module.css";
 interface Challenge {
   siteKey: string;
-  action: "catalogue" | "assistant";
+  action: "catalogue" | "assistant" | "logos";
   finish(token?: string): void;
 }
 interface Turnstile {
@@ -39,7 +40,7 @@ export function LiveWorkspace() {
     const proof = (
       siteKey: string,
       signal: AbortSignal,
-      action: "catalogue" | "assistant",
+      action: "catalogue" | "assistant" | "logos",
     ) =>
       new Promise<string>((resolve, reject) => {
         let settled = false;
@@ -68,6 +69,9 @@ export function LiveWorkspace() {
       assistantRequest: assistantRequester((siteKey, signal) =>
         proof(siteKey, signal, "assistant"),
       ),
+      logoRequest: logoRequester((siteKey, signal) =>
+        proof(siteKey, signal, "logos"),
+      ),
     };
   }, []);
   return (
@@ -76,6 +80,7 @@ export function LiveWorkspace() {
         fixtureAllowed={false}
         processor={ports.processor}
         assistantRequest={ports.assistantRequest}
+        logoRequest={ports.logoRequest}
       />
       {challenge && <ChallengeDialog challenge={challenge} />}
     </>
@@ -134,7 +139,9 @@ function ChallengeDialog({ challenge }: { challenge: Challenge }) {
       <p>
         {challenge.action === "catalogue"
           ? "Verify this deliberate draft request. Only selected photo previews go to OpenAI; originals stay in your browser."
-          : "Verify this deliberate Tailor turn. This demo’s records, prompt and recent role messages provide context. Photos are excluded."}
+          : challenge.action === "logos"
+            ? "Verify this deliberate three-logo batch. Only your store name, selected palette and typography direction go to OpenAI."
+            : "Verify this deliberate Tailor turn. This demo’s records, prompt and recent role messages provide context. Photos are excluded."}
       </p>
       <div ref={container} />
       <Script

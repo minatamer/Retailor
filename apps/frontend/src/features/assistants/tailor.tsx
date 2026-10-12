@@ -14,6 +14,7 @@ import { logoEligible, brandValues } from "./setup";
 import type { SetupStep } from "./setup";
 import styles from "./tailor.module.css";
 import { ConversationPanel } from "./conversation-panel";
+import { LogoPanel } from "./logo-panel";
 import { Tour } from "./tour";
 import { roleOf } from "./context";
 const PROMPTS: Record<SetupStep, { title: string; text: string }> = {
@@ -57,7 +58,7 @@ const LABELS = {
 };
 /** One mounted shell for local styling and grounded role conversation. */
 export function Tailor() {
-  const { controller, state, preparedLogo } = useSession();
+  const { controller, state } = useSession();
   const visible = ["style", "storefront", "dashboard"].includes(state.stage);
   const creator = state.stage === "style",
     expanded = state.setup.expanded;
@@ -280,37 +281,7 @@ export function Tailor() {
                   )}
                   {state.setup.step === "logo" &&
                     logoEligible(state.setup, state.previewDesign) && (
-                      <>
-                        <div
-                          className={styles.wordmark}
-                          style={{
-                            fontFamily:
-                              TYPOGRAPHIES[state.previewDesign.typography]
-                                .heading,
-                            color: PALETTES[state.previewDesign.theme].text,
-                            background:
-                              PALETTES[state.previewDesign.theme].canvas,
-                          }}
-                        >
-                          {state.previewDesign.name}
-                        </div>
-                        <div className={styles.actions}>
-                          <Button onClick={() => controller.keepWordmark()}>
-                            Keep my wordmark
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            onClick={() => controller.prepareLogo()}
-                          >
-                            Generate 3 logos
-                          </Button>
-                        </div>
-                        <p className={styles.note}>
-                          {preparedLogo
-                            ? "Three-logo intent prepared for this look. Generation is not connected yet; no AI call was made. Keep your wordmark to continue."
-                            : "Optional logo generation is being prepared. Your wordmark is ready now."}
-                        </p>
-                      </>
+                      <LogoPanel />
                     )}
                   {state.setup.step === "summary" && (
                     <>
@@ -327,11 +298,20 @@ export function Tailor() {
                           {state.previewDesign.heroPhotoId
                             ? "Supplied hero photo"
                             : "Your actual clothes in the hero"}{" "}
-                          · Text wordmark
+                          ·{" "}
+                          {state.previewDesign.logoId
+                            ? "Reviewed logo"
+                            : "Text wordmark"}
                         </small>
                       </div>
                       <Button onClick={() => controller.acceptDesign()}>
                         Enter my store <Icon name="arrow" />
+                      </Button>
+                      <Button
+                        variant="quiet"
+                        onClick={() => controller.prepareLogo()}
+                      >
+                        Review wordmark & logos
                       </Button>
                       <Button
                         variant="quiet"
@@ -415,6 +395,9 @@ export function Tailor() {
                   )}
                 </div>
               </article>
+            )}
+            {state.stage === "dashboard" && state.designEditing && (
+              <LogoPanel />
             )}
             <ConversationPanel />
           </div>

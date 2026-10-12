@@ -1,0 +1,130 @@
+.panel {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+.panel p {
+  font-size: 0.8rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.wordmark {
+  padding: 1.5rem 1rem;
+  border-radius: 1rem;
+  font-size: clamp(1.3rem, 4vw, 2rem);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.actions > * {
+  min-width: 0;
+}
+.review {
+  display: grid;
+  gap: 0.7rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #f2f4ed;
+  border: 1px solid #dfe4d7;
+  overflow-wrap: anywhere;
+}
+.processing {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  background: #f5f4f9;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+}
+.processing span {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, #d7dcff, #6055d2, #d7dcff);
+  background-size: 200%;
+  animation: sweep 1.8s ease-in-out infinite;
+}
+.candidates {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+.candidate {
+  min-width: 0;
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.85rem;
+  border: 1px solid #e2e2df;
+  border-radius: 1.2rem;
+  background: white;
+  animation: enter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.candidate[data-selected="true"] {
+  border-color: #6450b8;
+  box-shadow: 0 0 0 2px #6450b826;
+}
+.candidate > strong {
+  font-size: 0.8rem;
+}
+.large {
+  height: 128px;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  border-radius: 0.8rem;
+}
+.large img {
+  width: 100%;
+  height: 100%;
+  max-height: 96px;
+  object-fit: contain;
+}
+.small {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.6rem;
+}
+.small span {
+  font-size: 0.65rem;
+}
+.small img {
+  width: min(130px, 55%);
+  height: 30px;
+  object-fit: contain;
+}
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+.check input {
+  flex: none;
+  margin-top: 0.25rem;
+  width: 18px;
+  height: 18px;
+  accent-color: #6450b8;
+}
+@keyframes sweep {
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

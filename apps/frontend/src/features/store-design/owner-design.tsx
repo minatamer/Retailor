@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { Button, Choice } from "../../components/ui/button";
 import { useSession } from "../session/context";
 import { DesignChoices, BrandFields } from "../assistants/tailor";
+import { LogoPanel } from "../assistants/logo-panel";
+import { logoEligible } from "../assistants/setup";
 import { TEMPLATES, PALETTES, TYPOGRAPHIES } from "./presets";
 import styles from "./owner-design.module.css";
 const FIELDS = {
@@ -85,10 +87,15 @@ export function OwnerDesign({ preview }: { preview: ReactNode }) {
                 <div>
                   <h3>Brand details & hero</h3>
                   <BrandFields />
-                  <p className={styles.note}>
-                    Mark: your store name in the chosen typography. Optional
-                    generated marks arrive through Tailor.
-                  </p>
+                  {!logoEligible(state.setup, state.previewDesign) && (
+                    <Button
+                      variant="secondary"
+                      onClick={() => controller.confirmOwnerLogoLook()}
+                    >
+                      Confirm colour & type for optional logos
+                    </Button>
+                  )}
+                  <LogoPanel />
                 </div>
               ) : (
                 <DesignChoices kind={field} />
