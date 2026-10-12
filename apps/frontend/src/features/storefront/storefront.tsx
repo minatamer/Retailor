@@ -35,6 +35,7 @@ export interface StorefrontInput {
   preview: boolean;
   currency?: CurrencyScope;
   currencyControl?: ReactNode;
+  bagCount?: number;
 }
 export interface StorefrontActions {
   browse(patch: Partial<BrowseState>, expectedCurrency?: CurrencyScope): void;
@@ -127,7 +128,7 @@ export function Storefront({
               aria-label="Open shopping bag"
             >
               <Icon name="bag" />
-              <span>Bag</span>
+              <span>Bag{input.bagCount ? ` (${input.bagCount})` : ""}</span>
             </button>
           )}
         </header>

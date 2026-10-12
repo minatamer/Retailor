@@ -13,6 +13,7 @@ import { Storefront } from "../storefront/storefront";
 import { storeItems } from "../storefront/browse";
 import type { StorePhoto } from "../storefront/gallery";
 import { Tailor } from "../assistants/tailor";
+import { BagDialog } from "../bag/bag-dialog";
 import { CurrencyPicker } from "../currency/picker";
 import { selectedScope } from "../currency/display";
 import { OwnerDesign } from "../store-design/owner-design";
@@ -240,6 +241,7 @@ function WorkspaceFlow() {
         authority. No real payment or shipping.
       </footer>
       <Tailor />
+      <BagDialog />
       <WorkspaceDialog />
     </main>
   );
@@ -314,12 +316,26 @@ function CollectionCanvas() {
           browse: state.browse,
           preview,
           currency: selectedScope(state.currency),
+          bagCount: state.graph.bag.reduce(
+            (sum, line) => sum + line.quantity,
+            0,
+          ),
           ...(!preview ? { currencyControl: <CurrencyPicker /> } : {}),
         }}
         actions={{
           browse: (patch, expectedCurrency) =>
             controller.browse(patch, expectedCurrency),
           photoFailed: (id) => controller.photos.reportUnavailable(id),
+          ...(!preview
+            ? {
+                openBag: () => controller.openBag(),
+                addToBag: (
+                  productId: string,
+                  variantId: string,
+                  quantity: number,
+                ) => controller.addToBag(productId, variantId, quantity),
+              }
+            : {}),
           owner: () => controller.go(preview ? "catalogue" : "dashboard"),
         }}
       />
@@ -378,8 +394,8 @@ function OwnerBaseline() {
       </div>
       <OwnerDesign preview={<CollectionCanvas />} />
       <p className={styles.assumptions}>
-        Synthetic demo activity. This development publication contains opening
-        inventory and no authored sales history.
+        Synthetic demo activity. Opening inventory and your local demo orders
+        share the same actual garment records.
       </p>
       <div className={styles.metricGrid}>
         {cards.map(([id, label]) => {
@@ -399,6 +415,21 @@ function OwnerBaseline() {
           );
         })}
       </div>
+      {state.shopping.lastOrderId && (
+        <section className={styles.repair}>
+          <h2>Your latest demo order</h2>
+          <p>{state.shopping.lastOrderId}</p>
+          <p>
+            {state.graph.orders
+              .find((item) => item.id === state.shopping.lastOrderId)
+              ?.lines.map(
+                (line) =>
+                  `${line.title} · ${line.size} · ${line.quantity} units`,
+              )
+              .join("; ")}
+          </p>
+        </section>
+      )}
       <p className={styles.finePrint}>
         All amounts and quantities come from the accepted products and immutable
         linked records.
