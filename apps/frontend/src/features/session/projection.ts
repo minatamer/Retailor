@@ -2,10 +2,20 @@ import { z } from "zod";
 import { GraphSchema, TimestampSchema } from "@retailor/contracts/commerce";
 import { IdSchema } from "@retailor/contracts/core";
 import { PhotoSchema, PHOTO_LIMITS } from "@retailor/contracts/photos";
-import { DesignSchema } from "@retailor/contracts/design";
+import {
+  DesignSchema,
+  TemplateSchema,
+  ThemeSchema,
+  TypographySchema,
+} from "@retailor/contracts/design";
 import { parseGraph, serializedBytes } from "@retailor/commerce/graph";
 import { DraftSchema, parseDraft } from "../catalogue/draft";
 import { BrowseSchema, INITIAL_BROWSE } from "../storefront/browse";
+import {
+  SetupSchema,
+  INITIAL_SETUP,
+  reconcileSetup,
+} from "../assistants/setup";
 export const SESSION_KEY = "retailor.workspace.v1";
 export const SESSION_BYTES = 2 * 1024 * 1024;
 export const StageSchema = z.enum([
@@ -31,6 +41,9 @@ export const ProjectionSchema = z.strictObject({
   presentationRevision: z.number().int().nonnegative().max(1_000_000),
   fixture: z.boolean(),
   browse: BrowseSchema.default(INITIAL_BROWSE),
+  setup: SetupSchema.default(INITIAL_SETUP),
+  hasAcceptedLook: z.boolean().default(false),
+  designEditing: z.boolean().default(false),
 });
 export type Projection = z.infer<typeof ProjectionSchema>;
 export const INITIAL_DESIGN = DesignSchema.parse({
@@ -46,7 +59,8 @@ export function restoreProjection(
   now: number,
   fixtureAllowed: boolean,
 ) {
-  const state = ProjectionSchema.parse(input),
+  const repaired = recoverDesignPresets(input);
+  const state = ProjectionSchema.parse(repaired.input),
     graph = parseGraph(state.graph);
   if (
     serializedBytes(state) > SESSION_BYTES ||
@@ -100,6 +114,7 @@ export function restoreProjection(
   return {
     ...state,
     graph,
+    setup: reconcileSetup(state.setup, state.previewDesign),
     stage: state.stage === "process" ? ("choose" as const) : state.stage,
   };
 }
@@ -119,9 +134,47 @@ export function serializeProjection(state: Projection, now: number) {
     presentationRevision: state.presentationRevision,
     fixture: state.fixture,
     browse: state.browse,
+    setup: state.setup,
+    hasAcceptedLook: state.hasAcceptedLook,
+    designEditing: state.designEditing,
   };
   const encoded = JSON.stringify(ProjectionSchema.parse(selected));
   if (serializedBytes(selected) > SESSION_BYTES)
     throw new Error("This workspace exceeds its 2-MiB recovery envelope.");
   return encoded;
+}
+
+/** Repair only obsolete finite IDs. Other malformed or unknown data stays rejected. */
+export function recoverDesignPresets(input: unknown): {
+  input: unknown;
+  repaired: boolean;
+} {
+  if (!input || typeof input !== "object" || Array.isArray(input))
+    return { input, repaired: false };
+  const raw = { ...input } as Record<string, unknown>;
+  let repaired = false;
+  for (const field of ["acceptedDesign", "previewDesign"] as const) {
+    const value = raw[field];
+    if (!value || typeof value !== "object" || Array.isArray(value)) continue;
+    const design = { ...value } as Record<string, unknown>;
+    for (const [key, schema] of [
+      ["template", TemplateSchema],
+      ["theme", ThemeSchema],
+      ["typography", TypographySchema],
+    ] as const) {
+      if (
+        typeof design[key] === "string" &&
+        !schema.safeParse(design[key]).success
+      ) {
+        design[key] = INITIAL_DESIGN[key];
+        repaired = true;
+      }
+    }
+    raw[field] = design;
+  }
+  if (repaired) {
+    raw.setup = structuredClone(INITIAL_SETUP);
+    raw.hasAcceptedLook = false;
+  }
+  return { input: raw, repaired };
 }

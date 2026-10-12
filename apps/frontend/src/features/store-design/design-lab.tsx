@@ -49,6 +49,7 @@ const REFERENCE_PRODUCTS: readonly StorePresentation[] = [
   },
 ];
 const INITIAL_DESIGN: Design = {
+  heroPhotoId: null,
   template: "studio",
   theme: "ink",
   typography: "editorial",

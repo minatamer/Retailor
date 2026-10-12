@@ -28,6 +28,8 @@ describe("single workspace ownership and safe recovery", () => {
     await controller.photos.add([file("one")]);
     await controller.draftCatalogue();
     controller.publish();
+    controller.useCurrentLook();
+    controller.keepWordmark();
     controller.acceptDesign();
     controller.go("dashboard");
     const graph = controller.getSnapshot().state.graph;
@@ -68,6 +70,8 @@ describe("single workspace ownership and safe recovery", () => {
       expect(controller.getSnapshot().state.browse).toEqual(browse);
       expect(controller.getSnapshot().state.graph).toBe(state.graph);
     }
+    controller.useCurrentLook();
+    controller.keepWordmark();
     controller.acceptDesign();
     controller.go("dashboard");
     controller.go("storefront");
@@ -156,6 +160,8 @@ describe("single workspace ownership and safe recovery", () => {
       "My own garment",
     );
     const graph = controller.getSnapshot().state.graph;
+    controller.useCurrentLook();
+    controller.keepWordmark();
     controller.acceptDesign();
     controller.go("dashboard");
     controller.go("storefront");

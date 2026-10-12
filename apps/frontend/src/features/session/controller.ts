@@ -24,10 +24,24 @@ import { CatalogueRequestError } from "../catalogue/request-error";
 import { BrowseSchema, INITIAL_BROWSE } from "../storefront/browse";
 import type { BrowseState } from "../storefront/browse";
 import {
+  INITIAL_SETUP,
+  confirmSetup,
+  reconcileSetup,
+  logoEligible,
+  designConfirmed,
+  SetupStepSchema,
+  updateBrand,
+  brandValues,
+  CLEAN_BRAND,
+} from "../assistants/setup";
+import type { BrandDraft } from "../assistants/setup";
+import type { SetupStep } from "../assistants/setup";
+import {
   INITIAL_DESIGN,
   SESSION_KEY,
   SESSION_BYTES,
   restoreProjection,
+  recoverDesignPresets,
   serializeProjection,
 } from "./projection";
 import type { Projection, Stage } from "./projection";
@@ -63,7 +77,7 @@ interface SessionOptions {
   seed?: (catalogue: CommerceGraph) => CommerceGraph;
 }
 export interface SessionSnapshot {
-  dialog: "reset" | "rebuild" | null;
+  dialog: "reset" | "rebuild" | "leave-design" | null;
   state: Projection;
   notice: string;
   recoveryNotice: string;
@@ -71,6 +85,14 @@ export interface SessionSnapshot {
   sampleBusy: boolean;
   processStep: ProcessStep;
   missingPhotoIds: readonly string[];
+  heroBusy: boolean;
+  preparedLogo: {
+    designRevision: number;
+    name: string;
+    theme: Design["theme"];
+    typography: Design["typography"];
+    candidates: 3;
+  } | null;
 }
 /** The single owner of workflow/domain/presentation; photo resources remain its owned child. */
 export class SessionController {
@@ -80,6 +102,7 @@ export class SessionController {
   private readonly aborted = () => this.dispose();
   private listeners = new Set<() => void>();
   private generation = 0;
+  private pendingStage: Stage | null = null;
   private operation: AbortController | undefined;
   private active = true;
   private recovering = false;
@@ -103,6 +126,8 @@ export class SessionController {
       sampleBusy: false,
       processStep: "Checking photos",
       missingPhotoIds: [],
+      heroBusy: false,
+      preparedLogo: null,
     };
   }
   private fresh(): Projection {
@@ -125,6 +150,9 @@ export class SessionController {
       presentationRevision: 0,
       fixture: this.options.fixtureAllowed,
       browse: structuredClone(INITIAL_BROWSE),
+      setup: structuredClone(INITIAL_SETUP),
+      hasAcceptedLook: false,
+      designEditing: false,
     };
   }
   static async open(options: SessionOptions) {
@@ -195,6 +223,9 @@ export class SessionController {
           "stage" in raw &&
           raw.stage === "process";
         this.snapshot.state = restored;
+        if (recoverDesignPresets(raw).repaired)
+          this.snapshot.recoveryNotice =
+            "An unavailable saved style was replaced with Studio, Ink / Paper or Editorial. Your catalogue and records are preserved; review the look with Tailor.";
       }
     } catch {
       this.snapshot.recoveryNotice =
@@ -275,13 +306,7 @@ export class SessionController {
     this.recovering = false;
     if (!this.active) return;
     this.lastPhotoRevision = this.photos.getSnapshot().revision;
-    this.photos.protect([
-      ...new Set(
-        this.snapshot.state.graph.products.flatMap(
-          (product) => product.imageIds,
-        ),
-      ),
-    ]);
+    this.protectDesignPhotos();
     this.unlistenPhotos = this.photos.subscribe(() => this.photoChanged());
   }
   private photoChanged() {
@@ -562,13 +587,11 @@ export class SessionController {
       if (this.options.seed) graph = this.options.seed(graph);
       else if (draft.mode !== "development-fixture")
         throw new Error("Scenario composition unavailable");
-      this.photos.protect([
-        ...new Set(graph.products.flatMap((product) => product.imageIds)),
-      ]);
       this.state(
         { graph, stage: "style" },
         "Catalogue accepted. This is your local demo; no website was published externally.",
       );
+      this.protectDesignPhotos();
       this.update({ dialog: null }, false);
     } catch {
       this.update({
@@ -595,8 +618,62 @@ export class SessionController {
       (stage === "catalogue" && !state.draft)
     )
       return;
+    if (
+      stage === "storefront" &&
+      state.stage === "style" &&
+      !state.hasAcceptedLook
+    )
+      return;
+    if (
+      (state.stage === "style" || state.designEditing) &&
+      this.designDirty()
+    ) {
+      this.pendingStage = stage;
+      this.update({ dialog: "leave-design" }, false);
+      return;
+    }
     this.cancelOperation();
-    this.state({ stage });
+    this.photos.cancel();
+    this.update({ heroBusy: false, preparedLogo: null }, false);
+    this.state({
+      stage,
+      designEditing: false,
+      ...(stage === "style" && ["storefront", "dashboard"].includes(state.stage)
+        ? {
+            previewDesign: state.acceptedDesign,
+            setup: state.hasAcceptedLook
+              ? {
+                  ...state.setup,
+                  step: "summary" as const,
+                  expanded: true,
+                  template: state.acceptedDesign.template,
+                  theme: state.acceptedDesign.theme,
+                  typography: state.acceptedDesign.typography,
+                  brandConfirmed: true,
+                  wordmarkKept: true,
+                  brandDraft: brandValues(state.acceptedDesign),
+                  brandDirty: { ...CLEAN_BRAND },
+                }
+              : structuredClone(INITIAL_SETUP),
+          }
+        : {}),
+    });
+  }
+  private designDirty() {
+    const state = this.snapshot.state;
+    const accepted = { ...state.acceptedDesign, revision: 0 },
+      preview = { ...state.previewDesign, revision: 0 };
+    return (
+      JSON.stringify(accepted) !== JSON.stringify(preview) ||
+      Object.values(state.setup.brandDirty).some(Boolean)
+    );
+  }
+  discardDesignAndLeave() {
+    const stage = this.pendingStage;
+    this.pendingStage = null;
+    this.cancelDesign();
+    this.closeDialog();
+    if (stage) this.go(stage);
   }
   askReset() {
     this.update({ dialog: "reset" }, false);
@@ -626,20 +703,34 @@ export class SessionController {
     this.state({ browse: next });
   }
   closeDialog() {
+    this.pendingStage = null;
     this.update({ dialog: null }, false);
   }
   design(design: Design) {
     if (
       !this.valid() ||
-      !["style", "dashboard"].includes(this.snapshot.state.stage)
+      !["style", "dashboard"].includes(this.snapshot.state.stage) ||
+      (this.snapshot.state.stage === "dashboard" &&
+        !this.snapshot.state.designEditing)
     )
       return;
     try {
-      const previewDesign = DesignSchema.parse(design);
+      const previewDesign = DesignSchema.parse({
+        ...design,
+        revision: this.snapshot.state.previewDesign.revision + 1,
+      });
+      if (
+        previewDesign.heroPhotoId &&
+        !this.photos.availableIds().has(previewDesign.heroPhotoId)
+      )
+        throw new Error("Unavailable hero image");
       this.state({
         previewDesign,
+        setup: reconcileSetup(this.snapshot.state.setup, previewDesign),
         presentationRevision: this.snapshot.state.presentationRevision + 1,
       });
+      this.protectDesignPhotos();
+      this.update({ preparedLogo: null }, false);
     } catch {
       this.update({ notice: "Choose one of the accepted design presets." });
     }
@@ -647,21 +738,302 @@ export class SessionController {
   acceptDesign() {
     if (
       !this.valid() ||
-      !["style", "dashboard"].includes(this.snapshot.state.stage)
+      this.snapshot.state.stage !== "style" ||
+      !designConfirmed(
+        this.snapshot.state.setup,
+        this.snapshot.state.previewDesign,
+      ) ||
+      !this.snapshot.state.setup.brandConfirmed ||
+      !this.snapshot.state.setup.wordmarkKept
     )
       return;
+    this.cancelOperation();
+    this.photos.cancel();
     this.state({
       acceptedDesign: this.snapshot.state.previewDesign,
       presentationRevision: this.snapshot.state.presentationRevision + 1,
       stage: "storefront",
+      hasAcceptedLook: true,
+      designEditing: false,
     });
+    this.protectDesignPhotos();
+    this.update({ preparedLogo: null, heroBusy: false }, false);
   }
   cancelDesign() {
-    if (this.valid())
+    if (this.valid()) {
+      const state = this.snapshot.state;
+      this.cancelOperation();
+      this.photos.cancel();
       this.state({
-        previewDesign: this.snapshot.state.acceptedDesign,
+        previewDesign: state.acceptedDesign,
+        designEditing: false,
+        setup: state.hasAcceptedLook
+          ? {
+              ...state.setup,
+              template: state.acceptedDesign.template,
+              theme: state.acceptedDesign.theme,
+              typography: state.acceptedDesign.typography,
+              brandConfirmed: true,
+              wordmarkKept: true,
+              brandDraft: brandValues(state.acceptedDesign),
+              brandDirty: { ...CLEAN_BRAND },
+              step: "summary",
+            }
+          : structuredClone(INITIAL_SETUP),
         presentationRevision: this.snapshot.state.presentationRevision + 1,
       });
+      this.protectDesignPhotos();
+      this.update({ heroBusy: false, preparedLogo: null }, false);
+    }
+  }
+  private protectDesignPhotos() {
+    const state = this.snapshot.state;
+    this.photos.protect([
+      ...new Set([
+        ...state.graph.products.flatMap((item) => item.imageIds),
+        ...[
+          state.acceptedDesign.heroPhotoId,
+          state.previewDesign.heroPhotoId,
+        ].filter((id): id is string => id !== null),
+      ]),
+    ]);
+  }
+  toggleTailor(expanded: boolean) {
+    if (this.valid())
+      this.state({ setup: { ...this.snapshot.state.setup, expanded } });
+  }
+  stylingStep(step: SetupStep) {
+    const state = this.snapshot.state;
+    if (
+      !this.valid() ||
+      state.stage !== "style" ||
+      !SetupStepSchema.safeParse(step).success ||
+      (step === "logo" && !logoEligible(state.setup, state.previewDesign))
+    )
+      return;
+    this.state({ setup: { ...state.setup, step, expanded: true } });
+  }
+  confirmStyle(step: "template" | "theme" | "typography" | "brand") {
+    const state = this.snapshot.state;
+    if (!this.valid() || state.stage !== "style" || state.setup.step !== step)
+      return;
+    if (step === "brand" && state.setup.brandDraft?.name.trim() === "") {
+      this.update({
+        notice: "Choose a store name, or keep the suggested details.",
+      });
+      return;
+    }
+    this.state({ setup: confirmSetup(state.setup, state.previewDesign, step) });
+  }
+  brandInput(
+    patch: Partial<BrandDraft>,
+    origin: "human" | "suggestion" = "human",
+  ) {
+    const state = this.snapshot.state;
+    if (
+      !this.valid() ||
+      !["style", "dashboard"].includes(state.stage) ||
+      (state.stage === "dashboard" && !state.designEditing)
+    )
+      return;
+    try {
+      const setup = updateBrand(
+          state.setup,
+          state.previewDesign,
+          patch,
+          origin,
+        ),
+        draft = setup.brandDraft ?? brandValues(state.previewDesign);
+      if (setup === state.setup) return;
+      if (
+        draft.heroPhotoId &&
+        !this.photos.availableIds().has(draft.heroPhotoId)
+      )
+        return;
+      this.state({ setup: reconcileSetup(setup, state.previewDesign) });
+      const preview = {
+        ...state.previewDesign,
+        name: draft.name.trim() || state.previewDesign.name,
+        headline: draft.headline,
+        heroPhotoId: draft.heroPhotoId,
+      };
+      if (
+        JSON.stringify(brandValues(preview)) !==
+        JSON.stringify(brandValues(state.previewDesign))
+      )
+        this.design(preview);
+      else this.update({ preparedLogo: null }, false);
+    } catch {
+      this.update({
+        notice:
+          "Use a short store name and headline from the available brand fields.",
+      });
+    }
+  }
+  keepBrandDetails() {
+    const state = this.snapshot.state;
+    if (
+      !this.valid() ||
+      state.stage !== "style" ||
+      state.setup.step !== "brand"
+    )
+      return;
+    this.state({
+      setup: {
+        ...state.setup,
+        brandDraft: brandValues(state.previewDesign),
+        brandDirty: { ...CLEAN_BRAND },
+      },
+    });
+    this.confirmStyle("brand");
+  }
+  useCurrentLook() {
+    const state = this.snapshot.state;
+    if (!this.valid() || state.stage !== "style") return;
+    this.state({
+      setup: {
+        ...state.setup,
+        template: state.previewDesign.template,
+        theme: state.previewDesign.theme,
+        typography: state.previewDesign.typography,
+        brandConfirmed: true,
+        brandDraft: brandValues(state.previewDesign),
+        brandDirty: { ...CLEAN_BRAND },
+        wordmarkKept: false,
+        step: "logo",
+        expanded: true,
+      },
+    });
+  }
+  keepWordmark() {
+    const state = this.snapshot.state;
+    if (
+      !this.valid() ||
+      state.stage !== "style" ||
+      !designConfirmed(state.setup, state.previewDesign) ||
+      !state.setup.brandConfirmed
+    )
+      return;
+    this.state({
+      setup: { ...state.setup, wordmarkKept: true, step: "summary" },
+    });
+    this.update({ preparedLogo: null }, false);
+  }
+  prepareLogo() {
+    const state = this.snapshot.state;
+    if (
+      !this.valid() ||
+      !["style", "dashboard"].includes(state.stage) ||
+      !logoEligible(state.setup, state.previewDesign)
+    )
+      return;
+    const design = state.previewDesign;
+    this.update(
+      {
+        preparedLogo: {
+          designRevision: design.revision,
+          name: design.name,
+          theme: design.theme,
+          typography: design.typography,
+          candidates: 3,
+        },
+      },
+      false,
+    );
+  }
+  beginOwnerDesign() {
+    if (
+      !this.valid() ||
+      this.snapshot.state.stage !== "dashboard" ||
+      this.snapshot.state.designEditing
+    )
+      return;
+    this.cancelDesign();
+    this.state({ designEditing: true });
+  }
+  applyOwnerDesign() {
+    const state = this.snapshot.state;
+    if (!this.valid() || state.stage !== "dashboard" || !state.designEditing)
+      return;
+    if (state.setup.brandDraft?.name.trim() === "") {
+      this.update({ notice: "Choose a store name before applying this look." });
+      return;
+    }
+    this.cancelOperation();
+    this.photos.cancel();
+    this.state({
+      acceptedDesign: state.previewDesign,
+      hasAcceptedLook: true,
+      designEditing: false,
+      setup: {
+        ...state.setup,
+        template: state.previewDesign.template,
+        theme: state.previewDesign.theme,
+        typography: state.previewDesign.typography,
+        brandConfirmed: true,
+        wordmarkKept: true,
+        brandDraft: brandValues(state.previewDesign),
+        brandDirty: { ...CLEAN_BRAND },
+        step: "summary",
+      },
+      presentationRevision: state.presentationRevision + 1,
+    });
+    this.protectDesignPhotos();
+    this.update({ preparedLogo: null, heroBusy: false }, false);
+  }
+  async uploadHero(file: NamedPhoto) {
+    const state = this.snapshot.state;
+    if (
+      !this.valid() ||
+      !["style", "dashboard"].includes(state.stage) ||
+      this.snapshot.heroBusy ||
+      (state.stage === "dashboard" && !state.designEditing)
+    )
+      return;
+    const generation = this.generation,
+      photos = this.photos,
+      stage = state.stage,
+      designRevision = state.previewDesign.revision;
+    this.update({ heroBusy: true }, false);
+    try {
+      const ids = await photos.add([file], undefined, false);
+      if (
+        !this.active ||
+        generation !== this.generation ||
+        photos !== this.photos ||
+        this.snapshot.state.stage !== stage ||
+        this.snapshot.state.previewDesign.revision !== designRevision
+      )
+        return;
+      const id = ids[0];
+      if (!id) {
+        this.update({
+          notice:
+            photos.getSnapshot().notice ||
+            "That hero photo could not be added. Your current look is preserved.",
+        });
+        return;
+      }
+      const retained = new Map(
+        this.snapshot.state.photos.map((photo) => [photo.id, photo]),
+      );
+      for (const photo of photos.descriptors()) retained.set(photo.id, photo);
+      this.state({ photos: [...retained.values()] });
+      this.brandInput({ heroPhotoId: id });
+    } catch {
+      if (this.active && generation === this.generation)
+        this.update({
+          notice:
+            "That hero photo could not be added. Your current look is preserved.",
+        });
+    } finally {
+      if (
+        this.active &&
+        generation === this.generation &&
+        photos === this.photos
+      )
+        this.update({ heroBusy: false }, false);
+    }
   }
   async repair(expectedId: string, file: NamedPhoto) {
     const expected = this.snapshot.state.photos.find(
@@ -693,7 +1065,13 @@ export class SessionController {
     this.cancelOperation();
     this.unlistenPhotos?.();
     this.unlistenPhotos = undefined;
-    this.update({ ready: false, sampleBusy: false, dialog: null });
+    this.update({
+      ready: false,
+      sampleBusy: false,
+      dialog: null,
+      heroBusy: false,
+      preparedLogo: null,
+    });
     const previous = this.photos;
     const cleared = await previous.reset();
     if (!cleared)
