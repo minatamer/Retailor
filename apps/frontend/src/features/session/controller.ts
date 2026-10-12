@@ -1,3 +1,13 @@
+import {
+  CurrencySchema,
+  CurrencyScopeSchema,
+  INITIAL_CURRENCY,
+  DisplayMinorSchema,
+} from "@retailor/contracts/currency";
+import type { Currency, CurrencyScope } from "@retailor/contracts/currency";
+import { validateSnapshot } from "@retailor/commerce/currency";
+import { requestCurrencyQuote } from "../currency/request";
+import { selectedScope } from "../currency/display";
 import { DesignSchema } from "@retailor/contracts/design";
 import type { Design } from "@retailor/contracts/design";
 import type { CommerceGraph } from "@retailor/contracts/commerce";
@@ -42,6 +52,7 @@ import {
   SESSION_BYTES,
   restoreProjection,
   recoverDesignPresets,
+  recoverCurrency,
   serializeProjection,
 } from "./projection";
 import type { Projection, Stage } from "./projection";
@@ -75,6 +86,7 @@ interface SessionOptions {
   cache?: (workspace: string, owner: string, expires: number) => PhotoCache;
   photos?: (cache: PhotoCache, expires: number) => PhotoController;
   seed?: (catalogue: CommerceGraph) => CommerceGraph;
+  currencyQuote?: (signal: AbortSignal) => Promise<unknown>;
 }
 export interface SessionSnapshot {
   dialog: "reset" | "rebuild" | "leave-design" | null;
@@ -86,6 +98,8 @@ export interface SessionSnapshot {
   processStep: ProcessStep;
   missingPhotoIds: readonly string[];
   heroBusy: boolean;
+  currencyBusy: boolean;
+  currencyNotice: string;
   preparedLogo: {
     designRevision: number;
     name: string;
@@ -103,6 +117,8 @@ export class SessionController {
   private listeners = new Set<() => void>();
   private generation = 0;
   private pendingStage: Stage | null = null;
+  private currencyOperation: AbortController | undefined;
+  private currencyGeneration = 0;
   private operation: AbortController | undefined;
   private active = true;
   private recovering = false;
@@ -127,6 +143,8 @@ export class SessionController {
       processStep: "Checking photos",
       missingPhotoIds: [],
       heroBusy: false,
+      currencyBusy: false,
+      currencyNotice: "",
       preparedLogo: null,
     };
   }
@@ -153,6 +171,8 @@ export class SessionController {
       setup: structuredClone(INITIAL_SETUP),
       hasAcceptedLook: false,
       designEditing: false,
+      currency: structuredClone(INITIAL_CURRENCY),
+      orderDisplays: [],
     };
   }
   static async open(options: SessionOptions) {
@@ -223,6 +243,12 @@ export class SessionController {
           "stage" in raw &&
           raw.stage === "process";
         this.snapshot.state = restored;
+        if (
+          recoverCurrency(raw, this.clock(), this.options.fixtureAllowed)
+            .repaired
+        )
+          this.snapshot.currencyNotice =
+            "Euro pricing is unavailable right now; prices are shown in USD. Price bounds were cleared.";
         if (recoverDesignPresets(raw).repaired)
           this.snapshot.recoveryNotice =
             "An unavailable saved style was replaced with Studio, Ink / Paper or Editorial. Your catalogue and records are preserved; review the look with Tailor.";
@@ -339,7 +365,196 @@ export class SessionController {
     }
     this.update({}, false);
   }
+  private cancelCurrencyRequest() {
+    this.currencyGeneration++;
+    this.currencyOperation?.abort();
+    this.currencyOperation = undefined;
+    this.update({ currencyBusy: false }, false);
+  }
+  private applyCurrency(
+    selected: Currency,
+    acceptedSnapshot = this.snapshot.state.currency.acceptedSnapshot,
+  ) {
+    const state = this.snapshot.state,
+      changed = selected !== state.currency.selected;
+    this.state({
+      currency: { selected, acceptedSnapshot },
+      ...(changed
+        ? {
+            browse: {
+              ...state.browse,
+              filters: {
+                ...state.browse.filters,
+                minPrice: null,
+                maxPrice: null,
+              },
+            },
+            presentationRevision: state.presentationRevision + 1,
+          }
+        : {}),
+    });
+    this.update(
+      {
+        currencyNotice: changed
+          ? `Prices are shown in ${selected}. Price bounds were cleared for this currency.`
+          : "",
+      },
+      false,
+    );
+  }
+  async selectCurrency(value: Currency) {
+    if (
+      !this.valid() ||
+      !["style", "storefront", "dashboard"].includes(
+        this.snapshot.state.stage,
+      ) ||
+      !CurrencySchema.safeParse(value).success
+    )
+      return;
+    this.cancelCurrencyRequest();
+    if (value === "USD") {
+      this.applyCurrency("USD");
+      return;
+    }
+    const accepted = this.snapshot.state.currency.acceptedSnapshot;
+    if (accepted) {
+      try {
+        validateSnapshot(accepted, this.clock(), this.options.fixtureAllowed);
+        this.applyCurrency("EUR", accepted);
+        return;
+      } catch {
+        this.applyCurrency("USD", null);
+      }
+    }
+    const operation = new AbortController(),
+      generation = this.currencyGeneration,
+      workspace = this.snapshot.state.graph.workspaceId;
+    this.currencyOperation = operation;
+    this.update(
+      {
+        currencyBusy: true,
+        currencyNotice:
+          "Getting Euro reference prices. USD browsing remains available.",
+      },
+      false,
+    );
+    const stopped = new Promise<never>((_resolve, reject) => {
+      operation.signal.addEventListener(
+        "abort",
+        () => reject(new Error("Currency request stopped")),
+        { once: true },
+      );
+    });
+    const timer = setTimeout(() => operation.abort(), 7000);
+    try {
+      const quote = await Promise.race([
+        (this.options.currencyQuote ?? requestCurrencyQuote)(operation.signal),
+        stopped,
+      ]);
+      if (
+        !this.active ||
+        operation.signal.aborted ||
+        generation !== this.currencyGeneration ||
+        workspace !== this.snapshot.state.graph.workspaceId ||
+        !this.valid()
+      )
+        return;
+      const snapshot = validateSnapshot(
+        quote,
+        this.clock(),
+        this.options.fixtureAllowed,
+      );
+      this.applyCurrency("EUR", snapshot);
+    } catch {
+      if (
+        this.active &&
+        generation === this.currencyGeneration &&
+        workspace === this.snapshot.state.graph.workspaceId
+      )
+        this.update(
+          {
+            currencyNotice:
+              "Euro pricing is unavailable right now; prices are shown in USD.",
+          },
+          false,
+        );
+    } finally {
+      clearTimeout(timer);
+      operation.abort();
+      if (this.active && generation === this.currencyGeneration) {
+        this.currencyOperation = undefined;
+        this.update({ currencyBusy: false }, false);
+      }
+    }
+  }
+  filterDisplayBudget(maximum: number, expectedScope: CurrencyScope) {
+    if (
+      !this.valid() ||
+      this.snapshot.state.stage !== "storefront" ||
+      !DisplayMinorSchema.safeParse(maximum).success
+    )
+      return;
+    const state = this.snapshot.state;
+    if (
+      JSON.stringify(expectedScope) !==
+      JSON.stringify(selectedScope(state.currency))
+    ) {
+      this.update(
+        { currencyNotice: "Currency changed. Review your price budget." },
+        false,
+      );
+      return;
+    }
+    this.browse({
+      page: "collection",
+      filters: { ...state.browse.filters, minPrice: null, maxPrice: maximum },
+    });
+  }
+  rememberOrderDisplay(orderId: string, scope: CurrencyScope) {
+    if (!this.valid()) return;
+    const state = this.snapshot.state;
+    if (
+      !state.graph.orders.some((order) => order.id === orderId) ||
+      state.orderDisplays.some((item) => item.orderId === orderId)
+    )
+      return;
+    const parsed = CurrencyScopeSchema.safeParse(scope);
+    if (
+      !parsed.success ||
+      JSON.stringify(parsed.data) !==
+        JSON.stringify(selectedScope(state.currency))
+    )
+      return;
+    this.state({
+      orderDisplays: [...state.orderDisplays, { orderId, scope: parsed.data }],
+    });
+  }
+  private refreshCurrencyValidity() {
+    const state = this.snapshot.state;
+    if (this.active && state.currency.acceptedSnapshot) {
+      try {
+        validateSnapshot(
+          state.currency.acceptedSnapshot,
+          this.clock(),
+          this.options.fixtureAllowed,
+        );
+      } catch {
+        this.cancelCurrencyRequest();
+        this.applyCurrency("USD", null);
+        this.update(
+          {
+            currencyNotice:
+              state.currency.selected === "EUR"
+                ? "Euro pricing is unavailable right now; prices are shown in USD. Price bounds were cleared."
+                : "Euro pricing is unavailable right now; prices are shown in USD.",
+          },
+          false,
+        );
+      }
+    }
+  }
   checkExpiry() {
+    this.refreshCurrencyValidity();
     if (
       this.active &&
       this.clock() >= Date.parse(this.snapshot.state.graph.expiresAt)
@@ -347,6 +562,7 @@ export class SessionController {
       void this.reset("This temporary demo expired. Start a fresh collection.");
   }
   private valid() {
+    this.refreshCurrencyValidity();
     if (
       !this.active ||
       this.clock() >= Date.parse(this.snapshot.state.graph.expiresAt)
@@ -357,6 +573,7 @@ export class SessionController {
     return true;
   }
   private cancelOperation() {
+    this.cancelCurrencyRequest();
     this.generation++;
     this.operation?.abort();
     this.operation = undefined;
@@ -588,7 +805,7 @@ export class SessionController {
       else if (draft.mode !== "development-fixture")
         throw new Error("Scenario composition unavailable");
       this.state(
-        { graph, stage: "style" },
+        { graph, stage: "style", orderDisplays: [] },
         "Catalogue accepted. This is your local demo; no website was published externally.",
       );
       this.protectDesignPhotos();
@@ -678,12 +895,24 @@ export class SessionController {
   askReset() {
     this.update({ dialog: "reset" }, false);
   }
-  browse(patch: Partial<BrowseState>) {
+  browse(patch: Partial<BrowseState>, expectedCurrency?: CurrencyScope) {
     if (
       !this.valid() ||
       !["style", "storefront", "dashboard"].includes(this.snapshot.state.stage)
     )
       return;
+    if (
+      patch.filters &&
+      expectedCurrency &&
+      JSON.stringify(expectedCurrency) !==
+        JSON.stringify(selectedScope(this.snapshot.state.currency))
+    ) {
+      this.update(
+        { currencyNotice: "Currency changed. Review your price filters." },
+        false,
+      );
+      return;
+    }
     const parsed = BrowseSchema.safeParse({
       ...this.snapshot.state.browse,
       ...patch,
@@ -700,7 +929,10 @@ export class SessionController {
         ?.variants.some((variant) => variant.id === next.variantId)
     )
       return;
-    this.state({ browse: next });
+    this.state({
+      browse: next,
+      presentationRevision: this.snapshot.state.presentationRevision + 1,
+    });
   }
   closeDialog() {
     this.pendingStage = null;
@@ -1070,6 +1302,8 @@ export class SessionController {
       sampleBusy: false,
       dialog: null,
       heroBusy: false,
+      currencyBusy: false,
+      currencyNotice: "",
       preparedLogo: null,
     });
     const previous = this.photos;

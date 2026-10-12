@@ -1,3 +1,4 @@
+import { convertMinor } from "@retailor/commerce/currency";
 import { describe, it, expect } from "vitest";
 import { environment, file } from "../../../test/workspace";
 import {
@@ -20,6 +21,37 @@ async function catalogue() {
   return { env, controller, graph: controller.getSnapshot().state.graph };
 }
 describe("one current catalogue across every storefront family", () => {
+  it("uses inclusive rounded displayed EUR unit prices rather than inverse USD bounds", async () => {
+    const { env, controller, graph } = await catalogue();
+    try {
+      const changed: CommerceGraph = {
+        ...graph,
+        products: graph.products.map((product, index) => ({
+          ...product,
+          variants: product.variants.map((variant) => ({
+            ...variant,
+            price: [15999, 16000, 16001][index]!,
+          })),
+        })),
+      };
+      const items = storeItems(changed, controller.photos.availableIds());
+      const matches = collection(
+        items,
+        {
+          filters: { ...EMPTY_FILTERS, minPrice: 8000, maxPrice: 8000 },
+          sort: "price-low",
+        },
+        (cents) => convertMinor(cents, "0.5"),
+      );
+      expect(matches.map((item) => item.product.id)).toEqual([
+        graph.products[0]!.id,
+        graph.products[1]!.id,
+      ]);
+      expect(changed.products[0]!.variants[0]!.price).toBe(15999);
+    } finally {
+      env.dispose();
+    }
+  });
   it("requires the same variant to satisfy colour, size, price and stock", async () => {
     const { env, controller, graph } = await catalogue();
     try {

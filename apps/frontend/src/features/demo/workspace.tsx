@@ -13,6 +13,8 @@ import { Storefront } from "../storefront/storefront";
 import { storeItems } from "../storefront/browse";
 import type { StorePhoto } from "../storefront/gallery";
 import { Tailor } from "../assistants/tailor";
+import { CurrencyPicker } from "../currency/picker";
+import { selectedScope } from "../currency/display";
 import { OwnerDesign } from "../store-design/owner-design";
 import { facts, allActivityScope } from "@retailor/commerce/facts";
 import { formatUsd } from "@retailor/commerce/money";
@@ -311,9 +313,12 @@ function CollectionCanvas() {
           photos,
           browse: state.browse,
           preview,
+          currency: selectedScope(state.currency),
+          ...(!preview ? { currencyControl: <CurrencyPicker /> } : {}),
         }}
         actions={{
-          browse: (patch) => controller.browse(patch),
+          browse: (patch, expectedCurrency) =>
+            controller.browse(patch, expectedCurrency),
           photoFailed: (id) => controller.photos.reportUnavailable(id),
           owner: () => controller.go(preview ? "catalogue" : "dashboard"),
         }}

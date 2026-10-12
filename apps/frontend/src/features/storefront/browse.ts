@@ -1,5 +1,6 @@
+import { DisplayMinorSchema } from "@retailor/contracts/currency";
 import { z } from "zod";
-import { IdSchema, MinorAmountSchema } from "@retailor/contracts/core";
+import { IdSchema } from "@retailor/contracts/core";
 import { CategorySchema } from "@retailor/contracts/product";
 import type { Product, Variant } from "@retailor/contracts/product";
 import type { CommerceGraph } from "@retailor/contracts/commerce";
@@ -11,8 +12,8 @@ export const FiltersSchema = z
     category: CategorySchema.nullable(),
     colour: z.string().min(1).max(32).nullable(),
     size: z.string().min(1).max(16).nullable(),
-    minPrice: MinorAmountSchema.nullable(),
-    maxPrice: MinorAmountSchema.nullable(),
+    minPrice: DisplayMinorSchema.nullable(),
+    maxPrice: DisplayMinorSchema.nullable(),
     available: z.boolean(),
   })
   .refine(
@@ -86,6 +87,7 @@ export function storeItems(
 export function collection(
   items: readonly StoreItem[],
   browse: Pick<BrowseState, "filters" | "sort">,
+  displayPrice: (cents: number) => number = (value) => value,
 ) {
   const { filters: f, sort } = browse;
   const query = f.search.trim().toLocaleLowerCase("en-US");
@@ -108,15 +110,23 @@ export function collection(
           ({ variant: v, stock }) =>
             (!f.colour || (knownColour(v.colour) && v.colour === f.colour)) &&
             (!f.size || v.size === f.size) &&
-            (f.minPrice === null || v.price >= f.minPrice) &&
-            (f.maxPrice === null || v.price <= f.maxPrice) &&
+            (f.minPrice === null || displayPrice(v.price) >= f.minPrice) &&
+            (f.maxPrice === null || displayPrice(v.price) <= f.maxPrice) &&
             (!f.available || stock > 0),
         )),
   );
   if (sort === "price-low")
-    result.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
+    result.sort(
+      (a, b) =>
+        (a.price === null ? Infinity : displayPrice(a.price)) -
+        (b.price === null ? Infinity : displayPrice(b.price)),
+    );
   if (sort === "price-high")
-    result.sort((a, b) => (b.price ?? -Infinity) - (a.price ?? -Infinity));
+    result.sort(
+      (a, b) =>
+        (b.price === null ? -Infinity : displayPrice(b.price)) -
+        (a.price === null ? -Infinity : displayPrice(a.price)),
+    );
   if (sort === "title")
     result.sort((a, b) => a.product.title.localeCompare(b.product.title, "en"));
   return result;

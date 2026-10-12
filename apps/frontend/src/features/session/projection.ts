@@ -1,3 +1,9 @@
+import {
+  CurrencyPreferenceSchema,
+  INITIAL_CURRENCY,
+  OrderDisplaySchema,
+} from "@retailor/contracts/currency";
+import { validateSnapshot } from "@retailor/commerce/currency";
 import { z } from "zod";
 import { GraphSchema, TimestampSchema } from "@retailor/contracts/commerce";
 import { IdSchema } from "@retailor/contracts/core";
@@ -44,6 +50,8 @@ export const ProjectionSchema = z.strictObject({
   setup: SetupSchema.default(INITIAL_SETUP),
   hasAcceptedLook: z.boolean().default(false),
   designEditing: z.boolean().default(false),
+  currency: CurrencyPreferenceSchema.default(INITIAL_CURRENCY),
+  orderDisplays: z.array(OrderDisplaySchema).max(30).default([]),
 });
 export type Projection = z.infer<typeof ProjectionSchema>;
 export const INITIAL_DESIGN = DesignSchema.parse({
@@ -60,7 +68,8 @@ export function restoreProjection(
   fixtureAllowed: boolean,
 ) {
   const repaired = recoverDesignPresets(input);
-  const state = ProjectionSchema.parse(repaired.input),
+  const currencyRecovery = recoverCurrency(repaired.input, now, fixtureAllowed);
+  const state = ProjectionSchema.parse(currencyRecovery.input),
     graph = parseGraph(state.graph);
   if (
     serializedBytes(state) > SESSION_BYTES ||
@@ -111,6 +120,17 @@ export function restoreProjection(
     !graph.products.some((product) => !product.archived)
   )
     throw new Error("The saved storefront has no usable catalogue.");
+  if (
+    new Set(state.orderDisplays.map((item) => item.orderId)).size !==
+      state.orderDisplays.length ||
+    state.orderDisplays.some(
+      (item) =>
+        !graph.orders.some((order) => order.id === item.orderId) ||
+        (!fixtureAllowed &&
+          item.scope.snapshot?.sourceId === "development-fixture"),
+    )
+  )
+    throw new Error("Saved confirmation currency does not match orders");
   return {
     ...state,
     graph,
@@ -137,6 +157,8 @@ export function serializeProjection(state: Projection, now: number) {
     setup: state.setup,
     hasAcceptedLook: state.hasAcceptedLook,
     designEditing: state.designEditing,
+    currency: state.currency,
+    orderDisplays: state.orderDisplays,
   };
   const encoded = JSON.stringify(ProjectionSchema.parse(selected));
   if (serializedBytes(selected) > SESSION_BYTES)
@@ -177,4 +199,42 @@ export function recoverDesignPresets(input: unknown): {
     raw.hasAcceptedLook = false;
   }
   return { input: raw, repaired };
+}
+
+export function recoverCurrency(
+  input: unknown,
+  now: number,
+  fixtureAllowed: boolean,
+): { input: unknown; repaired: boolean } {
+  if (
+    !input ||
+    typeof input !== "object" ||
+    Array.isArray(input) ||
+    !("currency" in input)
+  )
+    return { input, repaired: false };
+  const parsed = CurrencyPreferenceSchema.safeParse(input.currency);
+  try {
+    if (!parsed.success) throw new Error("Invalid preference");
+    if (parsed.data.acceptedSnapshot)
+      validateSnapshot(parsed.data.acceptedSnapshot, now, fixtureAllowed);
+    return { input, repaired: false };
+  } catch {
+    const raw = {
+      ...input,
+      currency: structuredClone(INITIAL_CURRENCY),
+    } as Record<string, unknown>;
+    if (
+      raw.browse &&
+      typeof raw.browse === "object" &&
+      "filters" in raw.browse &&
+      raw.browse.filters &&
+      typeof raw.browse.filters === "object"
+    )
+      raw.browse = {
+        ...raw.browse,
+        filters: { ...raw.browse.filters, minPrice: null, maxPrice: null },
+      };
+    return { input: raw, repaired: true };
+  }
 }

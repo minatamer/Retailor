@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Design } from "@retailor/contracts/design";
 import { Button, Choice } from "../../components/ui/button";
-import { formatUsd } from "@retailor/commerce/money";
+import { formatDisplay, formatMinor } from "@retailor/commerce/currency";
+import { selectedScope } from "../currency/display";
 import { Icon } from "../../components/ui/icon";
 import { useSession } from "../session/context";
 import { PALETTES, TEMPLATES, TYPOGRAPHIES } from "../store-design/presets";
@@ -345,6 +346,19 @@ export function Tailor() {
                       </Button>
                       <Button
                         variant="secondary"
+                        onClick={() => {
+                          controller.filterDisplayBudget(
+                            8000,
+                            selectedScope(state.currency),
+                          );
+                          controller.toggleTailor(false);
+                        }}
+                      >
+                        Explore up to{" "}
+                        {formatMinor(8000, state.currency.selected)}
+                      </Button>
+                      <Button
+                        variant="secondary"
                         onClick={() => controller.go("style")}
                       >
                         Revisit my look
@@ -527,7 +541,7 @@ export function DesignChoices({
                 <small>
                   {specimenPrice === undefined
                     ? "Price unavailable"
-                    : `${formatUsd(specimenPrice)} · USD`}
+                    : `${formatDisplay(specimenPrice, selectedScope(state.currency))} · ${state.currency.selected}`}
                 </small>
               </span>
             </Choice>

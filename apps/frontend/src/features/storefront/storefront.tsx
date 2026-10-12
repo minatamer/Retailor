@@ -1,8 +1,16 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { USD_SCOPE } from "@retailor/contracts/currency";
+import type { CurrencyScope } from "@retailor/contracts/currency";
+import {
+  displayMinor,
+  formatDisplay,
+  formatMinor,
+  parseDisplay,
+} from "@retailor/commerce/currency";
 import type { Design } from "@retailor/contracts/design";
 import type { Variant } from "@retailor/contracts/product";
-import { formatUsd, parseUsd } from "@retailor/commerce/money";
 import { Icon } from "../../components/ui/icon";
 import { merchantStyle } from "../store-design/presets";
 import {
@@ -25,10 +33,11 @@ export interface StorefrontInput {
   browse: BrowseState;
   photos: ReadonlyMap<string, StorePhoto>;
   preview: boolean;
-  formatPrice?: (cents: number) => string;
+  currency?: CurrencyScope;
+  currencyControl?: ReactNode;
 }
 export interface StorefrontActions {
-  browse(patch: Partial<BrowseState>): void;
+  browse(patch: Partial<BrowseState>, expectedCurrency?: CurrencyScope): void;
   owner(): void;
   photoFailed(id: string): void;
   openBag?: () => void;
@@ -43,10 +52,13 @@ export function Storefront({
 }) {
   const { design, browse, items, preview } = input;
   const current = items.filter((item) => !item.product.archived);
-  const filtered = collection(items, browse);
+  const scope = input.currency ?? USD_SCOPE;
+  const filtered = collection(items, browse, (cents) =>
+    displayMinor(cents, scope),
+  );
   const picked = items.find((item) => item.product.id === browse.productId);
   const first = current.find((item) => item.photoIds.length) ?? current[0];
-  const price = input.formatPrice ?? formatUsd;
+  const price = (cents: number) => formatDisplay(cents, scope);
   const suppliedHero = design.heroPhotoId
     ? input.photos.get(design.heroPhotoId)
     : undefined;
@@ -106,6 +118,7 @@ export function Storefront({
               </button>
             ))}
           </nav>
+          {input.currencyControl}
           {!preview && (
             <button
               className={styles.bag}
@@ -304,8 +317,8 @@ export function Storefront({
               </div>
               <AppliedFilters
                 filters={browse.filters}
-                price={price}
-                onChange={(filters) => actions.browse({ filters })}
+                price={(cents) => formatMinor(cents, scope.currency)}
+                onChange={(filters) => actions.browse({ filters }, scope)}
               />
               <p className={styles.resultCount} role="status">
                 {filtered.length}{" "}
@@ -783,7 +796,8 @@ function FilterSheet({
     opener = useRef<HTMLButtonElement>(null),
     [error, setError] = useState("");
   const { filters } = input.browse,
-    options = filterOptions(input.items);
+    options = filterOptions(input.items),
+    scope = input.currency ?? USD_SCOPE;
   const close = () => ref.current?.close();
   return (
     <>
@@ -810,16 +824,22 @@ function FilterSheet({
           </button>
         </div>
         <form
-          key={JSON.stringify(filters)}
+          key={JSON.stringify([
+            filters,
+            scope.currency,
+            scope.snapshot?.snapshotId,
+          ])}
           onSubmit={(event) => {
             event.preventDefault();
             const data = new FormData(event.currentTarget);
             const minimum = String(data.get("minPrice") ?? "").trim(),
               maximum = String(data.get("maxPrice") ?? "").trim();
-            const min = minimum ? parseUsd(minimum) : null,
-              max = maximum ? parseUsd(maximum) : null;
+            const min = minimum ? parseDisplay(minimum) : null,
+              max = maximum ? parseDisplay(maximum) : null;
             if ((min && !min.ok) || (max && !max.ok)) {
-              setError("Use a valid USD price with up to two decimal places.");
+              setError(
+                `Use a valid ${scope.currency} price with up to two decimal places.`,
+              );
               return;
             }
             const parsed = FiltersSchema.safeParse({
@@ -837,7 +857,7 @@ function FilterSheet({
               );
               return;
             }
-            actions.browse({ filters: parsed.data });
+            actions.browse({ filters: parsed.data }, scope);
             close();
           }}
         >
@@ -871,18 +891,20 @@ function FilterSheet({
             </select>
           </label>
           <fieldset className={styles.priceFields}>
-            <legend>Price range · USD</legend>
+            <legend>Price range · {scope.currency}</legend>
             <label>
               Minimum
               <input
                 name="minPrice"
                 inputMode="decimal"
-                maxLength={12}
+                maxLength={15}
                 placeholder="0.00"
                 defaultValue={
                   filters.minPrice === null
                     ? ""
-                    : (filters.minPrice / 100).toFixed(2)
+                    : formatMinor(filters.minPrice, scope.currency)
+                        .slice(1)
+                        .replaceAll(",", "")
                 }
               />
             </label>
@@ -891,12 +913,14 @@ function FilterSheet({
               <input
                 name="maxPrice"
                 inputMode="decimal"
-                maxLength={12}
+                maxLength={15}
                 placeholder="Any price"
                 defaultValue={
                   filters.maxPrice === null
                     ? ""
-                    : (filters.maxPrice / 100).toFixed(2)
+                    : formatMinor(filters.maxPrice, scope.currency)
+                        .slice(1)
+                        .replaceAll(",", "")
                 }
               />
             </label>
