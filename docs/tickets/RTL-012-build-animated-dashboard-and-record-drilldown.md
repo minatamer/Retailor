@@ -1,6 +1,6 @@
 # RTL-012 — Build the animated owner dashboard and exact drilldown
 
-Status: **Planned — not started**\
+Status: **Implemented locally — native zoom/physical/owner quality acceptance pending in RTL-019**\
 Planning date: **11 October 2026**\
 Milestone: **Dashboard showcase**\
 Depends on: [RTL-011](RTL-011-deliver-three-scenarios-and-owner-operations.md)\
@@ -56,15 +56,15 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Four headline KPIs and question-led panels use exact registered facts.
-- [ ] Charts remain visibly smooth and values immediately readable.
-- [ ] Hover/focus/tap/click and exact tables offer equivalent meaningful information.
-- [ ] Every significant value opens real contributor records with basis/exclusions.
-- [ ] Negative values, zero and unavailable/comparison states are handled correctly.
-- [ ] Product images/labels and inventory match the actual store.
-- [ ] Mutations and all three scenarios update facts/selection without stale data.
-- [ ] Responsive/keyboard/zoom layouts preserve actions and readable legends.
-- [ ] No animation-off or OS suppression behavior is added.
+- [x] Four headline KPIs and question-led panels use exact registered facts.
+- [x] Charts remain visibly smooth and values immediately readable.
+- [x] Hover/focus/tap/click and exact tables offer equivalent meaningful information.
+- [x] Every significant value opens real contributor records with basis/exclusions.
+- [x] Negative values, zero and unavailable/comparison states are handled correctly.
+- [x] Product images/labels and inventory match the actual store.
+- [x] Mutations and all three scenarios update facts/selection without stale data.
+- [ ] Responsive/keyboard/zoom layouts preserve actions and readable legends. — viewport/keyboard verified; native 200% zoom and physical matrix explicitly pending RTL-019.
+- [x] No animation-off or OS suppression behavior is added.
 
 ## Focused verification and evidence
 
@@ -100,4 +100,4 @@ No CAC/LTV/ROAS, real attribution, demand prediction, widget builder or independ
 
 Keep this outcome under `RTL-012:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-012.md` and actual check/review evidence under `docs/validation/RTL-012.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Implemented local criteria and actual observations are recorded in [RTL-012 validation](../validation/RTL-012.md). The unchecked combined quality criterion retains its native zoom/physical prerequisite under RTL-019; no unavailable check is claimed as passed. Ticket creation alone does not authorize paid runtime providers, Git mutations or cloud publication. Follow the user’s actual execution authorization when work starts.
