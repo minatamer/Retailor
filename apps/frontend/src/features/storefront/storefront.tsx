@@ -480,7 +480,9 @@ function ProductCard({
         </button>
         {!item.available && (
           <span className={styles.stockBadge}>
-            {!photos.length ? "Photo unavailable" : "Sold out"}
+            {photos.length !== item.product.imageIds.length
+              ? "Photo needs repair"
+              : "Sold out"}
           </span>
         )}
         {photos.length > 1 && (
@@ -652,8 +654,8 @@ function ProductDetail({
           <p className={styles.availability} role="status">
             {item.product.archived
               ? "Archived garment"
-              : !photos.length
-                ? "Photo unavailable"
+              : photos.length !== item.product.imageIds.length
+                ? "A saved photo needs repair"
                 : !item.available
                   ? "Currently sold out"
                   : selected

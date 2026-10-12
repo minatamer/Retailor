@@ -51,7 +51,7 @@ async function storeWithPlacedOrder(advance = 0, rateDate = "2026-10-05") {
   env.advance(advance);
   const controller = await env.open({
     currencyQuote: async () => quote(env.clock(), { rateDate }),
-    seed: (initial) => {
+    scenarioFactory: (initial) => {
       let graph = initial;
       const at = new Date(env.clock()).toISOString();
       const step = (action: Pick<CommerceCommand, "type" | "payload">) => {
@@ -90,7 +90,7 @@ async function storeWithPlacedOrder(advance = 0, rateDate = "2026-10-05") {
         },
       });
       step({ type: "placeOrder", payload: { draftId, orderId: env.id() } });
-      return graph;
+      return { graph, info: null };
     },
   });
   await controller.photos.add([file("one")]);

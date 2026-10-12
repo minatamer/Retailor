@@ -8,6 +8,28 @@ import type { Currency, CurrencyScope } from "@retailor/contracts/currency";
 import { validateSnapshot } from "@retailor/commerce/currency";
 import { requestCurrencyQuote } from "../currency/request";
 import { selectedScope } from "../currency/display";
+import { generateScenario } from "@retailor/commerce/scenarios";
+import type {
+  ScenarioPreset,
+  ScenarioInfo,
+} from "@retailor/contracts/scenarios";
+import { ScenarioPresetSchema } from "@retailor/contracts/scenarios";
+import { previewCommand } from "@retailor/commerce/effects";
+import { USD_SCOPE } from "@retailor/contracts/currency";
+import {
+  openOwnerForm,
+  editOwnerField,
+  ownerIntent,
+  OwnerFormSchema,
+  OwnerViewSchema,
+} from "../operations/state";
+import type {
+  OwnerForm,
+  OwnerField,
+  OwnerOperationType,
+  OwnerReview,
+  OwnerView,
+} from "../operations/state";
 import { INITIAL_SHOPPING, SHOPPER_INACTIVITY_MS } from "../bag/state";
 import type { CheckoutReview } from "../bag/state";
 import { bagEntries, bagWitness, bagTotals } from "../bag/quote";
@@ -89,9 +111,19 @@ interface SessionOptions {
   id?: () => string;
   cache?: (workspace: string, owner: string, expires: number) => PhotoCache;
   photos?: (cache: PhotoCache, expires: number) => PhotoController;
-  seed?: (catalogue: CommerceGraph) => CommerceGraph;
+  scenarioFactory?: (
+    catalogue: CommerceGraph,
+    preset: ScenarioPreset,
+    options: Parameters<typeof generateScenario>[2],
+  ) => { graph: CommerceGraph; info: ScenarioInfo | null };
   currencyQuote?: (signal: AbortSignal) => Promise<unknown>;
 }
+export type ScenarioReview = ReturnType<typeof generateScenario> & {
+  expectedRevision: number;
+  sourceScenarioId: string;
+  expiresAt: number;
+  photoWitness: string;
+};
 export interface SessionSnapshot {
   dialog: "reset" | "rebuild" | "leave-design" | null;
   state: Projection;
@@ -104,6 +136,11 @@ export interface SessionSnapshot {
   heroBusy: boolean;
   currencyBusy: boolean;
   currencyNotice: string;
+  ownerForm: OwnerForm | null;
+  ownerReview: OwnerReview | null;
+  ownerNotice: string;
+  ownerPhotoBusy: boolean;
+  scenarioReview: ScenarioReview | null;
   bagOpen: boolean;
   bagReceiptId: string | null;
   bagNotice: string;
@@ -153,6 +190,11 @@ export class SessionController {
       heroBusy: false,
       currencyBusy: false,
       currencyNotice: "",
+      ownerForm: null,
+      ownerReview: null,
+      ownerNotice: "",
+      ownerPhotoBusy: false,
+      scenarioReview: null,
       bagOpen: false,
       bagReceiptId: null,
       bagNotice: "",
@@ -186,6 +228,10 @@ export class SessionController {
       currency: structuredClone(INITIAL_CURRENCY),
       orderDisplays: [],
       shopping: structuredClone(INITIAL_SHOPPING),
+      scenario: null,
+      ownerView: "overview",
+      ownerSearch: "",
+      ownerPage: 0,
     };
   }
   static async open(options: SessionOptions) {
@@ -531,6 +577,438 @@ export class SessionController {
       filters: { ...state.browse.filters, minPrice: null, maxPrice: maximum },
     });
   }
+  ownerNavigate(view: OwnerView) {
+    if (!this.ownerAllowed() || !OwnerViewSchema.safeParse(view).success)
+      return;
+    this.state({
+      ownerView: view,
+      ownerSearch: "",
+      ownerPage: 0,
+      presentationRevision: this.snapshot.state.presentationRevision + 1,
+    });
+  }
+  ownerSearch(value: string) {
+    if (!this.ownerAllowed() || value.length > 100) return;
+    this.state({ ownerSearch: value, ownerPage: 0 });
+  }
+  ownerPage(value: number) {
+    if (
+      !this.ownerAllowed() ||
+      !Number.isInteger(value) ||
+      value < 0 ||
+      value > 16
+    )
+      return;
+    this.state({ ownerPage: value });
+  }
+  editOwnerReview() {
+    this.update({ ownerReview: null }, false);
+  }
+  private ownerAllowed() {
+    return (
+      this.valid() &&
+      this.snapshot.state.stage === "dashboard" &&
+      !this.snapshot.state.designEditing
+    );
+  }
+  openOwnerOperation(type: OwnerOperationType, targetId?: string) {
+    if (!this.ownerAllowed()) return;
+    this.photos.cancel();
+    try {
+      this.update(
+        {
+          ownerForm: openOwnerForm(
+            this.snapshot.state.graph,
+            type,
+            targetId,
+            this.id,
+          ),
+          ownerReview: null,
+          ownerPhotoBusy: false,
+          ownerNotice: "",
+          scenarioReview: null,
+        },
+        false,
+      );
+      this.protectDesignPhotos();
+    } catch {
+      this.update(
+        { ownerNotice: "That form is unavailable. Choose a current record." },
+        false,
+      );
+    }
+  }
+  closeOwnerOperation() {
+    this.photos.cancel();
+    this.update(
+      { ownerForm: null, ownerReview: null, ownerPhotoBusy: false },
+      false,
+    );
+    this.protectDesignPhotos();
+  }
+  editOwnerField(
+    field: OwnerField,
+    value: string,
+    origin: "human" | "suggestion" = "human",
+    expectedFormId = this.snapshot.ownerForm?.id,
+  ) {
+    if (
+      !this.ownerAllowed() ||
+      !this.snapshot.ownerForm ||
+      this.snapshot.ownerForm.id !== expectedFormId
+    )
+      return;
+    try {
+      const form = editOwnerField(
+        this.snapshot.ownerForm,
+        field,
+        value,
+        origin,
+      );
+      if (form !== this.snapshot.ownerForm)
+        this.update(
+          { ownerForm: form, ownerReview: null, ownerNotice: "" },
+          false,
+        );
+    } catch {
+      this.update(
+        { ownerNotice: "Keep this field within the demo’s supported values." },
+        false,
+      );
+    }
+  }
+  addOwnerVariant() {
+    if (
+      !this.ownerAllowed() ||
+      !this.snapshot.ownerForm ||
+      this.snapshot.ownerForm.variants.length >= 24
+    )
+      return;
+    const id = this.id();
+    this.editOwnerRows("variants", [
+      ...this.snapshot.ownerForm.variants,
+      {
+        id,
+        size: "New option",
+        colour: "Unconfirmed",
+        sku: `DEMO-${id.slice(0, 16)}`,
+        price: "60.00",
+        cost: "24.00",
+        stock: "10",
+        archived: false,
+      },
+    ]);
+  }
+  editOwnerRows<
+    K extends "variants" | "photoIds" | "lines" | "unitsSelection" | "refunds",
+  >(
+    key: K,
+    value: OwnerForm[K],
+    origin: "human" | "suggestion" = "human",
+    expectedFormId = this.snapshot.ownerForm?.id,
+  ) {
+    if (!this.ownerAllowed() || !this.snapshot.ownerForm) return;
+    if (this.snapshot.ownerForm.id !== expectedFormId) return;
+    const before = this.snapshot.ownerForm,
+      dirtyKey: OwnerForm["dirty"][number] =
+        key === "photoIds"
+          ? "photos"
+          : key === "variants"
+            ? "variants"
+            : key === "lines"
+              ? "lines"
+              : key === "unitsSelection"
+                ? "unitsSelection"
+                : "refunds";
+    if (origin === "suggestion" && before.dirty.includes(dirtyKey)) return;
+    const parsed = OwnerFormSchema.safeParse({
+      ...before,
+      [key]: value,
+      dirty:
+        origin === "human"
+          ? [...new Set([...before.dirty, dirtyKey])]
+          : before.dirty,
+    });
+    if (!parsed.success) {
+      this.update(
+        { ownerNotice: "That selection exceeds the supported form limits." },
+        false,
+      );
+      return;
+    }
+    if (
+      key === "photoIds" &&
+      parsed.data.photoIds.some((id) => !this.photos.availableIds().has(id))
+    ) {
+      this.update(
+        { ownerNotice: "Choose a validated available photo." },
+        false,
+      );
+      return;
+    }
+    this.update(
+      { ownerForm: parsed.data, ownerReview: null, ownerNotice: "" },
+      false,
+    );
+    this.protectDesignPhotos();
+  }
+  async uploadOwnerPhoto(file: NamedPhoto) {
+    if (
+      !this.ownerAllowed() ||
+      !this.snapshot.ownerForm ||
+      this.snapshot.ownerPhotoBusy
+    )
+      return;
+    const form = this.snapshot.ownerForm,
+      generation = this.generation,
+      photos = this.photos,
+      witness = JSON.stringify(form.photoIds);
+    this.update({ ownerPhotoBusy: true }, false);
+    try {
+      const ids = await photos.add([file], undefined, false),
+        id = ids[0];
+      if (
+        !this.active ||
+        generation !== this.generation ||
+        photos !== this.photos ||
+        this.snapshot.ownerForm?.id !== form.id ||
+        JSON.stringify(this.snapshot.ownerForm.photoIds) !== witness ||
+        !this.ownerAllowed()
+      )
+        return;
+      if (!id) {
+        this.update(
+          {
+            ownerNotice:
+              photos.getSnapshot().notice || "Choose a valid clothing photo.",
+          },
+          false,
+        );
+        return;
+      }
+      const state = this.snapshot.state,
+        descriptors = photos.descriptors(),
+        available = new Set(photos.availableIds());
+      const next = applyCommand(
+        state.graph,
+        this.makeCommand(state.graph, "registerPhotos", {
+          photos: descriptors.filter((p) => available.has(p.id)),
+        }),
+        {
+          now: new Date(this.clock()).toISOString(),
+          availablePhotoIds: available,
+        },
+      );
+      if (!next.ok) {
+        this.update({ ownerNotice: next.message }, false);
+        return;
+      }
+      const retained = new Map(state.photos.map((p) => [p.id, p]));
+      for (const p of descriptors) retained.set(p.id, p);
+      this.update({
+        state: freeze({
+          ...state,
+          graph: next.graph,
+          photos: [...retained.values()],
+        }),
+        ownerReview: null,
+        ownerNotice:
+          "Photo checked and available. Review the garment before creating it.",
+      });
+      this.editOwnerRows("photoIds", [
+        ...new Set([...this.snapshot.ownerForm.photoIds, id]),
+      ]);
+    } catch {
+      if (this.active && generation === this.generation)
+        this.update(
+          {
+            ownerNotice:
+              "That photo could not be added. Keep or choose another available photo.",
+          },
+          false,
+        );
+    } finally {
+      if (
+        this.active &&
+        generation === this.generation &&
+        this.snapshot.ownerForm?.id === form.id
+      )
+        this.update({ ownerPhotoBusy: false }, false);
+    }
+  }
+  reviewOwnerOperation() {
+    if (
+      !this.ownerAllowed() ||
+      !this.snapshot.ownerForm ||
+      this.snapshot.ownerPhotoBusy
+    )
+      return;
+    try {
+      const state = this.snapshot.state,
+        form = this.snapshot.ownerForm,
+        intent = ownerIntent(form, state.graph);
+      const command = this.makeCommand(
+        state.graph,
+        intent.type,
+        intent.payload,
+      );
+      const result = previewCommand(state.graph, command, {
+        now: new Date(this.clock()).toISOString(),
+        availablePhotoIds: this.photos.availableIds(),
+      });
+      if (!result.ok) {
+        this.update({ ownerReview: null, ownerNotice: result.message }, false);
+        return;
+      }
+      if (intent.type === "saveOrderDraft") {
+        const rows = intent.payload.lines.map((line) => ({
+          quantity: line.quantity,
+          unitPrice: state.graph.products
+            .flatMap((p) => p.variants)
+            .find((v) => v.id === line.variantId)!.price,
+        }));
+        bagTotals(
+          rows,
+          intent.payload.discount,
+          intent.payload.delivery,
+          intent.payload.tax,
+        );
+      }
+      this.update(
+        {
+          ownerReview: freeze({
+            command,
+            effect: result.effect,
+            formId: form.id,
+          }),
+          ownerNotice:
+            "Review the exact effects. Nothing has been applied yet.",
+        },
+        false,
+      );
+    } catch {
+      this.update(
+        {
+          ownerReview: null,
+          ownerNotice:
+            "Review the required fields, whole quantities, USD amounts and available photo.",
+        },
+        false,
+      );
+    }
+  }
+  confirmOwnerOperation(review: OwnerReview) {
+    if (
+      !this.ownerAllowed() ||
+      this.snapshot.ownerReview !== review ||
+      this.snapshot.ownerForm?.id !== review.formId
+    )
+      return;
+    const result = this.applyCommerce(review.command);
+    if (!result.ok) {
+      this.update({ ownerReview: null, ownerNotice: result.message }, false);
+      return;
+    }
+    this.closeOwnerOperation();
+    this.update(
+      {
+        ownerNotice:
+          "Applied once to this demo. Current records and storefront now reflect the reviewed effect.",
+      },
+      false,
+    );
+    this.protectDesignPhotos();
+    return result.receipt;
+  }
+  prepareScenario(preset: ScenarioPreset) {
+    if (!this.ownerAllowed() || !ScenarioPresetSchema.safeParse(preset).success)
+      return;
+    try {
+      const state = this.snapshot.state,
+        now = new Date(this.clock()).toISOString();
+      const generated = generateScenario(state.graph, preset, {
+        scenarioId: this.id(),
+        now,
+        availablePhotoIds: this.photos.availableIds(),
+      });
+      this.update(
+        {
+          scenarioReview: freeze({
+            ...generated,
+            expectedRevision: state.graph.revision,
+            sourceScenarioId: state.graph.scenarioId,
+            expiresAt: Math.min(
+              this.clock() + 120_000,
+              Date.parse(state.graph.expiresAt),
+            ),
+            photoWitness: JSON.stringify(
+              [...this.photos.availableIds()].sort(),
+            ),
+          }),
+          ownerNotice: "",
+        },
+        false,
+      );
+    } catch {
+      this.update(
+        {
+          scenarioReview: null,
+          ownerNotice:
+            "This story cannot be rebuilt from the current catalogue. Keep your existing records and review availability.",
+        },
+        false,
+      );
+    }
+  }
+  cancelScenario() {
+    this.update({ scenarioReview: null }, false);
+  }
+  confirmScenario(review: ScenarioReview) {
+    if (!this.ownerAllowed() || this.snapshot.scenarioReview !== review) return;
+    const state = this.snapshot.state;
+    if (
+      state.graph.revision !== review.expectedRevision ||
+      state.graph.scenarioId !== review.sourceScenarioId ||
+      this.clock() >= review.expiresAt ||
+      review.photoWitness !==
+        JSON.stringify([...this.photos.availableIds()].sort())
+    ) {
+      this.update(
+        {
+          scenarioReview: null,
+          ownerNotice:
+            "The catalogue, availability or records changed. Review this scenario again.",
+        },
+        false,
+      );
+      return;
+    }
+    this.cancelOperation();
+    this.photos.cancel();
+    this.update({
+      state: freeze({
+        ...state,
+        graph: review.graph,
+        ownerPage: 0,
+        scenario: review.info,
+        shopping: structuredClone(INITIAL_SHOPPING),
+        orderDisplays: [],
+      }),
+      scenarioReview: null,
+      ownerForm: null,
+      ownerReview: null,
+      ownerPhotoBusy: false,
+      checkoutReview: null,
+      bagOpen: false,
+      bagReceiptId: null,
+      heroBusy: false,
+      preparedLogo: null,
+      ownerNotice: review.bagChanged
+        ? "Business activity replaced. Bag selections were revalidated against the rebuilt stock/prices."
+        : "Business activity replaced. Your catalogue, photos and accepted look are preserved.",
+    });
+    this.protectDesignPhotos();
+  }
   private shoppingAllowed() {
     return (
       this.valid() &&
@@ -570,7 +1048,13 @@ export class SessionController {
         ok: false as const,
         message: "Return to your accepted store or owner workspace.",
       };
-    if (command.type === "placeOrder")
+    if (
+      command.type === "placeOrder" &&
+      !(
+        this.snapshot.state.stage === "dashboard" &&
+        this.snapshot.ownerReview?.command === command
+      )
+    )
       return {
         ok: false as const,
         message: "Review the order before placing it.",
@@ -582,6 +1066,7 @@ export class SessionController {
     if (result.ok) {
       this.update({
         checkoutReview: null,
+        ownerReview: null,
         bagNotice: this.snapshot.state.graph.bag.some(
           (line) =>
             !result.graph.bag.some((next) => next.variantId === line.variantId),
@@ -591,6 +1076,17 @@ export class SessionController {
         state: freeze({
           ...this.snapshot.state,
           graph: result.graph,
+          ownerPage: 0,
+          orderDisplays:
+            command.type === "placeOrder" &&
+            !this.snapshot.state.orderDisplays.some(
+              (item) => item.orderId === command.payload.orderId,
+            )
+              ? [
+                  ...this.snapshot.state.orderDisplays,
+                  { orderId: command.payload.orderId, scope: USD_SCOPE },
+                ]
+              : this.snapshot.state.orderDisplays,
           shopping: {
             ...this.snapshot.state.shopping,
             draftId: result.graph.orderDrafts.some(
@@ -679,8 +1175,10 @@ export class SessionController {
     return true;
   }
   openBag() {
-    if (!this.shopper(this.snapshot.state.graph.bag.length ? "bag" : "visit"))
-      return;
+    if (!this.shoppingAllowed()) return;
+    const tracked = this.shopper(
+      this.snapshot.state.graph.bag.length ? "bag" : "visit",
+    );
     this.update(
       {
         bagOpen: true,
@@ -688,7 +1186,7 @@ export class SessionController {
           ? null
           : this.snapshot.state.shopping.lastOrderId,
         checkoutReview: null,
-        bagNotice: "",
+        bagNotice: tracked ? "" : this.snapshot.bagNotice,
       },
       false,
     );
@@ -722,13 +1220,17 @@ export class SessionController {
       );
       return;
     }
-    if (!this.shopper("bag", productId)) return;
+    if (!this.shopper("bag", productId)) {
+      this.update({ bagOpen: true, bagReceiptId: null }, false);
+      return;
+    }
     const result = this.applyCommerce(
       this.makeCommand(this.snapshot.state.graph, "setBagLine", {
         variantId,
         quantity: combined,
       }),
     );
+    if (!result.ok) this.update({ bagOpen: true, bagReceiptId: null }, false);
     if (result.ok)
       this.update(
         {
@@ -1216,12 +1718,20 @@ export class SessionController {
       dispatch({ type: "registerPhotos", payload: { photos: draft.photos } });
       for (const item of items)
         dispatch({ type: "createProduct", payload: item.product });
-      if (this.options.seed) graph = this.options.seed(graph);
-      else if (draft.mode !== "development-fixture")
-        throw new Error("Scenario composition unavailable");
+      const composed = (this.options.scenarioFactory ?? generateScenario)(
+        graph,
+        "healthy",
+        {
+          scenarioId: graph.scenarioId,
+          now,
+          availablePhotoIds: context.availablePhotoIds,
+        },
+      );
+      graph = composed.graph;
       this.state(
         {
           graph,
+          scenario: composed.info,
           stage: "style",
           orderDisplays: [],
           shopping: structuredClone(INITIAL_SHOPPING),
@@ -1275,6 +1785,12 @@ export class SessionController {
       {
         heroBusy: false,
         preparedLogo: null,
+        ownerForm: ["storefront", "dashboard"].includes(stage)
+          ? this.snapshot.ownerForm
+          : null,
+        ownerReview: null,
+        ownerPhotoBusy: false,
+        scenarioReview: null,
         bagOpen: false,
         bagReceiptId: null,
         checkoutReview: null,
@@ -1423,6 +1939,7 @@ export class SessionController {
       presentationRevision: this.snapshot.state.presentationRevision + 1,
       stage: "storefront",
       hasAcceptedLook: true,
+      setup: { ...this.snapshot.state.setup, expanded: false },
       designEditing: false,
     });
     this.protectDesignPhotos();
@@ -1469,6 +1986,10 @@ export class SessionController {
     this.photos.protect([
       ...new Set([
         ...state.graph.products.flatMap((item) => item.imageIds),
+        ...state.graph.orders.flatMap((order) =>
+          order.lines.map((line) => line.photoId),
+        ),
+        ...(this.snapshot.ownerForm?.photoIds ?? []),
         ...[
           state.acceptedDesign.heroPhotoId,
           state.previewDesign.heroPhotoId,
@@ -1750,6 +2271,11 @@ export class SessionController {
       heroBusy: false,
       currencyBusy: false,
       currencyNotice: "",
+      ownerForm: null,
+      ownerReview: null,
+      ownerNotice: "",
+      ownerPhotoBusy: false,
+      scenarioReview: null,
       bagOpen: false,
       bagReceiptId: null,
       bagNotice: "",

@@ -73,7 +73,7 @@ export function bagWitness(graph: CommerceGraph, photos: ReadonlySet<string>) {
   });
 }
 export function bagTotals(
-  entries: readonly BagEntry[],
+  entries: readonly Pick<BagEntry, "unitPrice" | "quantity">[],
   discount = 0,
   delivery = 600,
   tax = 0,

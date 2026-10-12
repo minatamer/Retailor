@@ -79,7 +79,7 @@ export function storeItems(
         : null,
       available:
         !product.archived &&
-        photoIds.length > 0 &&
+        photoIds.length === product.imageIds.length &&
         variants.some(({ stock }) => stock > 0),
     };
   });

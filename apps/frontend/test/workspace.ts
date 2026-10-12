@@ -114,6 +114,7 @@ export function environment() {
           id,
           urls: { create: () => `blob:owned-${id()}`, revoke: () => undefined },
         }),
+      scenarioFactory: (graph) => ({ graph, info: null }),
       ...overrides,
     });
     controllers.push(controller);

@@ -4,6 +4,8 @@ import {
   OrderDisplaySchema,
 } from "@retailor/contracts/currency";
 import { validateSnapshot } from "@retailor/commerce/currency";
+import { OwnerViewSchema } from "../operations/state";
+import { ScenarioInfoSchema } from "@retailor/contracts/scenarios";
 import { ShoppingSchema, INITIAL_SHOPPING } from "../bag/state";
 import { z } from "zod";
 import { GraphSchema, TimestampSchema } from "@retailor/contracts/commerce";
@@ -54,6 +56,10 @@ export const ProjectionSchema = z.strictObject({
   currency: CurrencyPreferenceSchema.default(INITIAL_CURRENCY),
   orderDisplays: z.array(OrderDisplaySchema).max(30).default([]),
   shopping: ShoppingSchema.default(INITIAL_SHOPPING),
+  scenario: ScenarioInfoSchema.nullable().default(null),
+  ownerView: OwnerViewSchema.default("overview"),
+  ownerSearch: z.string().max(100).default(""),
+  ownerPage: z.number().int().min(0).max(16).default(0),
 });
 export type Projection = z.infer<typeof ProjectionSchema>;
 export const INITIAL_DESIGN = DesignSchema.parse({
@@ -119,6 +125,7 @@ export function restoreProjection(
     throw new Error("The saved catalogue draft is missing.");
   if (
     ["style", "storefront", "dashboard"].includes(state.stage) &&
+    !state.hasAcceptedLook &&
     !graph.products.some((product) => !product.archived)
   )
     throw new Error("The saved storefront has no usable catalogue.");
@@ -190,6 +197,10 @@ export function serializeProjection(state: Projection, now: number) {
     currency: state.currency,
     orderDisplays: state.orderDisplays,
     shopping: state.shopping,
+    scenario: state.scenario,
+    ownerView: state.ownerView,
+    ownerSearch: state.ownerSearch,
+    ownerPage: state.ownerPage,
   };
   const encoded = JSON.stringify(ProjectionSchema.parse(selected));
   if (serializedBytes(selected) > SESSION_BYTES)
