@@ -1,0 +1,163 @@
+[
+  {
+    "requested": {
+      "width": 320,
+      "height": 430
+    },
+    "observed": {
+      "card": {
+        "bottom": 413.5001602172851,
+        "left": 16,
+        "right": 289,
+        "top": 118.00016021728516
+      },
+      "clientWidth": 305,
+      "innerHeight": 430,
+      "innerWidth": 320,
+      "minimumTourButton": 44,
+      "scrollWidth": 305,
+      "target": {
+        "bottom": 783.703125,
+        "top": 693.703125
+      }
+    }
+  },
+  {
+    "requested": {
+      "width": 375,
+      "height": 812
+    },
+    "observed": {
+      "card": {
+        "bottom": 566.53125,
+        "left": 16,
+        "right": 344,
+        "top": 322.03125
+      },
+      "clientWidth": 360,
+      "innerHeight": 812,
+      "innerWidth": 375,
+      "minimumTourButton": 44,
+      "scrollWidth": 360,
+      "target": {
+        "bottom": 665.03125,
+        "top": 581.03125
+      }
+    }
+  },
+  {
+    "requested": {
+      "width": 768,
+      "height": 1024
+    },
+    "observed": {
+      "card": {
+        "bottom": 694.28125,
+        "left": 30.71875,
+        "right": 378.71875,
+        "top": 469.28125
+      },
+      "clientWidth": 753,
+      "innerHeight": 1024,
+      "innerWidth": 768,
+      "minimumTourButton": 44,
+      "scrollWidth": 753,
+      "target": {
+        "bottom": 455.28125,
+        "top": 399.28125
+      }
+    }
+  },
+  {
+    "requested": {
+      "width": 1024,
+      "height": 600
+    },
+    "observed": {
+      "card": {
+        "bottom": 390.71875,
+        "left": 40.953125,
+        "right": 388.953125,
+        "top": 165.71875
+      },
+      "clientWidth": 1009,
+      "innerHeight": 600,
+      "innerWidth": 1024,
+      "minimumTourButton": 44,
+      "scrollWidth": 1009,
+      "target": {
+        "bottom": 460.71875,
+        "top": 404.71875
+      }
+    }
+  },
+  {
+    "requested": {
+      "width": 1280,
+      "height": 900
+    },
+    "observed": {
+      "card": {
+        "bottom": 711.59375,
+        "left": 51.203125,
+        "right": 399.203125,
+        "top": 486.59375
+      },
+      "clientWidth": 1265,
+      "innerHeight": 900,
+      "innerWidth": 1280,
+      "minimumTourButton": 44,
+      "scrollWidth": 1265,
+      "target": {
+        "bottom": 472.59375,
+        "top": 416.59375
+      }
+    }
+  },
+  {
+    "requested": {
+      "width": 1440,
+      "height": 900
+    },
+    "observed": {
+      "card": {
+        "bottom": 716.8125,
+        "left": 57.59375,
+        "right": 405.59375,
+        "top": 491.8125
+      },
+      "clientWidth": 1425,
+      "innerHeight": 900,
+      "innerWidth": 1440,
+      "minimumTourButton": 44,
+      "scrollWidth": 1425,
+      "target": {
+        "bottom": 477.8125,
+        "top": 421.8125
+      }
+    }
+  },
+  {
+    "requested": {
+      "width": 1920,
+      "height": 1080
+    },
+    "observed": {
+      "card": {
+        "bottom": 731.8125,
+        "left": 232.5,
+        "right": 580.5,
+        "top": 506.8125
+      },
+      "clientWidth": 1905,
+      "innerHeight": 1080,
+      "innerWidth": 1920,
+      "minimumTourButton": 44,
+      "scrollWidth": 1905,
+      "target": {
+        "bottom": 492.8125,
+        "top": 436.8125
+      }
+    }
+  }
+]

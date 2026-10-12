@@ -1,6 +1,6 @@
 # RTL-013 — Deliver grounded Tailor conversation, tools and tours
 
-Status: **Planned — not started**\
+Status: **Locally implemented — clean validation; live/account and final native quality evidence pending RTL-020/019**\
 Planning date: **11 October 2026**\
 Milestone: **Copilot breadth**\
 Depends on: [RTL-006](RTL-006-deliver-live-catalogue-recognition-and-admission.md), [RTL-008](RTL-008-deliver-tailor-chat-led-styling-and-owner-overrides.md), [RTL-010](RTL-010-connect-shopping-bag-and-simulated-orders.md), [RTL-012](RTL-012-build-animated-dashboard-and-record-drilldown.md)\
@@ -63,16 +63,16 @@ The local choice/tour dispatcher is distinct from the model tool loop. A generat
 
 ## Acceptance criteria — required local outcome
 
-- [ ] One Tailor surface supports creator/shopper/owner capability contexts.
-- [ ] Introductions, summaries, tours, shortcuts and grounded explanations work.
-- [ ] Known shopping filters/navigation apply immediately and reversibly.
-- [ ] Currency budgets and unknown/stock constraints use actual current evidence.
-- [ ] Consequence-producing output is inert and reviewed through authored forms.
-- [ ] Tool/turn/body/token/deadline limits and paid-off behavior are server enforced.
-- [ ] References and monetary facts bind valid scope/revision/source basis.
-- [ ] Tours use registered mounted targets with clean focus/scroll behavior.
-- [ ] Stale/restored replies cannot execute or masquerade as current facts.
-- [ ] Outage leaves local controls useful without fake live fallback.
+- [x] One Tailor surface supports creator/shopper/owner capability contexts.
+- [x] Introductions, summaries, tours, shortcuts and grounded explanations work.
+- [x] Known shopping filters/navigation apply immediately and reversibly.
+- [x] Currency budgets and unknown/stock constraints use actual current evidence.
+- [x] Consequence-producing output is inert and reviewed through authored forms.
+- [x] Tool/turn/body/token/deadline limits and paid-off behavior are server enforced.
+- [x] References and monetary facts bind valid scope/revision/source basis.
+- [x] Tours use registered mounted targets with clean focus/scroll behavior.
+- [x] Stale/restored replies cannot execute or masquerade as current facts.
+- [x] Outage leaves local controls useful without fake live fallback.
 
 ## Focused verification and evidence
 
@@ -113,4 +113,4 @@ No browsing agent, general-purpose assistant, voice stack, vector store, backgro
 
 Keep this outcome under `RTL-013:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-013.md` and actual check/review evidence under `docs/validation/RTL-013.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Local implementation and all required gates are recorded in [RTL-013 validation](../validation/RTL-013.md), with [file allocation](../commit-plans/RTL-013.md) and [Tailor engineering](../engineering/TAILOR.md). Final settled gates: 259 tests/44 files, 127 boundary modules, both builds; clean read-only pass 4. Native fake-mode evidence covers EUR filtering, unknown/no-match recovery, exact negative-day/source/expense summaries, inert photo-required proposals and seven viewport sizes. Inline chat operations remain RTL-014. Live semantic/account/usage/retention evidence requires keys/budget/policy in RTL-020; physical/zoom/owner quality remains RTL-019. No paid or hosted acceptance is claimed. Owner authorization covers the planned ticket-prefixed local commits; no push or publication.

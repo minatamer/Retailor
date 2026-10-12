@@ -1,0 +1,12 @@
+{
+  "afterBack": {
+    "button": "Next →",
+    "tag": "BUTTON",
+    "title": "Choose the story’s time window"
+  },
+  "afterFinish": {
+    "button": "Take a tour",
+    "tag": "BUTTON",
+    "tourPresent": false
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "active": "tailor-prompt",
+  "draft": "Keep my draft while resizing",
+  "tourPresent": true,
+  "afterEscape": {
+    "active": "tailor-prompt",
+    "draft": "Keep my draft while resizing",
+    "tourPresent": false
+  }
+}
