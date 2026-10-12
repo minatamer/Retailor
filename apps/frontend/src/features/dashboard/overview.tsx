@@ -74,7 +74,7 @@ export function DashboardOverview() {
     .sort((a, b) => a.fact.numerator - b.fact.numerator);
   return (
     <div className={styles.overview}>
-      <div className={styles.scope}>
+      <div className={styles.scope} data-tailor-target="owner-scope">
         <div
           className={styles.segmented}
           role="group"
@@ -121,7 +121,7 @@ export function DashboardOverview() {
           · Inspect basis ↗
         </button>
       )}
-      <div className={styles.kpis}>
+      <div className={styles.kpis} data-tailor-target="owner-kpis">
         {headlines.map((fact) => (
           <button
             type="button"
@@ -184,7 +184,9 @@ export function DashboardOverview() {
             </button>
           ))}
       </div>
-      <SalesTrend model={model} />
+      <div data-tailor-target="owner-trend">
+        <SalesTrend model={model} />
+      </div>
       <div className={styles.panelGrid}>
         <RankedBars
           title="Which garments contribute?"

@@ -1,0 +1,76 @@
+.highlight {
+  position: fixed;
+  pointer-events: none;
+  border: 2px solid var(--platform-action);
+  border-radius: 16px;
+  box-shadow: 0 0 0 7px #6b805121;
+  z-index: 41;
+  transition:
+    top 0.24s var(--ease-out),
+    left 0.24s var(--ease-out),
+    width 0.24s var(--ease-out),
+    height 0.24s var(--ease-out);
+}
+.card {
+  position: fixed;
+  z-index: 42;
+  padding: 18px;
+  border: 1px solid var(--platform-line);
+  border-radius: 20px;
+  background: var(--platform-surface);
+  box-shadow: 0 14px 50px #20291c2a;
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  animation: enter 0.3s var(--ease-out) both;
+  color: var(--platform-text);
+}
+.card small {
+  color: var(--platform-muted);
+  font-size: 11px;
+}
+.card h2 {
+  font-size: 20px;
+  line-height: 1.2;
+  margin: 10px 0;
+}
+.card p {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+.card > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.card button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 9px 14px;
+  background: var(--platform-selected);
+  color: var(--platform-text);
+  border: 1px solid var(--platform-line);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.card button:last-child {
+  margin-left: auto;
+}
+.card button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.card button:focus-visible {
+  outline: 2px solid var(--platform-action);
+  outline-offset: 3px;
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

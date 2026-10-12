@@ -69,7 +69,12 @@ export function Storefront({
   useEffect(() => {
     const next = `${browse.page}:${browse.productId ?? ""}`;
     if (previous.current !== next) {
-      body.current?.focus({ preventScroll: true });
+      if (
+        !document.activeElement?.matches(
+          "input,textarea,[contenteditable=true]",
+        )
+      )
+        body.current?.focus({ preventScroll: true });
       frame.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     previous.current = next;
@@ -126,13 +131,26 @@ export function Storefront({
               disabled={!actions.openBag}
               onClick={actions.openBag}
               aria-label="Open shopping bag"
+              data-tailor-target="store-bag"
             >
               <Icon name="bag" />
               <span>Bag{input.bagCount ? ` (${input.bagCount})` : ""}</span>
             </button>
           )}
         </header>
-        <div className={styles.page} key={browse.page} ref={body} tabIndex={-1}>
+        <div
+          className={styles.page}
+          key={browse.page}
+          ref={body}
+          tabIndex={-1}
+          data-tailor-target={
+            browse.page === "home"
+              ? "store-home"
+              : browse.page === "collection"
+                ? "store-collection"
+                : "store-product"
+          }
+        >
           {browse.page === "home" && (
             <>
               {first ? (

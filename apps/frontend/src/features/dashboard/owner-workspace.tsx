@@ -49,7 +49,10 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
   const { controller, state, ownerForm, ownerNotice } = useSession();
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
-    heading.current?.focus({ preventScroll: true });
+    if (
+      !document.activeElement?.matches("input,textarea,[contenteditable=true]")
+    )
+      heading.current?.focus({ preventScroll: true });
   }, [state.ownerView]);
   const graph = state.graph,
     view = state.ownerView,
@@ -138,7 +141,7 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
         ))}
       </nav>
       <div className={styles.layout} data-form={!!ownerForm}>
-        <div className={styles.records}>
+        <div className={styles.records} data-tailor-target="owner-records">
           <h2 id="owner-register-heading" ref={heading} tabIndex={-1}>
             {VIEWS.find((v) => v.id === view)?.label}
           </h2>

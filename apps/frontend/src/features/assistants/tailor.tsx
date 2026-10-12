@@ -13,6 +13,9 @@ import { GarmentImage } from "../storefront/gallery";
 import { logoEligible, brandValues } from "./setup";
 import type { SetupStep } from "./setup";
 import styles from "./tailor.module.css";
+import { ConversationPanel } from "./conversation-panel";
+import { Tour } from "./tour";
+import { roleOf } from "./context";
 const PROMPTS: Record<SetupStep, { title: string; text: string }> = {
   introduction: {
     title: "Hello, possibility.",
@@ -52,7 +55,7 @@ const LABELS = {
   summary: "Ready",
   introduction: "Welcome",
 };
-/** One mounted shell; local finite actions precede grounded conversation in RTL-013. */
+/** One mounted shell for local styling and grounded role conversation. */
 export function Tailor() {
   const { controller, state, preparedLogo } = useSession();
   const visible = ["style", "storefront", "dashboard"].includes(state.stage);
@@ -63,6 +66,30 @@ export function Tailor() {
     conversation = useRef<HTMLDivElement>(null);
   const previous = useRef({ step: state.setup.step, expanded });
   const [viewport, setViewport] = useState({ height: 0, bottom: 0 });
+  const lastMessageId = state.conversation
+    .filter((m) => m.role === roleOf(state))
+    .at(-1)?.id;
+  useEffect(() => {
+    if (
+      !expanded ||
+      !lastMessageId ||
+      document.activeElement?.matches("input,textarea,[contenteditable=true]")
+    )
+      return;
+    const pane = conversation.current,
+      message = pane?.querySelector<HTMLElement>(
+        `[data-tailor-message="${CSS.escape(lastMessageId)}"]`,
+      );
+    if (pane && message)
+      pane.scrollTo({
+        top:
+          pane.scrollTop +
+          message.getBoundingClientRect().top -
+          pane.getBoundingClientRect().top -
+          14,
+        behavior: "smooth",
+      });
+  }, [lastMessageId, expanded]);
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
@@ -79,6 +106,27 @@ export function Tailor() {
       vv.removeEventListener("scroll", measure);
     };
   }, []);
+  useEffect(() => {
+    const pane = conversation.current,
+      active = document.activeElement;
+    if (
+      !pane ||
+      !(active instanceof HTMLElement) ||
+      !pane.contains(active) ||
+      !active.matches("input,textarea,[contenteditable=true]")
+    )
+      return;
+    const input = active.getBoundingClientRect(),
+      bounds = pane.getBoundingClientRect();
+    const delta =
+      input.bottom > bounds.bottom - 8
+        ? input.bottom - bounds.bottom + 8
+        : input.top < bounds.top + 8
+          ? input.top - bounds.top - 8
+          : 0;
+    if (delta)
+      pane.scrollTo({ top: pane.scrollTop + delta, behavior: "smooth" });
+  }, [viewport.height]);
   useEffect(() => {
     const last = previous.current;
     if (visible && last.expanded && !expanded)
@@ -366,12 +414,9 @@ export function Tailor() {
                     </>
                   )}
                 </div>
-                <p className={styles.note}>
-                  Conversation, product actions and guided tours arrive in the
-                  next Tailor capability.
-                </p>
               </article>
             )}
+            <ConversationPanel />
           </div>
           <footer className={styles.footer}>
             <span>
@@ -386,6 +431,7 @@ export function Tailor() {
           </footer>
         </section>
       )}
+      <Tour />
     </aside>
   );
 }
@@ -440,7 +486,7 @@ export function DesignChoices({
     (variant) => !variant.archived,
   )?.price;
   return (
-    <fieldset className={styles.choices}>
+    <fieldset className={styles.choices} data-tailor-target="tailor-choices">
       <legend>
         {kind === "template"
           ? "Complete storefront templates"
