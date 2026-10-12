@@ -46,6 +46,10 @@
     "./scenarios": {
       "types": "./dist/scenarios/generate.d.ts",
       "import": "./dist/scenarios/generate.js"
+    },
+    "./dashboard": {
+      "types": "./dist/dashboard.d.ts",
+      "import": "./dist/dashboard.js"
     }
   },
   "scripts": {

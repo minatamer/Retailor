@@ -9,6 +9,7 @@ import { parseGraph, freeze } from "./graph.js";
 import { stockOf, orderOf } from "./selectors.js";
 import { exactSum, exactProduct, roundRatio } from "./allocation.js";
 import { ensure } from "./errors.js";
+import { unitEvents } from "./unit-events.js";
 const refs = (kind: string, items: readonly { id: string }[]) =>
   items.map((item) => `${kind}:${item.id}`);
 const combine = (...groups: readonly string[][]) => [...new Set(groups.flat())];
@@ -277,25 +278,11 @@ export function facts(input: unknown, rawScope: unknown): MetricFact[] {
     "rating-hundredths",
     { denominator: feedback.length, scale: 100 },
   );
-  const placedUnits = exactSum(
-      placed.flatMap((order) => order.lines.map((line) => line.quantity)),
-    ),
-    cancelledUnits = exactSum(
-      cancellations.flatMap((item) =>
-        orderOf(graph, item.orderId).lines.map((line) => line.quantity),
-      ),
-    ),
-    returnedUnits = exactSum(
-      received.flatMap((item) => item.lines.map((line) => line.units.length)),
-    );
+  const units = unitEvents(graph, scope);
   fact(
     "net_units",
-    exactSum([placedUnits, -cancelledUnits, -returnedUnits]),
-    combine(
-      refs("order", placed),
-      refs("cancellation", cancellations),
-      refs("return", received),
-    ),
+    units.value,
+    units.contributors,
     "placed units − cancelled units − physically received units",
     "Placement/cancellation/receipt event dates",
     "count",
