@@ -1,0 +1,186 @@
+.panel {
+  background: var(--platform-surface);
+  border: 1px solid var(--platform-line);
+  border-radius: 22px;
+  padding: clamp(18px, 3vw, 32px);
+  min-width: 0;
+  animation: rise 0.3s var(--ease-out) both;
+  scroll-margin-top: 20px;
+}
+.panel h2 {
+  font-family: var(--font-editorial);
+  font-weight: 400;
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.2;
+  margin: 0 0 12px;
+}
+.panel p {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--platform-muted);
+}
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.field {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  margin: 16px 0;
+  min-width: 0;
+}
+.field input,
+.field select,
+.field textarea,
+.variants input,
+.lines select,
+.lines input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: var(--platform-text);
+  background: var(--platform-canvas);
+  border: 1px solid var(--platform-control-line);
+  border-radius: 10px;
+  font: inherit;
+}
+.field textarea {
+  resize: vertical;
+}
+.group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.upload {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px dashed var(--platform-control-line);
+  border-radius: 14px;
+  background: var(--platform-soft);
+  font-size: 13px;
+}
+.upload input {
+  max-width: 100%;
+  min-height: 44px;
+}
+.photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+.photos figure {
+  margin: 0;
+  width: 88px;
+}
+.photos img {
+  width: 88px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.photos button {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  font-size: 11px;
+  width: 100%;
+  color: var(--platform-text);
+  cursor: pointer;
+}
+.variants {
+  display: grid;
+  gap: 14px;
+}
+.variants fieldset {
+  border: 1px solid var(--platform-line);
+  padding: 14px;
+  border-radius: 12px;
+  min-width: 0;
+}
+.variants legend {
+  padding: 0 6px;
+  font-size: 12px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.actions > button {
+  flex: 1;
+}
+.lines {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0;
+}
+.lines article {
+  padding: 14px;
+  border: 1px solid var(--platform-line);
+  border-radius: 12px;
+  min-width: 0;
+}
+.check {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  font-size: 12px;
+}
+.check input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.effect {
+  border-radius: 14px;
+  background: var(--platform-soft);
+  padding: 18px;
+  margin: 20px 0;
+}
+.effect dl {
+  display: grid;
+  gap: 10px;
+}
+.effect dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+.effect dd {
+  margin: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.notice {
+  color: var(--feedback-success) !important;
+  overflow-wrap: anywhere;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 520px) {
+  .group {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .actions {
+    flex-direction: column;
+  }
+}

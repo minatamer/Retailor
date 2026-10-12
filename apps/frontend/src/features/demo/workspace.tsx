@@ -16,10 +16,8 @@ import { Tailor } from "../assistants/tailor";
 import { BagDialog } from "../bag/bag-dialog";
 import { CurrencyPicker } from "../currency/picker";
 import { selectedScope } from "../currency/display";
+import { OwnerWorkspace } from "../dashboard/owner-workspace";
 import { OwnerDesign } from "../store-design/owner-design";
-import { facts, allActivityScope } from "@retailor/commerce/facts";
-import { formatUsd } from "@retailor/commerce/money";
-import type { FactId } from "@retailor/contracts/facts";
 import styles from "./workspace.module.css";
 export function Workspace({
   fixtureAllowed,
@@ -202,7 +200,11 @@ function WorkspaceFlow() {
               <CollectionCanvas />
             </div>
           )}
-          {state.stage === "dashboard" && <OwnerBaseline />}
+          {state.stage === "dashboard" && (
+            <OwnerWorkspace
+              design={<OwnerDesign preview={<CollectionCanvas />} />}
+            />
+          )}
         </div>
         {missingPhotoIds.length > 0 && (
           <section className={styles.repair}>
@@ -349,91 +351,6 @@ function CollectionCanvas() {
           </Button>
         </div>
       )}
-    </>
-  );
-}
-function OwnerBaseline() {
-  const { controller, state } = useSession(),
-    values = facts(state.graph, allActivityScope(state.graph));
-  const cards: [FactId, string][] = [
-    ["net_sales", "Net merchandise"],
-    ["included_orders", "Placed orders"],
-    ["available_stock", "Available units"],
-    ["sold_cost", "Sold cost"],
-    ["expenses", "Operating expenses"],
-    ["operating_result", "Demo result"],
-  ];
-  return (
-    <>
-      <div className={styles.reviewHeading}>
-        <div>
-          <span className={styles.eyebrow}>Owner workspace</span>
-          <h1>
-            The same collection.
-            <br />
-            <em>A clearer picture.</em>
-          </h1>
-          <p>Your storefront and these figures share one valid record graph.</p>
-        </div>
-        <div className={styles.actionBar}>
-          {state.draft && (
-            <Button
-              variant="secondary"
-              onClick={() => controller.go("catalogue")}
-            >
-              Review or add garments
-            </Button>
-          )}
-          <Button
-            variant="secondary"
-            onClick={() => controller.go("storefront")}
-          >
-            View storefront
-          </Button>
-        </div>
-      </div>
-      <OwnerDesign preview={<CollectionCanvas />} />
-      <p className={styles.assumptions}>
-        Synthetic demo activity. Opening inventory and your local demo orders
-        share the same actual garment records.
-      </p>
-      <div className={styles.metricGrid}>
-        {cards.map(([id, label]) => {
-          const fact = values.find((value) => value.factId === id)!;
-          return (
-            <article key={id}>
-              <span>{label}</span>
-              <strong>
-                {fact.value === null
-                  ? "Unavailable"
-                  : fact.unit === "usd-cents"
-                    ? formatUsd(fact.value)
-                    : fact.value.toLocaleString("en-US")}
-              </strong>
-              <p>{fact.formula}</p>
-            </article>
-          );
-        })}
-      </div>
-      {state.shopping.lastOrderId && (
-        <section className={styles.repair}>
-          <h2>Your latest demo order</h2>
-          <p>{state.shopping.lastOrderId}</p>
-          <p>
-            {state.graph.orders
-              .find((item) => item.id === state.shopping.lastOrderId)
-              ?.lines.map(
-                (line) =>
-                  `${line.title} · ${line.size} · ${line.quantity} units`,
-              )
-              .join("; ")}
-          </p>
-        </section>
-      )}
-      <p className={styles.finePrint}>
-        All amounts and quantities come from the accepted products and immutable
-        linked records.
-      </p>
     </>
   );
 }
