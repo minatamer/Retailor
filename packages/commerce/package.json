@@ -38,6 +38,10 @@
     "./effects": {
       "types": "./dist/effects.d.ts",
       "import": "./dist/effects.js"
+    },
+    "./currency": {
+      "types": "./dist/currency.d.ts",
+      "import": "./dist/currency.js"
     }
   },
   "scripts": {

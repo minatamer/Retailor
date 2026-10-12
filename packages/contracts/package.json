@@ -50,6 +50,10 @@
     "./recognition": {
       "types": "./dist/recognition.d.ts",
       "import": "./dist/recognition.js"
+    },
+    "./currency": {
+      "types": "./dist/currency.d.ts",
+      "import": "./dist/currency.js"
     }
   },
   "scripts": {
