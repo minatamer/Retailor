@@ -5,12 +5,17 @@ import {
   RECOGNITION_LIMITS,
 } from "@retailor/contracts/recognition";
 import { AssistantActionSchema } from "@retailor/contracts/assistant";
+import { LogoActionSchema } from "@retailor/contracts/brand";
 import { publicError } from "@retailor/contracts/api";
 import type { PaidAdmission } from "./admission.js";
 import { SAFETY_COOKIE, safetyCookie } from "./safety-cookie.js";
 import { deny, OperationFailure } from "./errors.js";
 const RequestSchema = z.strictObject({
-  action: z.union([CatalogueActionSchema, AssistantActionSchema]),
+  action: z.union([
+    CatalogueActionSchema,
+    AssistantActionSchema,
+    LogoActionSchema,
+  ]),
   challengeProof: z.string().min(1).max(2048),
 });
 export function admissionRoutes(

@@ -10,6 +10,7 @@ export const DesignSchema = z.strictObject({
   name: z.string().min(1).max(40),
   headline: z.string().max(100),
   heroPhotoId: IdSchema.nullable().default(null),
+  logoId: IdSchema.nullable().optional(),
   revision: z.number().int().nonnegative().max(1_000_000),
 });
 export type Design = z.infer<typeof DesignSchema>;

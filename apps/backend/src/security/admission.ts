@@ -11,12 +11,13 @@ import {
 } from "@retailor/contracts/assistant";
 import { parsePaidAction } from "./paid-action.js";
 import type { PaidAction } from "./paid-action.js";
+import { parseLogoAction, LOGO_LIMITS } from "@retailor/contracts/brand";
 import { deny } from "./errors.js";
 
 export interface ChallengeVerifier {
   verify(
     proof: string,
-    action: "catalogue" | "assistant",
+    action: "catalogue" | "assistant" | "logos",
     signal: AbortSignal,
   ): Promise<boolean>;
 }
@@ -47,10 +48,12 @@ type Workspace = {
   expires: number;
   attempts: number;
   turns: number;
+  logoBatches: number;
   operations: Map<string, Attempt>;
   admitted: boolean;
 };
 export const CATALOGUE_RESERVE_MICRO_USD = 1_000_000;
+export const LOGO_RESERVE_MICRO_USD = 2_000_000;
 export interface AdmissionOptions {
   secret: string;
   challenge: ChallengeVerifier;
@@ -165,6 +168,7 @@ export class PaidAdmission {
         expires: Date.parse(action.expiresAt),
         attempts: 0,
         turns: 0,
+        logoBatches: 0,
         operations: new Map(),
         admitted: false,
       };
@@ -202,7 +206,14 @@ export class PaidAdmission {
     signal.throwIfAborted();
     this.sweep();
     const { value, digest } = this.action(input);
-    if (!this.hasBudget()) return deny("UNAVAILABLE", 503);
+    if (
+      !this.hasBudget(
+        value.action === "logos"
+          ? LOGO_RESERVE_MICRO_USD
+          : CATALOGUE_RESERVE_MICRO_USD,
+      )
+    )
+      return deny("UNAVAILABLE", 503);
     if (typeof proof !== "string" || !proof.length || proof.length > 2048)
       return deny("INVALID_INPUT", 400);
     const existing = this.workspaces.get(value.workspaceId);
@@ -210,7 +221,9 @@ export class PaidAdmission {
       existing &&
       ((value.action === "assistant"
         ? existing.turns >= ASSISTANT_LIMITS.turns
-        : existing.attempts >= RECOGNITION_LIMITS.attempts) ||
+        : value.action === "logos"
+          ? existing.logoBatches >= LOGO_LIMITS.batches
+          : existing.attempts >= RECOGNITION_LIMITS.attempts) ||
         existing.operations.has(value.operationId) ||
         existing.operations.size >= 24)
     )
@@ -279,6 +292,15 @@ export class PaidAdmission {
     }
     return { ...this.beginAction(action, grant, safety), action };
   }
+  beginLogos(input: unknown, grant: string, safety: string) {
+    let action;
+    try {
+      action = parseLogoAction(input);
+    } catch {
+      return deny("INVALID_INPUT", 400);
+    }
+    return { ...this.beginAction(action, grant, safety), action };
+  }
   private beginAction(input: PaidAction, grant: string, safety: string) {
     this.sweep();
     const { value, digest } = this.action(input),
@@ -306,11 +328,16 @@ export class PaidAdmission {
       !state ||
       (value.action === "assistant"
         ? state.turns >= ASSISTANT_LIMITS.turns
-        : state.attempts >= RECOGNITION_LIMITS.attempts)
+        : value.action === "logos"
+          ? state.logoBatches >= LOGO_LIMITS.batches
+          : state.attempts >= RECOGNITION_LIMITS.attempts)
     )
       return deny("FORBIDDEN", 403);
-    const reserve = CATALOGUE_RESERVE_MICRO_USD; // Provisional allowance, not an actual price claim.
-    if (!this.hasBudget()) return deny("UNAVAILABLE", 503);
+    const reserve =
+      value.action === "logos"
+        ? LOGO_RESERVE_MICRO_USD
+        : CATALOGUE_RESERVE_MICRO_USD; // Provisional allowance, not an actual price claim.
+    if (!this.hasBudget(reserve)) return deny("UNAVAILABLE", 503);
     if (this.leases.has(value.workspaceId) || this.leases.size >= 2)
       return deny("BUSY", 429);
     const lease = this.id();
@@ -331,6 +358,7 @@ export class PaidAdmission {
         )
           return deny("FORBIDDEN", 403);
         if (value.action === "assistant") state.turns++;
+        else if (value.action === "logos") state.logoBatches++;
         else state.attempts++;
         dispatched = true;
         attempt.status = "dispatched";
@@ -345,7 +373,10 @@ export class PaidAdmission {
           usage.input < 0 ||
           usage.input > 1_050_000 ||
           usage.output < 0 ||
-          usage.output > RECOGNITION_LIMITS.outputTokens
+          usage.output >
+            (value.action === "logos"
+              ? 100000
+              : RECOGNITION_LIMITS.outputTokens)
         )
           return;
         observedUsage = true;
@@ -378,9 +409,7 @@ export class PaidAdmission {
       unknownDispatches: this.unknownUsage,
     });
   }
-  hasBudget() {
-    return (
-      this.charged + CATALOGUE_RESERVE_MICRO_USD <= this.options.budgetMicroUsd
-    );
+  hasBudget(reserve = CATALOGUE_RESERVE_MICRO_USD) {
+    return this.charged + reserve <= this.options.budgetMicroUsd;
   }
 }

@@ -3,8 +3,106 @@ import { PaidAdmission } from "./admission.js";
 import { action } from "../../../../test/fixtures/recognition.js";
 import { turnstile } from "./turnstile.js";
 import type { AssistantAction } from "@retailor/contracts/assistant";
+import type { LogoAction } from "@retailor/contracts/brand";
 describe("action-bound one-use paid admission", () => {
   const secret = "s".repeat(32);
+  it("binds exact logo context, shares paid capacity and retains both batch reservations without a third dispatch", async () => {
+    const created = Date.now();
+    const gate = new PaidAdmission({
+      secret,
+      budgetMicroUsd: 10_000_000,
+      clock: () => created,
+      challenge: { verify: async () => true },
+    });
+    const safety = gate.safety(undefined).identity;
+    const logo = (operationId: string): LogoAction => ({
+      schemaVersion: 1,
+      action: "logos",
+      mode: "live",
+      workspaceId: "logos_workspace",
+      operationId,
+      createdAt: new Date(created).toISOString(),
+      expiresAt: new Date(created + 7200000).toISOString(),
+      nameDigest: "a".repeat(64),
+      theme: "ink",
+      typography: "editorial",
+      designRevision: 1,
+      count: 3,
+      promptPolicy: "clothing-brand-v1",
+      outputPolicy: "transparent-png-v1",
+      disclosureVersion: "brand-context-v1",
+    });
+    const first = logo("logo_1"),
+      grant = await gate.admit(
+        first,
+        "proof",
+        safety,
+        new AbortController().signal,
+      );
+    expect(() =>
+      gate.beginLogos({ ...first, theme: "pine" }, grant.grant, safety),
+    ).toThrow("FORBIDDEN");
+    expect(() =>
+      gate.beginLogos(
+        { ...first, nameDigest: "b".repeat(64) },
+        grant.grant,
+        safety,
+      ),
+    ).toThrow("FORBIDDEN");
+    const lease = gate.beginLogos(first, grant.grant, safety);
+    const text = {
+      schemaVersion: 1,
+      action: "assistant",
+      mode: "live",
+      role: "owner",
+      workspaceId: first.workspaceId,
+      operationId: "text",
+      scenarioId: "story",
+      dataRevision: 0,
+      createdAt: first.createdAt,
+      expiresAt: first.expiresAt,
+      disclosureVersion: "tailor-context-v1",
+      digest: "a".repeat(64),
+    };
+    const textGrant = await gate.admit(
+      text,
+      "proof",
+      safety,
+      new AbortController().signal,
+    );
+    expect(() => gate.beginAssistant(text, textGrant.grant, safety)).toThrow(
+      "BUSY",
+    );
+    lease.dispatch();
+    lease.finish();
+    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 2_000_000 });
+    expect(() => gate.beginLogos(first, grant.grant, safety)).toThrow(
+      "FORBIDDEN",
+    );
+    const retry = logo("logo_2"),
+      retryGrant = await gate.admit(
+        retry,
+        "proof",
+        safety,
+        new AbortController().signal,
+      );
+    const second = gate.beginLogos(retry, retryGrant.grant, safety);
+    second.dispatch();
+    second.recordUsage({ input: 100, output: 20000 });
+    second.finish();
+    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 4_000_000 });
+    expect(gate.usageCounters()).toEqual({
+      inputTokens: 100,
+      outputTokens: 20000,
+      unknownDispatches: 1,
+    });
+    await expect(
+      gate.admit(logo("logo_3"), "proof", safety, new AbortController().signal),
+    ).rejects.toThrow("FORBIDDEN");
+    const textLease = gate.beginAssistant(text, textGrant.grant, safety);
+    textLease.finish();
+    expect(gate.counters().reservedMicroUsd).toBe(4_000_000);
+  });
   const textAction = (
     operationId: string,
     created: number,
@@ -27,7 +125,8 @@ describe("action-bound one-use paid admission", () => {
     const start = Date.now();
     let now = start;
     const verify = vi.fn(
-        async (_proof: string, _action: "catalogue" | "assistant") => true,
+        async (_proof: string, _action: "catalogue" | "assistant" | "logos") =>
+          true,
       ),
       gate = new PaidAdmission({
         secret,
