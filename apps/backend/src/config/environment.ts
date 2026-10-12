@@ -26,6 +26,8 @@ const EnvironmentSchema = z
     FAKE_MODE: bool.default(true),
     PAID_DEMO_ENABLED: bool.default(false),
     LIVE_POLICY_APPROVED: bool.default(false),
+    LOGO_GENERATION_ENABLED: bool.default(false),
+    LOGO_POLICY_APPROVED: bool.default(false),
     PROCESS_BUDGET_MICRO_USD: z.coerce
       .number()
       .int()

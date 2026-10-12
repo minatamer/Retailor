@@ -5,6 +5,7 @@ import type { Runtime } from "../runtime/compose.js";
 import { recognitionRoutes } from "../catalogue/routes.js";
 import { currencyRoutes } from "../currency/routes.js";
 import { assistantRoutes } from "../assistants/routes.js";
+import { logoRoutes } from "../brand/routes.js";
 import { admissionRoutes } from "../security/admission-routes.js";
 import { OperationFailure } from "../security/errors.js";
 export function createApp(runtime: Runtime): Express {
@@ -43,6 +44,7 @@ export function createApp(runtime: Runtime): Express {
   admissionRoutes(app, runtime.recognition?.admission, runtime.frontendOrigin);
   recognitionRoutes(app, runtime.recognition);
   assistantRoutes(app, runtime.assistant);
+  logoRoutes(app, runtime.logos);
   currencyRoutes(app, runtime.currency);
   app.use((_req, res) => {
     res.status(404).json(publicError("NOT_FOUND", res.locals.requestId));

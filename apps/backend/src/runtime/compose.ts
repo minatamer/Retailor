@@ -3,6 +3,7 @@ import type { Environment } from "../config/environment.js";
 import {
   PaidAdmission,
   CATALOGUE_RESERVE_MICRO_USD,
+  LOGO_RESERVE_MICRO_USD,
 } from "../security/admission.js";
 import { turnstile } from "../security/turnstile.js";
 import { openAiCatalogue } from "../catalogue/provider.js";
@@ -13,6 +14,10 @@ import type { AssistantRuntime } from "../assistants/routes.js";
 import type { AssistantProvider } from "../assistants/provider.js";
 import { fixtureAssistant } from "../assistants/fake.js";
 import { openAiAssistant } from "../providers/assistant.js";
+import type { LogoRuntime } from "../brand/routes.js";
+import type { LogoProvider } from "../brand/provider.js";
+import { fixtureLogos } from "../brand/fake.js";
+import { openAiLogos } from "../providers/logos.js";
 export interface Runtime {
   capabilities: Capabilities;
   ready: boolean;
@@ -22,6 +27,7 @@ export interface Runtime {
   recognition?: RecognitionRuntime;
   currency?: CurrencyService;
   assistant?: AssistantRuntime;
+  logos?: LogoRuntime;
 }
 export function composeRuntime(
   env: Environment,
@@ -52,6 +58,10 @@ export function composeRuntime(
     environment.FAKE_MODE
       ? fixtureAssistant()
       : openAiAssistant(environment.OPENAI_API_KEY),
+  logoFactory: (environment: Environment) => LogoProvider = (environment) =>
+    environment.FAKE_MODE
+      ? fixtureLogos()
+      : openAiLogos(environment.OPENAI_API_KEY),
 ): Runtime {
   const mode = env.FAKE_MODE ? "fake" : "live";
   const unavailable = {
@@ -81,6 +91,18 @@ export function composeRuntime(
           ...(recognition ? { admission: recognition.admission } : {}),
         }
       : undefined;
+  const logos: LogoRuntime | undefined =
+    env.FAKE_MODE ||
+    (recognition &&
+      env.LOGO_GENERATION_ENABLED &&
+      env.LOGO_POLICY_APPROVED &&
+      env.PROCESS_BUDGET_MICRO_USD >= LOGO_RESERVE_MICRO_USD)
+      ? {
+          mode,
+          provider: logoFactory(env),
+          ...(recognition ? { admission: recognition.admission } : {}),
+        }
+      : undefined;
   return {
     ready: env.FAKE_MODE || enabled,
     revision: env.APP_REVISION,
@@ -89,6 +111,7 @@ export function composeRuntime(
     currency,
     ...(recognition ? { recognition } : {}),
     ...(assistant ? { assistant } : {}),
+    ...(logos ? { logos } : {}),
     get capabilities(): Capabilities {
       const available = enabled && !!recognition?.admission.hasBudget();
       return {
@@ -106,7 +129,18 @@ export function composeRuntime(
           : enabled
             ? { available, reason: available ? "ready" : "unavailable" }
             : unavailable,
-        logos: unavailable,
+        logos: env.FAKE_MODE
+          ? { available: true, reason: "fixture" }
+          : logos
+            ? {
+                available: !!recognition?.admission.hasBudget(
+                  LOGO_RESERVE_MICRO_USD,
+                ),
+                reason: recognition?.admission.hasBudget(LOGO_RESERVE_MICRO_USD)
+                  ? "ready"
+                  : "unavailable",
+              }
+            : unavailable,
         eur: { available: true, reason: env.FAKE_MODE ? "fixture" : "ready" },
       };
     },

@@ -1,0 +1,41 @@
+import sharp from "sharp";
+import type { LogoProvider } from "./provider.js";
+import { BRAND_PALETTE } from "./context.js";
+const xml = (text: string) =>
+  text.replace(
+    /[&<>"']/g,
+    (char) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&apos;",
+      })[char]!,
+  );
+/** Authored development raster directions. No live generation, semantic quality claim or failure fallback. */
+export function fixtureLogos(): LogoProvider {
+  return {
+    async generate(context, signal, accounting) {
+      signal.throwIfAborted();
+      accounting.dispatch();
+      const palette = BRAND_PALETTE[context.theme];
+      const symbols = [
+        `<circle cx="155" cy="512" r="58" fill="none" stroke="${palette.accent}" stroke-width="6"/><text x="155" y="541" text-anchor="middle" font-size="82" fill="${palette.ink}">${xml(Array.from(context.name)[0]!)}</text>`,
+        `<path d="M98 470 L155 425 L212 470 L155 590 Z M98 470 L155 510 L212 470" fill="none" stroke="${palette.accent}" stroke-width="7" stroke-linejoin="round"/>`,
+        `<path d="M96 556 Q155 400 214 556 M110 534 H200" fill="none" stroke="${palette.accent}" stroke-width="8" stroke-linecap="round"/>`,
+      ];
+      const rows: Uint8Array[] = [];
+      for (let index = 0; index < 3; index++) {
+        signal.throwIfAborted();
+        const font =
+          context.typography === "editorial" ? "serif" : "sans-serif";
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024"><g font-family="${font}">${symbols[index]}<text x="600" y="541" text-anchor="middle" font-size="86" font-weight="${index === 1 ? 600 : 400}" fill="${palette.ink}" textLength="650" lengthAdjust="spacingAndGlyphs">${xml(context.name)}</text>${index === 2 ? `<path d="M280 575 H920" stroke="${palette.accent}" stroke-width="3"/>` : ""}</g></svg>`;
+        rows.push(
+          await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer(),
+        );
+      }
+      return rows;
+    },
+  };
+}
