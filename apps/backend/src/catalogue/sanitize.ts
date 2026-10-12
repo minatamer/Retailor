@@ -5,6 +5,20 @@ import {
   RecognitionManifestSchema,
 } from "@retailor/contracts/photos";
 import { inspectRaster } from "@retailor/contracts/raster";
+import { ImageCapacity, IMAGE_WORKER_LIMITS } from "./image-capacity.js";
+import { deny } from "../security/errors.js";
+export type ImageDecoder = (
+  bytes: Uint8Array,
+  width: number,
+  height: number,
+  signal: AbortSignal,
+) => Promise<Uint8Array>;
+export interface SanitizerPorts {
+  capacity?: ImageCapacity;
+  decode?: ImageDecoder;
+  rss?: () => number;
+}
+const processCapacity = new ImageCapacity();
 
 function decode(
   bytes: Uint8Array,
@@ -60,17 +74,18 @@ function decode(
     if (signal.aborted) abort();
   });
 }
-/** One worker at a time; parent owns the deadline, cancellation and exact input hash. */
+/** Two bounded request loops share two process-wide native slots; retain one result per loop until ordered commit. */
 export async function prepareProviderImages(
   manifestInput: unknown,
   files: ReadonlyMap<string, Uint8Array>,
   signal: AbortSignal,
+  ports: SanitizerPorts = {},
 ) {
+  signal.throwIfAborted();
   const manifest = RecognitionManifestSchema.parse(manifestInput);
   if (files.size !== manifest.length)
     throw new Error("Image coverage mismatch");
-  const output = new Map<string, Uint8Array>();
-  let total = 0;
+  // Check every submitted identity before creating any native worker.
   for (const image of manifest) {
     signal.throwIfAborted();
     const bytes = files.get(image.id);
@@ -88,11 +103,75 @@ export async function prepareProviderImages(
       header.privateMetadata
     )
       throw new Error("Image manifest mismatch");
-    const sanitized = await decode(bytes, image.width, image.height, signal);
-    total += sanitized.length;
-    if (total > PHOTO_LIMITS.derivatives)
-      throw new Error("Sanitized batch exceeds envelope");
-    output.set(image.id, sanitized);
   }
-  return output;
+  const owner = new AbortController(),
+    owned = AbortSignal.any([signal, owner.signal]);
+  const capacity = ports.capacity ?? processCapacity,
+    decoder = ports.decode ?? decode,
+    rss = ports.rss ?? (() => process.memoryUsage.rss());
+  const completions = manifest.map(() => {
+    let resolve!: () => void;
+    const done = new Promise<void>((finish) => {
+      resolve = finish;
+    });
+    return { done, resolve };
+  });
+  const output = new Map<string, Uint8Array>();
+  let cursor = 0,
+    total = 0,
+    failure: { error: unknown } | undefined;
+  const run = async () => {
+    while (!owned.aborted && cursor < manifest.length) {
+      const index = cursor++,
+        image = manifest[index]!;
+      try {
+        const release = await capacity.enter(owned);
+        let sanitized: Uint8Array;
+        try {
+          owned.throwIfAborted();
+          if (rss() >= IMAGE_WORKER_LIMITS.rssBytes) return deny("BUSY", 429);
+          sanitized = await decoder(
+            files.get(image.id)!,
+            image.width,
+            image.height,
+            owned,
+          );
+        } finally {
+          release();
+        }
+        if (
+          !(sanitized instanceof Uint8Array) ||
+          !sanitized.length ||
+          sanitized.length > PHOTO_LIMITS.derivative
+        )
+          throw new Error("Invalid sanitized image");
+        if (index) await completions[index - 1]!.done;
+        owned.throwIfAborted();
+        total += sanitized.length;
+        if (total > PHOTO_LIMITS.derivatives)
+          throw new Error("Sanitized batch exceeds envelope");
+        output.set(image.id, sanitized);
+      } catch (error) {
+        failure ??= { error };
+        owner.abort(error);
+      } finally {
+        completions[index]!.resolve();
+      }
+    }
+  };
+  try {
+    // Await every owned decoder's termination, even when a sibling fails first.
+    await Promise.allSettled(
+      Array.from(
+        { length: Math.min(IMAGE_WORKER_LIMITS.active, manifest.length) },
+        run,
+      ),
+    );
+    if (failure) throw failure.error;
+    owned.throwIfAborted();
+    return output;
+  } finally {
+    owner.abort();
+    if (failure || signal.aborted) output.clear();
+  }
 }

@@ -8,12 +8,13 @@ import type { PaidAdmission } from "../security/admission.js";
 import type { CatalogueProvider } from "./provider.js";
 import { OperationFailure, deny } from "../security/errors.js";
 import { receiveCatalogue } from "./multipart.js";
-import { prepareProviderImages } from "./sanitize.js";
+import { prepareProviderImages, type SanitizerPorts } from "./sanitize.js";
 import { reconcileCatalogue } from "./reconcile.js";
 import { safetyCookie } from "../security/safety-cookie.js";
 export interface RecognitionRuntime {
   admission: PaidAdmission;
   provider: CatalogueProvider;
+  sanitizer?: SanitizerPorts;
 }
 /** Allow only a small already-in-flight tail to drain so a limit error can reach
  * the client. An unbounded/slow remainder is closed, never buffered or decoded. */
@@ -79,8 +80,11 @@ export function recognitionRoutes(
           lease.action.photos.map((photo) => photo.derivative),
           input.files,
           owned.signal,
+          runtime!.sanitizer,
         );
-      } catch {
+      } catch (error) {
+        if (!owned.signal.aborted && error instanceof OperationFailure)
+          throw error;
         return deny(
           owned.signal.aborted ? "DEADLINE" : "INVALID_INPUT",
           owned.signal.aborted ? 504 : 400,

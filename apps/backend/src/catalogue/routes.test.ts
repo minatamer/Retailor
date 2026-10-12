@@ -9,6 +9,8 @@ import { parseEnvironment } from "../config/environment.js";
 import { PaidAdmission } from "../security/admission.js";
 import { action, observation } from "../../../../test/fixtures/recognition.js";
 import { prepareProviderImages } from "./sanitize.js";
+import type { SanitizerPorts } from "./sanitize.js";
+import { ImageCapacity, IMAGE_WORKER_LIMITS } from "./image-capacity.js";
 import { inspectRaster } from "@retailor/contracts/raster";
 import { SampleManifestSchema } from "@retailor/contracts/photos";
 import type { CatalogueAction } from "@retailor/contracts/recognition";
@@ -32,7 +34,7 @@ async function image(id = "source", colour = "#123456") {
   };
   return { bytes, photo: { id, source: descriptor, derivative: descriptor } };
 }
-function harness() {
+function harness(sanitizer?: SanitizerPorts) {
   const gate = new PaidAdmission({
     secret: "s".repeat(32),
     budgetMicroUsd: 10_000_000,
@@ -56,7 +58,11 @@ function harness() {
   const base = composeRuntime(parseEnvironment({}), () => "request_test");
   const app = createApp({
     ...base,
-    recognition: { admission: gate, provider },
+    recognition: {
+      admission: gate,
+      provider,
+      ...(sanitizer ? { sanitizer } : {}),
+    },
   });
   return { app, gate, provider };
 }
@@ -75,6 +81,70 @@ async function admit(
   };
 }
 describe("bounded admission and actual multipart recognition", () => {
+  it("reports native capacity pressure safely before provider dispatch and releases its unspent reservation", async () => {
+    const capacity = new ImageCapacity(),
+      h = harness({ capacity, rss: () => IMAGE_WORKER_LIMITS.rssBytes }),
+      input = await image();
+    const value = { ...action(), photos: [input.photo] },
+      approved = await admit(h.app, value);
+    const result = await request(h.app)
+      .post("/v1/catalogue/interpret")
+      .set("Origin", origin)
+      .set("Cookie", approved.cookie)
+      .field(
+        "manifest",
+        JSON.stringify({ action: value, grant: approved.grant }),
+      )
+      .attach(input.photo.id, input.bytes, {
+        filename: "preview",
+        contentType: "image/jpeg",
+      });
+    expect(result.status).toBe(429);
+    expect(result.body.error.code).toBe("BUSY");
+    expect(h.provider.interpret).not.toHaveBeenCalled();
+    expect(capacity.counters()).toEqual({ active: 0, waiting: 0 });
+    expect(h.gate.counters()).toEqual({ active: 0, reservedMicroUsd: 0 });
+  });
+  it("does not release admission or dispatch the provider while a failed sibling still awaits native termination", async () => {
+    const capacity = new ImageCapacity(),
+      jobs: { signal: AbortSignal; reject(error: Error): void }[] = [];
+    const h = harness({
+      capacity,
+      rss: () => 0,
+      decode: (_bytes, _width, _height, signal) =>
+        new Promise((_resolve, reject) => {
+          jobs.push({ signal, reject });
+        }),
+    });
+    const inputs = [await image("one"), await image("two", "#234567")],
+      value = { ...action(), photos: inputs.map((input) => input.photo) },
+      approved = await admit(h.app, value);
+    const submit = request(h.app)
+      .post("/v1/catalogue/interpret")
+      .set("Origin", origin)
+      .set("Cookie", approved.cookie)
+      .field(
+        "manifest",
+        JSON.stringify({ action: value, grant: approved.grant }),
+      );
+    for (const input of inputs)
+      submit.attach(input.photo.id, input.bytes, {
+        filename: "preview",
+        contentType: "image/jpeg",
+      });
+    const pending = submit.then((result) => result);
+    await vi.waitFor(() => expect(jobs).toHaveLength(2));
+    jobs[1]!.reject(new Error("invalid pixels"));
+    await vi.waitFor(() => expect(jobs[0]!.signal.aborted).toBe(true));
+    expect(capacity.counters()).toEqual({ active: 1, waiting: 0 });
+    expect(h.gate.counters()).toEqual({ active: 1, reservedMicroUsd: 1000000 });
+    expect(h.provider.interpret).not.toHaveBeenCalled();
+    jobs[0]!.reject(new Error("termination finished"));
+    expect((await pending).status).toBe(400);
+    expect(capacity.counters()).toEqual({ active: 0, waiting: 0 });
+    expect(h.gate.counters()).toEqual({ active: 0, reservedMicroUsd: 0 });
+    expect(h.provider.interpret).not.toHaveBeenCalled();
+  });
   it("accepts the exact 24-file plus one-manifest multipart boundary", async () => {
     const h = harness(),
       batch = await Promise.all(

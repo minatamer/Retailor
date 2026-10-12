@@ -12,6 +12,7 @@
     "test/**/*.ts",
     "test/**/*.mjs",
     "apps/**/*.test.ts",
+    "apps/backend/test/**/*.ts",
     "packages/**/*.test.ts",
     "vitest.config.ts"
   ]
