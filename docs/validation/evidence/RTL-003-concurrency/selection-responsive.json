@@ -1,0 +1,107 @@
+[
+  {
+    "ancestors": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cardCount": 15,
+    "documentOverflow": 0,
+    "height": 430,
+    "pickerOverflow": 0,
+    "width": 320
+  },
+  {
+    "ancestors": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cardCount": 15,
+    "documentOverflow": 0,
+    "height": 812,
+    "pickerOverflow": 0,
+    "width": 375
+  },
+  {
+    "ancestors": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cardCount": 15,
+    "documentOverflow": 0,
+    "height": 1024,
+    "pickerOverflow": 0,
+    "width": 768
+  },
+  {
+    "ancestors": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cardCount": 15,
+    "documentOverflow": 0,
+    "height": 600,
+    "pickerOverflow": 0,
+    "width": 1024
+  },
+  {
+    "ancestors": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cardCount": 15,
+    "documentOverflow": 0,
+    "height": 900,
+    "pickerOverflow": 0,
+    "width": 1280
+  },
+  {
+    "ancestors": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cardCount": 15,
+    "documentOverflow": 0,
+    "height": 900,
+    "pickerOverflow": 0,
+    "width": 1440
+  },
+  {
+    "ancestors": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cardCount": 15,
+    "documentOverflow": 0,
+    "height": 1080,
+    "pickerOverflow": 0,
+    "width": 1920
+  }
+]

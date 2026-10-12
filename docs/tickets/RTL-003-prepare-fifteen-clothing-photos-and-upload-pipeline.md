@@ -1,6 +1,6 @@
 # RTL-003 — Prepare fifteen clothing photos and the bounded upload pipeline
 
-Status: **Implemented locally — owner/zoom and live recognition evidence pending in owning follow-on tickets**\
+Status: **Local outcome and browser image-concurrency follow-up verified; external evidence pending**\
 Planning date: **11 October 2026**\
 Milestone: **Product inputs**\
 Depends on: [RTL-001](RTL-001-initialize-workspace-contracts-and-safe-runtime.md), [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md)\
@@ -65,6 +65,18 @@ Paths describe future ownership. Create modules/directories only with real behav
 - [x] Owner and Tailor reuse a mandatory-photo validation seam.
 - [x] Picking photos and choosing the sample dispatch zero model calls.
 - [x] Object URLs, owned cache and unavailable-photo behavior are correct.
+
+## Latest owner follow-up — bounded image concurrency
+
+On 12 October 2026 the owner required thorough Retrosum concurrency research, an owning-ticket plan and priority for past tickets. The original outcome remains implemented; [the researched design](../engineering/IMAGE-CONCURRENCY.md) adds a prioritized local follow-up before RTL-006’s separate sanitizer follow-up and RTL-016. Use two bounded browser jobs, stable input-order commits, source/count reservations, a shared two-worker/24-MP active decode gate, two fixed sample fetches, all-slot cancel/stale/reset ownership and truthful completed-photo progress. Keep ten-second active-worker deadlines, all existing cached/retained image limits, single-photo/native controls, paid-off behavior and designed motion. No per-photo inference fan-out is requested.
+
+- [x] Two actual local decodes can overlap while result buffering stays at most two and original selection/duplicate order stays stable.
+- [x] Source/count and active pixel budgets precede large allocation; quota pressure waits for earlier outcomes instead of prematurely rejecting valid later files.
+- [x] Upload, sample loading and cached verification use bounded foreground work with all-slot cancellation and no queued late starts.
+- [x] Meaningful reversed/failure/duplicate/quota/cancel tests and actual fifteen-photo local browser observations are recorded.
+- [x] Settled required gates and read-only review are clean; actual timings are separate from simulated/live/hosted claims.
+
+The following original verification matrix stays applicable; no original requirement is waived.
 
 ## Focused verification and evidence
 

@@ -4,7 +4,7 @@
 **Prepared:** 11 October 2026.\
 **Product:** Retailor. **Sample clothing brand:** FORME.\
 **Companion:** [Retailor product overview](RETAILOR_OVERVIEW.html).\
-**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–015 locally implemented, next eligible packet RTL-016; owner visual/device/zoom and paid evidence remain separately pending.\
+**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–015 locally implemented, next prioritized work RTL-006 image-concurrency follow-up, then RTL-016; owner visual/device/zoom and paid evidence remain separately pending.\
 **Signature promise:** **Bring your products. See your store.**\
 **Owner decisions incorporated:** all eleven answers on clothing-only scope, researched presets, Tailor-led setup, optional logos, mandatory photos, catalogue integrity, three scenarios, live sample processing, runway direction, image sourcing and USD/EUR; 11 October 2026.
 
@@ -397,6 +397,8 @@ HEIC, animated GIF/WebP, SVG, archives, URLs and videos receive specific unsuppo
 7. Bind the selected derivative manifest to the eventual processing approval.
 
 Backend validation repeats the derivative signature, size, dimension, hash and decoding checks independently. The backend never trusts a browser statement that a photo is safe. Reject excess data while streaming, even when Content-Length is absent or false.
+
+Latest owner performance instruction (12 October): overlap bounded image processing while preserving the photo order and all resource/cleanup rules. [Retrosum research and the owning plan](engineering/IMAGE-CONCURRENCY.md) prioritizes RTL-003’s two-item local sample/decode/recovery pipeline with ordered commits and a shared two-worker/24-MP active bitmap budget, then RTL-006’s independently bounded backend sanitizer. Keep one joint catalogue model request so multiple views can be grouped consistently; no per-photo inference fan-out, extra paid attempt, hidden retry or animation setting is introduced. Each owning validation record distinguishes observed local timing from simulated, paid and hosted evidence.
 
 Original photos remain in the browser. The recognition request sends the inspected derivatives. A clearly readable label can be hard to preserve at the standard resolution; leave the fact unknown or offer a deliberate bounded detail crop later, rather than fabricate transcription. Sending a crop is a new approved input and counts toward the same limits.
 
@@ -1651,7 +1653,7 @@ Security review must follow the implemented data flow and actual exposed artifac
 | Assistant model output | At most 1,500 tokens/request and bounded final text |
 | Assistant model input | At most 12,000 text tokens/request after context projection, including tool history |
 | Assistant investigation | At most 3 model requests and 4 aggregate tools/turn |
-| Decoding | 10-second owned worker deadline/image, serial within a batch |
+| Decoding | 10-second active worker deadline/image; browser at most two workers / 24 MP active pixels; backend serial pending RTL-006 concurrency follow-up |
 | Catalogue operation | 120-second total backend deadline |
 | Logo generation | At most 2 explicit batches/workspace; 3 candidates/batch; 180-second total backend deadline |
 | Logo response/cache | 4.2 MiB serialized response; 3 MiB candidate bytes |
@@ -1971,7 +1973,7 @@ The owner has authorized detailed ticket planning. The [canonical queue](tickets
 | Linux release preparation | [RTL-021](tickets/RTL-021-package-linux-services-and-manual-release-runbook.md) | Reproducible images, fixed private bridge, concrete manual deploy and rollback plan; independent of paid evaluation. |
 | Owner-authorized hosted release | [RTL-022](tickets/RTL-022-deploy-verify-hosted-demo-and-record-rollback.md) | Exact accepted artifacts, actual private IAM/origins, HTTPS walkthrough, usage evidence and recovery readiness. |
 
-RTL-001–015 have verified local implementation, with explicit quality/external checks still pending. RTL-016 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
+RTL-001–015 have verified local implementation, with explicit quality/external checks still pending. The owner-prioritized RTL-006 image-concurrency follow-up precedes RTL-016; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
 
 The first complete local path may use declared development fixtures, but public acceptance requires fresh live recognition for sample and uploads. Security and cleanup start with the first owning feature; later hardening and lifecycle packets complete the combined surface. Optional logo generation follows a polished wordmark path. Domain integrity keeps charts connected to actual products; design evidence proves that all accepted storefront choices look excellent.
 
