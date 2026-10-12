@@ -1,0 +1,128 @@
+{
+  "recordedAt": "2026-10-12T20:07:53.409Z",
+  "platform": "win32",
+  "node": "v24.19.0",
+  "conditions": "Same process and bytes; slot order 1,2,2,1; fresh terminable workers per image; 20-ms sampled process RSS, not guaranteed peak; other local apps remain running; no inference/network",
+  "trials": [
+    {
+      "case": "fifteen-public-assets",
+      "slots": 1,
+      "milliseconds": 5865,
+      "sampledMaxRss": 204980224,
+      "sampledMaxActive": 1,
+      "sampledMaxWaiting": 1,
+      "submittedBytes": 1406012,
+      "providerBytes": 1221616,
+      "outputHash": "ea23bc30f54190aea03a5d3772eb793fbb5589f9027b9d45e5b77d10669ac743",
+      "remaining": {
+        "active": 0,
+        "waiting": 0
+      }
+    },
+    {
+      "case": "fifteen-public-assets",
+      "slots": 2,
+      "milliseconds": 3368,
+      "sampledMaxRss": 255651840,
+      "sampledMaxActive": 2,
+      "sampledMaxWaiting": 0,
+      "submittedBytes": 1406012,
+      "providerBytes": 1221616,
+      "outputHash": "ea23bc30f54190aea03a5d3772eb793fbb5589f9027b9d45e5b77d10669ac743",
+      "remaining": {
+        "active": 0,
+        "waiting": 0
+      }
+    },
+    {
+      "case": "fifteen-public-assets",
+      "slots": 2,
+      "milliseconds": 3338,
+      "sampledMaxRss": 255631360,
+      "sampledMaxActive": 2,
+      "sampledMaxWaiting": 0,
+      "submittedBytes": 1406012,
+      "providerBytes": 1221616,
+      "outputHash": "ea23bc30f54190aea03a5d3772eb793fbb5589f9027b9d45e5b77d10669ac743",
+      "remaining": {
+        "active": 0,
+        "waiting": 0
+      }
+    },
+    {
+      "case": "fifteen-public-assets",
+      "slots": 1,
+      "milliseconds": 5847,
+      "sampledMaxRss": 226263040,
+      "sampledMaxActive": 1,
+      "sampledMaxWaiting": 1,
+      "submittedBytes": 1406012,
+      "providerBytes": 1221616,
+      "outputHash": "ea23bc30f54190aea03a5d3772eb793fbb5589f9027b9d45e5b77d10669ac743",
+      "remaining": {
+        "active": 0,
+        "waiting": 0
+      }
+    },
+    {
+      "case": "twenty-four-synthetic-noise",
+      "slots": 1,
+      "milliseconds": 19955,
+      "sampledMaxRss": 242921472,
+      "sampledMaxActive": 1,
+      "sampledMaxWaiting": 1,
+      "submittedBytes": 18054979,
+      "providerBytes": 9387284,
+      "outputHash": "6ea8a5a6eaa1c81a79409571ace2ed1cfa7624f8a79be93a38055b8efec25b3d",
+      "remaining": {
+        "active": 0,
+        "waiting": 0
+      }
+    },
+    {
+      "case": "twenty-four-synthetic-noise",
+      "slots": 2,
+      "milliseconds": 10980,
+      "sampledMaxRss": 334786560,
+      "sampledMaxActive": 2,
+      "sampledMaxWaiting": 0,
+      "submittedBytes": 18054979,
+      "providerBytes": 9387284,
+      "outputHash": "6ea8a5a6eaa1c81a79409571ace2ed1cfa7624f8a79be93a38055b8efec25b3d",
+      "remaining": {
+        "active": 0,
+        "waiting": 0
+      }
+    },
+    {
+      "case": "twenty-four-synthetic-noise",
+      "slots": 2,
+      "milliseconds": 11507,
+      "sampledMaxRss": 335507456,
+      "sampledMaxActive": 2,
+      "sampledMaxWaiting": 0,
+      "submittedBytes": 18054979,
+      "providerBytes": 9387284,
+      "outputHash": "6ea8a5a6eaa1c81a79409571ace2ed1cfa7624f8a79be93a38055b8efec25b3d",
+      "remaining": {
+        "active": 0,
+        "waiting": 0
+      }
+    },
+    {
+      "case": "twenty-four-synthetic-noise",
+      "slots": 1,
+      "milliseconds": 20446,
+      "sampledMaxRss": 273223680,
+      "sampledMaxActive": 1,
+      "sampledMaxWaiting": 1,
+      "submittedBytes": 18054979,
+      "providerBytes": 9387284,
+      "outputHash": "6ea8a5a6eaa1c81a79409571ace2ed1cfa7624f8a79be93a38055b8efec25b3d",
+      "remaining": {
+        "active": 0,
+        "waiting": 0
+      }
+    }
+  ]
+}

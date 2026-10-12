@@ -1,6 +1,6 @@
 # RTL-006 — Deliver live catalogue recognition and action-bound admission
 
-Status: **Locally complete — paid/account/hosted evidence pending**\
+Status: **Local core and sanitizer-concurrency follow-up verified; paid/account/hosted evidence pending**\
 Planning date: **11 October 2026**\
 Milestone: **Live drafting**\
 Depends on: [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md)\
@@ -40,7 +40,7 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 2. **Bind the approved action.** Explain derivative transfer before Draft my catalogue. Request a short-lived one-use grant tied to workspace/operation/manifest hash, image count/size/mode and disclosure version. Verify challenge hostname/action server-side; opening previews performs no admission or provider call.
 
-3. **Inspect independently before dispatch.** Stream bounded multipart and compare actual hashes, named parts and metadata. Limit derivatives to 18 MiB and transport to 19 MiB. Re-decode/reencode safely with serial workers and owned deadlines; browser claims/Content-Length are not authority.
+3. **Inspect independently before dispatch.** Stream bounded multipart and compare actual hashes, named parts and metadata. Limit derivatives to 18 MiB and transport to 19 MiB. Re-decode/reencode safely with bounded owned workers/deadlines; the latest concurrency follow-up below supersedes serial execution. Browser claims/Content-Length are not authority.
 
 4. **Dispatch once within limits.** One model call per approved batch; at most two catalogue attempts/workspace including explicit retry. Use 120-second backend total with proposed 95-second provider subdeadline and 12,000 output-token cap. Enforce one paid operation/workspace and two/process, releasing the correct lease on all terminal paths.
 
@@ -69,6 +69,14 @@ Paths describe future ownership. Create modules/directories only with real behav
 - [x] Capabilities/log/errors expose only safe truthful information.
 
 ## Focused verification and evidence
+
+Latest owner follow-up (12 October): [Retrosum research and the owning design](../engineering/IMAGE-CONCURRENCY.md) prioritizes this completed ticket after RTL-003's verified browser pool and before RTL-016. Use two native sanitizers across the process and two bounded foreground waiters, with at most two in-flight results/request and stable manifest-order output. Validate all actual submitted hashes/headers before native work, keep fresh ten-second/resource-limited workers and settle only after termination. On any image failure/abort, stop queued starts, abort siblings and await cleanup before returning or releasing admission. Defensively reject new native allocation at a private conservative RSS bound. These resource pools do not multiply the one-workspace/two-process paid limits or dispatch per-photo model requests.
+
+- [x] Two actual backend sanitizers can overlap across requests while process-wide native work and waiters stay bounded.
+- [x] Reversed completion retains exact signed manifest order and independent normalized-byte limits.
+- [x] Failure/cancel cleans all request-owned work and waits for termination before capacity/admission release; provider dispatch remains zero on failed preparation.
+- [x] Fixed sample and near-cap real raster processing plus controlled local serial/two-worker timing and sampled memory are recorded without a paid/hosted speedup claim.
+- [x] Required settled gates and read-only review are clean; blueprint/deployment guidance distinguish HTTP, CPU and provider concurrency.
 
 | Case | Required observable evidence |
 | --- | --- |
@@ -109,4 +117,4 @@ Report files, delivered behavior, settled checks, browser/device observations, d
 
 ## Actual local completion
 
-Shared source contracts, exact admitted transport, owned image workers, zero-retry Responses adapter and deliberate public integration are implemented. [Actual gates, three read-only validation passes and browser evidence](../validation/RTL-006.md) record 161 passing tests, both builds and final No actionable findings. All nine boxes describe required local behavior, not paid quality/usage or real challenge acceptance. [Recognition policy](../engineering/RECOGNITION.md) and [independent actual-image expectations](../evaluation/catalogue/README.md) retain every external prerequisite; committed configuration stays fake, paid-off, policy-off and budget zero. RTL-007 is next.
+Shared source contracts, exact admitted transport, owned image workers, zero-retry Responses adapter and deliberate public integration are implemented. [Actual gates, three read-only validation passes and browser evidence](../validation/RTL-006.md) record 161 passing tests, both builds and final No actionable findings. All nine boxes describe required local behavior, not paid quality/usage or real challenge acceptance. [Recognition policy](../engineering/RECOGNITION.md) and [independent actual-image expectations](../evaluation/catalogue/README.md) retain every external prerequisite; committed configuration stays fake, paid-off, policy-off and budget zero. That historical handoff selected RTL-007. The owner-prioritized browser/backend concurrency follow-ups are now verified; RTL-016 is next.
