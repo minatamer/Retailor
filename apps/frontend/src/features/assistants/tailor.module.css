@@ -13,6 +13,31 @@
   border-top: 1px solid var(--platform-line);
   padding-top: 18px;
 }
+.resumeDraft,
+.operationResult > button {
+  min-height: 44px;
+  border: 1px solid var(--platform-control-line);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--platform-selected);
+  color: var(--platform-text);
+  font: inherit;
+  cursor: pointer;
+}
+.operationResult {
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--platform-soft);
+  margin-block: 14px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  animation: message 0.25s var(--ease-out) both;
+}
+.operationResult > button {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
 .shortcuts {
   display: flex;
   flex-wrap: wrap;

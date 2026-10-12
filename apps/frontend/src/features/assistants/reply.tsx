@@ -11,7 +11,9 @@ import {
 import type { DashboardModel } from "../dashboard/model";
 import { formatDisplay } from "@retailor/commerce/currency";
 import { stockOf } from "@retailor/commerce/selectors";
+import { formatUsd } from "@retailor/commerce/money";
 import styles from "./tailor.module.css";
+import { OPERATION_LABELS } from "../operations/form-shell";
 export function Reply({
   message,
   context,
@@ -129,26 +131,90 @@ export function Reply({
           <p>
             {result.reply.proposal.kind === "operation"
               ? "Editable draft only. Review the photo, values and exact effects before confirming."
-              : result.reply.proposal.kind === "bag"
-                ? `Review quantity ${result.reply.proposal.quantity}, the exact option and its current price on the product page.`
-                : result.reply.proposal.kind === "scenario"
-                  ? "Review replacement activity and stock before switching this story."
-                  : result.reply.proposal.kind === "logo-offer"
-                    ? "Optional separate logo batch. Your wordmark stays ready to use."
-                    : "Preview these choices before accepting your look."}
+              : result.reply.proposal.kind === "operation-choices"
+                ? `Choose the exact record for: ${OPERATION_LABELS[result.reply.proposal.operation]}.`
+                : result.reply.proposal.kind === "bag"
+                  ? `Review quantity ${result.reply.proposal.quantity}, the exact option and its current price on the product page.`
+                  : result.reply.proposal.kind === "scenario"
+                    ? "Review replacement activity and stock before switching this story."
+                    : result.reply.proposal.kind === "logo-offer"
+                      ? "Optional separate logo batch. Your wordmark stays ready to use."
+                      : "Preview these choices before accepting your look."}
           </p>
-          <button
-            onClick={() => controller.prepareAssistantProposal(message.id)}
-          >
-            {result.reply.proposal.kind === "bag"
-              ? "Review on product page"
-              : result.reply.proposal.kind === "logo-offer"
-                ? "Explore optional logos"
-                : result.reply.proposal.kind === "design"
-                  ? "Preview these choices"
-                  : "Open editable review"}{" "}
-            ↗
-          </button>
+          {result.reply.proposal.kind === "operation-choices" ? (
+            <>
+              <div className={styles.referenceList}>
+                {result.reply.proposal.targetIds.map((id) => {
+                  const g = state.graph;
+                  const product = g.products.find(
+                    (p) => p.id === id || p.variants.some((v) => v.id === id),
+                  );
+                  const variant = product?.variants.find((v) => v.id === id);
+                  const expense =
+                    g.expenseDrafts.find((e) => e.id === id) ??
+                    g.expenses.find((e) => e.id === id);
+                  const order = g.orders.find((o) => o.id === id);
+                  const returned = g.returns.find((r) => r.id === id);
+                  return (
+                    <button
+                      key={id}
+                      onClick={() =>
+                        controller.prepareAssistantProposal(message.id, id)
+                      }
+                    >
+                      <strong>
+                        {product?.title ??
+                          (expense
+                            ? `${expense.category} expense`
+                            : returned
+                              ? "Physical return"
+                              : order
+                                ? order.lines
+                                    .map((line) => line.title)
+                                    .join(" / ")
+                                : "Current draft / receipt")}
+                      </strong>
+                      <span>
+                        {variant
+                          ? `${variant.size} · ${variant.colour} · ${variant.sku}`
+                          : order
+                            ? `${order.state} · ${order.placedAt.slice(0, 10)} · Original total ${formatUsd(order.total)}`
+                            : expense
+                              ? `${expense.category} · ${formatUsd(expense.amount)} · ${expense.note}`
+                              : (returned?.state ?? "Current draft / receipt")}
+                      </span>
+                      <small>Exact reference: {id}</small>
+                    </button>
+                  );
+                })}
+              </div>
+              {!result.reply.proposal.targetIds.length && (
+                <p>
+                  No eligible current record matches. Open its owner register or
+                  refine the request.
+                </p>
+              )}
+              {result.reply.proposal.moreMatches && (
+                <p>
+                  More matching records exist. Refine your request or choose the
+                  exact record from its owner register.
+                </p>
+              )}
+            </>
+          ) : (
+            <button
+              onClick={() => controller.prepareAssistantProposal(message.id)}
+            >
+              {result.reply.proposal.kind === "bag"
+                ? "Review on product page"
+                : result.reply.proposal.kind === "logo-offer"
+                  ? "Explore optional logos"
+                  : result.reply.proposal.kind === "design"
+                    ? "Preview these choices"
+                    : "Open editable review"}{" "}
+              ↗
+            </button>
+          )}
         </div>
       )}
     </article>

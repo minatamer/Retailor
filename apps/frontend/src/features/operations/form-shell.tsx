@@ -5,6 +5,7 @@ import { productReferenced } from "@retailor/commerce/selectors";
 import { Button } from "../../components/ui/button";
 import { useSession } from "../session/context";
 import type { OwnerOperationType } from "./state";
+import { ownerIntent } from "./state";
 import { ReviewSummary } from "./review-summary";
 import { ProductForm } from "./product-form";
 import { OrderForm } from "./order-form";
@@ -36,17 +37,17 @@ export const OPERATION_LABELS: Record<OwnerOperationType, string> = {
   voidExpense: "Void this posted expense",
   undo: "Undo latest reversible change",
 };
-export function FormShell() {
+export function FormShell({ inline = false }: { inline?: boolean }) {
   const {
     controller,
     ownerForm,
     ownerReview,
     ownerNotice,
     ownerPhotoBusy,
+    ownerFilling,
     state,
   } = useSession();
   const heading = useRef<HTMLHeadingElement>(null),
-    panel = useRef<HTMLElement>(null),
     opener = useRef<HTMLElement | null>(null);
   useEffect(() => {
     opener.current =
@@ -64,7 +65,7 @@ export function FormShell() {
   }, []);
   useEffect(() => {
     heading.current?.focus({ preventScroll: true });
-    panel.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    heading.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [ownerForm?.id, ownerReview?.command.id]);
   if (!ownerForm) return null;
   const type = ownerForm.type,
@@ -75,10 +76,29 @@ export function FormShell() {
       state.graph.orderDrafts.some((d) =>
         d.lines.some((l) => product.variants.some((v) => v.id === l.variantId)),
       ));
+  let missing = "";
+  if (type === "createProduct" || type === "updateProduct") {
+    if (
+      !ownerForm.photoIds.length ||
+      !ownerForm.photoIds.every((id) =>
+        controller.photos.availableIds().has(id),
+      )
+    )
+      missing = "Choose at least one available clothing photograph.";
+    else if (!ownerForm.fields.title?.trim())
+      missing = "Give this garment a title.";
+    else {
+      try {
+        ownerIntent(ownerForm, state.graph);
+      } catch {
+        missing =
+          "Review the category, option labels, USD prices and whole stock quantities.";
+      }
+    }
+  }
   return (
     <section
-      ref={panel}
-      className={styles.panel}
+      className={`${styles.panel} ${inline ? styles.inline : ""}`}
       aria-label="Current owner operation"
     >
       <div className={styles.top}>
@@ -93,6 +113,26 @@ export function FormShell() {
         </Button>
       </div>
       <p>Current records · Owner amounts in USD · Temporary local demo</p>
+      <div className={styles.actions}>
+        <Button
+          type="button"
+          variant="quiet"
+          onClick={() =>
+            controller.moveOwnerForm(inline ? "dashboard" : "tailor")
+          }
+        >
+          {inline ? "Open full form" : "Continue in Tailor"}
+        </Button>
+        {ownerFilling && (
+          <Button
+            type="button"
+            variant="quiet"
+            onClick={() => controller.stopOwnerPrefill()}
+          >
+            Stop suggested fill
+          </Button>
+        )}
+      </div>
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -134,10 +174,11 @@ export function FormShell() {
               <OrderForm />
             )}
             <div className={styles.actions}>
-              <Button type="submit" disabled={ownerPhotoBusy}>
+              <Button type="submit" disabled={ownerPhotoBusy || !!missing}>
                 Review exact effects
               </Button>
             </div>
+            {missing && <p role="status">{missing}</p>}
           </>
         ) : (
           <>

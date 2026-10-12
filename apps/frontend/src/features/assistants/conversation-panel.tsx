@@ -3,11 +3,21 @@ import { useMemo } from "react";
 import { useSession } from "../session/context";
 import { roleOf } from "./context";
 import { Reply } from "./reply";
+import { FormShell } from "../operations/form-shell";
+import { OperationResult } from "./operation-result";
 import { dashboardModel } from "../dashboard/model";
 import styles from "./tailor.module.css";
 export function ConversationPanel() {
-  const { controller, state, assistantDraft, assistantBusy, assistantNotice } =
-      useSession(),
+  const {
+      controller,
+      state,
+      assistantDraft,
+      assistantBusy,
+      assistantNotice,
+      ownerForm,
+      ownerSurface,
+      ownerResult,
+    } = useSession(),
     role = roleOf(state);
   const messages = state.conversation.filter((m) => m.role === role);
   const context = controller.assistantContext();
@@ -38,6 +48,18 @@ export function ConversationPanel() {
           What can you help with?
         </button>
       </div>
+      {role === "owner" && ownerForm && ownerSurface === "tailor" && (
+        <FormShell inline key={ownerForm.id} />
+      )}
+      {role === "owner" && ownerForm && ownerSurface === "dashboard" && (
+        <button
+          className={styles.resumeDraft}
+          onClick={() => controller.moveOwnerForm("tailor")}
+        >
+          Continue your current draft here
+        </button>
+      )}
+      {role === "owner" && !ownerForm && ownerResult && <OperationResult />}
       <div className={styles.history} aria-label="Conversation history">
         {messages.map((message) => (
           <Reply

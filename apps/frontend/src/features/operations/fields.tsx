@@ -16,10 +16,11 @@ export function Field({
   area?: boolean;
   maxLength?: number;
 }) {
-  const { controller, ownerForm } = useSession();
+  const { controller, ownerForm, ownerFilling } = useSession();
   if (!ownerForm) return null;
   const props = {
     value: ownerForm.fields[name] ?? "",
+    "data-filling": ownerFilling === name && !ownerForm.dirty.includes(name),
     maxLength,
     onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       controller.editOwnerField(name, event.target.value),
@@ -47,12 +48,13 @@ export function SelectField({
   label: string;
   choices: readonly { id: string; label: string }[];
 }) {
-  const { controller, ownerForm } = useSession();
+  const { controller, ownerForm, ownerFilling } = useSession();
   if (!ownerForm) return null;
   return (
     <label className={styles.field}>
       <span>{label}</span>
       <select
+        data-filling={ownerFilling === name && !ownerForm.dirty.includes(name)}
         value={ownerForm.fields[name] ?? ""}
         onChange={(e) => controller.editOwnerField(name, e.target.value)}
       >

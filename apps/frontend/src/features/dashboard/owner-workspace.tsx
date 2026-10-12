@@ -46,7 +46,8 @@ function Source({ origin, at }: { origin: string; at?: string }) {
   );
 }
 export function OwnerWorkspace({ design }: { design: ReactNode }) {
-  const { controller, state, ownerForm, ownerNotice } = useSession();
+  const { controller, state, ownerForm, ownerNotice, ownerSurface } =
+    useSession();
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     if (
@@ -140,7 +141,10 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
           </button>
         ))}
       </nav>
-      <div className={styles.layout} data-form={!!ownerForm}>
+      <div
+        className={styles.layout}
+        data-form={!!ownerForm && ownerSurface === "dashboard"}
+      >
         <div className={styles.records} data-tailor-target="owner-records">
           <h2 id="owner-register-heading" ref={heading} tabIndex={-1}>
             {VIEWS.find((v) => v.id === view)?.label}
@@ -761,7 +765,17 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
             </p>
           )}
         </div>
-        {ownerForm && <FormShell key={ownerForm.id} />}
+        {ownerForm && ownerSurface === "dashboard" && (
+          <FormShell key={ownerForm.id} />
+        )}
+        {ownerForm && ownerSurface === "tailor" && (
+          <Button
+            variant="secondary"
+            onClick={() => controller.moveOwnerForm("dashboard")}
+          >
+            Open your current Tailor draft in the full form
+          </Button>
+        )}
       </div>
     </section>
   );

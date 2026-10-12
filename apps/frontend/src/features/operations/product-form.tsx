@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { CategorySchema } from "@retailor/contracts/product";
 import { Button } from "../../components/ui/button";
 import { useSession } from "../session/context";
@@ -8,7 +9,9 @@ import { Field, SelectField } from "./fields";
 import type { OwnerForm } from "./state";
 import styles from "./operations.module.css";
 export function ProductForm() {
-  const { controller, ownerForm, ownerPhotoBusy, state } = useSession();
+  const [clothingConfirmed, setClothingConfirmed] = useState(false);
+  const { controller, ownerForm, ownerPhotoBusy, ownerNotice, state } =
+    useSession();
   if (!ownerForm) return null;
   const form = ownerForm,
     current = state.graph.products.find((p) => p.id === form.targetId);
@@ -26,13 +29,14 @@ export function ProductForm() {
       <label className={styles.upload}>
         <strong>Clothing photograph · required</strong>
         <span>
-          Choose a photo you own or have permission to use. It is checked
-          locally; no product is created until confirmation.
+          Choose a photo you own or have permission to use. It is checked for
+          valid raster bytes locally. Fabric and fit remain unconfirmed.
         </span>
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          disabled={ownerPhotoBusy}
+          disabled={ownerPhotoBusy || !clothingConfirmed}
+          aria-describedby="owner-photo-guidance"
           onChange={(event) => {
             const file = namedFiles(event.target.files)[0];
             event.target.value = "";
@@ -41,6 +45,28 @@ export function ProductForm() {
         />
         {ownerPhotoBusy && <span role="status">Checking your photograph…</span>}
       </label>
+      <label className={styles.check}>
+        <input
+          type="checkbox"
+          checked={clothingConfirmed}
+          onChange={(event) => setClothingConfirmed(event.target.checked)}
+        />
+        This upload shows clothing, rather than a logo or illustration.
+      </label>
+      <p id="owner-photo-guidance">
+        JPEG, PNG or static WebP · 4 MiB per original. Upload adds a view;
+        remove an old view to replace it. A missing photograph cannot unlock the
+        review.
+      </p>
+      {!form.photoIds.length && (
+        <p role="status">
+          A clothing photograph is required before this garment can be reviewed.
+        </p>
+      )}
+      {ownerNotice &&
+        /photo|image|webp|jpeg|png|decode|format/i.test(ownerNotice) && (
+          <p role="status">{ownerNotice}</p>
+        )}
       <div className={styles.photos}>
         {form.photoIds.map((id) => {
           const photo = controller.photos.view(id);
@@ -70,6 +96,50 @@ export function ProductForm() {
           );
         })}
       </div>
+      <details className={styles.acceptedPhotos}>
+        <summary>Reuse an accepted clothing photo</summary>
+        <p>
+          Select deliberately from this workspace. Logo candidates are separate
+          and never appear here.
+        </p>
+        <div className={styles.photoChoices}>
+          {state.graph.photos
+            .filter(
+              (photo) =>
+                state.graph.products.some((product) =>
+                  product.imageIds.includes(photo.id),
+                ) &&
+                controller.photos.availableIds().has(photo.id) &&
+                !form.photoIds.includes(photo.id),
+            )
+            .map((photo) => {
+              const view = controller.photos.view(photo.id);
+              const title =
+                state.graph.products.find((p) => p.imageIds.includes(photo.id))
+                  ?.title ?? "Accepted clothing photo";
+              return view ? (
+                <button
+                  key={photo.id}
+                  type="button"
+                  disabled={form.photoIds.length >= 8 || ownerPhotoBusy}
+                  onClick={() =>
+                    controller.editOwnerRows("photoIds", [
+                      ...form.photoIds,
+                      photo.id,
+                    ])
+                  }
+                >
+                  <GarmentImage
+                    photo={{ ...view, id: photo.id }}
+                    title={title}
+                    onFailure={(id) => controller.photos.reportUnavailable(id)}
+                  />
+                  <span>Use {title}</span>
+                </button>
+              ) : null;
+            })}
+        </div>
+      </details>
       <SelectField
         name="productState"
         label="Storefront availability"
