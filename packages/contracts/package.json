@@ -58,6 +58,10 @@
     "./scenarios": {
       "types": "./dist/scenarios.d.ts",
       "import": "./dist/scenarios.js"
+    },
+    "./assistant": {
+      "types": "./dist/assistant.d.ts",
+      "import": "./dist/assistant.js"
     }
   },
   "scripts": {
