@@ -1,6 +1,6 @@
 # RTL-009 — Deliver exact automatic USD/EUR storefront pricing
 
-Status: **Planned — not started**\
+Status: **Locally implemented — connected bag/confirmation evidence follows in RTL-010; broader device/release evidence tracked separately**\
 Planning date: **11 October 2026**\
 Milestone: **Currency display**\
 Depends on: [RTL-004](RTL-004-build-exact-commerce-commands-and-fact-engine.md), [RTL-005](RTL-005-build-one-page-workspace-review-and-recovery.md), [RTL-007](RTL-007-deliver-three-complete-clothing-store-templates.md)\
@@ -23,13 +23,13 @@ Dependency completion means required local behavior, owning contracts and checks
 
 ## Files and responsibility boundaries
 
-| Area | Responsibility owned here |
-| --- | --- |
+| Area                                                               | Responsibility owned here                                    |
+| ------------------------------------------------------------------ | ------------------------------------------------------------ |
 | `packages/commerce/src or narrow browser-safe monetary projection` | Exact rational conversion and component remainder allocation |
-| `packages/contracts/src` | Strict fixed-pair dated quote shape |
-| `apps/backend/src/currency and providers` | Fixed public-data adapter and bounded process cache |
-| `apps/frontend/src/features/currency` | USD/EUR selection, dated snapshot and storefront projection |
-| `docs/engineering/CURRENCY.md` | Provider verification, rounding, scope and failure behavior |
+| `packages/contracts/src`                                           | Strict fixed-pair dated quote shape                          |
+| `apps/backend/src/currency and providers`                          | Fixed public-data adapter and bounded process cache          |
+| `apps/frontend/src/features/currency`                              | USD/EUR selection, dated snapshot and storefront projection  |
+| `docs/engineering/CURRENCY.md`                                     | Provider verification, rounding, scope and failure behavior  |
 
 Paths describe future ownership. Create modules/directories only with real behavior; reuse contracts, commands, assets and session state rather than a parallel authority.
 
@@ -57,26 +57,26 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] USD remains authoritative for product inputs, orders, costs and dashboard.
-- [ ] EUR storefront prices convert automatically from a dated validated quote.
-- [ ] The provider is explicitly identified and actual route/schema verification is recorded.
-- [ ] Exact rounding/remainder rules keep displayed components and total consistent.
-- [ ] Price filters and € Tailor budgets use the same selected display snapshot.
-- [ ] FX works independently of fake/paid AI settings and sends no visitor data upstream.
-- [ ] Outage/invalid/stale rates preserve usable USD without invented conversion.
-- [ ] Accepted quote persists safely without invisible mid-bag changes.
+- [x] USD remains authoritative for product inputs, orders, costs and dashboard.
+- [x] EUR storefront prices convert automatically from a dated validated quote.
+- [x] The provider is explicitly identified and actual route/schema verification is recorded.
+- [x] Exact rounding/remainder rules keep displayed components and total consistent.
+- [x] Price filters and € Tailor budgets use the same selected display snapshot.
+- [x] FX works independently of fake/paid AI settings and sends no visitor data upstream.
+- [x] Outage/invalid/stale rates preserve usable USD without invented conversion.
+- [x] Accepted quote persists safely without invisible mid-bag changes.
 
 ## Focused verification and evidence
 
-| Case | Required observable evidence |
-| --- | --- |
-| Rate decimals and half-cent | Exact rational parser and documented rounding cases |
-| Multi-line quote | EUR components equal converted canonical total |
-| € boundary filter | Displayed equality/inclusion matches real rounded product prices |
-| USD owner operations | Storefront choice does not mutate source amounts |
-| Stale/invalid/upstream timeout | Safe USD fallback message and bounded fetch count |
-| Provider identity | Current official fixed-pair response/source/date checked |
-| Reset/refresh | Snapshot restores only when valid; late quote cannot attach |
+| Case                           | Required observable evidence                                     |
+| ------------------------------ | ---------------------------------------------------------------- |
+| Rate decimals and half-cent    | Exact rational parser and documented rounding cases              |
+| Multi-line quote               | EUR components equal converted canonical total                   |
+| € boundary filter              | Displayed equality/inclusion matches real rounded product prices |
+| USD owner operations           | Storefront choice does not mutate source amounts                 |
+| Stale/invalid/upstream timeout | Safe USD fallback message and bounded fetch count                |
+| Provider identity              | Current official fixed-pair response/source/date checked         |
+| Reset/refresh                  | Snapshot restores only when valid; late quote cannot attach      |
 
 Run meaningful focused tests during iteration. At the settled implementation snapshot run the applicable root gates established by RTL-001: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm check:boundaries`, `pnpm test:unit` and `pnpm build`. Record actual commands/results and revision. UI acceptance needs real browser observations where available; DOM simulations or animation declarations alone do not prove appearance/movement. Do not add tests that merely mirror CSS or static labels.
 
@@ -103,4 +103,4 @@ No bank/payment/FX trading integration, manually entered rate, currency pricing 
 
 Keep this outcome under `RTL-009:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-009.md` and actual check/review evidence under `docs/validation/RTL-009.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Local completion is backed by [actual execution/validation](../validation/RTL-009.md), [currency contract](../engineering/CURRENCY.md) and [source evidence](../validation/evidence/RTL-009/source-verification.json). Two independently reproduced findings were fixed; read-only pass 2 found no actionable findings, and all gates passed with 199 tests. Shared component projection and immutable confirmation scope are prepared here; actual bag/confirmation UI evidence follows in RTL-010 and typed budgets in RTL-013. Physical/broad release acceptance remains tracked in RTL-019/020/022. Four cohesive commits follow the owner-authorized allocation; no paid call, push or cloud publication occurred.

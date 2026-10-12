@@ -1,0 +1,25 @@
+{
+  "endpoint": "https://api.frankfurter.dev/v2/providers/ecb/rate/usd/eur",
+  "directResponse": {
+    "fetchedAt": "2026-10-12T08:24:25.4644466Z",
+    "status": 200,
+    "contentType": ["application/json; charset=utf-8"],
+    "bytes": 63,
+    "body": "{\"date\":\"2026-10-09\",\"base\":\"USD\",\"quote\":\"EUR\",\"rate\":0.89238}"
+  },
+  "implementedAdapterProbe": {
+    "fetchedAt": "2026-10-12T09:30:29.669Z",
+    "quote": {
+      "schemaVersion": 1,
+      "snapshotId": "fx_b9fb44806198d4ab0d7a493c681d93865d991055",
+      "base": "USD",
+      "quote": "EUR",
+      "rateDecimal": "0.89238",
+      "rateDate": "2026-10-09",
+      "fetchedAt": "2026-10-12T09:30:29.663Z",
+      "sourceId": "frankfurter-ecb-v2"
+    },
+    "upstreamCalls": 1,
+    "cachedSnapshotId": "fx_b9fb44806198d4ab0d7a493c681d93865d991055"
+  }
+}
