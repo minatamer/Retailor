@@ -211,8 +211,17 @@
     gap: 10px;
     flex-wrap: wrap;
   }
+  .lines li:has(.photo) {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+  .rowActions label {
+    white-space: nowrap;
+    flex-wrap: wrap;
+  }
   .lineTotal {
-    margin-left: 68px;
+    grid-column: 2;
+    margin-left: 0;
   }
   .actions {
     flex-direction: column;
