@@ -1,0 +1,37 @@
+# Optional identity and three-logo policy
+
+RTL-015 connects the optional logo branch to the same session controller, Tailor shell and actual storefront renderer. Explicit palette and typography confirmation precede the offer; viewing the offer prepares context and makes no provider call. The text wordmark remains the default and the skip/failure/missing-cache option. Owner Design exposes the same candidate panel as a manual override. Tailor’s finite logo proposal only opens this prepared branch.
+
+## Deliberate operation
+
+The visitor reviews the exact short name, accepted palette and typography direction before approving one batch of three independent marks. Only these finite values, confirmation flags and the design revision reach the brand route. Clothing-brand prompt, transparent-PNG output and disclosure policy IDs are fixed. The name is literal JSON data, never an unrestricted prompt. Live admission binds its SHA-256 digest, workspace and operation IDs, fixed two-hour lifetime, chosen IDs/revision and exact count three.
+
+There is one initial batch and one optional explicit retry per workspace. The browser conservatively counts a request when it is sent, including unknown outcomes. Config/challenge failure before the batch POST does not consume a browser request. The backend counts only provider dispatch and rejects replay or a third dispatch. A valid retry replaces the complete candidate set; malformed/partial output leaves the previous set intact. No reveal, hover, style choice, refresh, cancellation or failure dispatches an automatic generation/repair/retry.
+
+Live logos require the existing paid master, accepted catalogue/text policy, keys/challenge/signing prerequisites and shared admission, plus **both** `LOGO_GENERATION_ENABLED=true` and `LOGO_POLICY_APPROVED=true`. Examples keep these false and secrets blank. Fake development composition returns explicitly code-authored marks, not AI results. Production forbids fake providers. Health/config construction dispatches nothing; live failures never select fixtures.
+
+## Prepared adapter and external acceptance
+
+The pinned OpenAI SDK is configured for the fixed Images generation endpoint, explicit credentials, no SDK retries, no redirects and no logging. The prepared policy is `gpt-image-2.5-flare-2026-09-08`, medium quality, 1024×1024, transparent PNG, moderation auto, foreground/non-streaming and `n=3`. Each response entry supplies bounded canonical Base64 bytes; remote URLs and partial sets are rejected. No output bucket, upload library or durable result URL is created.
+
+Current official [Images generate reference](https://developers.openai.com/api/reference/resources/images/methods/generate), [image prompting guide](https://developers.openai.com/api/docs/guides/image-prompting) and [model page](https://developers.openai.com/api/docs/models/gpt-image-2.5-flare) were consulted on 12 October 2026 and compared with the pinned SDK declarations. This is prepared policy, not account acceptance or proof that a paid image renders the exact chosen font/name. The provisional two-dollar process reservation per dispatched batch is a conservative local allowance, **not** a measured price, billing guarantee or owner-approved spend. RTL-020 must verify model/account/count/transparency availability, quality, usage/pricing/latency and worst-case allowance with separately authorized keys and budget before enabling the branch.
+
+## Validation and time/resource envelopes
+
+Request JSON is strict and at most 64 KiB. Backend deadline ownership starts before body parsing: total 180 seconds, provider subdeadline 150 seconds; bridge/browser 195 seconds. The outer host needs suitable additional headroom. Decode and normalization each have a ten-second native Sharp timeout; cancellation wins the service race and releases admission. Unknown dispatched usage keeps its reservation. Logos share one paid operation per workspace and two per process with catalogue and assistant work.
+
+Every output must be actual static PNG, bounded to 1024 on each side and one megapixel, at most 1 MiB. Bounded pixel decoding checks meaningful visible content and genuinely empty alpha pixels. Only empty surrounding padding is cropped; image colours are never silently changed. Normalization strips metadata, and actual bytes, hash and dimensions become authoritative. Exactly three distinct normalized hashes and candidate IDs are required. Final cache holds at most three images/3 MiB; JSON response envelope is at most 4,404,020 bytes (the planned 4.2-MiB limit). The browser separately verifies signature, hash, dimensions, metadata exclusion, pixel decode and alpha in owned terminable ten-second workers.
+
+These structural checks cannot prove spelling or visual quality. Each card shows a large mark and a real small-header specimen. A visitor explicitly checks spelling/legibility, previews the mark in their actual Home, Collection and Product headers, and then uses the reviewed candidate. The header exposes the exact store name through its accessible button label even when the raster is decorative. No extra OCR/provider call or exact-font promise is hidden in acceptance.
+
+## Identity, cache and cleanup
+
+Logo metadata/bounded request count/review IDs are explicit projection fields; bytes, Base64, grants and object URLs are excluded. `Design.logoId` is a separate optional identity. The existing IndexedDB database upgrades to version 2 with a separate `logos` store. Garment decoding/availability cannot read those rows. Logos borrow the same workspace lease, owner/fence, fixed expiry, navigator lock and serialized transactions; aggregate logo bytes join the existing 80-MiB origin envelope. Replacing a set is atomic. Old leases default the new counters to zero, and upgrade preserves existing photo rows.
+
+The session owns logo object URLs and verifies cached bytes on restore. Refresh restores no pending operation and no newly trusted review checkbox; already accepted image identity can survive verified recovery. A missing/corrupt optional set falls back to the wordmark while commerce/garments remain intact. In-memory validated candidates remain usable if persistence fails, with a refresh warning. Reset/expiry clear this workspace’s photo and logo rows and revoke its URLs; disposal revokes URLs and the photo owner releases the shared lease. Other workspace rows remain intact.
+
+Name, palette, typography, relevant design revision, stage/workspace change, reset, disposal or explicit cancellation aborts pending generation and fences late output. No stale result attaches to the current look. An already selected old raster is explicitly labelled as an earlier look and retains its old colours until the visitor chooses wordmark/new directions. A late already-started cache transaction can leave an unreferenced bounded set; it cannot change design/projection and retains its original fixed expiry. Recovery will not promote mismatched rows.
+
+## Actual evidence
+
+See [RTL-015 validation](../validation/RTL-015.md) for commands, native browser observations, responsive measurements and read-only review. Local fixtures/injected transports prove the connected behavior and bounds; they do not establish live logo spelling/quality, account availability, actual cost/latency, physical device/keyboard or hosted/Linux acceptance.

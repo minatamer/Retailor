@@ -1,6 +1,6 @@
 # RTL-015 — Deliver optional three-logo generation after styling
 
-Status: **Planned — not started**\
+Status: **Locally implemented — paid/account and final device/owner evidence pending**\
 Planning date: **11 October 2026**\
 Milestone: **Optional identity path**\
 Depends on: [RTL-006](RTL-006-deliver-live-catalogue-recognition-and-admission.md), [RTL-008](RTL-008-deliver-tailor-chat-led-styling-and-owner-overrides.md), [RTL-013](RTL-013-deliver-grounded-tailor-conversation-tools-and-tours.md)\
@@ -57,16 +57,16 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Offer appears only after explicit palette/type confirmation.
-- [ ] Wordmark is excellent default/skip/failure/recovery behavior.
-- [ ] One approved action requests exactly three independent image candidates.
-- [ ] Only constrained finite brand context reaches the backend/provider.
-- [ ] Candidate format/bytes/transparency/name legibility are reviewed.
-- [ ] Per-workspace batch/retry/global capacity/deadline policy is enforced.
-- [ ] Candidate selection updates actual page headers accessibly.
-- [ ] Stale design/name/colour/type results never apply.
-- [ ] Temporary logo bytes restore or fall back safely without a hosted library.
-- [ ] No automatic generation on reveal/hover/style selection or hidden retry.
+- [x] Offer appears only after explicit palette/type confirmation.
+- [x] Wordmark is excellent default/skip/failure/recovery behavior.
+- [x] One approved action requests exactly three independent image candidates.
+- [x] Only constrained finite brand context reaches the backend/provider.
+- [x] Candidate format/bytes/transparency/name legibility are reviewed.
+- [x] Per-workspace batch/retry/global capacity/deadline policy is enforced.
+- [x] Candidate selection updates actual page headers accessibly.
+- [x] Stale design/name/colour/type results never apply.
+- [x] Temporary logo bytes restore or fall back safely without a hosted library.
+- [x] No automatic generation on reveal/hover/style selection or hidden retry.
 
 ## Focused verification and evidence
 
@@ -103,6 +103,8 @@ No unrestricted logo editor/reroll loop, runtime product-photo generation, arbit
 - [29. Decisions to settle during implementation](../RETAILOR_DEMO_SOURCE_OF_TRUTH.md#29-decisions-to-settle-during-implementation)
 
 ## Completion handoff and commit boundary
+
+Local completion evidence: [RTL-015 validation](../validation/RTL-015.md), [logo policy](../engineering/LOGOS.md) and [file-level commits](../commit-plans/RTL-015.md). All ten local acceptance items are checked from connected implementation and actual local evidence. Paid/model/account/quality/usage and final physical/owner/hosted prerequisites above remain pending; no provider budget or release authorization is inferred.
 
 Keep this outcome under `RTL-015:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-015.md` and actual check/review evidence under `docs/validation/RTL-015.md`. These are future records, not fabricated by this planning pass.
 
