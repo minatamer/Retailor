@@ -8,14 +8,19 @@ import { assistantRoutes } from "../assistants/routes.js";
 import { logoRoutes } from "../brand/routes.js";
 import { admissionRoutes } from "../security/admission-routes.js";
 import { OperationFailure } from "../security/errors.js";
+import { ingress } from "./ingress.js";
 export function createApp(runtime: Runtime): Express {
   const app = express();
   app.disable("x-powered-by");
+  app.set("trust proxy", false);
   app.use((req, res, next) => {
     res.locals.requestId = runtime.requestId();
     res.set({
       "Cache-Control": "no-store",
       "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
+      "X-Frame-Options": "DENY",
+      "Referrer-Policy": "no-referrer",
     });
     if (req.method !== "GET" && req.headers.origin !== runtime.frontendOrigin) {
       res.status(403).json(publicError("FORBIDDEN", res.locals.requestId));
@@ -23,6 +28,7 @@ export function createApp(runtime: Runtime): Express {
     }
     next();
   });
+  app.use(ingress());
   app.get("/v1/health", (_req, res) => {
     res.json({
       schemaVersion: 1,

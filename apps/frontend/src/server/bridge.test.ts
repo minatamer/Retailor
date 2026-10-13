@@ -194,7 +194,15 @@ describe("fixed bounded private bridge", () => {
     );
     expect(
       (await forward(new Request("http://x"), "health", config, io)).status,
-    ).toBe(413);
+    ).toBe(502);
+    io.fetch.mockResolvedValue(
+      new Response("malformed JSON", {
+        headers: { "content-type": "application/json" },
+      }),
+    );
+    expect(
+      (await forward(new Request("http://x"), "health", config, io)).status,
+    ).toBe(502);
     io.fetch.mockRejectedValue(new Error("private_key_sentinel"));
     const result = await forward(new Request("http://x"), "health", config, io);
     expect(result.status).toBe(503);
@@ -305,5 +313,107 @@ it("preserves the response limit category even when upstream cancellation reject
   );
   expect(
     (await forward(new Request("http://x"), "health", config, io)).status,
-  ).toBe(413);
+  ).toBe(502);
+});
+
+it("preserves only the safety identity on every fixed paid operation", async () => {
+  const cookie = `retailor_safety=abc.${"a".repeat(64)}`;
+  for (const path of [
+    "assistant/creator",
+    "assistant/shopper",
+    "assistant/owner",
+    "brand/logos",
+  ] as const) {
+    const io = ports();
+    io.fetch.mockResolvedValue(
+      Response.json(
+        {
+          schemaVersion: 1,
+          error: {
+            code: "FORBIDDEN",
+            message: "untrusted",
+            requestId: "req_test",
+            retry: "never",
+          },
+        },
+        { status: 403 },
+      ),
+    );
+    const result = await forward(
+      new Request("http://x", {
+        method: "POST",
+        headers: {
+          origin: config.FRONTEND_ORIGIN,
+          "content-type": "application/json",
+          cookie: `other=private; ${cookie}`,
+          authorization: "Bearer untrusted",
+          "x-forwarded-for": "private",
+        },
+        body: "{}",
+      }),
+      path,
+      config,
+      io,
+    );
+    expect(result.status).toBe(403);
+    const sent = new Headers(io.fetch.mock.calls[0]![1]!.headers);
+    expect(sent.get("cookie")).toBe(cookie);
+    expect(sent.has("authorization")).toBe(false);
+    expect(sent.has("x-forwarded-for")).toBe(false);
+    io.fetch.mockClear();
+    await forward(
+      new Request("http://x", {
+        method: "POST",
+        headers: {
+          origin: config.FRONTEND_ORIGIN,
+          "content-type": "application/json",
+          cookie: `${cookie}; ${cookie}`,
+        },
+        body: "{}",
+      }),
+      path,
+      config,
+      io,
+    );
+    expect(new Headers(io.fetch.mock.calls[0]![1]!.headers).has("cookie")).toBe(
+      false,
+    );
+  }
+});
+
+it("limits transport before identity/fetch and releases stalled response slots on cancellation", async () => {
+  const io = ports();
+  io.fetch.mockImplementation(
+    async () =>
+      new Response(new ReadableStream<Uint8Array>(), {
+        headers: { "content-type": "application/json" },
+      }),
+  );
+  const owners = Array.from({ length: 8 }, () => new AbortController());
+  const running = owners.map((owner) =>
+    forward(
+      new Request("http://x", { signal: owner.signal }),
+      "ready",
+      config,
+      io,
+    ),
+  );
+  try {
+    await vi.waitFor(() => expect(io.fetch).toHaveBeenCalledTimes(8));
+    expect(
+      (await forward(new Request("http://x"), "ready", config, io)).status,
+    ).toBe(429);
+    expect(io.fetch).toHaveBeenCalledTimes(8);
+    owners[0]!.abort();
+    expect((await running[0]!).status).toBe(504);
+    io.fetch.mockResolvedValue(
+      Response.json({ schemaVersion: 1, ready: true, mode: "fake" }),
+    );
+    expect(
+      (await forward(new Request("http://x"), "ready", config, io)).status,
+    ).toBe(200);
+  } finally {
+    owners.forEach((owner) => owner.abort());
+    await Promise.all(running);
+  }
 });

@@ -17,7 +17,7 @@ async function authorization(
   });
   if (!response.ok) throw new Error("Runtime identity unavailable");
   const token = new TextDecoder().decode(
-    await readBounded(response.body, 8192),
+    await readBounded(response.body, 8192, signal),
   );
   if (!/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/u.test(token))
     throw new Error("Invalid runtime identity");

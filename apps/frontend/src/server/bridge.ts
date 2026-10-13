@@ -34,7 +34,7 @@ const ConfigSchema = z
       .default("development"),
     FRONTEND_ORIGIN: origin.default("http://127.0.0.1:4310"),
     BACKEND_ORIGIN: origin.default("http://127.0.0.1:4311"),
-    BACKEND_AUDIENCE: z.string().default(""),
+    BACKEND_AUDIENCE: z.string().max(512).default(""),
   })
   .superRefine((v, ctx) => {
     if (
@@ -60,6 +60,8 @@ export interface BridgePorts {
   requestId(): string;
 }
 class LimitError extends Error {}
+// Owned process-local transport slots, separate from backend paid-action leases.
+let activeBridges = 0;
 export async function readBounded(
   body: ReadableStream<Uint8Array> | null,
   limit: number,
@@ -67,7 +69,7 @@ export async function readBounded(
 ): Promise<Uint8Array> {
   if (!body) return new Uint8Array();
   const reader = body.getReader();
-  const chunks: Uint8Array[] = [];
+  const bytes = new Uint8Array(limit);
   let size = 0;
   const abort = () => {
     void reader.cancel().catch(() => undefined);
@@ -84,19 +86,13 @@ export async function readBounded(
         await reader.cancel().catch(() => undefined);
         throw new LimitError();
       }
-      chunks.push(next.value);
+      bytes.set(next.value, size - next.value.byteLength);
     }
   } finally {
     signal?.removeEventListener("abort", abort);
     reader.releaseLock();
   }
-  const bytes = new Uint8Array(size);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.length;
-  }
-  return bytes;
+  return bytes.subarray(0, size);
 }
 function boundedStream(
   body: ReadableStream<Uint8Array>,
@@ -150,6 +146,13 @@ export async function forward(
   const length = request.headers.get("content-length");
   if (length && (!/^\d+$/u.test(length) || Number(length) > policy.bodyLimit))
     return fail("TOO_LARGE", 413);
+  if (
+    request.headers.has("content-encoding") &&
+    request.headers.get("content-encoding") !== "identity"
+  )
+    return fail("INVALID_INPUT", 415);
+  if (activeBridges >= 8) return fail("BUSY", 429);
+  activeBridges++;
   let requestTooLarge = false;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), policy.timeoutMs);
@@ -158,7 +161,7 @@ export async function forward(
     const headers = new Headers({ Accept: "application/json" });
     if (type) headers.set("Content-Type", type);
     if (request.method !== "GET") headers.set("Origin", config.FRONTEND_ORIGIN);
-    if (path === "admission" || path === "catalogue/interpret") {
+    if (request.method === "POST") {
       const cookie = request.headers.get("cookie") ?? "";
       const values =
         cookie.length <= 4096
@@ -256,8 +259,9 @@ export async function forward(
       headers: outputHeaders,
     });
   } catch (error) {
-    if (requestTooLarge || error instanceof LimitError)
-      return fail("TOO_LARGE", 413);
+    if (requestTooLarge) return fail("TOO_LARGE", 413);
+    if (error instanceof LimitError || error instanceof SyntaxError)
+      return fail("UPSTREAM_FAILED", 502);
     return fail(
       signal.aborted ? "DEADLINE" : "UNAVAILABLE",
       signal.aborted ? 504 : 503,
@@ -265,5 +269,6 @@ export async function forward(
   } finally {
     clearTimeout(timer);
     controller.abort();
+    activeBridges--;
   }
 }

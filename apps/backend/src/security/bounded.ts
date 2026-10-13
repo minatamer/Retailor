@@ -11,7 +11,7 @@ export async function boundedBytes(
     void reader.cancel().catch(() => undefined);
   };
   signal.addEventListener("abort", abort, { once: true });
-  const chunks: Uint8Array[] = [];
+  const bytes = new Uint8Array(limit);
   let size = 0;
   try {
     signal.throwIfAborted();
@@ -21,18 +21,12 @@ export async function boundedBytes(
       if (part.done) break;
       size += part.value.byteLength;
       if (size > limit) {
-        await reader.cancel();
+        await reader.cancel().catch(() => undefined);
         return deny("UPSTREAM_FAILED", 502);
       }
-      chunks.push(part.value);
+      bytes.set(part.value, size - part.value.byteLength);
     }
-    const bytes = new Uint8Array(size);
-    let at = 0;
-    for (const chunk of chunks) {
-      bytes.set(chunk, at);
-      at += chunk.length;
-    }
-    return bytes;
+    return bytes.subarray(0, size);
   } finally {
     signal.removeEventListener("abort", abort);
     reader.releaseLock();

@@ -337,7 +337,13 @@ describe("bounded admission and actual multipart recognition", () => {
       const result = await request(app)
         .post(`/v1/${path}`)
         .set("Origin", origin)
-        .send({});
+        .set(
+          "Content-Type",
+          path === "admission"
+            ? "application/json"
+            : "multipart/form-data; boundary=unavailable",
+        )
+        .send("{}");
       expect(result.status).toBe(503);
       expect(result.body.error.code).toBe("UNAVAILABLE");
     }
