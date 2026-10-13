@@ -1,0 +1,12 @@
+# Exact release hashes must describe the same checkout bytes on every OS.
+* text=auto eol=lf
+
+# Shipped raster/font bytes are never subject to text conversion.
+*.webp -text
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.gif -text
+*.woff -text
+*.woff2 -text
+*.ico -text
