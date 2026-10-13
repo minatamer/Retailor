@@ -1,6 +1,6 @@
 # RTL-021 — Package Linux services and the manual release runbook
 
-Status: **Planned — not started**\
+Status: **Locally packaged and verified — cloud/paid/owner acceptance pending**\
 Planning date: **11 October 2026**\
 Milestone: **Deployment preparation**\
 Depends on: [RTL-016](RTL-016-complete-export-reset-expiry-and-session-lifecycle.md), [RTL-018](RTL-018-harden-privacy-abuse-spend-and-runtime-boundaries.md), [RTL-019](RTL-019-verify-polish-responsive-motion-and-design-matrix.md)\
@@ -52,22 +52,22 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 8. **Write the deploy and rollback runbook.** Provide ordered manual commands/templates with explicit owner-supplied resource inputs, candidate image tags/digests, origin/Turnstile host settings and exact checks before enabling paid capability. Include paid-disable steps and rollback to an identified immutable prior image/config. Explain Git revision plus dirty-file/source fingerprint recording when building an uncommitted candidate; do not imply a pushed clean revision exists.
 
-9. **Reconcile operational documentation.** Document frontend 3000 and backend 4000 local commands, separate terminals, health/status URLs, normal environment loading and full-stack start/stop ownership. Root checks must remain unpaid and deployment commands must never run as part of build/test. Link the security and data-retention prerequisites. State that the intended tryretailor.com domain is unconfirmed until actual owner evidence exists.
+9. **Reconcile operational documentation.** Document frontend 4310 and backend 4311 local commands, separate terminals, health/status URLs, normal environment loading and full-stack start/stop ownership. Root checks must remain unpaid and deployment commands must never run as part of build/test. Link the security and data-retention prerequisites. State that the intended tryretailor.com domain is unconfirmed until actual owner evidence exists.
 
 10. **Hand off a reviewable candidate.** Record image digests, source snapshot, Linux checks, asset/licence evidence, memory findings, configuration template and every missing external input. Fix packaging defects before asking to deploy. RTL-022 receives a complete concrete deployment plan plus the RTL-020 acceptance verdict; do not create cloud resources or mutate DNS while preparing it.
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Both services have reproducible workspace-aware multi-stage Linux packaging with pinned runtime and frozen dependency install.
-- [ ] Runtime images include approved fonts/photos/shared modules and exclude secrets, private payloads and unused build tooling.
-- [ ] Both services bind the platform PORT on 0.0.0.0 and run as a non-root user.
-- [ ] Production fake-mode/configuration rejection and content-free readiness are covered by unpaid checks.
-- [ ] The frontend bridge has fixed authenticated private-backend behavior; platform IAM is clearly separate from browser action admission.
-- [ ] Actual Linux/container evidence is recorded or its absence is an explicit unresolved packaging prerequisite.
-- [ ] The manual runbook names intended resource/configuration inputs, service limits, secret versions and least-privilege identities.
-- [ ] Rollback and immediate paid-disable procedures identify immutable artifacts/configuration and required verification.
-- [ ] Local README commands and ports match the implementation; no automatic deploy or paid test is attached to root checks.
-- [ ] A concrete candidate/source fingerprint is handed off without cloud publication, DNS changes or fabricated hosted status.
+- [x] Both services have reproducible workspace-aware multi-stage Linux packaging with pinned runtime and frozen dependency install.
+- [x] Runtime images include approved fonts/photos/shared modules and exclude secrets, private payloads and unused build tooling.
+- [x] Both services bind the platform PORT on 0.0.0.0 and run as a non-root user.
+- [x] Production fake-mode/configuration rejection and content-free readiness are covered by unpaid checks.
+- [x] The frontend bridge has fixed authenticated private-backend behavior; platform IAM is clearly separate from browser action admission.
+- [x] Actual Linux/container evidence is recorded or its absence is an explicit unresolved packaging prerequisite.
+- [x] The manual runbook names intended resource/configuration inputs, service limits, secret versions and least-privilege identities.
+- [x] Rollback and immediate paid-disable procedures identify immutable artifacts/configuration and required verification.
+- [x] Local README commands and ports match the implementation; no automatic deploy or paid test is attached to root checks.
+- [x] A concrete candidate/source fingerprint is handed off without cloud publication, DNS changes or fabricated hosted status.
 
 ## Focused verification and evidence
 
@@ -101,8 +101,12 @@ No actual cloud provisioning, registry push, IAM/Secret Manager mutation, DNS up
 - [26. Infrastructure, deployment and operations](../RETAILOR_DEMO_SOURCE_OF_TRUTH.md#26-infrastructure-deployment-and-operations)
 - [28. Documentation and collaboration practices](../RETAILOR_DEMO_SOURCE_OF_TRUTH.md#28-documentation-and-collaboration-practices)
 
+## Actual local outcome
+
+Both non-root Linux images were built and probed with network denied, supplied PORT=8080 and no published host ports. Fifteen photos, five fonts, licences, fixed route failures, production startup rejection, native Sharp and SIGTERM were verified. See [RTL-021 evidence](../validation/RTL-021.md) and [manual release packet](../operations/RELEASE.md). Keys, live acceptance, project/domain/identity/secret inputs and actual hosted publication/rollback remain pending; none are claimed passed.
+
 ## Completion handoff and commit boundary
 
 Keep this outcome under `RTL-021:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-021.md` and actual check/review evidence under `docs/validation/RTL-021.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Required local packaging boxes are covered by actual Linux evidence; external release gates remain pending. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.

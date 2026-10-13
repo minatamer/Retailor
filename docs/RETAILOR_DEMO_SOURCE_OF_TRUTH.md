@@ -4,7 +4,7 @@
 **Prepared:** 11 October 2026.\
 **Product:** Retailor. **Sample clothing brand:** FORME.\
 **Companion:** [Retailor product overview](RETAILOR_OVERVIEW.html).\
-**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–019 locally implemented, RTL-020 locally prepared/audited, next eligible packet RTL-021; owner visual/device/zoom and paid evidence remain separately pending.\
+**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–019 locally implemented, RTL-020 locally prepared/audited, RTL-021 locally Linux-packaged/verified, next local preparation packet RTL-022; owner visual/device/zoom and paid evidence remain separately pending.\
 **Signature promise:** **Bring your products. See your store.**\
 **Owner decisions incorporated:** all eleven answers on clothing-only scope, researched presets, Tailor-led setup, optional logos, mandatory photos, catalogue integrity, three scenarios, live sample processing, runway direction, image sourcing and USD/EUR; 11 October 2026.
 
@@ -1919,6 +1919,8 @@ The region is owner-resolved during release preparation. Reuse the same region s
 
 ### 26.4 Packaging
 
+RTL-021 now supplies real non-root Linux frontend/backend images, approved photo/font/licence delivery, native Sharp, supplied PORT binding, paid-unavailable/fake rejection and SIGTERM observations. [Linux evidence](validation/RTL-021.md) records actual local identifiers, source fingerprint and memory limitations. [Manual release packet](operations/RELEASE.md) owns exact owner resource inputs, IAM/private bridge, numeric secret versions, paid-off bootstrap and immutable rollback. These are local checks; no registry push, cloud service, paid-provider acceptance or domain ownership is implied.
+
 Build from an explicit audited commit and a restricted context. Use frozen installs and reviewed dependency lifecycle-script policy. Build contracts, commerce, backend and frontend in dependency order.
 
 Package Next standalone output with verified monorepo tracing, `.next/static`, public sample assets and required fonts. Package backend compiled output and package exports. Sharp/native binaries must match the Linux target. No runtime dependency/tool downloads are allowed.
@@ -1983,7 +1985,7 @@ The owner has authorized detailed ticket planning. The [canonical queue](tickets
 | Linux release preparation | [RTL-021](tickets/RTL-021-package-linux-services-and-manual-release-runbook.md) | Reproducible images, fixed private bridge, concrete manual deploy and rollback plan; independent of paid evaluation. |
 | Owner-authorized hosted release | [RTL-022](tickets/RTL-022-deploy-verify-hosted-demo-and-record-rollback.md) | Exact accepted artifacts, actual private IAM/origins, HTTPS walkthrough, usage evidence and recovery readiness. |
 
-RTL-001–019 have verified local implementation and RTL-020 has verified local evaluation preparation/audit, with explicit quality/external checks still pending. The owner-prioritized RTL-003/006 image-concurrency follow-ups have verified local implementation; RTL-021 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
+RTL-001–019 have verified local implementation and RTL-020 has verified local evaluation preparation/audit, with explicit quality/external checks still pending. The owner-prioritized RTL-003/006 image-concurrency follow-ups have verified local implementation; RTL-021 has actual Linux packaging evidence; RTL-022 is next for independent local release preparation while live acceptance and owner cloud authorization remain pending; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
 
 The first complete local path may use declared development fixtures, but public acceptance requires fresh live recognition for sample and uploads. Security and cleanup start with the first owning feature; later hardening and lifecycle packets complete the combined surface. Optional logo generation follows a polished wordmark path. Domain integrity keeps charts connected to actual products; design evidence proves that all accepted storefront choices look excellent.
 

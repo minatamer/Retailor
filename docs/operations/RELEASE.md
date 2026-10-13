@@ -1,0 +1,117 @@
+# Manual Linux release packet
+
+RTL-021 prepares local images and the commands below. **Nothing here authorizes publication, registry pushes, provisioning, IAM/DNS changes, resource purchases or paid requests.** Owner approval with exact project, region, identities, origin, candidate digests, spend envelope and accepted RTL-020 results is required before those actions. RTL-022 records the eventual hosted verdict. No cloud resource, domain or prior revision is assumed to exist.
+
+## Candidate construction and provenance
+
+Run at the repository root with Node 24.19.0 and pnpm 11.25.0. The Dockerfiles pin the verified official `node:24.19.0-bookworm-slim` OCI index digest `sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df`; Linux amd64 is the release target. Pinned pnpm is installed only in the builder; dependency install uses the existing frozen lockfile. The backend's pnpm 11 `deploy --prod --legacy` produces a portable production package from the existing linked workspace. All app and public-package files fields already restrict backend deployment to compiled output. Linux builds, rather than Windows junctions, supply the native Sharp libraries and portable Next tracing.
+
+```powershell
+pnpm install --frozen-lockfile
+pnpm check
+node scripts/release/snapshot.mjs > artifacts/local/release-source.json
+docker build --platform linux/amd64 --progress plain -f apps/backend/Dockerfile -t retailor/rtl021-backend:local .
+docker build --platform linux/amd64 --progress plain -f apps/frontend/Dockerfile -t retailor/rtl021-frontend:local .
+node scripts/release/containers.mjs retailor/rtl021-frontend:local retailor/rtl021-backend:local > artifacts/local/release-containers.json
+```
+
+Create `artifacts/local` first if absent. Stop on any command error; redirected stdout is not a passing verdict. The helper accepts only the two explicit local tags or immutable local `sha256` image IDs. It creates unique labelled containers, publishes no host ports, denies container networking, applies one CPU and 512 MiB/1 GiB memory limits, then removes only IDs it created. It does not start, stop, enumerate or prune unrelated containers. It leaves Docker Desktop running. Ordinary `pnpm check` never builds containers or deploys.
+
+The snapshot records Git HEAD, a dirty flag, every selected source/manifest/public-asset hash and a deterministic build-input fingerprint. It opens no env, guest, local output or sibling files. The checked-in `.dockerignore` permits only application/build inputs; explicit COPY boundaries add another constraint. Development preview photos, tests, docs, `.git`, all `.env*`, local `node_modules`, build outputs and captured payloads are excluded. Next has an explicit workspace tracing root and includes standalone modules, `.next/static`, all fifteen public sample photos, the sample manifest, five fonts and four OFL licences/provenance in its runtime. Guest uploads stay in browser/session memory and never enter this context. Development-only `/design` behavior remains blocked by the normal production flag; compiled development provider modules are inert unless fake mode is selected, and production rejects that selection.
+
+Use a clean committed candidate for eventual paid acceptance. A dirty local candidate is valid packaging evidence **only with its fingerprint**; a Git hash alone does not identify its uncommitted source. Rerun snapshot/build/probes after any build-input change. Local image ID, OCI manifest digest and registry digest are different identifiers: record all available actual values; no local tag or empty `RepoDigests` proves publication. Build caching with pinned inputs is reproducible dependency/source resolution, not a promise of byte-identical Next build IDs or timestamps. Update pinned tools/base images deliberately, rebuild and repeat acceptance.
+
+## Runtime envelope and unpaid observations
+
+| Setting | Frontend candidate | Backend candidate |
+| --- | --- | --- |
+| Runtime | Node PID 1, non-root UID 1000 | Node PID 1, non-root UID 1000 |
+| App environment | production, development preview off | production, fake mode false |
+| Local/platform PORT | 4310, bind 0.0.0.0 | 4311, bind 0.0.0.0 |
+| CPU / memory | 1 CPU / 512 MiB | 1 CPU / 1 GiB |
+| Min/max instances | 0 / 1 | 0 / 1 |
+| Outer request timeout | 210 seconds | 200 seconds |
+| Cloud request concurrency | 8 | 4 |
+| Startup probe | GET `/` | GET `/v1/health` |
+| Paid operation slots | fixed bridge transport bound 8 | shared AI bound 2; no waiting AI queue |
+| Native image preparation | browser preparation bound 2 | shared native workers 2, pending jobs 2 |
+
+These Cloud Run settings are proposals, not a deployed configuration or measured paid-load guarantee. Request concurrency, AI admission slots, native workers and pixel/byte limits serve different purposes; see [image concurrency evidence](../engineering/IMAGE-CONCURRENCY.md). Paid subdeadlines remain shorter than outer request limits: catalogue bridge 135 seconds, Tailor 75, logos 195; actual provider/native deadlines are defined by existing implementation, not this deployment packet. Express `requestTimeout=125000` bounds receipt of the HTTP request body; it is not the Cloud Run response deadline. Keep the outer backend timeout 200 seconds to accommodate the 195-second logo bridge envelope. Use request-based CPU and no background worker service. Do not raise concurrency or budgets without evidence.
+
+`/v1/health` is content-free process liveness. `/v1/ready` correctly returns 503 when paid prerequisites are absent; **do not configure that as startup/liveness** or the intentionally disabled deployment would restart forever. `/v1/config` describes safe capabilities only, dispatches no provider call and contains no key/internal URL. A production paid-off backend is alive, selects `mode=live`, reports vision/Tailor/logos unavailable and never falls back to fixtures. FX is a separate free fixed-source operation; the isolated helper does not call its upstream. The frontend serves `/` and `/demo` without a working paid backend. Its fixed bridge returns safe errors when identity/backend access is unavailable and never accepts a client-supplied proxy destination.
+
+Local point-in-time resource and safe route/asset observations are in [RTL-021 validation](../validation/RTL-021.md). They do not prove peak memory, live-provider behavior, IAM, TLS, mobile rendering or hosted latency. Keep the actual fifteen-photo native-worker workload and HTTP/AI admission limits in the later hosted capacity checklist. Non-root is enforced by both images. No runtime install, database, upload directory, bucket, worker, queue or third service is needed.
+
+## Owner inputs and identity ownership
+
+Copy [inputs.example.json](../../scripts/release/inputs.example.json) into ignored `artifacts/local/release-inputs.json`. Fill only metadata, never key values. All empty identities/URLs/digests/revisions are pending; `tryretailor.com` is the intended domain and **unconfirmed**. Use canonical HTTPS origins without paths, userinfo, trailing slashes or query. Registry images must be `REGION-docker.pkg.dev/PROJECT/REPOSITORY/NAME@sha256:ACTUAL_DIGEST`. Use exact positive numeric secret versions, never `latest`. Record actual primary service URLs separately from any preview traffic-tag URL.
+
+| Principal | Smallest intended permission |
+| --- | --- |
+| Frontend runtime service account | `roles/run.invoker` on this backend service only; no Secret Manager/API-key access |
+| Backend runtime service account | `roles/secretmanager.secretAccessor` on the three required named secrets only; no registry writer or IAM admin |
+| Release operator | Owner-authorized image writer, deploy/service-account-use and narrowly scoped IAM/secret setup permissions; distinct from runtime identities |
+| Public visitor | Eventually invoke the frontend only, after owner release approval; never invoke the backend |
+
+Secret Manager IAM bindings are scoped to a **secret**, while runtime references pin its version; do not claim version-level IAM isolation. Backend secret env bindings own `OPENAI_API_KEY`, `TURNSTILE_SECRET_KEY`, `GRANT_SIGNING_SECRET`. The site key is public configuration returned safely by `/config`, not a secret. Frontend private origin/audience stay in server configuration with no `NEXT_PUBLIC_*` exposure. Use Cloud Run workload identity and the existing fixed metadata ID-token path; no downloaded service-account JSON or token in files/logs. The ID-token audience is the backend's primary Cloud Run service URL even if a tagged URL is used during an approved check. [Google's service-to-service guidance](https://docs.cloud.google.com/run/docs/authenticating/service-to-service) describes this identity boundary; it remains separate from the browser's origin, Turnstile challenge, safety cookie and action/revision/photo-hash grants.
+
+IAM-private means authenticated invocation; an `ingress=all` endpoint can still be IAM-private. Do not switch to internal-only ingress and assume frontend invocation works without the required networking. Check that IAM invoker enforcement is enabled, not merely that `allUsers` is absent. No broad project invoker grant, `allAuthenticatedUsers`, public backend, unauthenticated-invoker disable or organization-wide secret accessor is part of this plan.
+
+## Ordered manual publication, only after explicit approval
+
+These are reviewable PowerShell command templates. **None have been run.** Read the owner-filled input and validate every required field; empty values are a hard stop. Use `--project`/`--region` on each command instead of changing global gcloud settings shared with other repos. Check current account/project read-only, confirm the owner-approved resource set and capture the existing service/revision/IAM/config metadata before a mutation. Preserve prior immutable images, secret-version references, budgets and origin/audience; never preserve secret values. On a first deployment there is no prior revision: the rollback is paid-off plus frontend closure until a known-good pair exists.
+
+1. Owner supplies/approves project billing, region, registry, service identities and secret resources. Existing resources may be reused only with actual evidence. Enable needed APIs/create named resources/grant least-privilege roles manually within that exact approved scope. Never copy sibling identities. Do not put secrets in shell arguments or source files; let the owner populate named Secret Manager versions through a secure approved workflow.
+
+2. After accepted clean source and local checks, tag/push the **actual local immutable image ID** to the owner-approved registry, then record its actual registry digest. `docker tag` and `docker push` are explicit future actions, not root build hooks. Deploy by the resulting digest, never mutable `latest`. Read [gcloud run deploy](https://docs.cloud.google.com/sdk/gcloud/reference/run/deploy) before executing against the then-installed CLI.
+
+3. Deploy the backend **private and paid off**, initially without provider secret bindings. A placeholder `https://retailor.invalid` origin is permissible only for this inaccessible paid-off bootstrap if the final origin cannot be known yet; it is never a release/Turnstile hostname. Otherwise use the already owner-confirmed production origin. The service account is required even during bootstrap.
+
+```powershell
+$rtlRelease = Get-Content artifacts/local/release-inputs.json -Raw | ConvertFrom-Json
+gcloud run deploy $rtlRelease.backendService --project $rtlRelease.projectId --region $rtlRelease.region --image $rtlRelease.backendRegistryImage --service-account $rtlRelease.backendServiceAccount --no-allow-unauthenticated --ingress all --port 4311 --cpu 1 --memory 1Gi --min 0 --max 1 --concurrency 4 --timeout 200s --cpu-throttling --set-env-vars "APP_ENV=production,FAKE_MODE=false,PAID_DEMO_ENABLED=false,LIVE_POLICY_APPROVED=false,LOGO_GENERATION_ENABLED=false,LOGO_POLICY_APPROVED=false,PROCESS_BUDGET_MICRO_USD=0,FRONTEND_ORIGIN=$($rtlRelease.productionOrigin),APP_REVISION=$($rtlRelease.candidateTag)" --startup-probe "httpGet.path=/v1/health,httpGet.port=4311,periodSeconds=5,timeoutSeconds=2,failureThreshold=24"
+gcloud run services describe $rtlRelease.backendService --project $rtlRelease.projectId --region $rtlRelease.region --format="value(status.url)"
+gcloud run services get-iam-policy $rtlRelease.backendService --project $rtlRelease.projectId --region $rtlRelease.region --format=json
+```
+
+Record the returned primary URL as `backendServiceUrl`; use it verbatim for both `BACKEND_ORIGIN` and `BACKEND_AUDIENCE`. Check existing IAM: the deploy flag alone does not substitute for inspecting/removing unauthorized prior grants. Require invoker enforcement. Add only this calling frontend identity:
+
+```powershell
+gcloud run services add-iam-policy-binding $rtlRelease.backendService --project $rtlRelease.projectId --region $rtlRelease.region --member "serviceAccount:$($rtlRelease.frontendServiceAccount)" --role roles/run.invoker
+gcloud run deploy $rtlRelease.frontendService --project $rtlRelease.projectId --region $rtlRelease.region --image $rtlRelease.frontendRegistryImage --service-account $rtlRelease.frontendServiceAccount --no-allow-unauthenticated --ingress all --port 4310 --cpu 1 --memory 512Mi --min 0 --max 1 --concurrency 8 --timeout 210s --cpu-throttling --set-env-vars "APP_ENV=production,RETAILOR_DEV=false,FRONTEND_ORIGIN=$($rtlRelease.productionOrigin),BACKEND_ORIGIN=$($rtlRelease.backendServiceUrl),BACKEND_AUDIENCE=$($rtlRelease.backendServiceUrl)" --startup-probe "httpGet.path=/,httpGet.port=4310,periodSeconds=5,timeoutSeconds=2,failureThreshold=24"
+```
+
+4. Keep the frontend closed to the public. Confirm actual frontend service URL; choose/verify final owner-approved origin (primary URL or verified custom domain), then update **both** app origins if bootstrap used a placeholder. Owner configures actual Cloudflare domain/TLS/Turnstile hostname and records retention/provider policy. A proxy does not automatically guarantee private Cloud Run origin or correct challenge hostname; verify redirects, forwarded paths and HTTPS end-to-end. Custom domain setup is a later explicit DNS/certificate action.
+
+5. Invoke private health/config through an authorized operator workflow without logging tokens. Unauthenticated direct backend calls must fail at platform IAM before the Express route. Authorized frontend bridge must reach known health/config; wrong origin/action/expired grant must still fail, and arbitrary bridge operations must 404. Paid-off `/ready=503` is expected. Safe config must show no enabled vision/Tailor/logos. Verify all public photos/fonts/static files and CSP on the real frontend; repeat normal browser scenarios from RTL-019. Record actual revisions, image digests, service settings and point-in-time memory. No paid call is needed for these checks.
+
+6. After separate accepted RTL-020 account/vision/text/logo/billing results and owner-approved hosted spend, bind **exact existing versions** while still paid off. Example only:
+
+```powershell
+gcloud run services update $rtlRelease.backendService --project $rtlRelease.projectId --region $rtlRelease.region --update-secrets "OPENAI_API_KEY=$($rtlRelease.openaiSecret):$($rtlRelease.openaiSecretVersion),TURNSTILE_SECRET_KEY=$($rtlRelease.turnstileSecret):$($rtlRelease.turnstileSecretVersion),GRANT_SIGNING_SECRET=$($rtlRelease.grantSecret):$($rtlRelease.grantSecretVersion)" --update-env-vars "PAID_DEMO_ENABLED=false,LIVE_POLICY_APPROVED=false,LOGO_GENERATION_ENABLED=false,LOGO_POLICY_APPROVED=false,PROCESS_BUDGET_MICRO_USD=0,TURNSTILE_SITE_KEY=$($rtlRelease.turnstileSiteKey)"
+```
+
+Check actual new revision/traffic and secret reference metadata. Only a separately reviewed enabling command may set policy/master flags and an approved positive process reservation budget. This runbook supplies **no enabling command or accepted budget**. Normal challenge and action admission must remain intact; no backend bypass or fixture acceptance. Logo capability additionally requires accepted three-output quality/cost envelope. Public rollout requires the accepted paid scenario, real browser/device/owner checks and rollback rehearsal. Keep the frontend private until that decision; granting public frontend invocation is itself a later approved IAM mutation.
+
+## Immediate disable and immutable rollback
+
+If a provider, spend, admission or privacy check fails, stop new paid actions first. Close public frontend invocation within the approved incident scope if exposure remains. Update backend to all flags false/budget zero, record its **actual new ready revision**, and explicitly route the primary backend to that revision at 100%. Existing pinned traffic must not be assumed to follow an update. Inspect/remove access to old traffic-tag URLs and old frontend routes within the incident scope. Requests already dispatched may finish; routing a new revision is not instantaneous revocation of in-flight calls. If immediate provider revocation is required, the owner revokes the affected provider project key under the incident procedure and replaces the pinned secret version later.
+
+```powershell
+gcloud run services update $rtlRelease.backendService --project $rtlRelease.projectId --region $rtlRelease.region --update-env-vars "PAID_DEMO_ENABLED=false,LIVE_POLICY_APPROVED=false,LOGO_GENERATION_ENABLED=false,LOGO_POLICY_APPROVED=false,PROCESS_BUDGET_MICRO_USD=0"
+gcloud run services describe $rtlRelease.backendService --project $rtlRelease.projectId --region $rtlRelease.region --format="value(status.latestReadyRevisionName)"
+# Record the actual returned revision as $rtlDisabledRevision, then:
+gcloud run services update-traffic $rtlRelease.backendService --project $rtlRelease.projectId --region $rtlRelease.region --to-revisions "$rtlDisabledRevision=100"
+```
+
+Verify `/config` paid disabled, `/ready` unavailable, liveness alive, and no new paid dispatch. The provider reservation ledger and grant/replay/cache/counters live **per process**; restarts/reset do not supply a durable monthly cap. New runtime action grants include revision/lifetime/state and old process grants are rejected; signing secret pinning is not replay-store persistence. Process instances during rollout can each have their own reservation allowance. Max one is a scaling target, not proof that overlap/exceptions cannot occur. Maintain provider project budgets/alerts, short accepted grant life, staged capacity checks and recorded rollout overlap. Browser reset never authorizes paid budget renewal.
+
+For UI/app rollback, require both recorded `priorFrontendRevision` and `priorBackendRevision` plus their immutable image/config metadata. Keep paid off: **do not route to a prior paid-enabled backend revision merely to restore its code**. First redeploy its exact image and known compatible configuration/secret versions with flags false and budget zero; capture that new paid-off revision. Route backend to it and frontend to the recorded compatible prior frontend revision, explicitly 100% for both. Recheck IAM, audience/origins, assets, config, browser recovery and no paid dispatch. [Cloud Run traffic migration](https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration) supports explicit named-revision rollback; an arbitrary `LATEST` or mutable image tag is not this plan's rollback target. If no compatible prior pair exists, retain safe disabled service and frontend closure; do not invent a successful rollback.
+
+No guest data migrates: browser-local versioned state governs restore; unsupported versions discard safely, provider readiness resets unavailable until deliberate admission, old grants expire/reject. No persistent uploaded file or shared commerce database is expected across revisions. Confirm stale session/late response fences and report/reset cleanup on the real hosted app before rollout approval.
+
+## Required evidence before public release
+
+Keep candidate fingerprint, clean commit, both **actual registry digests**, runtime revisions/settings, IAM/invoker evidence, exact secret version references, domain/TLS/Turnstile proof, owner/physical acceptance and RTL-020 live verdict together. Record timings/usage/counts/outcomes only; do not save keys, tokens, grant values, photos of guests, complete commerce reports or chat payloads. [Security](../engineering/SECURITY.md), [provider policy](PROVIDERS.md) and [evaluation worksheet](EVALUATION.md) remain mandatory. Pending inputs and unperformed checks are listed in RTL-021/022 validation, not marked passed by this packet.
+
+Official references inspected 13 October 2026: [Node image practices](https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md), [pnpm deployment](https://pnpm.io/cli/deploy) (installed 11.25.0 help and real Linux build are authoritative for this candidate; current docs describe newer releases), [container configuration](https://docs.cloud.google.com/run/docs/configuring/services/containers), [secret references](https://docs.cloud.google.com/run/docs/configuring/services/secrets) and [service update](https://docs.cloud.google.com/sdk/gcloud/reference/run/services/update). Recheck external command/host policy before eventual execution.
