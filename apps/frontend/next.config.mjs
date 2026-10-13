@@ -1,5 +1,8 @@
+import { fileURLToPath } from "node:url";
+
 const nextConfig = {
   output: "standalone",
+  outputFileTracingRoot: fileURLToPath(new URL("../../", import.meta.url)),
   distDir: process.env.RETAILOR_DEV === "true" ? ".next-dev" : ".next",
   poweredByHeader: false,
   async headers() {
