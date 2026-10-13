@@ -121,6 +121,8 @@ import { localReply } from "../assistants/local";
 import type { LocalShortcut } from "../assistants/local";
 import { assistantRequester } from "../assistants/request";
 import type { AssistantRequester } from "../assistants/request";
+import { buildExport } from "./export";
+import { ReportDownload, type DownloadPort } from "./download";
 export type ProcessStep =
   | "Checking photos"
   | "Approving this request"
@@ -142,6 +144,7 @@ export interface CatalogueProcessor {
   }): Promise<CatalogueDraft>;
 }
 interface SessionOptions {
+  download?: DownloadPort;
   logoRequest?: LogoRequester;
   logoVerify?: LogoVerifier;
   assistantRequest?: AssistantRequester;
@@ -213,6 +216,7 @@ export class SessionController {
   private readonly clock: () => number;
   private readonly id: () => string;
   private readonly owner: string;
+  private readonly download: ReportDownload;
   private readonly aborted = () => this.dispose();
   private listeners = new Set<() => void>();
   private generation = 0;
@@ -236,6 +240,7 @@ export class SessionController {
     this.clock = options.clock ?? Date.now;
     this.id = options.id ?? (() => crypto.randomUUID());
     this.owner = this.id();
+    this.download = new ReportDownload(options.download);
     options.signal?.addEventListener("abort", this.aborted, { once: true });
     this.snapshot = {
       logoBusy: false,
@@ -289,6 +294,7 @@ export class SessionController {
       previewDesign: { ...INITIAL_DESIGN },
       presentationRevision: 0,
       fixture: this.options.fixtureAllowed,
+      pendingProvider: null,
       browse: structuredClone(INITIAL_BROWSE),
       setup: structuredClone(INITIAL_SETUP),
       hasAcceptedLook: false,
@@ -389,7 +395,20 @@ export class SessionController {
       if (!this.options.storage) throw new Error("Storage unavailable");
       this.options.storage?.setItem(
         SESSION_KEY,
-        serializeProjection(this.snapshot.state, this.clock()),
+        serializeProjection(
+          {
+            ...this.snapshot.state,
+            pendingProvider:
+              this.snapshot.state.stage === "process"
+                ? "catalogue"
+                : this.logoOperation
+                  ? "logos"
+                  : this.assistantOperation
+                    ? "assistant"
+                    : null,
+          },
+          this.clock(),
+        ),
       );
     } catch {
       this.snapshot = {
@@ -417,13 +436,16 @@ export class SessionController {
           this.options.fixtureAllowed,
         );
         interrupted =
-          typeof raw === "object" &&
-          raw !== null &&
-          "stage" in raw &&
-          raw.stage === "process";
-        this.snapshot.state = restored.designEditing
-          ? { ...restored, ownerView: "design" }
-          : restored;
+          restored.pendingProvider !== null ||
+          (typeof raw === "object" &&
+            raw !== null &&
+            "stage" in raw &&
+            raw.stage === "process");
+        this.snapshot.state = {
+          ...restored,
+          pendingProvider: null,
+          ...(restored.designEditing ? { ownerView: "design" as const } : {}),
+        };
         if (
           recoverCurrency(raw, this.clock(), this.options.fixtureAllowed)
             .repaired
@@ -448,7 +470,7 @@ export class SessionController {
     this.update({
       ready: true,
       notice: interrupted
-        ? "Processing was interrupted. Its outcome may be unknown; retry only when you choose."
+        ? "A request was interrupted. Its provider outcome may be unknown; completed work is kept. Nothing was repeated. Retry only when you choose."
         : "Your temporary workspace is ready. Photos are processed only on your instruction.",
     });
     this.timer = setInterval(() => this.checkExpiry(), 5000);
@@ -1760,6 +1782,7 @@ export class SessionController {
     this.refreshCurrencyValidity();
     if (
       !this.active ||
+      this.resetting ||
       this.clock() >= Date.parse(this.snapshot.state.graph.expiresAt)
     ) {
       this.checkExpiry();
@@ -2470,7 +2493,7 @@ export class SessionController {
     } finally {
       if (this.assistantOperation === owner) {
         this.assistantOperation = undefined;
-        this.update({ assistantBusy: false }, false);
+        this.update({ assistantBusy: false });
       } else if (!owner.signal.aborted)
         this.update({ assistantBusy: false }, false);
       owner.abort();
@@ -2484,7 +2507,7 @@ export class SessionController {
         assistantBusy: false,
         assistantNotice: "Request cancelled. Your local controls are ready.",
       },
-      false,
+      true,
     );
   }
   currentAssistantMessage(id: string) {
@@ -2876,7 +2899,7 @@ export class SessionController {
               }
             : {}),
         },
-        false,
+        notice,
       );
   }
   async generateLogos() {
@@ -2913,7 +2936,7 @@ export class SessionController {
         logoNotice:
           "Preparing three separate directions. Your storefront stays usable.",
       },
-      false,
+      true,
     );
     const current = () =>
       this.active &&
@@ -2997,7 +3020,7 @@ export class SessionController {
     } finally {
       if (this.logoOperation === owner) {
         this.logoOperation = undefined;
-        this.update({ logoBusy: false }, false);
+        this.update({ logoBusy: false });
       }
       owner.abort();
     }
@@ -3061,6 +3084,12 @@ export class SessionController {
     this.update({ preparedLogo: null }, false);
   }
   logoUnavailable(id: string) {
+    if (
+      !this.valid() ||
+      !this.snapshot.state.logos.candidates.some((logo) => logo.id === id) ||
+      !this.logoUrl(id)
+    )
+      return;
     this.logoAssets?.unavailable(id);
     const state = this.snapshot.state;
     this.state({
@@ -3200,10 +3229,43 @@ export class SessionController {
       )
         photos.selectAvailable(this.snapshot.state.selectedIds);
     } finally {
-      this.recovering = false;
-      this.lastPhotoRevision = this.photos.getSnapshot().revision;
+      if (
+        this.active &&
+        generation === this.generation &&
+        this.photos === photos
+      ) {
+        this.recovering = false;
+        this.lastPhotoRevision = photos.getSnapshot().revision;
+      }
     }
-    this.update({}, false);
+    if (this.active && generation === this.generation && this.photos === photos)
+      this.update({}, false);
+  }
+  exportReport() {
+    if (!this.valid() || !this.snapshot.ready) return;
+    try {
+      const report = buildExport(
+        this.snapshot.state,
+        this.clock(),
+        this.options.fixtureAllowed,
+      );
+      this.download.save(report.json, report.filename);
+      this.update(
+        {
+          notice:
+            "JSON download requested. It contains completed demo records and scoped USD facts; images, chat and pending actions are excluded. Saved files cannot be recalled by Reset.",
+        },
+        false,
+      );
+    } catch {
+      this.update(
+        {
+          notice:
+            "The report could not be downloaded. Your collection is kept; check browser downloads and try again.",
+        },
+        false,
+      );
+    }
   }
   async reset(
     notice = "Fresh collection. Your previous temporary workspace has been cleared.",
@@ -3211,10 +3273,14 @@ export class SessionController {
     if (!this.active || this.resetting) return;
     this.resetting = true;
     this.cancelOperation();
+    this.download.clear();
     this.logoAssets?.dispose();
     this.unlistenPhotos?.();
     this.unlistenPhotos = undefined;
     this.update({
+      logoBusy: false,
+      logoNotice: "",
+      recoveryNotice: "",
       assistantDraft: "",
       assistantBusy: false,
       assistantNotice: "",
@@ -3260,6 +3326,7 @@ export class SessionController {
     this.active = false;
     this.options.signal?.removeEventListener("abort", this.aborted);
     this.cancelOperation();
+    this.download.clear();
     this.unlistenPhotos?.();
     if (this.timer) clearInterval(this.timer);
     this.photos?.dispose();

@@ -22,6 +22,31 @@ const setup = () => {
   return env;
 };
 describe("single workspace ownership and safe recovery", () => {
+  it("ignores a retiring exact-photo repair after reset, including its final notification", async () => {
+    const env = setup(),
+      controller = await env.open();
+    await controller.photos.add([file("one")]);
+    const expected = controller.getSnapshot().state.photos[0]!;
+    controller.photos.reportUnavailable(expected.id);
+    let finish!: () => void;
+    vi.spyOn(controller.photos, "repair").mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const pending = controller.repair(expected.id, file("one"));
+    await controller.reset();
+    const identity = controller.getSnapshot().state.graph.workspaceId,
+      changed = vi.fn();
+    const unlisten = controller.subscribe(changed);
+    finish();
+    await pending;
+    expect(changed).not.toHaveBeenCalled();
+    expect(controller.getSnapshot().state.graph.workspaceId).toBe(identity);
+    expect(controller.getSnapshot().missingPhotoIds).toEqual([]);
+    unlisten();
+  });
   it("opens the owner garment-review/add-photo path without replacing current commerce", async () => {
     const env = setup(),
       controller = await env.open();
@@ -329,6 +354,23 @@ describe("single workspace ownership and safe recovery", () => {
     expect(() =>
       restoreProjection(
         { ...JSON.parse(encoded), secret: "extra" },
+        env.clock(),
+        true,
+      ),
+    ).toThrow();
+    expect(() =>
+      restoreProjection(
+        { ...JSON.parse(encoded), schemaVersion: 2 },
+        env.clock(),
+        true,
+      ),
+    ).toThrow();
+    expect(() =>
+      restoreProjection(
+        {
+          ...JSON.parse(encoded),
+          graph: { ...state.graph, expiresAt: "2026-10-12T18:00:00.000Z" },
+        },
         env.clock(),
         true,
       ),

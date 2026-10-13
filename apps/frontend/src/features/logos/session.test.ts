@@ -126,6 +126,9 @@ it("atomically replaces three choices once, bounds retries, and never changes co
   expect(controller.getSnapshot().state.graph).toBe(graph);
   await controller.reset();
   expect(second.every((id) => !controller.logoUrl(id))).toBe(true);
+  expect(controller.getSnapshot().logoNotice).toBe("");
+  controller.logoUnavailable(second[0]!);
+  expect(controller.getSnapshot().logoNotice).toBe("");
   expect(env.caches.get(graph.workspaceId)!.logos).toEqual([]);
 });
 it("discards late context after a name/style change and preserves previous choices on a failed set", async () => {
@@ -172,4 +175,43 @@ it("does not spend a batch before transport dispatch and rejects a foreign resul
   expect(
     controller.getSnapshot().state.previewDesign.logoId ?? null,
   ).toBeNull();
+});
+it("records a pending logo request as inert recovery metadata and fences its late result after reset", async () => {
+  let signal!: AbortSignal,
+    input!: LogoInput,
+    finish!: (value: LogoResult) => void;
+  const { env, controller, request, verify } = await setup(
+    (next, owned, dispatch) => {
+      input = next;
+      signal = owned;
+      dispatch();
+      return new Promise((resolve) => {
+        finish = resolve;
+      });
+    },
+  );
+  controller.useCurrentLook();
+  controller.prepareLogo();
+  const operation = controller.generateLogos();
+  const encoded = env.storage.getItem(SESSION_KEY)!;
+  expect(JSON.parse(encoded).pendingProvider).toBe("logos");
+  expect(encoded).not.toMatch(/"(?:grant|token|data)"\s*:|blob:/u);
+  await controller.reset();
+  const identity = controller.getSnapshot().state.graph.workspaceId;
+  expect(signal.aborted).toBe(true);
+  finish(result(input, new Date(env.clock()).toISOString()));
+  await operation;
+  expect(controller.getSnapshot().state.graph.workspaceId).toBe(identity);
+  expect(controller.getSnapshot().logoNotice).toBe("");
+  expect(controller.getSnapshot().state.logos.candidates).toEqual([]);
+  env.storage.setItem(SESSION_KEY, encoded);
+  const restored = await env.open({ logoRequest: request, logoVerify: verify });
+  expect(restored.getSnapshot().notice).toContain(
+    "provider outcome may be unknown",
+  );
+  expect(restored.getSnapshot().state.logos.batches).toBe(1);
+  expect(restored.getSnapshot().preparedLogo).toBeNull();
+  expect(restored.getSnapshot().logoBusy).toBe(false);
+  expect(restored.getSnapshot().state.pendingProvider).toBeNull();
+  expect(request).toHaveBeenCalledOnce();
 });

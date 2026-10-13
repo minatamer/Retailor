@@ -8,6 +8,7 @@ import type {
 import { replyCurrent } from "./conversation";
 import { currentAssistantContext } from "./context";
 import { tourPlacement } from "./tour-layout";
+import { SESSION_KEY } from "../session/projection";
 const environments: ReturnType<typeof environment>[] = [];
 afterEach(() => environments.splice(0).forEach((e) => e.dispose()));
 function env() {
@@ -136,6 +137,8 @@ describe("one session owns scoped Tailor conversation", () => {
     c.assistantInput("Try again");
     const second = c.sendAssistant();
     const old = reply(input);
+    const encoded = e.storage.getItem(SESSION_KEY)!;
+    expect(JSON.parse(encoded).pendingProvider).toBe("assistant");
     await c.reset();
     expect(signal.aborted).toBe(true);
     resolve(old);
@@ -143,6 +146,18 @@ describe("one session owns scoped Tailor conversation", () => {
     expect(c.getSnapshot().state.conversation).toEqual([]);
     expect(c.getSnapshot().assistantBusy).toBe(false);
     expect(c.getSnapshot().state.stage).toBe("choose");
+    e.storage.setItem(SESSION_KEY, encoded);
+    const recovered = await e.open({ assistantRequest: request });
+    expect(recovered.getSnapshot().notice).toContain(
+      "provider outcome may be unknown",
+    );
+    expect(recovered.getSnapshot().assistantBusy).toBe(false);
+    expect(
+      recovered
+        .getSnapshot()
+        .state.conversation.every((message) => message.restored),
+    ).toBe(true);
+    expect(request).toHaveBeenCalledTimes(2);
   });
   it("protects dirty authored drafts, bounds combined history and fences only relevant presentation changes", async () => {
     const e = env(),

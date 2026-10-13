@@ -63,6 +63,10 @@
       "types": "./dist/assistant.d.ts",
       "import": "./dist/assistant.js"
     },
+    "./export": {
+      "types": "./dist/export.d.ts",
+      "import": "./dist/export.js"
+    },
     "./brand": {
       "types": "./dist/brand.d.ts",
       "import": "./dist/brand.js"

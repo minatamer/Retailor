@@ -52,6 +52,10 @@ export const ProjectionSchema = z.strictObject({
   previewDesign: DesignSchema,
   presentationRevision: z.number().int().nonnegative().max(1_000_000),
   fixture: z.boolean(),
+  pendingProvider: z
+    .enum(["catalogue", "assistant", "logos"])
+    .nullable()
+    .default(null),
   browse: BrowseSchema.default(INITIAL_BROWSE),
   setup: SetupSchema.default(INITIAL_SETUP),
   hasAcceptedLook: z.boolean().default(false),
@@ -211,6 +215,7 @@ export function serializeProjection(state: Projection, now: number) {
     previewDesign: state.previewDesign,
     presentationRevision: state.presentationRevision,
     fixture: state.fixture,
+    pendingProvider: state.pendingProvider,
     browse: state.browse,
     setup: state.setup,
     hasAcceptedLook: state.hasAcceptedLook,
