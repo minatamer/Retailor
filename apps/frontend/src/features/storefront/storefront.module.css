@@ -1161,3 +1161,260 @@
   height: 42px;
   object-fit: contain;
 }
+
+/* Compact, inert marketing presentation of the same renderer. Normal stores retain their full layout. */
+.store[data-illustration] {
+  --illustration-body: calc(100cqh - 96px);
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+.store[data-illustration] .header {
+  padding: 7px 18px;
+  min-height: 36px;
+  height: 36px;
+  flex-wrap: nowrap;
+  gap: 12px;
+}
+.store[data-illustration] .wordmark {
+  font-size: 20px;
+  min-height: 0;
+  max-width: 65%;
+}
+.store[data-illustration] .header nav {
+  gap: 12px;
+}
+.store[data-illustration] .header nav button {
+  min-height: 0;
+  padding: 2px 0;
+  font-size: 8px;
+}
+.store[data-illustration] .page {
+  padding: 12px;
+}
+.store[data-illustration] .hero {
+  min-height: 0;
+  height: var(--illustration-body);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 16px;
+  align-items: center;
+}
+.store[data-illustration] .heroCopy {
+  padding: 8px 0;
+}
+.store[data-illustration] .heroCopy .eyebrow,
+.store[data-illustration] .heroCopy > p,
+.store[data-illustration] .heroIndex,
+.store[data-illustration] .hero .primary,
+.store[data-illustration] .categoryBar,
+.store[data-illustration] .featured,
+.store[data-illustration] .footer {
+  display: none;
+}
+.store[data-illustration] .hero h1 {
+  font-size: clamp(22px, 6cqw, 58px);
+  line-height: 1.07;
+  margin: 0;
+}
+.store[data-illustration] .heroPhoto {
+  height: var(--illustration-body);
+  min-height: 0;
+  aspect-ratio: auto;
+}
+.store[data-illustration] .heroPhoto img {
+  object-fit: contain;
+}
+.store[data-illustration] .heroPhotoLabel {
+  font-size: 8px;
+  padding: 7px;
+}
+.store[data-illustration][data-family="pulse"] .hero {
+  gap: 0;
+}
+.store[data-illustration][data-family="pulse"] .heroCopy {
+  padding: 15px;
+}
+.store[data-illustration][data-family="pulse"] .hero h1 {
+  font-size: clamp(22px, 6cqw, 58px);
+}
+.store[data-illustration][data-family="gallery"] .hero {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 10px 14px;
+}
+.store[data-illustration][data-family="gallery"] .heroCopy {
+  grid-column: 1/-1;
+  padding: 0;
+}
+.store[data-illustration][data-family="gallery"] .heroCopy h1 {
+  font-size: clamp(21px, 4.8cqw, 42px);
+  margin: 0 auto;
+}
+.store[data-illustration][data-family="gallery"] .heroPhoto,
+.store[data-illustration] .secondHero {
+  height: 100%;
+  margin: 0;
+  aspect-ratio: auto;
+  min-height: 0;
+}
+.store[data-illustration] .secondHero img {
+  object-fit: contain;
+}
+.store[data-illustration] .secondHero span {
+  font-size: 8px;
+  padding: 7px;
+}
+.store[data-illustration] .collectionHeading {
+  padding: 0;
+  margin: 0 0 12px;
+}
+.store[data-illustration] .collectionHeading h1 {
+  font-size: 28px;
+  margin: 3px 0;
+}
+.store[data-illustration] .collectionHeading > p,
+.store[data-illustration] .collectionTools,
+.store[data-illustration] .filters {
+  display: none;
+}
+.store[data-illustration] .grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.store[data-illustration] .cardImage > button:first-child {
+  height: calc(100cqh - 160px);
+  aspect-ratio: auto;
+  min-height: 0;
+}
+.store[data-illustration] .cardImage img {
+  object-fit: contain;
+}
+.store[data-illustration] .card h2 {
+  font-size: 11px;
+  margin: 8px 0 4px;
+}
+.store[data-illustration] .card h2 button {
+  min-height: 0;
+}
+.store[data-illustration] .price {
+  font-size: 10px;
+}
+.store[data-illustration] .stockBadge {
+  font-size: 8px;
+}
+.store[data-illustration] .detail {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  margin: 0;
+}
+.store[data-illustration] .mainPhoto {
+  height: var(--illustration-body);
+  min-height: 0;
+  aspect-ratio: auto;
+}
+.store[data-illustration] .mainPhoto img {
+  object-fit: contain;
+}
+.store[data-illustration] .caption,
+.store[data-illustration] .zoomHint {
+  display: none;
+}
+.store[data-illustration] .purchase {
+  padding: 14px 0;
+  position: static;
+}
+.store[data-illustration] .purchase h1 {
+  font-size: clamp(22px, 4.5cqw, 42px);
+  margin: 9px 0 12px;
+}
+.store[data-illustration] .purchase > p {
+  font-size: 11px;
+  line-height: 1.6;
+}
+.store[data-illustration] .purchase fieldset {
+  margin-block: 12px;
+}
+.store[data-illustration] .purchase legend {
+  font-size: 9px;
+}
+.store[data-illustration] .options button {
+  min-height: 28px;
+  font-size: 9px;
+}
+@container landing-preview (max-height: 180px) {
+  .store[data-illustration] {
+    --illustration-body: calc(100cqh - 38px);
+  }
+  .store[data-illustration] .header {
+    display: none;
+  }
+  .store[data-illustration] .page {
+    padding: 8px;
+  }
+  .store[data-illustration] .hero {
+    gap: 8px;
+  }
+  .store[data-illustration] .hero h1,
+  .store[data-illustration][data-family="pulse"] .hero h1 {
+    font-size: 16px;
+    max-width: none;
+  }
+  .store[data-illustration] .heroCopy {
+    padding: 0;
+  }
+  .store[data-illustration][data-family="pulse"] .heroCopy {
+    padding: 8px;
+  }
+  .store[data-illustration][data-family="gallery"] .heroCopy h1 {
+    font-size: 16px;
+  }
+  .store[data-illustration][data-family="gallery"] .hero {
+    gap: 5px;
+  }
+  .store[data-illustration] .heroPhotoLabel,
+  .store[data-illustration] .secondHero span {
+    display: none;
+  }
+  .store[data-illustration] .collectionHeading {
+    margin-bottom: 5px;
+  }
+  .store[data-illustration] .collectionHeading h1 {
+    font-size: 16px;
+    margin: 0;
+  }
+  .store[data-illustration] .collectionHeading .eyebrow {
+    display: none;
+  }
+  .store[data-illustration] .cardImage > button:first-child {
+    height: calc(100cqh - 67px);
+  }
+  .store[data-illustration] .card h2,
+  .store[data-illustration] .card .price,
+  .store[data-illustration] .card .eyebrow {
+    display: none;
+  }
+  .store[data-illustration] .detail {
+    gap: 10px;
+  }
+  .store[data-illustration] .purchase {
+    padding: 0;
+  }
+  .store[data-illustration] .purchase h1 {
+    font-size: 17px;
+    margin: 3px 0 5px;
+  }
+  .store[data-illustration] .purchase > p:not(.detailPrice),
+  .store[data-illustration] .purchase fieldset {
+    display: none;
+  }
+  .store[data-illustration] .purchase .eyebrow {
+    display: none;
+  }
+  .store[data-illustration] .purchase .detailPrice {
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0;
+  }
+}

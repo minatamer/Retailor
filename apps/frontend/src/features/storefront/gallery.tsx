@@ -1,11 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import type { PhotoView } from "../photos/controller";
+import type { StorePhoto } from "./photo";
+export type { StorePhoto } from "./photo";
 import styles from "./storefront.module.css";
-export interface StorePhoto extends PhotoView {
-  id: string;
-}
 export function GarmentImage({
   photo,
   title,

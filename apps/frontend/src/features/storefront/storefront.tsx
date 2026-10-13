@@ -29,6 +29,7 @@ import type { StorePhoto } from "./gallery";
 import styles from "./storefront.module.css";
 
 export interface StorefrontInput {
+  illustration?: boolean;
   design: Design;
   items: readonly StoreItem[];
   browse: BrowseState;
@@ -70,6 +71,7 @@ export function Storefront({
     frame = useRef<HTMLDivElement>(null);
   const previous = useRef(`${browse.page}:${browse.productId ?? ""}`);
   useEffect(() => {
+    if (input.illustration) return;
     const next = `${browse.page}:${browse.productId ?? ""}`;
     if (previous.current !== next) {
       if (
@@ -81,7 +83,7 @@ export function Storefront({
       frame.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     previous.current = next;
-  }, [browse.page, browse.productId]);
+  }, [browse.page, browse.productId, input.illustration]);
   const select = (id: string) =>
     actions.browse({
       page: "product",
@@ -98,6 +100,7 @@ export function Storefront({
       className={styles.store}
       style={merchantStyle(design)}
       data-family={design.template}
+      data-illustration={input.illustration ? "true" : undefined}
       aria-label={`${design.name} storefront`}
     >
       <div className={styles.storeFrame} ref={frame}>
