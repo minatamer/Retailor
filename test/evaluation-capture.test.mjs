@@ -23,7 +23,6 @@ function approved(caseIds = ["shopper_category"]) {
       planDigest: authorizationDigest(plan),
       ownerApproved: true,
       accountAndRetentionVerified: true,
-      maximumReservationMicroUsd: caseIds.length * 1000000,
       logoOutputEnvelopeVerified: false,
       expiresAt: new Date(Date.now() + 3600000).toISOString(),
       caseIds,
@@ -41,7 +40,7 @@ describe("operator-only bounded metadata capture", () => {
       { planDigest: "0".repeat(64) },
       { expiresAt: "2020-01-01T00:00:00.000Z" },
       { caseIds: ["shopper_category", "shopper_category"] },
-      { caseIds: ["logos_optional"], maximumReservationMicroUsd: 4000000 },
+      { caseIds: ["logos_optional"] },
     ])
       expect(() =>
         validateAuthorization({ ...authorization, ...patch }, plan),

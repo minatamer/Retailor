@@ -30,7 +30,6 @@ describe("bounded release evaluation preparation", () => {
         assistantTurns: 7,
         logoBatches: 1,
         providerRequests: 24,
-        reservationMicroUsd: 13000000,
       },
     });
     expect(plan.cost.measuredMicroUsd).toBeNull();

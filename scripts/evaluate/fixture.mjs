@@ -96,7 +96,6 @@ export async function runFixture(candidate, inputs) {
   const providerCalls = { catalogue: 0, paid: 0 };
   const gate = new PaidAdmission({
     secret: "evaluation-only-secret-".repeat(2),
-    budgetMicroUsd: 22000000,
     challenge: { verify: async (proof) => proof === "fixture-proof" },
   });
   let currentRequestId = randomUUID();
@@ -433,7 +432,7 @@ export async function runFixture(candidate, inputs) {
       (sum, input) => sum + input.bytes.length,
       0,
     ),
-    simulatedReservationMicroUsd: gate.counters().reservedMicroUsd,
+    activePaidOperations: gate.counters().active,
     rows,
     verdict: rows.every((row) => row.outcome === "pass")
       ? "fixture-only-pass"

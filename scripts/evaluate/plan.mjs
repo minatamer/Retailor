@@ -10,10 +10,6 @@ import { LOGO_MODEL } from "../../apps/backend/src/providers/logos.js";
 import { RECOGNITION_LIMITS } from "@retailor/contracts/recognition";
 import { ASSISTANT_LIMITS } from "@retailor/contracts/assistant";
 import { LOGO_LIMITS } from "@retailor/contracts/brand";
-import {
-  CATALOGUE_RESERVE_MICRO_USD,
-  LOGO_RESERVE_MICRO_USD,
-} from "../../apps/backend/src/security/admission.js";
 export const LIVE_CASES = Object.freeze([
   { id: "catalogue_sample", capability: "catalogue", inputCount: 15 },
   { id: "catalogue_upload_subset", capability: "catalogue", inputCount: 3 },
@@ -68,10 +64,6 @@ export function evaluationPlan(candidate, assets) {
         ASSISTANT_LIMITS.modelRequests *
         ASSISTANT_LIMITS.outputTokens,
       logoImages: logos * LOGO_LIMITS.count,
-      reservationMicroUsd:
-        catalogue * CATALOGUE_RESERVE_MICRO_USD +
-        assistant * CATALOGUE_RESERVE_MICRO_USD +
-        logos * LOGO_RESERVE_MICRO_USD,
     },
     limits: {
       catalogue: RECOGNITION_LIMITS,
@@ -80,7 +72,6 @@ export function evaluationPlan(candidate, assets) {
     },
     cost: {
       measuredMicroUsd: null,
-      reservationIsBillCeiling: false,
       actualVisionInputTokens: "pending",
       actualLogoOutputEnvelope: "pending",
       optionalLogoApprovable: false,

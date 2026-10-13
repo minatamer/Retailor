@@ -148,28 +148,16 @@ export async function executeEvaluation(args = []) {
       configured.FAKE_MODE
     )
       throw new Error("Capture requires explicitly configured local live mode");
-    const env = {
-      ...configured,
-      APP_REVISION: candidate,
-      PROCESS_BUDGET_MICRO_USD: Math.min(
-        configured.PROCESS_BUDGET_MICRO_USD,
-        authorization.maximumReservationMicroUsd,
-      ),
-      LOGO_GENERATION_ENABLED:
-        configured.LOGO_GENERATION_ENABLED &&
-        authorization.caseIds.includes("logos_optional"),
-    };
     const session = createCaptureSession(authorization, (row) =>
       process.stdout.write(JSON.stringify(row) + "\n"),
     );
     const fetcher = session.fetcher();
     const runtime = composeRuntime(
-      env,
+      configured,
       () => "request_capture",
       (environment) => ({
         admission: new PaidAdmission({
           secret: environment.GRANT_SIGNING_SECRET,
-          budgetMicroUsd: environment.PROCESS_BUDGET_MICRO_USD,
           challenge: turnstile(
             environment.TURNSTILE_SECRET_KEY,
             environment.FRONTEND_ORIGIN,

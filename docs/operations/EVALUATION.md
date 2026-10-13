@@ -27,7 +27,7 @@ pnpm --filter @retailor/backend exec tsx ../../scripts/evaluate/run.mjs --fixtur
 
 ## Exact provisional live sequence
 
-Use the real `/demo` page, current catalogue/graph, normal source disclosure, actual challenge and each exact action grant. Complete all free/manual checks before adding a paid turn. Do not post directly to OpenAI, swap challenge verification, bypass budgets or infer paid permission from a ticket/plan file.
+Use the real `/demo` page, current catalogue/graph, normal source disclosure, actual challenge and each exact action grant. Complete all free/manual checks before adding a paid turn. Do not post directly to OpenAI, swap challenge verification, bypass admission/request limits or infer paid permission from a ticket/plan file.
 
 | Case                       | Deliberate operation                                                       | Required inspection                                                                                                                                                                                          |
 | -------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -50,13 +50,13 @@ Additional grouping/label/lighting/mixed-item/non-clothing and independent uploa
 
 The plan imports actual source policy: catalogue and assistant **`gpt-6-luna`**, prompt versions `catalogue-evidence-v1` / `tailor-grounded-v1`; optional **`gpt-image-2.5-flare-2026-09-08`**, `clothing-brand-v1` / `transparent-png-v1`. These are provisional configured models, not verified account capability or quality recommendations. Responses use foreground `store:false`, default processing tier and zero SDK retries. Image generation is exactly n=3, 1024 square, medium quality, transparent PNG, foreground/nonstreamed.
 
-The proposed process allowance is **USD 13 reservations**: 2×$1 catalogue + 7×$1 text + 1×$4 logo. The non-logo sequence reserves $9. This is **not an invoice, a guaranteed worst bill or a project monthly hard cap**. Source limits allow 24,000 aggregate catalogue output tokens and 31,500 text output tokens; text input is bounded at 12,000 tokens/request. Actual vision usage and the Flare image-output ceiling remain unmeasured.
+RTL-024 removes the process dollar allowance and evaluation reservation metadata. The fixed plan still permits two catalogue batches, seven text turns and one optional three-logo batch, with exact case approval, bounded provider request counts, expiry and stop-on-unknown/failure. Source limits allow 24,000 aggregate catalogue output tokens and 31,500 text output tokens; text input is bounded at 12,000 tokens/request. Actual vision usage and the image-output envelope remain unmeasured.
 
 The [provider policy](PROVIDERS.md) records the official price basis checked 13 October. At its short-context standard Luna prices, the text plan's 252,000 input-token upper bound and 31,500 output-token bound correspond to $0.04095; the catalogue's output component alone is $0.012. Those are component estimates from bounded tokens, excluding unmeasured vision input and logo generation, account adjustments and hosting. They are not the full evaluation budget or a measured bill. [Official pricing](https://developers.openai.com/api/docs/pricing), [Flare model](https://developers.openai.com/api/docs/models/gpt-image-2.5-flare).
 
-Before any paid run the owner must identify the account/project, verify model/endpoint/tier access and retention policy, privately configure keys/challenge/grant secret, choose actual enforced spending limits and approve the exact cases/allowance. Optional logos additionally require a concrete accepted output/cost envelope and normal logo policy flags. `store:false` does not promise zero provider retention. Account, aggregate usage/billing, unknown outcomes and platform costs need their own evidence.
+Before any paid run the owner must identify the account/project, verify model/endpoint/tier access and retention policy, privately configure keys/challenge/grant secret, choose actual enforced spending limits and approve the exact cases. Optional logos additionally require a concrete accepted output/cost envelope; there are no logo policy environment flags. `store:false` does not promise zero provider retention. Account, aggregate usage/billing, unknown outcomes and platform costs need their own evidence.
 
-Stop on model/tier/billing/retention mismatch, refusal or unexpected output, exceeded allowance/case count, invalid associations, missing usage, cancelled/unknown outcome, stale context, bad quote or a validation error. Preserve inputs and existing local controls. Unknown dispatch may have spent its reservation. No automatic fake fallback or unapproved repeated live case. Price/model/SDK policy changes require a newly frozen plan and review.
+Stop on model/tier/billing/retention mismatch, refusal or unexpected output, exceeded allowance/case count, invalid associations, missing usage, cancelled/unknown outcome, stale context, bad quote or a validation error. Preserve inputs and existing local controls. Unknown dispatch may have incurred an actual provider charge. No automatic fake fallback or unapproved repeated live case. Price/model/SDK policy changes require a newly frozen plan and review.
 
 ## Operator capture — prepared, never started here
 
@@ -74,14 +74,13 @@ An operator authorization has these fields; the deliberately unapproved example 
   "planDigest": "REPLACE_WITH_PREPARE_PLAN_DIGEST",
   "ownerApproved": false,
   "accountAndRetentionVerified": false,
-  "maximumReservationMicroUsd": 0,
   "expiresAt": "REPLACE_WITH_APPROVED_WINDOW",
   "logoOutputEnvelopeVerified": false,
   "caseIds": []
 }
 ```
 
-After separate real authorization, keep this file and capture output in ignored local artifacts. Configure local live backend and frontend through their normal app-local files; the ordinary fake dev launcher is not a live evaluation environment. Capture requires backend development/test local mode, port **4311**, exact frontend origin **http://127.0.0.1:4310**, live/paid/policy prerequisites and bounded process allowance. It never sets a missing paid switch/key or enables logos absent from the approved inventory. The frontend must point to that same local backend and preserve normal real challenge behavior.
+After separate real authorization, keep this file and capture output in ignored local artifacts. Configure local live backend and frontend through their normal app-local files; the ordinary fake dev launcher is not a live evaluation environment. Capture requires backend development/test local mode, port **4311**, exact frontend origin **http://127.0.0.1:4310**, live/paid/credential prerequisites and exact approved case inventory. It never sets a missing paid switch/key; its wrapper refuses logo dispatch absent from the approved inventory even though runtime logos share live availability. The frontend must point to that same local backend and preserve normal real challenge behavior.
 
 **Inspect listeners and process ancestry first.** Stop only a verified Retailor backend through the documented lifecycle workflow before starting its replacement. Never stop another repository, take its port or select a fallback port. Then use the pinned runtime explicitly:
 
@@ -93,7 +92,7 @@ The server binds only 127.0.0.1:4311. It creates one exclusive ignored local `ev
 
 Only one provider case is active. Exact role/count inventory and per-case model-network bounds are enforced; caller changes cannot add cases. Failed/aborted/unaccounted requests and exhausted inventory disable further AI capabilities, while health/local controls/FX remain independent. At most one extra pre-provider rejection record is kept, so repeated rejected traffic cannot grow the recorder. An incomplete response has nullable status and unknown outcome. Ordinary SIGINT/SIGTERM closes only this server and its owned connections.
 
-Capture emits newline JSON metadata. Review that metadata and the actual native UI together. Per-request usage-derived costs are estimates until reconciled with the account; do not fill `measuredCostMicroUsd` with the reserved amount. Validate a final content-free operator record with `--record`, retain actual failures/unknowns, and attach useful screenshots/source references without visitor/provider payloads. The real challenge requires the human's normal participation. No challenge bypass is offered.
+Capture emits newline JSON metadata. Review that metadata and the actual native UI together. Per-request usage-derived costs are estimates until reconciled with the account; do not invent a value for `measuredCostMicroUsd`. Validate a final content-free operator record with `--record`, retain actual failures/unknowns, and attach useful screenshots/source references without visitor/provider payloads. The real challenge requires the human's normal participation. No challenge bypass is offered.
 
 ## Public FX source and release verdict
 

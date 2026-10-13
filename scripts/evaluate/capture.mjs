@@ -20,7 +20,6 @@ const AuthorizationSchema = z.strictObject({
   planDigest: z.string().regex(/^[a-f0-9]{64}$/u),
   ownerApproved: z.literal(true),
   accountAndRetentionVerified: z.literal(true),
-  maximumReservationMicroUsd: z.number().int().min(1000000).max(13000000),
   expiresAt: z.iso.datetime({ precision: 3 }),
   logoOutputEnvelopeVerified: z.boolean(),
   caseIds: z
@@ -47,16 +46,11 @@ export function validateAuthorization(input, plan) {
   const cases = authorization.caseIds.map((id) =>
     LIVE_CASES.find((c) => c.id === id),
   );
-  const reserved = cases.reduce(
-    (sum, c) => sum + (c.capability === "logos" ? 4000000 : 1000000),
-    0,
-  );
   if (
-    reserved > authorization.maximumReservationMicroUsd ||
-    (cases.some((c) => c.capability === "logos") &&
-      !authorization.logoOutputEnvelopeVerified)
+    cases.some((c) => c.capability === "logos") &&
+    !authorization.logoOutputEnvelopeVerified
   )
-    throw new Error("Authorized allowance/envelope unavailable");
+    throw new Error("Authorized logo envelope unavailable");
   return Object.freeze({
     ...authorization,
     caseIds: Object.freeze([...authorization.caseIds]),
