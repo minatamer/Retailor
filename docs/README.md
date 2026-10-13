@@ -20,6 +20,8 @@ The owner has authorized queue execution and ticket-prefixed commits after clean
 
 [Storefront-runway landing](design/LANDING.md) records the result-first clothing story, real template illustration and retained alternatives. [RTL-017 validation](validation/RTL-017.md) records ten native viewport fits, visible matching-page motion, stable CTA, photo fallback and completed-draft resume; owner/physical/zoom/hosted checks remain separately pending.
 
+[Combined security](engineering/SECURITY.md) traces bounded admission, transport, parser, provider and error/UI boundaries. [Provider operations](operations/PROVIDERS.md) records checked prices, conservative reservations and actual-account prerequisites. [RTL-018 validation](validation/RTL-018.md) separates adversarial/local/native evidence from unperformed paid, Linux and hosted acceptance.
+
 ## Retained source material
 
 - [Original concept Markdown](retailor.md) and [original concept preview](retailor.html) are archived exploration; their simulations do not prove real recognition or deployed behavior.

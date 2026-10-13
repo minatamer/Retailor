@@ -1,6 +1,6 @@
 # RTL-018 — Harden privacy, abuse controls, spend and runtime boundaries
 
-Status: **Planned — not started**\
+Status: **Implemented locally — account/paid/Linux/hosted acceptance pending**\
 Planning date: **11 October 2026**\
 Milestone: **Public hardening**\
 Depends on: [RTL-006](RTL-006-deliver-live-catalogue-recognition-and-admission.md), [RTL-009](RTL-009-deliver-automatic-usd-eur-storefront-pricing.md), [RTL-013](RTL-013-deliver-grounded-tailor-conversation-tools-and-tours.md), [RTL-015](RTL-015-deliver-optional-three-logo-generation.md), [RTL-016](RTL-016-complete-export-reset-expiry-and-session-lifecycle.md)\
@@ -56,16 +56,16 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Every paid route fails closed before dispatch on any admission/input/control failure.
-- [ ] Manifest/revision/role/count bindings prevent grants from authorizing changed actions.
-- [ ] Rate/replay/cost/capacity memory and lease ownership are bounded.
-- [ ] Body/output/token/array/deadline caps are consistent across layers.
-- [ ] Paid-off and unavailable states never silently invoke fakes/live adapters.
-- [ ] FX remains fixed, unpaid and free of guest data.
-- [ ] Logs/UI/errors contain no sensitive content or raw SDK payload.
-- [ ] Private bridge and safe config expose no general proxy or secret.
-- [ ] Actual cost assumptions and enforcement limitations are documented.
-- [ ] Deterministic adversarial checks pass; external account/hosted checks remain separate.
+- [x] Every paid route fails closed before dispatch on any admission/input/control failure.
+- [x] Manifest/revision/role/count bindings prevent grants from authorizing changed actions.
+- [x] Rate/replay/cost/capacity memory and lease ownership are bounded.
+- [x] Body/output/token/array/deadline caps are consistent across layers.
+- [x] Paid-off and unavailable states never silently invoke fakes/live adapters.
+- [x] FX remains fixed, unpaid and free of guest data.
+- [x] Logs/UI/errors contain no sensitive content or raw SDK payload.
+- [x] Private bridge and safe config expose no general proxy or secret.
+- [x] Actual cost assumptions and enforcement limitations are documented.
+- [x] Deterministic adversarial checks pass; external account/hosted checks remain separate.
 
 ## Focused verification and evidence
 
@@ -103,4 +103,4 @@ No Redis/database/auth/fingerprinting/paid WAF, durable uniqueness or guaranteed
 
 Keep this outcome under `RTL-018:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-018.md` and actual check/review evidence under `docs/validation/RTL-018.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Local hardening and six final gates pass: 327 tests / 59 files, 156 boundary modules and both builds. [Validation](../validation/RTL-018.md) records actual failures/repairs, native CSP photo/style observations, production artifact checks, resolved operator-retry finding and clean revalidation. [Security](../engineering/SECURITY.md) traces actual controls/data/logs; [provider operations](../operations/PROVIDERS.md) records checked prices, USD 22 workspace reservation and the unknown actual logo-generation ceiling. [Commit allocation](../commit-plans/RTL-018.md) owns three cohesive slices. No API key/account, paid, Linux image, hosted IAM/challenge/retention or deployment acceptance is claimed. Those prerequisites stay pending under RTL-020/021/022; current owner authorization covers the validated local commits. RTL-019 is next eligible.
