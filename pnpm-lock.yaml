@@ -14,6 +14,12 @@ importers:
       '@next/eslint-plugin-next':
         specifier: 16.4.0
         version: 16.4.0(eslint@10.12.0)
+      '@retailor/commerce':
+        specifier: workspace:*
+        version: link:packages/commerce
+      '@retailor/contracts':
+        specifier: workspace:*
+        version: link:packages/contracts
       '@types/node':
         specifier: 24.19.0
         version: 24.19.0

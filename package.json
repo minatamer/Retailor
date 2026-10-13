@@ -21,9 +21,14 @@
     "typecheck": "pnpm build:shared && pnpm -r --sort typecheck && tsc --noEmit -p tsconfig.tests.json",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "test:unit": "pnpm build:shared && vitest run",
+    "evaluate:prepare": "pnpm build:shared && pnpm --filter @retailor/backend exec tsx ../../scripts/evaluate/run.mjs --plan",
+    "evaluate:fixture": "pnpm build:shared && pnpm --filter @retailor/backend exec tsx ../../scripts/evaluate/run.mjs --fixture",
+    "evaluate:fx": "pnpm build:shared && pnpm --filter @retailor/backend exec tsx ../../scripts/evaluate/run.mjs --fx-live",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm test:unit && pnpm build"
   },
   "devDependencies": {
+    "@retailor/contracts": "workspace:*",
+    "@retailor/commerce": "workspace:*",
     "@eslint/js": "10.0.1",
     "@next/eslint-plugin-next": "16.4.0",
     "@types/node": "24.19.0",
