@@ -18,6 +18,8 @@ The owner has authorized queue execution and ticket-prefixed commits after clean
 
 [Temporary workspace lifecycle](engineering/LIFECYCLE.md) inventories resource owners, strict recovery, fixed expiry and the bounded local JSON report. [RTL-016 validation](validation/RTL-016.md) records actual exported-file inspection, refresh/order/reset/two-tab behavior and pending physical/paid/hosted checks.
 
+[Storefront-runway landing](design/LANDING.md) records the result-first clothing story, real template illustration and retained alternatives. [RTL-017 validation](validation/RTL-017.md) records ten native viewport fits, visible matching-page motion, stable CTA, photo fallback and completed-draft resume; owner/physical/zoom/hosted checks remain separately pending.
+
 ## Retained source material
 
 - [Original concept Markdown](retailor.md) and [original concept preview](retailor.html) are archived exploration; their simulations do not prove real recognition or deployed behavior.

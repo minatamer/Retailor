@@ -1,6 +1,6 @@
 # RTL-017 — Build the vibrant storefront-runway landing
 
-Status: **Planned — not started**\
+Status: **Implemented locally — owner/final visual acceptance pending**\
 Planning date: **11 October 2026**\
 Milestone: **Public story**\
 Depends on: [RTL-002](RTL-002-prove-brand-design-system-and-storefront-direction.md), [RTL-003](RTL-003-prepare-fifteen-clothing-photos-and-upload-pipeline.md), [RTL-007](RTL-007-deliver-three-complete-clothing-store-templates.md), [RTL-008](RTL-008-deliver-tailor-chat-led-styling-and-owner-overrides.md)\
@@ -56,15 +56,15 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] Landing instantly communicates clothing photos becoming a beautiful store.
-- [ ] One vibrant runway composition shows complete coherent style transformations.
-- [ ] Actual accepted photos/components underpin the result illustration.
-- [ ] CTA/header actions enter the real one-page demo and preserve valid resume behavior.
-- [ ] Tailor, owner value and temporary/synthetic boundaries are clear in concise PM copy.
-- [ ] No fake testimonials/results or hidden live processing occurs on load.
-- [ ] Phone/short-height/large layouts remain legible and stable.
-- [ ] Visible animation has no suppressing setting or conditional OS gate.
-- [ ] Two alternative concepts remain documented for later visual feedback.
+- [x] Landing instantly communicates clothing photos becoming a beautiful store.
+- [x] One vibrant runway composition shows complete coherent style transformations.
+- [x] Actual accepted photos/components underpin the result illustration.
+- [x] CTA/header actions enter the real one-page demo and preserve valid resume behavior.
+- [x] Tailor, owner value and temporary/synthetic boundaries are clear in concise PM copy.
+- [x] No fake testimonials/results or hidden live processing occurs on load.
+- [x] Phone/short-height/large layouts remain legible and stable.
+- [x] Visible animation has no suppressing setting or conditional OS gate.
+- [x] Two alternative concepts remain documented for later visual feedback.
 
 ## Focused verification and evidence
 
@@ -101,4 +101,4 @@ No full video-rendering service, borrowed protected brand composition, merchant-
 
 Keep this outcome under `RTL-017:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-017.md` and actual check/review evidence under `docs/validation/RTL-017.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Local outcome and six settled gates pass; 317 tests / 57 files and 154 boundary modules. [Validation](../validation/RTL-017.md) records native ten-viewport fits, actual style/collection/detail motion, stable CTA, photo fallback, anchors and completed-draft resume, plus two clean read-only passes. [Design](../design/LANDING.md) retains the research/storyboard/alternatives; [commit allocation](../commit-plans/RTL-017.md) owns three cohesive slices. Owner visual/comprehension feedback, physical devices, native zoom, genuinely cold font-cache failure and hosted performance remain unverified. No paid or cloud action occurred. The current owner authorization covers the validated ticket-prefixed local commits. RTL-018 is next eligible.

@@ -1,0 +1,31 @@
+{
+  "before": {
+    "cta": {
+      "bottom": 210.171875,
+      "height": 44,
+      "left": 55.453125,
+      "right": 249.53125,
+      "top": 166.171875,
+      "width": 194.078125,
+      "x": 55.453125,
+      "y": 166.171875
+    },
+    "scene": "1",
+    "scrollY": 0
+  },
+  "visibleAfter": {
+    "cta": {
+      "bottom": 210.171875,
+      "height": 44,
+      "left": 55.453125,
+      "right": 249.53125,
+      "top": 166.171875,
+      "width": 194.078125,
+      "x": 55.453125,
+      "y": 166.171875
+    },
+    "scene": "3",
+    "scrollY": 0
+  },
+  "note": "Real foreground autoplay advanced from Editorial to Gallery with no new scene selection; CTA rectangle and scroll position stayed equal. Hidden-pane wait did not establish motion."
+}

@@ -1,0 +1,77 @@
+{
+  "kind": "Local production build assets referenced by static landing HTML, not measured hosted transfer or Lighthouse",
+  "htmlBytes": 53046,
+  "javascriptBytes": 755314,
+  "javascriptGzipBytes": 233096,
+  "cssBytes": 122719,
+  "illustratedPhotoBytes": 277938,
+  "source": "Accepted local F01/F07/F12 WebP inputs; no remote font or photo service",
+  "fontFallback": "Self-hosted licensed faces with swap; fixed heading line heights and system stacks",
+  "files": [
+    {
+      "path": "/_next/static/chunks/0mcydhajqyxgm.css",
+      "bytes": 3210,
+      "gzipBytes": 1200
+    },
+    {
+      "path": "/_next/static/chunks/2xv_d1i8c6qfr.css",
+      "bytes": 119509,
+      "gzipBytes": 20657
+    },
+    {
+      "path": "/_next/static/chunks/15qodxqfjcfc1.js",
+      "bytes": 6527,
+      "gzipBytes": 2353
+    },
+    {
+      "path": "/_next/static/chunks/2luwi83-ejzeu.js",
+      "bytes": 28826,
+      "gzipBytes": 7683
+    },
+    {
+      "path": "/_next/static/chunks/11r-39yjurhd-.js",
+      "bytes": 228648,
+      "gzipBytes": 71623
+    },
+    {
+      "path": "/_next/static/chunks/084ss0i9ame3l.js",
+      "bytes": 168152,
+      "gzipBytes": 46254
+    },
+    {
+      "path": "/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+      "bytes": 10030,
+      "gzipBytes": 3940
+    },
+    {
+      "path": "/_next/static/chunks/12blnxuo924jf.js",
+      "bytes": 13827,
+      "gzipBytes": 3512
+    },
+    {
+      "path": "/_next/static/chunks/36lo-jbpy-_-t.js",
+      "bytes": 12506,
+      "gzipBytes": 4860
+    },
+    {
+      "path": "/_next/static/chunks/458p6hbx2y7us.js",
+      "bytes": 33816,
+      "gzipBytes": 10555
+    },
+    {
+      "path": "/_next/static/chunks/22-d9b5z0pi2h.js",
+      "bytes": 114117,
+      "gzipBytes": 32695
+    },
+    {
+      "path": "/_next/static/chunks/06zmvyg9_8ww6.js",
+      "bytes": 26271,
+      "gzipBytes": 9994
+    },
+    {
+      "path": "/_next/static/chunks/0cz1d0mv5g_q7.js",
+      "bytes": 112594,
+      "gzipBytes": 39627
+    }
+  ]
+}
