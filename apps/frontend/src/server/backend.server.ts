@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { publicError } from "@retailor/contracts/api";
 import { forward, parseBridgeConfig, readBounded } from "./bridge";
+import { originGuard } from "./origin-guard.server";
 async function authorization(
   audience: string,
   signal: AbortSignal,
@@ -27,6 +28,8 @@ export async function backendRequest(
   request: Request,
   path: string,
 ): Promise<Response> {
+  const denied = originGuard(request);
+  if (denied) return denied;
   try {
     const config = parseBridgeConfig(process.env);
     return await forward(request, path, config, {
