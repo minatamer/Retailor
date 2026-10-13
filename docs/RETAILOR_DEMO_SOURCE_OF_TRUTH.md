@@ -4,7 +4,7 @@
 **Prepared:** 11 October 2026.\
 **Product:** Retailor. **Sample clothing brand:** FORME.\
 **Companion:** [Retailor product overview](RETAILOR_OVERVIEW.html).\
-**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–019 locally implemented, RTL-020 locally prepared/audited, RTL-021 locally Linux-packaged/verified, next local preparation packet RTL-022; owner visual/device/zoom and paid evidence remain separately pending.\
+**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–019 locally implemented, RTL-020 locally prepared/audited, RTL-021 locally Linux-packaged/verified, RTL-022 locally prepared; all independent local work covered, public release pending; owner visual/device/zoom and paid evidence remain separately pending.\
 **Signature promise:** **Bring your products. See your store.**\
 **Owner decisions incorporated:** all eleven answers on clothing-only scope, researched presets, Tailor-led setup, optional logos, mandatory photos, catalogue integrity, three scenarios, live sample processing, runway direction, image sourcing and USD/EUR; 11 October 2026.
 
@@ -1961,6 +1961,8 @@ Version persisted projections. An older release that cannot understand a newer p
 
 ### 26.8 Release record
 
+RTL-022 now provides a strict local-only matching preflight, fixed read-only inspection commands and a bounded GET delivery/capability helper tested with injected responses. [Hosted worksheet](operations/HOSTED-VERIFICATION.md) owns exact private identity/action, capacity, authorized smoke, visual/lifecycle and recovery checks. [Release status](operations/RELEASE-STATUS.md) lists the real local Linux identifiers and unsupplied external prerequisites. [Validation](validation/RTL-022.md) records actual local commands and keeps every original hosted acceptance criterion unverified. No public URL, cloud mutation, paid acceptance or Complete hosted status is invented.
+
 Record source commit, image digests, deployed revisions, configuration mode, provider/model/prompt/schema versions, origin/challenge scope, named secret versions, service resource limits, IAM verification, safe cost/usage, manual walkthrough and rollback target.
 
 Record what was actually checked separately from owner reports and planned settings. Avoid secret-bearing screenshots, source images, prompts and private account IDs in public documentation.
@@ -1985,7 +1987,7 @@ The owner has authorized detailed ticket planning. The [canonical queue](tickets
 | Linux release preparation | [RTL-021](tickets/RTL-021-package-linux-services-and-manual-release-runbook.md) | Reproducible images, fixed private bridge, concrete manual deploy and rollback plan; independent of paid evaluation. |
 | Owner-authorized hosted release | [RTL-022](tickets/RTL-022-deploy-verify-hosted-demo-and-record-rollback.md) | Exact accepted artifacts, actual private IAM/origins, HTTPS walkthrough, usage evidence and recovery readiness. |
 
-RTL-001–019 have verified local implementation and RTL-020 has verified local evaluation preparation/audit, with explicit quality/external checks still pending. The owner-prioritized RTL-003/006 image-concurrency follow-ups have verified local implementation; RTL-021 has actual Linux packaging evidence; RTL-022 is next for independent local release preparation while live acceptance and owner cloud authorization remain pending; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
+RTL-001–019 have verified local implementation and RTL-020 has verified local evaluation preparation/audit, with explicit quality/external checks still pending. The owner-prioritized RTL-003/006 image-concurrency follow-ups have verified local implementation; RTL-021 has actual Linux packaging evidence; RTL-022 has local preflight/hosted-verification preparation; all authorized independent local work is covered while live acceptance and owner cloud authorization remain pending; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
 
 The first complete local path may use declared development fixtures, but public acceptance requires fresh live recognition for sample and uploads. Security and cleanup start with the first owning feature; later hardening and lifecycle packets complete the combined surface. Optional logo generation follows a polished wordmark path. Domain integrity keeps charts connected to actual products; design evidence proves that all accepted storefront choices look excellent.
 
@@ -2057,7 +2059,7 @@ Routine composition, labels and token refinements can be decided within accepted
 
 The **documentation baseline** is complete when the detailed Markdown and summarized HTML are readable, consistent, linked and traceable to the inspected resources. The original documentation deliverable did not require application implementation.
 
-The **ticket-planning deliverable** is complete when the 22 detailed packets and canonical queue cover the accepted product decisions, have valid dependencies and precision links, and specify context, ownership, an implementation sequence, unchecked acceptance and actual evidence requirements. Ticket planning does not satisfy the future demo acceptance below. Execution status is recorded in the queue; RTL-001 now delivers the verified local foundation. Later product behavior remains intended until its owning evidence exists.
+The **ticket-planning deliverable** is complete when the 22 detailed packets and canonical queue cover the accepted product decisions, have valid dependencies and precision links, and specify context, ownership, an implementation sequence, unchecked acceptance and actual evidence requirements. Ticket planning does not satisfy the future demo acceptance below. Execution status is recorded in the queue: RTL-001–019 have local implementation/evidence, RTL-020 prepares live acceptance, RTL-021 verifies actual Linux packaging and RTL-022 completes independent local release preparation. Required paid, owner/physical and hosted acceptance remains pending; the public demo is not Complete.
 
 The **future demo** is complete only when:
 

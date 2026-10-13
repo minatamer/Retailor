@@ -1,0 +1,90 @@
+# Hosted verification worksheet — prepared, never executed here
+
+RTL-022 completes independent local release preparation while hosted acceptance stays **pending**. The owner has authorized local files/fake checks/commits, not cloud publication, DNS/IAM changes, account reads or paid spend. No real cloud resource identity, public URL, token, secret or accepted live result has been supplied. [Current release status](RELEASE-STATUS.md) is the concise handoff; [RTL-021 manual release](RELEASE.md) contains ordered deploy/disable/rollback commands and candidate settings; [RTL-020 evaluation](EVALUATION.md) owns account/AI/cost/retention acceptance. This worksheet never substitutes for either.
+
+## Local preflight, no network
+
+```powershell
+node scripts/release/preflight.mjs
+```
+
+Default reads the committed blank metadata template, the existing real RTL-021 Linux evidence and the positive build-input fingerprint. It loads no app env, token/key, sibling file or cloud account, and dispatches no network request. Its exit 0 means only the current application inputs match the recorded Linux candidate. Output always says `publicReleaseAccepted=false` and `publicationAuthorized=false`, even with all resource fields supplied. A fingerprint mismatch returns exit 1. Dirty state and missing inputs stay visible. Do not use successful preflight as spend/deploy approval.
+
+Copy `scripts/release/inputs.example.json` to ignored `artifacts/local/release-inputs.json` and fill **metadata only**, after the owner resolves exact resource scope. The reader permits only these two paths and the committed Linux evidence, rejects symlinks/noncanonical files and caps input at 32 KiB/evidence at 128 KiB before parsing. Unknown fields (including API keys), malformed/cross-project identities, mutable registry images, unrelated registry destinations and nonnumeric secret versions fail validation. No caller-specified env/visitor path is opened. Inputs require canonical HTTPS with no credentials, ports or path; backend audience/target uses the primary `.run.app` service URL.
+
+```powershell
+node scripts/release/preflight.mjs artifacts/local/release-inputs.json
+```
+
+With named project/region/services it emits fixed **read-only argument arrays**, not executable shell text. Review/run individual `gcloud run services describe`, `get-iam-policy` and named `gcloud secrets versions describe` operations only within the owner's inspection scope. They neither mutate resources nor access secret values. Service projection deliberately excludes raw env, annotation dumps and full service export because those can contain literal keys or last-applied config. It selects URI/revision/traffic/runtime account/images/ports/resources/timeout/concurrency. Secret projection contains version name/state/create time only. Operator console inspection separately records approved boolean flags, max/min/CPU/ingress/IAM-enforcement and secret-version references; never copy full env/secret values into a report. No command array is automatically run by a helper or root check, and CLI syntax/actual resource metadata are not claimed verified here.
+
+Compare clean commit plus source fingerprint with RTL-020 accepted live evidence and the exact built/published image pair. RTL-021's recorded dirty packaging base is explicitly identified; matching current inputs demonstrates source continuity, not new live acceptance. Capture actual registry digests **after an authorized push**, actual active revisions/traffic, secret-version references and origin/audience. Existing source-only local tags/digests do not prove registry publication. If there is no prior pair, use the first-release paid-disabled/closed-frontend recovery in RELEASE.md.
+
+## Private identity and unpaid boundary checks
+
+Perform these before enabling paid capability. The frontend remains private during deployment/bootstrap; a future public GET helper will correctly fail while it is closed. An authorized operator uses approved identity tooling/console to invoke the private frontend and backend without printing/storing tokens. Obtain only short-lived scoped identity; no service-account JSON files. Any identity impersonation permission also needs explicit owner scope. A token issued for the backend primary service URL is distinct from a tagged/custom frontend URL.
+
+| Check | Required real observation |
+| --- | --- |
+| Backend IAM | Unauthenticated direct `/v1/health` returns platform denial (401/403); authenticated intended frontend principal succeeds; no `allUsers`/`allAuthenticatedUsers`, invoker enforcement remains enabled |
+| Runtime identity | Real frontend `/api/retailor/v1/health` and `/config` reach the private backend through its normal fixed metadata identity path; an operator impersonation test alone is insufficient |
+| Paid off | Backend liveness 200, readiness 503, safe config live-selected/paid false and vision/Tailor/logos unavailable; zero paid dispatch |
+| Fixed bridge | Unknown operation 404; client target/query/auth headers cannot change destination, audience or forwarded identity; production routes expose no internal target/key |
+| Origin/body | Wrong origin, invalid schema/MIME/compression/known oversized envelope rejected before dispatch; one case per boundary, no request floods |
+| Action admission | After separately approved paid configuration, missing/expired/wrong-role/wrong-action/photo-changed grants reject before model dispatch; confirm correct challenge host/real proof and single-use replay |
+| Delivery/edge | Canonical HTTPS, expected redirects, Cloudflare/Cloud Run forwarding, actual TLS/domain ownership, Turnstile hostname; no debug route or fixture sample interpretation |
+| Logging/privacy | Inspect only approved timing/count/status/usage/error metadata. No key/token/cookie/grant, guest image/name/text, raw exception or complete graph/report is retained |
+
+Prepare a harmless reviewed invalid schema/action **before** execution; malformed unauthenticated bodies do not prove application rejection if platform IAM prevented access first. Conversely an Express 403 cannot substitute for platform-private invocation evidence. Tests/fixtures establish local rejection contracts only. For a valid-action replay, submit the same manifest/grant metadata with no repeated large bytes if rejected before body parsing, as RTL-020 documents; do not resend a multi-megabyte body just to trigger TCP drain/reset. Record actual response status/category and dispatch counts, not raw request bodies.
+
+## Bounded public GET helper, explicit future invocation
+
+After an owner-confirmed public frontend origin exists and public/read-only access is in scope:
+
+```powershell
+node scripts/release/hosted.mjs artifacts/local/release-inputs.json > artifacts/local/hosted-get.json
+```
+
+The helper first checks candidate fingerprint and strict input metadata. Then it performs **31 fixed sequential GETs**, stopping at the first failed/unknown observation: five fixed page/config/debug/unknown-route checks and 26 shipped assets (15 WebPs, sample manifest, five WOFF2, four OFL texts and font provenance). It accepts no arbitrary route/body/header/provider URL, POST, bearer token, cookie or challenge. Redirect following and automatic retries are disabled. GET `/config` can perform the normal private identity lookup; it dispatches no paid request. The helper does not query the FX upstream or draft any product.
+
+Each request has an owned 12-second deadline; body reads use one capped buffer, actual-byte cap and finite read-count cap including empty chunks. Caps: HTML 512 KiB, config/error 8 KiB, each asset exactly its current shipped bytes. Abort/error cancels body reading and clears the owned timer. A full worst-case serial plan is bounded by 31 × 12 seconds; stop early on uncertainty rather than retry. Exact asset bytes/hash and MIME, production HTML security headers, missing debug route, strict safe config and unknown-operation error are checked. Metadata output contains finite paths/status/counts/hash/timing/mime-valid booleans and selected capability booleans only. It never writes HTML, chat/catalogue bodies, site key, raw exception or authorization.
+
+Default expects paid off and all AI capabilities unavailable. Only after approved enabling/acceptance, `--expect-paid` checks that the returned vision/Tailor capability is ready. **That flag enables nothing and authorizes no paid call.** Optional logos may remain unavailable with the wordmark path. A GET pass establishes delivery/config within this scope; it proves no live AI, private IAM denial, Turnstile, browser movement, financial consistency, session lifetime or rollback. No actual hosted invocation occurred here; only injected fixture responses were tested. Exit 1/unaccepted means stop and inspect the named boundary before continuing; do not publish a passing URL claim from it.
+
+## Owner-approved connected smoke inventory
+
+Require accepted same-candidate RTL-020 results and an explicit bounded hosted approval first. Record operation IDs, allowed case counts, optional-logo inclusion, current model/usage price/retention capability and maximum process reservations. Resolve ambiguous-photo/grouping/unknown-material evaluation before publication. Never share guest images across evaluation records. Use the real sample/photos and challenge through the canonical browser flow; no fixture composition, stored canned catalogue, synthetic challenge or backend paid bypass.
+
+Proposed **one controlled session**, not authorized spending:
+
+| Stage | Concrete action / acceptance | Maximum paid request allowance |
+| --- | --- | --- |
+| Fresh sample draft | Deliberately load 15 shipped bytes, inspect consent, obtain real action admission, process once; source/photo coverage, clothing-only groups and unknowns independently reviewed | 1 catalogue request |
+| Creator | One grounded style explanation, use chat template/theme/type CTAs with real-product preview; local selections do not need extra model turns | 1 turn, at most 3 requests |
+| Store/shopper | One grounded shopper filter/budget turn; select real variant, bag/confirm one simulated order; verify USD authority, EUR quote/rounding if actually available | 1 turn, at most 3 requests |
+| Owner | Inspect exact order/stock/chart contributors; one grounded summary or inline required-photo form proposal; review before local product mutation; chart numbers reconcile afterwards | 1 turn, at most 3 requests |
+| Optional logo | Only if expressly included, confirmed colour/type then one batch of exactly three PNG candidates; choose or retain wordmark | 1 image-generation request |
+
+Thus at most **10 provider requests without logos / 11 with logos**, no automatic retry. Existing conservative reservations are $1 per catalogue/text turn and $4 per logo batch: proposed $4/$8 reservations, **not an approved budget or guaranteed bill**. These values come from the existing canonical runtime policy, not sibling budgets. Account billing, vision-input usage and logo output-envelope costs remain unresolved until RTL-020 acceptance. Admission counters/global provider project controls and restart/overlap remain separate; do not claim a durable monthly cap. If a stage fails, usage is absent/unknown, grounding/financial/photo integrity fails, or the allowance is exhausted, stop immediately, disable further paid actions and record the unaccepted outcome. A retry requires a new explicitly approved inventory, never an automatic continuation.
+
+The broader independent upload/ambiguous-grouping corpus belongs to RTL-020. Add no extra upload run or logo retry to this smoke without revising approval counts. EUR reference is an independently bounded public-data check: record actual source/date/pair/rate or unavailable USD fallback; the earlier local 12 October quote is not a current hosted rate. Wordmarks and local styling/commerce remain usable when optional AI logos/FX are unavailable.
+
+## Linux/hosted capacity and cancellation worksheet
+
+The owner-prioritized concurrency work is implemented and locally measured; [IMAGE-CONCURRENCY.md](../engineering/IMAGE-CONCURRENCY.md) traces Retrosum, browser two-slot preparation and backend shared two-worker/two-waiter native preparation. RTL-021 proves Linux Sharp startup/encoding and safe route/assets within isolated limits, **not full Linux/hosted paid-load peaks**. Keep HTTP concurrency (frontend 8/backend 4), shared paid gate 2, per-workspace gate and native workers/waiters distinct. Do not raise limits based on Windows timings.
+
+Measure in an approved isolated staging/private service, with paid off and injected ports wherever interpretation is irrelevant. Controlled workload inventory: one and two simultaneous accepted near-envelope bodies, at most four coarse body arrivals, one queue-exhaustion rejection, and one cancellation/reset/expiry during native work. Account separately for multipart buffers, inspected derivatives, Base64 provider expansion, decoded native pixels, waiters and in-flight response buffers. Record peak process/native/container memory, CPU, body/count caps, timing, admitted/rejected operations and cancellation-to-slot-release; no raw bytes/content. Compare against frontend 512 MiB/backend 1 GiB and outer 210/200-second timeouts. Do not flood public routes, exhaust credits or let uncontrolled fixtures dispatch a real provider. If capacity is not measured, keep it explicitly pending and preserve current conservative settings.
+
+Paid model stages need a separately approved small live case and actual usage/account rate evidence. Browser cancellation does not guarantee provider billing stops. Cloud Run request-based CPU and revision overlap require observation; max one is a target, not a universal overlap/spend guarantee. Invalid/replayed/late grants must reject across actual restart. Do not add a queue/database/third service to hide a measurement failure; return to the owning code/capacity checks and revalidate the candidate before new live evidence.
+
+## Production appearance, lifecycle and recovery
+
+Reuse RTL-019's 216 composition cells only when the actual asset/layout input fingerprint matches. Inspect fresh hosted delivery for three families × home/collection/detail at compact and wide viewports, plus a tablet/short-screen landing fit; actual fonts/photos, chat cards/inline upload, long text, chart hover/keyboard, and visibly moving scenes must be observed. Confirm header+hero+main CTA fully fit the first device screen. OS preference, actual 200% browser zoom, physical touch/virtual keyboard, owner aesthetic approval and performance/frame/heap measures remain pending until real observations; resizing or a DOM simulation cannot claim them. Preserve designed motion; add no animation-off/render-off control.
+
+In the same controlled workspace, exercise refresh/resume, corrupt/missing-photo recovery, reset while a proposal/request is pending, fixed expiry, duplicate-tab ownership and all three scenarios. Preserve photos/design/catalogue across scenario replacement, discard warned activity/drafts and recheck signed chart contributors/current stock. Reports contain no photo/chat/grant/bag/secret payload; inspect only a local reviewed download, never store it as hosted evidence. Public sample failure preserves selected photos and offers recovery rather than a canned storefront. Optional wordmark/logo and EUR fallbacks are explicitly visible.
+
+Use the paid-disable and immutable compatible-pair commands in RELEASE.md against **actual named revisions/configuration**, with new disabled revision explicitly receiving primary traffic. Verify safe config/readiness and absence of new paid dispatch; in-flight calls may finish. Remove access to prior paid traffic-tag paths within the approved scope if needed. A rollback drill is a separate owner-authorized traffic mutation: record whether performed, exact prior pair/secret references, compatible browser state recovery, paid-off status and post-drill checks. Without a known prior pair, retain a closed frontend/disabled backend first-release recovery; do not invent an executed rollback.
+
+## Evidence and final release verdict
+
+Keep clean candidate/fingerprint, actual registry digests/revisions/traffic, least-privilege identities/IAM enforcement, exact secret **references**, canonical HTTPS/Turnstile proof, bounded smoke timing/counts/request IDs/usage/measured bill, capacity/appearance/lifecycle/recovery observations and remaining limitations. Metadata grants no automatic release approval; a successful HTTP response still needs semantic review. No raw token/key/grant/visitor text/image/catalogue/report belongs in Git or public validation. Named original RTL-022 acceptance boxes remain unchecked until actual hosted evidence. No public URL or Complete status is inferred from this prepared worksheet.

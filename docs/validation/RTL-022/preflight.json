@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "candidate": {
+    "gitRevision": "898f63d7fad9c14fe4503f2b160ed94c0eac0f8a",
+    "dirty": true,
+    "fingerprint": "ffc4eddf45f4a8e323537dd417363b1b9c51dd58766de85a1e49eb832a811d58",
+    "packagedFingerprint": "ffc4eddf45f4a8e323537dd417363b1b9c51dd58766de85a1e49eb832a811d58",
+    "matchesLocalLinuxEvidence": true,
+    "frontendLocalImage": "sha256:b8b05f084e202b239fa666fa11a91e471e1764c2eb23c29fa257f066efcaa2ad",
+    "backendLocalImage": "sha256:8910fea7e8104f08461cd2607d7d7bac21cf6f0252c62facf0ea16f4c46f5e3e"
+  },
+  "localVerdict": "matches-local-linux-candidate",
+  "missingInputs": [
+    "projectId",
+    "region",
+    "repository",
+    "frontendService",
+    "backendService",
+    "frontendServiceAccount",
+    "backendServiceAccount",
+    "productionOrigin",
+    "backendServiceUrl",
+    "frontendRegistryImage",
+    "backendRegistryImage",
+    "candidateTag",
+    "frontendRevision",
+    "backendRevision",
+    "openaiSecret",
+    "openaiSecretVersion",
+    "turnstileSecret",
+    "turnstileSecretVersion",
+    "grantSecret",
+    "grantSecretVersion",
+    "turnstileSiteKey"
+  ],
+  "firstReleaseRecovery": true,
+  "publicReleaseAccepted": false,
+  "publicationAuthorized": false,
+  "paidRequests": 0,
+  "networkRequests": 0,
+  "externalGates": [
+    "Owner authorization for exact cloud resources/publication",
+    "Accepted same-candidate RTL-020 live vision/Tailor/account/retention/billing",
+    "Published immutable registry digests and active runtime/config/secret versions",
+    "IAM enforcement/private backend and authenticated bridge",
+    "Confirmed HTTPS origin/domain/Turnstile and real action admission",
+    "Authorized bounded hosted smoke and capacity observations",
+    "Owner/physical/zoom/hosted visual and lifecycle acceptance",
+    "Actual paid-disable verification and compatible immutable recovery/drill scope"
+  ],
+  "readOnlyInspectionCommands": []
+}

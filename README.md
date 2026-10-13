@@ -16,6 +16,8 @@ No key/env file is required for fake development. Optional ignored `apps/fronten
 
 ## Documentation and release preparation
 
+All 22 tickets' independent local work is covered; required paid/owner/hosted acceptance remains pending. The [operator release status](docs/operations/RELEASE-STATUS.md) lists exact evidence, missing inputs and next checks. [Hosted verification](docs/operations/HOSTED-VERIFICATION.md) includes local-only preflight and bounded read-only GET tooling; no real hosted check or publication is inferred.
+
 - [Detailed blueprint](docs/RETAILOR_DEMO_SOURCE_OF_TRUTH.md) and [visual PM overview](docs/RETAILOR_OVERVIEW.html)
 - [Documentation navigation](docs/README.md), [22 tickets](docs/tickets/README.md) and actual [validation](docs/validation)
 - [Frontend guide](apps/frontend/README.md), [backend guide](apps/backend/README.md), [foundation](docs/engineering/FOUNDATION.md) and [security](docs/engineering/SECURITY.md)

@@ -1,6 +1,6 @@
 # RTL-022 — Deploy, verify the hosted demo and record rollback
 
-Status: **Planned — not started**\
+Status: **Independent local preparation verified — required hosted release acceptance pending**\
 Planning date: **11 October 2026**\
 Milestone: **Hosted release**\
 Depends on: [RTL-020](RTL-020-evaluate-live-ai-and-audit-release-acceptance.md), [RTL-021](RTL-021-package-linux-services-and-manual-release-runbook.md)\
@@ -100,8 +100,17 @@ Do not purchase a domain, add paid cloud services, change unrelated IAM/DNS, cre
 - [26. Infrastructure, deployment and operations](../RETAILOR_DEMO_SOURCE_OF_TRUTH.md#26-infrastructure-deployment-and-operations)
 - [30. Definition of complete](../RETAILOR_DEMO_SOURCE_OF_TRUTH.md#30-definition-of-complete)
 
+## Actual independent local handoff
+
+- [x] Strict bounded local candidate/resource preflight and fixed read-only inspection commands prepared; actual source fingerprint matches the RTL-021 Linux evidence.
+- [x] Bounded GET-only delivery/capability helper tested with injected responses, with no real hosted invocation or paid dispatch.
+- [x] Complete private-identity/admission, authorized smoke, capacity, appearance/lifecycle and paid-off immutable recovery worksheet plus concise operator status prepared.
+- [x] Required local gates and read-only validation recorded; actual original hosted acceptance remains unverified.
+
+See [RTL-022 validation](../validation/RTL-022.md), [hosted worksheet](../operations/HOSTED-VERIFICATION.md) and [release status](../operations/RELEASE-STATUS.md). No cloud/secret/domain/public URL or provider budget is supplied. All original acceptance boxes remain unchecked; the current owner scope ends at locally complete preparation with explicitly deferred external gates.
+
 ## Completion handoff and commit boundary
 
 Keep this outcome under `RTL-022:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-022.md` and actual check/review evidence under `docs/validation/RTL-022.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All original hosted acceptance boxes remain unchecked; the separate local preparation handoff is evidence-backed. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.

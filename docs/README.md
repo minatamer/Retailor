@@ -24,6 +24,8 @@ The owner has authorized queue execution and ticket-prefixed commits after clean
 
 ## Retained source material
 
+[Operator release status](operations/RELEASE-STATUS.md) consolidates all 22 tickets' independent local handoff and unsupplied external gates. [Hosted verification worksheet](operations/HOSTED-VERIFICATION.md) and [RTL-022 validation](validation/RTL-022.md) own strict preflight, bounded GET preparation and honestly pending original hosted acceptance.
+
 [Manual Linux release packet](operations/RELEASE.md) owns the pinned two-service images, exact owner resource/identity/secret inputs, paid-off bootstrap, private bridge verification and immutable rollback. [RTL-021 Linux evidence](validation/RTL-021.md) records actual builds, assets, startup rejection, non-root PORT binding, memory limits and shutdown; paid/account/hosted acceptance remains pending.
 
 - [Original concept Markdown](retailor.md) and [original concept preview](retailor.html) are archived exploration; their simulations do not prove real recognition or deployed behavior.
