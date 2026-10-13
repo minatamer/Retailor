@@ -91,8 +91,9 @@ export function ecbCurrency(
       throw new RangeError("Reference response exceeds limit");
     }
     const reader = response.body.getReader(),
-      chunks: Uint8Array[] = [];
-    let size = 0;
+      bytes = new Uint8Array(FX_LIMITS.responseBytes);
+    let size = 0,
+      reads = 0;
     const abort = () => {
       void reader.cancel().catch(() => undefined);
     };
@@ -100,23 +101,27 @@ export function ecbCurrency(
     try {
       for (;;) {
         signal.throwIfAborted();
+        // A byte limit alone cannot bound retained empty chunks or a hot empty stream.
+        if (++reads > FX_LIMITS.responseBytes * 2 + 1) {
+          await reader.cancel();
+          throw new RangeError("Reference response exceeds chunk limit");
+        }
         const next = await reader.read();
         signal.throwIfAborted();
         if (next.done) break;
-        size += next.value.byteLength;
-        if (size > FX_LIMITS.responseBytes) {
+        if (size + next.value.byteLength > FX_LIMITS.responseBytes) {
           await reader.cancel();
           throw new RangeError("Reference response exceeds limit");
         }
-        chunks.push(next.value);
+        bytes.set(next.value, size);
+        size += next.value.byteLength;
       }
     } finally {
       signal.removeEventListener("abort", abort);
       reader.releaseLock();
     }
-    const bytes = Buffer.concat(chunks, size);
     return parseEcbResponse(
-      new TextDecoder("utf-8", { fatal: true }).decode(bytes),
+      new TextDecoder("utf-8", { fatal: true }).decode(bytes.subarray(0, size)),
       clock(),
     );
   };

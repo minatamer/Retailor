@@ -25,6 +25,53 @@ const quote = () =>
   });
 afterEach(() => vi.useRealTimers());
 describe("fixed bounded independent public reference data", () => {
+  it("accepts tiny segmented bytes and cancels an excessive empty stream before unbounded allocation/work", async () => {
+    const bytes = new TextEncoder().encode(
+      '{"date":"2026-10-09","base":"USD","quote":"EUR","rate":0.89238}',
+    );
+    let offset = 0;
+    const segmented = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (offset >= bytes.length * 2) return controller.close();
+        controller.enqueue(
+          offset++ % 2 === 0
+            ? new Uint8Array()
+            : bytes.subarray(
+                Math.floor((offset - 1) / 2),
+                Math.floor((offset - 1) / 2) + 1,
+              ),
+        );
+      },
+    });
+    const quote = await ecbCurrency(
+      async () =>
+        new Response(segmented, {
+          headers: { "Content-Type": "application/json" },
+        }),
+      () => at,
+    )(new AbortController().signal);
+    expect(quote.rateDecimal).toBe("0.89238");
+    let pulls = 0;
+    const cancel = vi.fn();
+    const empty = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulls++;
+        controller.enqueue(new Uint8Array());
+      },
+      cancel,
+    });
+    await expect(
+      ecbCurrency(
+        async () =>
+          new Response(empty, {
+            headers: { "Content-Type": "application/json" },
+          }),
+        () => at,
+      )(new AbortController().signal),
+    ).rejects.toThrow("chunk limit");
+    expect(cancel).toHaveBeenCalledTimes(1);
+    expect(pulls).toBeLessThanOrEqual(FX_LIMITS.responseBytes * 2 + 3);
+  });
   it("preserves the upstream decimal lexeme and rejects malformed source/pair/date", () => {
     const raw =
       '{"date":"2026-10-09","base":"USD","quote":"EUR","rate":0.123456789012345678}';
