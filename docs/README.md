@@ -1,5 +1,7 @@
 # Retailor documentation
 
+[RTL-023 post deployment and pre sharing](tickets/RTL-023-post-deployment-and-pre-sharing.md) adds the owner-requested quality audit and a separate manual security-review gate. [Quality dispositions](audits/RTL-023-CODE-QUALITY.md) and [actual validation](validation/RTL-023.md) describe the preserved behavior, targeted fixes and current source-linked Linux candidate. Security findings are audit-only and require manual feedback before implementation.
+
 Retailor is a planned clothing-only demo built around a beautiful storefront from supplied product photos. Documentation and the 22-ticket implementation queue are prepared; implementation is underway in fake mode and deployment preparation follows the queue.
 
 ## Current authority

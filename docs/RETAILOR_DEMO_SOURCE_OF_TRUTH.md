@@ -4,7 +4,7 @@
 **Prepared:** 11 October 2026.\
 **Product:** Retailor. **Sample clothing brand:** FORME.\
 **Companion:** [Retailor product overview](RETAILOR_OVERVIEW.html).\
-**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–019 locally implemented, RTL-020 locally prepared/audited, RTL-021 locally Linux-packaged/verified, RTL-022 locally prepared; all independent local work covered, public release pending; owner visual/device/zoom and paid evidence remain separately pending.\
+**Implementation queue:** [22 implementation tickets plus RTL-023](tickets/README.md); RTL-001–019 locally implemented, RTL-020 locally prepared/audited, RTL-021 locally Linux-packaged/verified, RTL-022 locally prepared; all independent local work covered, public release pending; owner visual/device/zoom and paid evidence remain separately pending.\
 **Signature promise:** **Bring your products. See your store.**\
 **Owner decisions incorporated:** all eleven answers on clothing-only scope, researched presets, Tailor-led setup, optional logos, mandatory photos, catalogue integrity, three scenarios, live sample processing, runway direction, image sourcing and USD/EUR; 11 October 2026.
 
@@ -2343,3 +2343,8 @@ Choose a model via current capabilities, visual results, legible store-name rend
 [Frankfurter’s current API documentation](https://frankfurter.dev/) describes v2 single-pair routes and provider-specific rate endpoints. Pin the explicitly selected ECB provider in the adapter rather than claim a default blended quote is solely ECB-derived. The [ECB reference-rate page](https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html) describes working-day publication and informational reference usage. This is suitable context for simulated price display; no real payment settlement is implemented.
 
 RTL-009 subsequently verified the official fixed USD/EUR route and implemented adapter/cache directly on 12 October 2026 after the web reader could not access the API; [timestamped source evidence](validation/evidence/RTL-009/source-verification.json) records the result. Runtime fetches validated dated data; this evidence is not a hardcoded current rate. The HTML does not fetch currency data or execute logo generation; its copy explains the intended app behavior. Exact conversion/rounding, snapshot persistence, budget/filter semantics and failure behavior are specified in Section 13.2.1.
+
+
+## Owner-requested post deployment / pre sharing audit
+
+[RTL-023](tickets/RTL-023-post-deployment-and-pre-sharing.md) preserves the accepted demo while removing confirmed response-reader duplication/unused runtime schemas, preventing unknown technical visitor notices and adding private failure correlation. The [quality plan/dispositions](audits/RTL-023-CODE-QUALITY.md), [validation](validation/RTL-023.md) and root instructions govern future visual/manual changes. The subsequent STRIDE/dependency audit is documentation-only until manual owner feedback; its findings are not implementation approval. There is no verified deployment yet.

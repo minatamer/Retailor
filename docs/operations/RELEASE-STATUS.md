@@ -11,14 +11,14 @@
 
 ## Candidate identity
 
-Application build-input fingerprint **`ffc4eddf45f4a8e323537dd417363b1b9c51dd58766de85a1e49eb832a811d58`**, 220 input files. RTL-021's recorded dirty source is explicitly base `cf471463a944c2acad3f8f16a67029c17f98c5cc` plus its reviewed packaging worktree; it does not pretend those images came from a clean pushed commit. The current committed application inputs match that candidate; release-tool/docs work is outside its app input fingerprint. Rerun preflight on the final clean commit before future evaluation/publication and save fresh candidate evidence. Any application/lock/public-asset/Docker input change requires new Linux checks and relevant live acceptance.
+Current RTL-023 application build-input fingerprint **`c9d45e7a66762d91dd32a76f2bba622925a88165e6551c2644c0f40c5f8d58d2`**, 228 input files. [Actual fresh Linux evidence](../validation/RTL-023/containers.json) records base `1b1714f` plus its validated quality worktree, explicitly dirty when built. The application bytes match the locally tested images; quality commits do not change their fingerprint. Original RTL-021 proof remains historical and unmodified. Preflight now reads the fixed RTL-023 candidate proof, not arbitrary discovered evidence. App/lock/public-asset/Docker changes require fresh relevant Linux/live acceptance.
 
 | Role | Actual tested local image identifier |
 | --- | --- |
-| Frontend | `sha256:b8b05f084e202b239fa666fa11a91e471e1764c2eb23c29fa257f066efcaa2ad` |
-| Backend | `sha256:8910fea7e8104f08461cd2607d7d7bac21cf6f0252c62facf0ea16f4c46f5e3e` |
+| Frontend | `sha256:f3b6c43d0159d588aaeceb3e3ddd84ecf7a0e0c7397505ef9275e00f3d267a27` |
+| Backend | `sha256:83d596a229f5a5a6929a5242d098fbb84d296eacc371795cf51b315cd10928f0` |
 
-No registry push or cloud service is inferred from these local identifiers. Final isolated Linux observation: frontend 58.85 MiB/512 MiB, backend 52.41 MiB/1 GiB; non-root supplied PORT=8080, all approved public photos/fonts/licences, paid unavailable, invalid production configs rejected, SIGTERM/owned cleanup successful. This is an unpaid point-in-time probe, not peak paid-load or hosted proof. Dedicated host 4310/4311 services were not displaced; Docker test containers publish no ports and are removed, and the existing Docker engine remains running.
+Unpaid network-disabled Linux probes observed frontend 59.11 MiB/512 MiB and backend 53.14 MiB/1 GiB; non-root supplied PORT=8080, public photos/fonts/licences, safe paid-off configuration, invalid-production rejection, native raster validation and owned SIGTERM cleanup passed. These are local image identifiers and point-in-time observations, not registry/IAM/TLS/paid-load/hosted acceptance. Dedicated host services were not displaced. All owned probe containers were removed; the Docker engine and other services remain untouched. Current public release is still unaccepted.
 
 ## Exact external inputs still needed
 

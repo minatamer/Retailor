@@ -137,6 +137,7 @@ export async function readReleaseJson(path, limit = 32768) {
     "scripts/release/inputs.example.json",
     "artifacts/local/release-inputs.json",
     "docs/validation/RTL-021/containers.json",
+    "docs/validation/RTL-023/containers.json",
   ];
   const absolute = resolve(root, path);
   if (!permitted.some((candidate) => resolve(root, candidate) === absolute))
@@ -257,7 +258,7 @@ export async function preparePreflight(
 ) {
   const input = await readReleaseJson(inputPath);
   const packaged = await readReleaseJson(
-    "docs/validation/RTL-021/containers.json",
+    "docs/validation/RTL-023/containers.json",
     131072,
   );
   // Narrow existing evidence checks. A record is not permission or new container execution.
