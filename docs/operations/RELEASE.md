@@ -4,7 +4,7 @@ RTL-021 prepares local images and the commands below. **Nothing here authorizes 
 
 ## Candidate construction and provenance
 
-Run at the repository root with Node 24.19.0 and pnpm 11.25.0. The Dockerfiles pin the verified official `node:24.19.0-bookworm-slim` OCI index digest `sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df`; Linux amd64 is the release target. Pinned pnpm is installed only in the builder; dependency install uses the existing frozen lockfile. The backend's pnpm 11 `deploy --prod --legacy` produces a portable production package from the existing linked workspace. All app and public-package files fields already restrict backend deployment to compiled output. Linux builds, rather than Windows junctions, supply the native Sharp libraries and portable Next tracing.
+Run at the repository root with supported Node24 (local checks use 24.19.0) and pnpm 11.25.0. The security-refreshed Dockerfiles pin official `node:24.21.0-bookworm-slim` OCI index digest `sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20`; Linux amd64 is the release target. The base includes vendor-fixed PCRE2 and explicitly installs supported Debian `perl-base=5.36.0-7+deb12u4`, released after that base snapshot. Apt lists are removed; a missing pinned version must fail the build rather than silently downgrade/float. Pinned pnpm remains builder-only; the frozen lock and pnpm11 legacy deploy/compiled files ownership are unchanged. Fresh Linux/native/container/advisory proof is required; an image refresh is not a claim that every remaining OS advisory is fixed.
 
 ```powershell
 pnpm install --frozen-lockfile
@@ -23,18 +23,18 @@ Use a clean committed candidate for eventual paid acceptance. A dirty local cand
 
 ## Runtime envelope and unpaid observations
 
-| Setting | Frontend candidate | Backend candidate |
-| --- | --- | --- |
-| Runtime | Node PID 1, non-root UID 1000 | Node PID 1, non-root UID 1000 |
-| App environment | production, development preview off | production, fake mode false |
-| Local/platform PORT | 4310, bind 0.0.0.0 | 4311, bind 0.0.0.0 |
-| CPU / memory | 1 CPU / 512 MiB | 1 CPU / 1 GiB |
-| Min/max instances | 0 / 1 | 0 / 1 |
-| Outer request timeout | 210 seconds | 200 seconds |
-| Cloud request concurrency | 8 | 4 |
-| Startup probe | GET `/` | GET `/v1/health` |
-| Paid operation slots | fixed bridge transport bound 8 | shared AI bound 2; no waiting AI queue |
-| Native image preparation | browser preparation bound 2 | shared native workers 2, pending jobs 2 |
+| Setting                   | Frontend candidate                  | Backend candidate                       |
+| ------------------------- | ----------------------------------- | --------------------------------------- |
+| Runtime                   | Node PID 1, non-root UID 1000       | Node PID 1, non-root UID 1000           |
+| App environment           | production, development preview off | production, fake mode false             |
+| Local/platform PORT       | 4310, bind 0.0.0.0                  | 4311, bind 0.0.0.0                      |
+| CPU / memory              | 1 CPU / 512 MiB                     | 1 CPU / 1 GiB                           |
+| Min/max instances         | 0 / 1                               | 0 / 1                                   |
+| Outer request timeout     | 210 seconds                         | 200 seconds                             |
+| Cloud request concurrency | 8                                   | 4                                       |
+| Startup probe             | TCP on supplied frontend PORT       | GET `/v1/health`                        |
+| Paid operation slots      | fixed bridge transport bound 8      | shared AI bound 2; no waiting AI queue  |
+| Native image preparation  | browser preparation bound 2         | shared native workers 2, pending jobs 2 |
 
 These Cloud Run settings are proposals, not a deployed configuration or measured paid-load guarantee. Request concurrency, AI admission slots, native workers and pixel/byte limits serve different purposes; see [image concurrency evidence](../engineering/IMAGE-CONCURRENCY.md). Paid subdeadlines remain shorter than outer request limits: catalogue bridge 135 seconds, Tailor 75, logos 195; actual provider/native deadlines are defined by existing implementation, not this deployment packet. Express `requestTimeout=125000` bounds receipt of the HTTP request body; it is not the Cloud Run response deadline. Keep the outer backend timeout 200 seconds to accommodate the 195-second logo bridge envelope. Use request-based CPU and no background worker service. Do not raise concurrency or budgets without evidence.
 
@@ -46,12 +46,12 @@ Local point-in-time resource and safe route/asset observations are in [RTL-021 v
 
 Copy [inputs.example.json](../../scripts/release/inputs.example.json) into ignored `artifacts/local/release-inputs.json`. Fill only metadata, never key values. All empty identities/URLs/digests/revisions are pending; `tryretailor.com` is the intended domain and **unconfirmed**. Use canonical HTTPS origins without paths, userinfo, trailing slashes or query. Registry images must be `REGION-docker.pkg.dev/PROJECT/REPOSITORY/NAME@sha256:ACTUAL_DIGEST`. Use exact positive numeric secret versions, never `latest`. Record actual primary service URLs separately from any preview traffic-tag URL.
 
-| Principal | Smallest intended permission |
-| --- | --- |
-| Frontend runtime service account | `roles/run.invoker` on this backend service only; no Secret Manager/API-key access |
-| Backend runtime service account | `roles/secretmanager.secretAccessor` on the three required named secrets only; no registry writer or IAM admin |
-| Release operator | Owner-authorized image writer, deploy/service-account-use and narrowly scoped IAM/secret setup permissions; distinct from runtime identities |
-| Public visitor | Eventually invoke the frontend only, after owner release approval; never invoke the backend |
+| Principal                        | Smallest intended permission                                                                                                                 |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend runtime service account | `roles/run.invoker` on this backend service only; no Secret Manager/API-key access                                                           |
+| Backend runtime service account  | `roles/secretmanager.secretAccessor` on the three required named secrets only; no registry writer or IAM admin                               |
+| Release operator                 | Owner-authorized image writer, deploy/service-account-use and narrowly scoped IAM/secret setup permissions; distinct from runtime identities |
+| Public visitor                   | Eventually invoke the frontend only, after owner release approval; never invoke the backend                                                  |
 
 Secret Manager IAM bindings are scoped to a **secret**, while runtime references pin its version; do not claim version-level IAM isolation. Backend secret env bindings own `OPENAI_API_KEY`, `TURNSTILE_SECRET_KEY`, `GRANT_SIGNING_SECRET`. The site key is public configuration returned safely by `/config`, not a secret. Frontend private origin/audience stay in server configuration with no `NEXT_PUBLIC_*` exposure. Use Cloud Run workload identity and the existing fixed metadata ID-token path; no downloaded service-account JSON or token in files/logs. The ID-token audience is the backend's primary Cloud Run service URL even if a tagged URL is used during an approved check. [Google's service-to-service guidance](https://docs.cloud.google.com/run/docs/authenticating/service-to-service) describes this identity boundary; it remains separate from the browser's origin, Turnstile challenge, safety cookie and action/revision/photo-hash grants.
 
@@ -78,7 +78,7 @@ Record the returned primary URL as `backendServiceUrl`; use it verbatim for both
 
 ```powershell
 gcloud run services add-iam-policy-binding $rtlRelease.backendService --project $rtlRelease.projectId --region $rtlRelease.region --member "serviceAccount:$($rtlRelease.frontendServiceAccount)" --role roles/run.invoker
-gcloud run deploy $rtlRelease.frontendService --project $rtlRelease.projectId --region $rtlRelease.region --image $rtlRelease.frontendRegistryImage --service-account $rtlRelease.frontendServiceAccount --no-allow-unauthenticated --ingress all --port 4310 --cpu 1 --memory 512Mi --min 0 --max 1 --concurrency 8 --timeout 210s --cpu-throttling --set-env-vars "APP_ENV=production,RETAILOR_DEV=false,FRONTEND_ORIGIN=$($rtlRelease.productionOrigin),BACKEND_ORIGIN=$($rtlRelease.backendServiceUrl),BACKEND_AUDIENCE=$($rtlRelease.backendServiceUrl)" --startup-probe "httpGet.path=/,httpGet.port=4310,periodSeconds=5,timeoutSeconds=2,failureThreshold=24"
+gcloud run deploy $rtlRelease.frontendService --project $rtlRelease.projectId --region $rtlRelease.region --image $rtlRelease.frontendRegistryImage --service-account $rtlRelease.frontendServiceAccount --no-allow-unauthenticated --ingress all --port 4310 --cpu 1 --memory 512Mi --min 0 --max 1 --concurrency 8 --timeout 210s --cpu-throttling --set-env-vars "APP_ENV=production,RETAILOR_DEV=false,RETAILOR_ORIGIN_GUARD=disabled,FRONTEND_ORIGIN=$($rtlRelease.productionOrigin),BACKEND_ORIGIN=$($rtlRelease.backendServiceUrl),BACKEND_AUDIENCE=$($rtlRelease.backendServiceUrl)" --startup-probe "tcpSocket.port=4310,periodSeconds=5,timeoutSeconds=2,failureThreshold=24"
 ```
 
 4. Keep the frontend closed to the public. Confirm actual frontend service URL; choose/verify final owner-approved origin (primary URL or verified custom domain), then update **both** app origins if bootstrap used a placeholder. Owner configures actual Cloudflare domain/TLS/Turnstile hostname and records retention/provider policy. A proxy does not automatically guarantee private Cloud Run origin or correct challenge hostname; verify redirects, forwarded paths and HTTPS end-to-end. Custom domain setup is a later explicit DNS/certificate action.
@@ -111,6 +111,20 @@ For UI/app rollback, require both recorded `priorFrontendRevision` and `priorBac
 No guest data migrates: browser-local versioned state governs restore; unsupported versions discard safely, provider readiness resets unavailable until deliberate admission, old grants expire/reject. No persistent uploaded file or shared commerce database is expected across revisions. Confirm stale session/late response fences and report/reset cleanup on the real hosted app before rollout approval.
 
 ## Required evidence before public release
+
+### RTL-023 public origin and spend gates
+
+The selected public strategy is the existing Cloudflare proxy with **trusted header overwrite**, path-aware rate controls and the app's server-only origin seal. No new load balancer/WAF purchase is made or required locally. Actual plan/rule availability and hosting scope must be confirmed before configuring anything; if unavailable, retain restricted/paid-off access instead of silently exposing an origin.
+
+1. Generate a fresh private 32-byte lowercase-hex seal through the authorized secret workflow. Store it in the frontend's named `originSecret` / numeric `originSecretVersion`; its runtime identity receives access only to that additional named secret. Do not share backend OpenAI/grant secrets with the frontend. Never put the value into release JSON, screenshots, output, a browser variable or a command body saved to docs.
+2. On the exact canonical proxied hostname, configure a Cloudflare request-header transform to **set/overwrite** `x-retailor-origin` to that value on all paths/methods (pages, RSC, scripts, samples/fonts and APIs). Do not append/preserve visitor values. Restrict zone-rule access and any rule metadata containing the seal. [Cloudflare header transforms](https://developers.cloudflare.com/rules/transform/request-header-modification/) describe the mechanism; vendor availability is not evidence that our zone is configured.
+3. While frontend invocation remains private, bind the exact secret version as `RETAILOR_ORIGIN_SECRET` and set `RETAILOR_ORIGIN_GUARD=cloudflare` in an authorized reviewed deployment. Missing/invalid enabled config rejects covered requests with a generic 503; a missing/wrong/duplicate seal returns 403. Keep the TCP startup probe: protected `/` cannot be an unsealed HTTP probe, and no public health bypass is added. [Cloud Run TCP startup](https://docs.cloud.google.com/run/docs/configuring/healthchecks#tcp-startup) avoids both a leaked probe secret and a restart loop. Backend health/IAM stays unchanged.
+4. Configure edge rate rules separately for `/api/retailor/v1/admission`, paid POST paths, navigation/RSC and static/public assets. Use trusted edge counters, never an application trust of raw forwarding headers. Do not challenge a multipart upload mid-stream, cache guest JSON or use one tiny threshold for photos/fonts/scripts. Measure cold-page/font/chunk/15-photo bursts, one-batch catalogue admission/execution, six legitimate Tailor turns/minute (two HTTP operations each), optional logos, retry, cancellation and two ordinary visitors. Keep stable busy/recovery behavior and no automatic retry storm. Actual thresholds depend on measured normal traffic and available plan, and remain unverified here.
+5. Enumerate canonical, managed primary, every current/prior tag and alias/custom-domain URL. Verify canonical edge access, required transform/rules, direct GET/POST/page/RSC/sample/static rejection and normal full walkthrough. Reject unreviewed aliases/tags or remove their access in authorized operator scope. A seal rejects expensive app work, but direct traffic can still incur platform/cheap rejection costs; it is not a network DDoS guarantee. Keep backend IAM private and identity/audience exact.
+6. Copy `scripts/release/security.example.json` to ignored `artifacts/local/release-security.json`. Record the exact current fingerprint/local immutable image pair, verification date and private non-secret evidence filenames. Defaults are deliberately unverified. Use `node scripts/release/preflight.mjs artifacts/local/release-inputs.json artifacts/local/release-security.json`: policy rejects mismatched/dirty candidates, future or older-than-72-hour evidence, incomplete ingress checks and absent public paid-off observation. This validates owner metadata, not the actual external settings, and never authorizes publication.
+7. Paid stays off unless actual independent account/project cutoff refusal, reporting/reset/restart/revision/tag overlap and outstanding unknown/in-flight cost are proven. Select `paid=external-cutoff` only after those inspections/tests are separately authorized and observed; an alert, process reserve, one-instance setting or declaration cannot substitute. If the provider lacks sufficient enforcement, retain paid-off/restricted scope; no global accounting database is added. Actual cutoff proof and live RTL-020 acceptance remain external blockers.
+
+On origin-protection failure, restrict frontend invocation with paid disabled; repair the edge/secret pairing under approved scope. Do not recover by turning off the guard on a public service, opening a tag, making backend public or reducing challenge/budget protection. During seal rotation, keep edge and runtime versions coordinated in restricted staging, verify every routed revision, and close old tag paths; no automatic secret rotation or metadata dump is performed here.
 
 Keep candidate fingerprint, clean commit, both **actual registry digests**, runtime revisions/settings, IAM/invoker evidence, exact secret version references, domain/TLS/Turnstile proof, owner/physical acceptance and RTL-020 live verdict together. Record timings/usage/counts/outcomes only; do not save keys, tokens, grant values, photos of guests, complete commerce reports or chat payloads. [Security](../engineering/SECURITY.md), [provider policy](PROVIDERS.md) and [evaluation worksheet](EVALUATION.md) remain mandatory. Pending inputs and unperformed checks are listed in RTL-021/022 validation, not marked passed by this packet.
 

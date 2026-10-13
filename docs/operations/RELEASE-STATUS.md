@@ -11,14 +11,14 @@
 
 ## Candidate identity
 
-Current RTL-023 application build-input fingerprint **`c9d45e7a66762d91dd32a76f2bba622925a88165e6551c2644c0f40c5f8d58d2`**, 228 input files. [Actual fresh Linux evidence](../validation/RTL-023/containers.json) records base `1b1714f` plus its validated quality worktree, explicitly dirty when built. The application bytes match the locally tested images; quality commits do not change their fingerprint. Original RTL-021 proof remains historical and unmodified. Preflight now reads the fixed RTL-023 candidate proof, not arbitrary discovered evidence. App/lock/public-asset/Docker changes require fresh relevant Linux/live acceptance.
+Current approved RTL-023 security application build-input fingerprint **`370eafb8afc5300e424f03ea96f60ace4e9873814a1dfa7ba198a995123cb537`**, 230 input files. [Actual security Linux evidence](../validation/RTL-023/security-containers.json) records baseline `8057f3c` plus its validated security worktree, explicitly dirty when verified; the fingerprint identifies the actual app bytes. Original RTL-021 and RTL-023 quality proof remains historical and unmodified. Preflight reads the fixed current security proof; app/lock/public/Docker changes invalidate relevant acceptance. Node24.21/OpenSSL3.5.8 and pinned Debian Perl u4/PCRE2 u2 preserve Sharp/native compatibility. [Scans](../audits/RTL-023/scout-after-fixes.json) reduce 70 entries/4 Critical to 50/0 Critical per image; six unpatched High OS-package records retain honest applicability. Production npm audit has zero advisories; dev braces remains vendor-unpatched. No image is declared universally clean.
 
-| Role | Actual tested local image identifier |
-| --- | --- |
-| Frontend | `sha256:f3b6c43d0159d588aaeceb3e3ddd84ecf7a0e0c7397505ef9275e00f3d267a27` |
-| Backend | `sha256:83d596a229f5a5a6929a5242d098fbb84d296eacc371795cf51b315cd10928f0` |
+| Role     | Actual tested local image identifier                                      |
+| -------- | ------------------------------------------------------------------------- |
+| Frontend | `sha256:87a8ac7f3fe2d988fdb2e0b3e4cc0e70dad5bafb9005af7579e5232e85703566` |
+| Backend  | `sha256:cabcd84a3d3fbddc33d7ffd20670f93b1d502fd49f315614cbb3e09eed85dfd7` |
 
-Unpaid network-disabled Linux probes observed frontend 59.11 MiB/512 MiB and backend 53.14 MiB/1 GiB; non-root supplied PORT=8080, public photos/fonts/licences, safe paid-off configuration, invalid-production rejection, native raster validation and owned SIGTERM cleanup passed. These are local image identifiers and point-in-time observations, not registry/IAM/TLS/paid-load/hosted acceptance. Dedicated host services were not displaced. All owned probe containers were removed; the Docker engine and other services remain untouched. Current public release is still unaccepted.
+Unpaid network-disabled Linux probes observed frontend 62.13 MiB/512 MiB and backend 53.5 MiB/1 GiB; non-root supplied PORT=8080, public photos/fonts/licences, safe paid-off config, production rejection, native raster and owned SIGTERM passed. Additional guarded probes reject missing/wrong seals, serve legitimate pages/assets and fail enabled missing config safely. A test-only local peer received all 10,485,761 upload bytes without the seal header being forwarded; no provider/IAM result is inferred. These are point-in-time local checks, not peak/registry/IAM/TLS/paid/hosted acceptance. All owned probe containers were removed; existing Retailor watchers were safely reused and sibling services untouched.
 
 ## Exact external inputs still needed
 
@@ -28,6 +28,7 @@ Unpaid network-disabled Linux probes observed frontend 59.11 MiB/512 MiB and bac
 4. Actual registry digests/revisions/traffic, private backend IAM enforcement and working frontend runtime identity, approved capacity/paid smoke and safe logs.
 5. Owner aesthetic approval, actual browser zoom/OS/physical-device/virtual-keyboard acceptance and fresh hosted delivery/motion/lifecycle evidence. Captured local resized browser cells do not supply those checks.
 6. Actual paid-disable verification and either a known compatible immutable prior pair or explicit first-release disabled/closed recovery. Any traffic-changing rollback drill needs its own authorized scope.
+7. Actual Cloudflare trusted seal overwrite/rate calibration/all-primary-tag-alias rejection and external provider refusal/reset/overlap/outstanding-cost evidence, recorded in strict fresh `release-security.json`. Matching images and a process allowance cannot supply this proof. Defaults keep public/paid security readiness false; see [approved security dispositions](../audits/RTL-023-SECURITY.md).
 
 ## Next operator steps
 

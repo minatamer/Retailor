@@ -4,6 +4,10 @@ RTL-022 completes independent local release preparation while hosted acceptance 
 
 ## Local preflight, no network
 
+RTL-023 adds fixed, bounded `artifacts/local/release-security.json` metadata from `scripts/release/security.example.json`, passed as the optional second preflight path. Record actual non-secret evidence references, current fingerprint/immutable images and verification time; never keys/seal values. Defaults report public/paid security readiness false. Matching source alone is not edge/account verification; policy rejects incomplete, dirty, mismatched, future or older-than-72-hour evidence and always retains publication authorization false.
+
+Before public sharing verify the selected Cloudflare overwrite seal, path-aware rate/normal-flow calibration, every primary/tag/alias direct-URL rejection and actual enabled frontend configuration. Guarded frontend startup is TCP, not an unsealed `/` exception. Probe real script/font/sample/RSC delivery, generic rejection, full >10-MiB upload/cancellation and private backend identity; local test-peer bytes are not hosted IAM proof. The seal blocks app work but cannot eliminate platform costs or replace edge abuse controls. Before paid enablement separately prove actual external cutoff refusal, account/reset/restart/overlap/outstanding-usage scope; an alert or process cap is insufficient. Record these actual observations under the exact policy fields only after authorized checks. Keep paid off/restricted if prerequisites are absent. [Release steps](RELEASE.md#rtl-023-public-origin-and-spend-gates) own configuration/rollback; no live operation is performed by this worksheet.
+
 ```powershell
 node scripts/release/preflight.mjs
 ```
@@ -24,16 +28,16 @@ Compare clean commit plus source fingerprint with RTL-020 accepted live evidence
 
 Perform these before enabling paid capability. The frontend remains private during deployment/bootstrap; a future public GET helper will correctly fail while it is closed. An authorized operator uses approved identity tooling/console to invoke the private frontend and backend without printing/storing tokens. Obtain only short-lived scoped identity; no service-account JSON files. Any identity impersonation permission also needs explicit owner scope. A token issued for the backend primary service URL is distinct from a tagged/custom frontend URL.
 
-| Check | Required real observation |
-| --- | --- |
-| Backend IAM | Unauthenticated direct `/v1/health` returns platform denial (401/403); authenticated intended frontend principal succeeds; no `allUsers`/`allAuthenticatedUsers`, invoker enforcement remains enabled |
-| Runtime identity | Real frontend `/api/retailor/v1/health` and `/config` reach the private backend through its normal fixed metadata identity path; an operator impersonation test alone is insufficient |
-| Paid off | Backend liveness 200, readiness 503, safe config live-selected/paid false and vision/Tailor/logos unavailable; zero paid dispatch |
-| Fixed bridge | Unknown operation 404; client target/query/auth headers cannot change destination, audience or forwarded identity; production routes expose no internal target/key |
-| Origin/body | Wrong origin, invalid schema/MIME/compression/known oversized envelope rejected before dispatch; one case per boundary, no request floods |
+| Check            | Required real observation                                                                                                                                                                                |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend IAM      | Unauthenticated direct `/v1/health` returns platform denial (401/403); authenticated intended frontend principal succeeds; no `allUsers`/`allAuthenticatedUsers`, invoker enforcement remains enabled    |
+| Runtime identity | Real frontend `/api/retailor/v1/health` and `/config` reach the private backend through its normal fixed metadata identity path; an operator impersonation test alone is insufficient                    |
+| Paid off         | Backend liveness 200, readiness 503, safe config live-selected/paid false and vision/Tailor/logos unavailable; zero paid dispatch                                                                        |
+| Fixed bridge     | Unknown operation 404; client target/query/auth headers cannot change destination, audience or forwarded identity; production routes expose no internal target/key                                       |
+| Origin/body      | Wrong origin, invalid schema/MIME/compression/known oversized envelope rejected before dispatch; one case per boundary, no request floods                                                                |
 | Action admission | After separately approved paid configuration, missing/expired/wrong-role/wrong-action/photo-changed grants reject before model dispatch; confirm correct challenge host/real proof and single-use replay |
-| Delivery/edge | Canonical HTTPS, expected redirects, Cloudflare/Cloud Run forwarding, actual TLS/domain ownership, Turnstile hostname; no debug route or fixture sample interpretation |
-| Logging/privacy | Inspect only approved timing/count/status/usage/error metadata. No key/token/cookie/grant, guest image/name/text, raw exception or complete graph/report is retained |
+| Delivery/edge    | Canonical HTTPS, expected redirects, Cloudflare/Cloud Run forwarding, actual TLS/domain ownership, Turnstile hostname; no debug route or fixture sample interpretation                                   |
+| Logging/privacy  | Inspect only approved timing/count/status/usage/error metadata. No key/token/cookie/grant, guest image/name/text, raw exception or complete graph/report is retained                                     |
 
 Prepare a harmless reviewed invalid schema/action **before** execution; malformed unauthenticated bodies do not prove application rejection if platform IAM prevented access first. Conversely an Express 403 cannot substitute for platform-private invocation evidence. Tests/fixtures establish local rejection contracts only. For a valid-action replay, submit the same manifest/grant metadata with no repeated large bytes if rejected before body parsing, as RTL-020 documents; do not resend a multi-megabyte body just to trigger TCP drain/reset. Record actual response status/category and dispatch counts, not raw request bodies.
 
@@ -57,13 +61,13 @@ Require accepted same-candidate RTL-020 results and an explicit bounded hosted a
 
 Proposed **one controlled session**, not authorized spending:
 
-| Stage | Concrete action / acceptance | Maximum paid request allowance |
-| --- | --- | --- |
-| Fresh sample draft | Deliberately load 15 shipped bytes, inspect consent, obtain real action admission, process once; source/photo coverage, clothing-only groups and unknowns independently reviewed | 1 catalogue request |
-| Creator | One grounded style explanation, use chat template/theme/type CTAs with real-product preview; local selections do not need extra model turns | 1 turn, at most 3 requests |
-| Store/shopper | One grounded shopper filter/budget turn; select real variant, bag/confirm one simulated order; verify USD authority, EUR quote/rounding if actually available | 1 turn, at most 3 requests |
-| Owner | Inspect exact order/stock/chart contributors; one grounded summary or inline required-photo form proposal; review before local product mutation; chart numbers reconcile afterwards | 1 turn, at most 3 requests |
-| Optional logo | Only if expressly included, confirmed colour/type then one batch of exactly three PNG candidates; choose or retain wordmark | 1 image-generation request |
+| Stage              | Concrete action / acceptance                                                                                                                                                        | Maximum paid request allowance |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| Fresh sample draft | Deliberately load 15 shipped bytes, inspect consent, obtain real action admission, process once; source/photo coverage, clothing-only groups and unknowns independently reviewed    | 1 catalogue request            |
+| Creator            | One grounded style explanation, use chat template/theme/type CTAs with real-product preview; local selections do not need extra model turns                                         | 1 turn, at most 3 requests     |
+| Store/shopper      | One grounded shopper filter/budget turn; select real variant, bag/confirm one simulated order; verify USD authority, EUR quote/rounding if actually available                       | 1 turn, at most 3 requests     |
+| Owner              | Inspect exact order/stock/chart contributors; one grounded summary or inline required-photo form proposal; review before local product mutation; chart numbers reconcile afterwards | 1 turn, at most 3 requests     |
+| Optional logo      | Only if expressly included, confirmed colour/type then one batch of exactly three PNG candidates; choose or retain wordmark                                                         | 1 image-generation request     |
 
 Thus at most **10 provider requests without logos / 11 with logos**, no automatic retry. Existing conservative reservations are $1 per catalogue/text turn and $4 per logo batch: proposed $4/$8 reservations, **not an approved budget or guaranteed bill**. These values come from the existing canonical runtime policy, not sibling budgets. Account billing, vision-input usage and logo output-envelope costs remain unresolved until RTL-020 acceptance. Admission counters/global provider project controls and restart/overlap remain separate; do not claim a durable monthly cap. If a stage fails, usage is absent/unknown, grounding/financial/photo integrity fails, or the allowance is exhausted, stop immediately, disable further paid actions and record the unaccepted outcome. A retry requires a new explicitly approved inventory, never an automatic continuation.
 

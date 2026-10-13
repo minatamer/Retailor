@@ -1,0 +1,589 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-13T19:03:52.441Z",
+  "candidate": {
+    "baseRevision": "8057f3cfabffeda1047d2680c35da30f118b7fa9",
+    "fingerprint": "370eafb8afc5300e424f03ea96f60ace4e9873814a1dfa7ba198a995123cb537",
+    "dirtyWhenVerified": true
+  },
+  "tool": "Docker Scout 1.24.0",
+  "authorization": "Owner approved all documented security remedies, local execute/validate and commits; one-off metadata scans verify the refreshed images; no ongoing integration or publication",
+  "images": {
+    "frontend": {
+      "role": "frontend",
+      "image": "sha256:87a8ac7f3fe2d988fdb2e0b3e4cc0e70dad5bafb9005af7579e5232e85703566",
+      "observedAt": "2026-10-13T18:57:50.2676828Z",
+      "exitCode": 2,
+      "indexedPackages": 198,
+      "reportedPackages": 15,
+      "reportedEntries": 50,
+      "severities": {
+        "CRITICAL": 0,
+        "HIGH": 6,
+        "MEDIUM": 4,
+        "LOW": 38,
+        "UNSPECIFIED": 2
+      },
+      "rawReportSha256": "68402a6ed97ea8381150cfaed9a39b1d6decd94ffed3f7a210fb8bc53a4d88aa",
+      "command": "docker scout cves --exit-code --format sarif --output artifacts/local/rtl023-security-scout-frontend.json local://sha256:87a8ac7f3fe2d988fdb2e0b3e4cc0e70dad5bafb9005af7579e5232e85703566"
+    },
+    "backend": {
+      "role": "backend",
+      "exitCode": 2,
+      "image": "sha256:cabcd84a3d3fbddc33d7ffd20670f93b1d502fd49f315614cbb3e09eed85dfd7",
+      "observedAt": "2026-10-13T18:57:53.2118678Z",
+      "indexedPackages": 211,
+      "reportedPackages": 15,
+      "reportedEntries": 50,
+      "severities": {
+        "CRITICAL": 0,
+        "HIGH": 6,
+        "MEDIUM": 4,
+        "LOW": 38,
+        "UNSPECIFIED": 2
+      },
+      "rawReportSha256": "68402a6ed97ea8381150cfaed9a39b1d6decd94ffed3f7a210fb8bc53a4d88aa",
+      "command": "docker scout cves --exit-code --format sarif --output artifacts/local/rtl023-security-scout-backend.json local://sha256:cabcd84a3d3fbddc33d7ffd20670f93b1d502fd49f315614cbb3e09eed85dfd7"
+    }
+  },
+  "sameReportedFindings": true,
+  "reportedSet": [
+    {
+      "id": "CVE-2026-53613",
+      "severity": "UNSPECIFIED",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/util-linux@2.38.1-5%2Bdeb12u3?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-53615",
+      "severity": "UNSPECIFIED",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/util-linux@2.38.1-5%2Bdeb12u3?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2005-2541",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/tar@1.34%2Bdfsg-1.2%2Bdeb12u1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2007-5686",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/shadow@1%3A4.13%2Bdfsg1-1%2Bdeb12u2?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2010-4756",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/glibc@2.36-9%2Bdeb12u14?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2011-3374",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/apt@2.6.1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2011-3389",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/gnutls28@3.7.9-2%2Bdeb12u7?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2011-4116",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/perl@5.36.0-7%2Bdeb12u4?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2013-4392",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/systemd@252.39-1~deb12u2?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2017-18018",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/coreutils@9.1-1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2018-20796",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/glibc@2.36-9%2Bdeb12u14?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2018-6829",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/libgcrypt20@1.10.1-3%2Bdeb12u1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2019-1010022",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/glibc@2.36-9%2Bdeb12u14?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2019-1010023",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/glibc@2.36-9%2Bdeb12u14?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2019-1010024",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/glibc@2.36-9%2Bdeb12u14?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2019-1010025",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/glibc@2.36-9%2Bdeb12u14?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2019-9192",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/glibc@2.36-9%2Bdeb12u14?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2022-0563",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/util-linux@2.38.1-5%2Bdeb12u3?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2022-27943",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/gcc-12@12.2.0-14%2Bdeb12u1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2022-3219",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/gnupg2@2.2.40-1.1%2Bdeb12u2?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2023-31437",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/systemd@252.39-1~deb12u2?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2023-31438",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/systemd@252.39-1~deb12u2?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2023-31439",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/systemd@252.39-1~deb12u2?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2023-31486",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/perl@5.36.0-7%2Bdeb12u4?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2024-2236",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/libgcrypt20@1.10.1-3%2Bdeb12u1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2025-14104",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/util-linux@2.38.1-5%2Bdeb12u3?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2025-5278",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/coreutils@9.1-1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-102473",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/dash@0.5.12-2?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-102474",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/dash@0.5.12-2?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-53910",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/diffutils@1%3A3.8-4?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-56391",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/coreutils@9.1-1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-56392",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/coreutils@9.1-1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-67693",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/gnutls28@3.7.9-2%2Bdeb12u7?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-88647",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/gnutls28@3.7.9-2%2Bdeb12u7?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-88648",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/gnutls28@3.7.9-2%2Bdeb12u7?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-95184",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/gnutls28@3.7.9-2%2Bdeb12u7?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-95209",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/gnutls28@3.7.9-2%2Bdeb12u7?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-95210",
+      "severity": "LOW",
+      "score": "3.1",
+      "purls": [
+        "pkg:deb/debian/gnutls28@3.7.9-2%2Bdeb12u7?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-95818",
+      "severity": "LOW",
+      "score": "3.6",
+      "purls": [
+        "pkg:deb/debian/glibc@2.36-9%2Bdeb12u14?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-97399",
+      "severity": "LOW",
+      "score": "3.7",
+      "purls": [
+        "pkg:deb/debian/glibc@2.36-9%2Bdeb12u14?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2025-45582",
+      "severity": "MEDIUM",
+      "score": "4.1",
+      "purls": [
+        "pkg:deb/debian/tar@1.34%2Bdfsg-1.2%2Bdeb12u1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">=1.34+dfsg-1.2+deb12u1"
+    },
+    {
+      "id": "CVE-2026-15534",
+      "severity": "MEDIUM",
+      "score": "5.7",
+      "purls": [
+        "pkg:deb/debian/perl@5.36.0-7%2Bdeb12u4?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-86805",
+      "severity": "MEDIUM",
+      "score": "6.3",
+      "purls": [
+        "pkg:deb/debian/glibc@2.36-9%2Bdeb12u14?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-13595",
+      "severity": "MEDIUM",
+      "score": "6.8",
+      "purls": [
+        "pkg:deb/debian/util-linux@2.38.1-5%2Bdeb12u3?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-78409",
+      "severity": "HIGH",
+      "score": "7.0",
+      "purls": [
+        "pkg:deb/debian/util-linux@2.38.1-5%2Bdeb12u3?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-82560",
+      "severity": "HIGH",
+      "score": "7.5",
+      "purls": [
+        "pkg:deb/debian/perl@5.36.0-7%2Bdeb12u4?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-78410",
+      "severity": "HIGH",
+      "score": "7.8",
+      "purls": [
+        "pkg:deb/debian/util-linux@2.38.1-5%2Bdeb12u3?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-78408",
+      "severity": "HIGH",
+      "score": "7.9",
+      "purls": [
+        "pkg:deb/debian/util-linux@2.38.1-5%2Bdeb12u3?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-85091",
+      "severity": "HIGH",
+      "score": "8.3",
+      "purls": [
+        "pkg:deb/debian/zlib@1%3A1.2.13.dfsg-1?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    },
+    {
+      "id": "CVE-2026-76642",
+      "severity": "HIGH",
+      "score": "8.5",
+      "purls": [
+        "pkg:deb/debian/util-linux@2.38.1-5%2Bdeb12u3?os_distro=bookworm&os_name=debian&os_version=12"
+      ],
+      "fixedVersion": "not fixed",
+      "affectedRange": ">0"
+    }
+  ],
+  "comparison": {
+    "baseline": "scout-summary.json",
+    "baselineEntriesPerImage": 70,
+    "currentEntriesPerImage": 50,
+    "removedIds": [
+      "CVE-2026-57433",
+      "CVE-2026-7017",
+      "CVE-2026-89156",
+      "CVE-2026-89160",
+      "CVE-2026-19487",
+      "CVE-2025-15649",
+      "CVE-2026-89157",
+      "CVE-2026-7010",
+      "CVE-2026-89158",
+      "CVE-2026-48962",
+      "CVE-2026-89161",
+      "CVE-2026-42497",
+      "CVE-2026-48959",
+      "CVE-2026-103111",
+      "CVE-2026-86145",
+      "CVE-2026-57432",
+      "CVE-2026-12087",
+      "CVE-2026-13221",
+      "CVE-2026-42496",
+      "CVE-2026-8376"
+    ],
+    "newIds": []
+  },
+  "securityImplementation": true,
+  "registryPush": false,
+  "deployment": false,
+  "paidAiCalls": 0,
+  "limitations": [
+    "Package matches are not proven website exploitability; residual unpatched Debian records are retained without suppression",
+    "No exhaustive native/static/fuzz/hosted/account proof is inferred",
+    "Current local source fingerprint and image IDs identify the dirty candidate; clean commit correspondence is verified separately"
+  ]
+}

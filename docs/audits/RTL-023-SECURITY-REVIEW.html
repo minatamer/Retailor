@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Retailor · Security review before sharing</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #202824;
+        --muted: #52615a;
+        --paper: #faf8f2;
+        --line: #d9dfd5;
+        --blue: #2846c4;
+        --green: #e5eedb;
+        --high: #9b3223;
+        --medium: #735217;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 80px;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          16px/1.6 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      a {
+        color: var(--blue);
+        text-underline-offset: 4px;
+      }
+      a:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid var(--blue);
+        outline-offset: 5px;
+      }
+      header {
+        border-bottom: 1px solid var(--line);
+        padding: 18px 5vw;
+        display: flex;
+        gap: 20px;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .wordmark {
+        font-size: 25px;
+        font-weight: 780;
+        letter-spacing: -1.2px;
+      }
+      .stamp {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      main {
+        max-width: 1120px;
+        padding: 56px 28px 76px;
+        margin: auto;
+      }
+      .eyebrow {
+        color: var(--blue);
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        font-weight: 750;
+        text-transform: uppercase;
+      }
+      h1 {
+        font-size: clamp(38px, 6vw, 70px);
+        line-height: 1.04;
+        letter-spacing: -0.055em;
+        max-width: 880px;
+        margin: 18px 0 24px;
+      }
+      h1 span {
+        color: var(--blue);
+      }
+      .intro {
+        max-width: 760px;
+        font-size: 19px;
+        color: var(--muted);
+      }
+      .notice {
+        padding: 20px 24px;
+        border-radius: 20px;
+        background: var(--green);
+        border: 1px solid #ccd9bf;
+        margin: 28px 0;
+      }
+      .notice p {
+        margin: 6px 0;
+      }
+      .meta {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin: 26px 0;
+      }
+      .stat {
+        background: white;
+        border: 1px solid var(--line);
+        padding: 22px;
+        border-radius: 18px;
+      }
+      .stat b {
+        font-size: 32px;
+        line-height: 1.2;
+        display: block;
+        letter-spacing: -0.04em;
+      }
+      .stat span {
+        display: block;
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      nav {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 30px 0 44px;
+      }
+      nav a {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 10px 18px;
+        text-decoration: none;
+        font-weight: 650;
+        background: white;
+      }
+      h2 {
+        font-size: 26px;
+        line-height: 1.25;
+        letter-spacing: -0.025em;
+        margin-top: 44px;
+      }
+      .section-note {
+        color: var(--muted);
+        max-width: 800px;
+      }
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: white;
+        margin: 20px 0;
+        padding: 30px;
+      }
+      .tag {
+        display: inline-flex;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 750;
+        letter-spacing: 0.04em;
+      }
+      .high {
+        background: #fae9e4;
+        color: var(--high);
+      }
+      .medium {
+        background: #f5edda;
+        color: var(--medium);
+      }
+      .id {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        margin-left: 10px;
+      }
+      .card h3 {
+        font-size: clamp(24px, 3vw, 32px);
+        line-height: 1.2;
+        letter-spacing: -0.035em;
+        margin: 18px 0 10px;
+      }
+      .kind {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 0 0 22px;
+      }
+      .columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 26px;
+      }
+      .label {
+        font-size: 11px;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+        font-weight: 750;
+        color: var(--muted);
+      }
+      .columns p {
+        margin: 8px 0 14px;
+      }
+      .solution {
+        padding: 18px 20px;
+        border-radius: 16px;
+        background: #f1f3fd;
+      }
+      .status {
+        border-top: 1px solid var(--line);
+        margin-top: 22px;
+        padding-top: 18px;
+        font-size: 14px;
+      }
+      .status strong {
+        color: var(--blue);
+      }
+      details {
+        border-top: 1px solid var(--line);
+        margin-top: 22px;
+        padding-top: 16px;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 650;
+        min-height: 32px;
+      }
+      details p {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .proof {
+        background: #f1f2ed;
+        border-radius: 12px;
+        padding: 16px;
+        font-size: 14px;
+      }
+      .dependency {
+        background: #f0f1f8;
+        border: 1px solid #d9dce9;
+        border-radius: 24px;
+        padding: 28px;
+        margin-top: 28px;
+      }
+      .dependency h3 {
+        margin-top: 0;
+        font-size: 23px;
+      }
+      .checks {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 22px 0;
+      }
+      .check {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+        font-size: 14px;
+      }
+      .check b {
+        display: block;
+        margin-bottom: 5px;
+      }
+      footer {
+        margin-top: 44px;
+        border-top: 1px solid var(--line);
+        padding-top: 24px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .links {
+        display: flex;
+        gap: 22px;
+        flex-wrap: wrap;
+      }
+      code {
+        font:
+          13px ui-monospace,
+          SFMono-Regular,
+          Consolas,
+          monospace;
+        overflow-wrap: anywhere;
+      }
+      p,
+      li {
+        overflow-wrap: anywhere;
+      }
+      ul {
+        padding-left: 22px;
+      }
+      li {
+        margin: 8px 0;
+      }
+      .zero {
+        padding: 18px 22px;
+        border: 1px dashed var(--line);
+        border-radius: 16px;
+        color: var(--muted);
+      }
+      @media (max-width: 640px) {
+        main {
+          padding: 34px 18px 50px;
+        }
+        .stats {
+          gap: 8px;
+        }
+        .stat {
+          padding: 14px 12px;
+        }
+        .stat b {
+          font-size: 27px;
+        }
+        .stat span {
+          font-size: 11px;
+        }
+        .card {
+          padding: 22px 20px;
+          border-radius: 20px;
+        }
+        .columns,
+        .checks {
+          grid-template-columns: 1fr;
+          gap: 14px;
+        }
+        .notice,
+        .dependency {
+          padding: 20px;
+        }
+        .intro {
+          font-size: 17px;
+        }
+        nav {
+          gap: 8px;
+        }
+        nav a {
+          padding: 9px 12px;
+          font-size: 13px;
+        }
+        header {
+          padding: 15px 20px;
+        }
+        .stamp {
+          font-size: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wordmark">
+        retailor <span style="color: var(--blue)">✧</span>
+      </div>
+      <div class="stamp">
+        RTL-023 · Post deployment &amp; pre sharing · 13 Oct 2026
+      </div>
+    </header>
+    <main>
+      <p class="eyebrow">Approved security improvements</p>
+      <h1>A smooth demo.<br /><span>A careful sharing decision.</span></h1>
+      <p class="intro">
+        The code-quality work is finished, tested and committed. Here are the
+        security improvements you approved, with the demo’s functionality
+        protected throughout implementation and validation.
+      </p>
+      <div class="notice">
+        <strong>Approved local fixes pass all six gates.</strong>
+        <p>
+          Request fairness, direct-origin protection, release evidence gates and
+          a compatible container security refresh are implemented. The original
+          findings below explain why. Retailor has no verified deployment yet;
+          paid AI remains off. No cloud or account action is authorized by this
+          work.
+        </p>
+        <p class="meta">
+          Security checks: 375 tests / 71 files, 165 boundary modules, fresh
+          Linux and responsive fake-mode observations. Original audit:
+          <code>8057f3c</code>. Actual evidence is linked below.
+        </p>
+      </div>
+      <div class="stats" aria-label="Review priorities">
+        <div class="stat">
+          <b>1</b><strong>High priority</strong
+          ><span>Conditional paid-release risk</span>
+        </div>
+        <div class="stat">
+          <b>2</b><strong>Medium priorities</strong
+          ><span>One confirmed issue + one release policy</span>
+        </div>
+        <div class="stat">
+          <b>0</b><strong>Low recommendations</strong
+          ><span>No minor hardening checklist</span>
+        </div>
+      </div>
+      <p class="meta">
+        These are review priorities, not three proven live exploits. One
+        application weakness was confirmed. The other two depend on how we
+        enable paid AI and expose the demo.
+      </p>
+      <nav aria-label="Audit sections">
+        <a href="#high">High priority</a><a href="#medium">Medium priorities</a
+        ><a href="#dependencies">Dependencies</a
+        ><a href="#decisions">Your decisions</a
+        ><a href="RTL-023-SECURITY.md">Full technical audit ↗</a>
+      </nav>
+
+      <section id="high" aria-labelledby="high-title">
+        <h2 id="high-title">High priority</h2>
+        <p class="section-note">
+          A condition to resolve before opening funded AI to the public. It is
+          safe to keep those capabilities disabled while we decide.
+        </p>
+        <article class="card">
+          <span class="tag high">HIGH · IF PUBLIC PAID AI IS ENABLED</span
+          ><span class="id">SEC-02</span>
+          <h3>The spending allowance can refill with a new server.</h3>
+          <p class="kind">
+            Confirmed architecture property · Existing release condition · Not
+            an active paid-off exploit
+          </p>
+          <div class="columns">
+            <div>
+              <p class="label">The threat</p>
+              <p>
+                The current allowance belongs to each running backend. A
+                restart, rollout or extra instance starts another allowance.
+                “One server” does not guarantee one total spending ceiling.
+              </p>
+              <p class="label">Why it matters</p>
+              <p>
+                If public visitors use funded AI without a verified external
+                cutoff, total charges can exceed the amount we intended for the
+                demo.
+              </p>
+            </div>
+            <div class="solution">
+              <p class="label">Selected fix</p>
+              <p>
+                Keep paid AI off until an actual external cutoff and rollout
+                policy are verified. A strict release record now requires recent
+                evidence for this exact app and both images; a process allowance
+                or email alert cannot open paid readiness.
+              </p>
+              <p>
+                Do not add a database by default, and do not mistake email
+                budget alerts for an enforced cutoff.
+              </p>
+            </div>
+          </div>
+          <details>
+            <summary>How the fix preserves the demo</summary>
+            <p>
+              Photos, storefront styles, dashboard, wordmark and local controls
+              remain usable. Keep all existing challenges, grants, limits and
+              private logs. No cheaper interpretation, hidden retry or fake live
+              fallback. Real spending checks need a separately approved account
+              and budget.
+            </p>
+          </details>
+          <p class="status">
+            <strong>Selected:</strong> paid stays off until real account
+            refusal, restart/overlap and outstanding-cost evidence is supplied.
+            The local gate is prepared; no account or cloud change has been
+            made.
+          </p>
+        </article>
+      </section>
+
+      <section id="medium" aria-labelledby="medium-title">
+        <h2 id="medium-title">Medium priorities</h2>
+        <article class="card">
+          <span class="tag medium">MEDIUM · CONFIRMED</span
+          ><span class="id">SEC-01</span>
+          <h3>Rejected requests can make everyone else wait.</h3>
+          <p class="kind">
+            Availability weakness · Safely reproduced in memory · No internet or
+            local-server flood
+          </p>
+          <div class="columns">
+            <div>
+              <p class="label">The threat</p>
+              <p>
+                Previously all visitors shared one small request allowance.
+                Requests that later fail can still fill it. One caller can make
+                legitimate photo processing and Tailor requests receive “busy”
+                for the rest of the minute.
+              </p>
+              <p class="proof">
+                <strong>Actual proof:</strong> 64 rejected attempts filled the
+                window; the next valid attempt was busy. After a minute it
+                worked again. Zero paid calls.
+              </p>
+            </div>
+            <div class="solution">
+              <p class="label">Selected fix</p>
+              <p>
+                Reserve request capacity for genuinely issued sessions while
+                keeping the hard total limit. Unknown callers cannot occupy all
+                body handlers or the signed-session allowance; one issued
+                session also cannot hold every handler. Public entry controls
+                still protect first-time visitors.
+              </p>
+              <p>Simply removing or increasing the limit is not the fix.</p>
+            </div>
+          </div>
+          <details>
+            <summary>How the fix preserves the demo</summary>
+            <p>
+              Use the existing friendly busy response. Keep bounded
+              upload/parsing/native/paid work, correct cancellation and every
+              private log. Test full normal multi-visitor flows, including the
+              sample, chat and optional logos, before settling thresholds. No
+              login, fingerprinting or database is proposed.
+            </p>
+            <p>
+              The isolated proof used wrong media directly against middleware.
+              The frontend already rejects wrong media; valid-media malformed
+              bodies are the corresponding public path. No claim is made that
+              the frontend forwards unsupported uploads.
+            </p>
+          </details>
+          <p class="status">
+            <strong>Local fix:</strong> fairness and signature/expiry/cleanup
+            regressions pass. Distributed abuse, initial-visitor capacity and
+            hosted traffic still require the selected edge policy and
+            normal-flow calibration.
+          </p>
+        </article>
+        <article class="card">
+          <span class="tag medium">MEDIUM · BEFORE PUBLIC SHARING</span
+          ><span class="id">SEC-03</span>
+          <h3>Protection must cover the direct URLs too.</h3>
+          <p class="kind">
+            Deployment policy gap · Actual cloud configuration is not available
+            yet
+          </p>
+          <div class="columns">
+            <div>
+              <p class="label">The threat</p>
+              <p>
+                Protecting only our custom domain can leave a direct Cloud Run
+                URL or preview tag open to abuse. Pages and ordinary GET
+                requests also consume server work before an AI challenge.
+              </p>
+              <p class="label">Why it matters</p>
+              <p>
+                Traffic can slow the demo or raise cloud usage even when paid AI
+                is off. Existing app limits protect expensive tasks, but do not
+                prove edge DDoS protection.
+              </p>
+            </div>
+            <div class="solution">
+              <p class="label">Selected fix</p>
+              <p>
+                A private server check now rejects requests that do not carry
+                the trusted edge’s seal. It covers pages and assets while the
+                API keeps its streaming upload path. Missing enabled settings
+                fail safely. Actual edge rules and all URLs must be verified.
+              </p>
+              <p>
+                Use the existing Cloudflare proxy to overwrite the private
+                header and apply measured traffic rules. No new load balancer,
+                database or security-service purchase was made.
+              </p>
+            </div>
+          </div>
+          <details>
+            <summary>How the fix preserves the demo</summary>
+            <p>
+              Keep the backend private and preserve its caller identity.
+              Maintain photos, fonts, navigation, challenge, long processing
+              requests and operator health access. Do not impose a tiny
+              arbitrary rate, suppress animations or cache private guest state.
+              No hosted settings have been changed.
+            </p>
+          </details>
+          <p class="status">
+            <strong>Local guard verified:</strong> direct page/asset/API
+            requests are rejected, legitimate requests work and a full upload
+            larger than 10 MiB passes without forwarding the seal. Actual cloud
+            configuration and abuse-policy proof remain release gates.
+          </p>
+        </article>
+      </section>
+
+      <section id="dependencies" aria-labelledby="dependency-title">
+        <h2 id="dependency-title">Dependencies, with context</h2>
+        <div class="dependency">
+          <h3>One published High advisory is development-only.</h3>
+          <p>
+            The package scan found
+            <strong>one High advisory in the lint tooling</strong>, with no
+            patch listed. It is not a visitor-driven operation; our lint pattern
+            is fixed. The affected package could not be resolved from either
+            runtime image’s entrypoint.
+          </p>
+          <p>
+            <strong>The production npm scan reports zero advisories.</strong>
+            This is not a promise that every native or OS component is safe.
+            Local OS comparison also identified older utility/library records;
+            the detailed audit separates those records from actual application
+            reachability.
+          </p>
+          <p class="meta">
+            Retained disposition: keep lint working and the reviewed patterns
+            fixed; review a compatible upstream fix when available. No package
+            upgrade, override, rule removal or vulnerability suppression has
+            been made.
+          </p>
+          <p>
+            <a href="https://github.com/advisories/GHSA-vfj7-8cjw-p6xm"
+              >Published advisory ↗</a
+            >
+            ·
+            <a href="RTL-023-SECURITY.md#dependency-and-runtime-applicability"
+              >Detailed applicability ↗</a
+            >
+          </p>
+        </div>
+        <div class="dependency">
+          <h3>The refreshed images removed all reported Critical entries.</h3>
+          <p>
+            Both images report the same
+            <strong>50 entries across 15 Debian packages</strong>: 0 Critical, 6
+            High, 4 Medium, 38 Low and 2 unclassified. The original scan had 70
+            entries and 4 Critical; 20 reported IDs disappeared after the
+            supported Node/Debian fixes. Shared entries count once.
+          </p>
+          <p>
+            The six remaining High records have no offered Bookworm patch. They
+            require absent Perl modules, privileged mount operations or a zlib
+            API the app does not expose. No new remotely reachable website High
+            or Critical was established. The images are not declared clean;
+            unsupported package removals or vulnerability suppression were not
+            used to hide the results.
+          </p>
+          <p>
+            <strong>BASE-01 · Completed locally:</strong> compatible pinned
+            Node24.21 base, vendor-fixed PCRE2 and supported Perl patch. Both
+            images passed native/photo/font/startup/shutdown checks. The browser
+            flow, private logs and designed motion remain intact.
+          </p>
+          <p class="meta">
+            Your later approval covered all local fixes and commits. Fresh
+            one-off scans verify these images; no image push, cloud deployment
+            or paid AI call occurred. Scanning does not prove every
+            native/static component or hosted control safe. Unpatched cases
+            remain documented.
+          </p>
+          <p>
+            <a href="RTL-023/scout-after-fixes.json">Current scan evidence ↗</a>
+            ·
+            <a href="RTL-023-SECURITY.md#dependency-and-runtime-applicability"
+              >Applicability and careful maintenance plan ↗</a
+            >
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="low-title">
+        <h2 id="low-title">Low severity</h2>
+        <div class="zero">
+          No minor or speculative recommendations were added. Existing real
+          controls are documented instead of creating a long checklist of
+          low-value changes.
+        </div>
+      </section>
+
+      <section id="decisions" aria-labelledby="decision-title">
+        <h2 id="decision-title">What remains before public sharing</h2>
+        <p>
+          All documented fixes are approved for local execution and commits.
+          Real cloud rules, domain/IAM, account-enforced spending refusal, paid
+          acceptance and final device/owner checks still need actual inputs and
+          separate authority. A passing local record cannot approve publication.
+        </p>
+        <div class="checks">
+          <div class="check">
+            <b>Functionality stays first.</b>Preserve the flow, exact money,
+            photos, chat, templates, smooth motion and responsive layouts.
+          </div>
+          <div class="check">
+            <b>Private logs stay.</b>Keep existing diagnostics private and
+            useful. No technical error copy or application debug logging for
+            visitors.
+          </div>
+          <div class="check">
+            <b>Each change is validated.</b>Plan exact files, retain private
+            logs and functionality, independently fix review findings, then
+            commit the settled result after the required checks.
+          </div>
+          <div class="check">
+            <b>Cloud and paid actions stay separate.</b>Exact
+            account/resource/budget permission is still needed. Local audit
+            evidence is not deployment approval.
+          </div>
+        </div>
+        <p class="section-note">
+          Backend IAM, real challenge/domain settings, combined hosted capacity,
+          provider costs/retention and final owner/device acceptance remain
+          normal release gates. They are not presented as confirmed deployed
+          defects.
+        </p>
+      </section>
+      <footer>
+        <div class="links">
+          <a href="RTL-023-SECURITY.md"
+            >Detailed audit &amp; careful fix plans</a
+          ><a href="RTL-023/security-evidence.json"
+            >Actual non-secret evidence</a
+          ><a href="../validation/RTL-023.md">Committed quality validation</a>
+        </div>
+        <p>
+          Owner-approved local fixes validated; external/upstream acceptance
+          remains pending · No paid calls or cloud publication.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

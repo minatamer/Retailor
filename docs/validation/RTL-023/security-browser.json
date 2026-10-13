@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-13T19:23:48.435Z",
+  "sourceFingerprint": "370eafb8afc5300e424f03ea96f60ace4e9873814a1dfa7ba198a995123cb537",
+  "mode": "development-fixture",
+  "paidRequests": 0,
+  "reusedRetailorListeners": {
+    "frontend": 21204,
+    "backend": 4188
+  },
+  "viewports": [
+    {
+      "width": 375,
+      "height": 812,
+      "landingCtaBottom": 280.265625,
+      "documentWidth": 360
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "landingCtaBottom": 277.171875,
+      "documentWidth": 305
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "view": "Pulse / Cobalt / Cloud / Expressive store"
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "view": "owner dashboard",
+      "documentWidth": 753
+    }
+  ],
+  "observations": [
+    "15 actual shipped photos loaded, decoded and linked to 15 declared fixture garments",
+    "Chat-led template/palette/type/brand/wordmark setup and explicit store acceptance",
+    "One typed fake shopper request completed through the real fixed bridge/backend and filtered to two current jeans",
+    "Owner net merchandise KPI 91000 USD cents / 14 contributing records opened with Enter",
+    "Closing evidence returned focus to the originating KPI",
+    "Two incomplete images were below-viewport lazy assets; no visible image failure was observed",
+    "Landing hero/action fully visible at both phone sizes, designed automatic scene motion observed"
+  ],
+  "screenshots": [
+    "security-landing-phone.png",
+    "security-landing-small-phone.png",
+    "security-store-laptop.png",
+    "security-owner-tablet.png"
+  ],
+  "limits": [
+    "Native resized browser, not physical devices or actual browser zoom/OS preferences",
+    "Fixture success is not fresh live recognition, paid-provider quality or hosted acceptance",
+    "HTML audit local-file rendering remains owner inspection; no policy bypass attempted"
+  ]
+}

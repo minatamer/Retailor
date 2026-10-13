@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-13T17:19:54.289Z",
+  "candidate": "8057f3cfabffeda1047d2680c35da30f118b7fa9",
+  "applicationFingerprint": "c9d45e7a66762d91dd32a76f2bba622925a88165e6551c2644c0f40c5f8d58d2",
+  "qualityCommits": ["e42bff5", "d6bf6e6", "8057f3c"],
+  "cleanPreflight": {
+    "gitRevision": "8057f3cfabffeda1047d2680c35da30f118b7fa9",
+    "dirty": false,
+    "fingerprint": "c9d45e7a66762d91dd32a76f2bba622925a88165e6551c2644c0f40c5f8d58d2",
+    "packagedFingerprint": "c9d45e7a66762d91dd32a76f2bba622925a88165e6551c2644c0f40c5f8d58d2",
+    "matchesLocalLinuxEvidence": true,
+    "frontendLocalImage": "sha256:f3b6c43d0159d588aaeceb3e3ddd84ecf7a0e0c7397505ef9275e00f3d267a27",
+    "backendLocalImage": "sha256:83d596a229f5a5a6929a5242d098fbb84d296eacc371795cf51b315cd10928f0"
+  },
+  "dependencyAudit": {
+    "all": {
+      "advisories": {
+        "1240992": {
+          "findings": [
+            {
+              "version": "3.0.3",
+              "paths": [
+                ".>@next/eslint-plugin-next>fast-glob>micromatch>braces"
+              ],
+              "dev": true,
+              "optional": false,
+              "bundled": false
+            }
+          ],
+          "id": 1240992,
+          "title": "braces vulnerable to stack-exhaustion denial of service through deeply nested patterns",
+          "module_name": "braces",
+          "vulnerable_versions": "<=3.0.3",
+          "patched_versions": null,
+          "severity": "high",
+          "cwe": "CWE-674",
+          "github_advisory_id": "GHSA-vfj7-8cjw-p6xm",
+          "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+          "patched_versions_unpublished": true
+        }
+      },
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 1,
+          "critical": 0
+        },
+        "dependencies": 125,
+        "devDependencies": 232,
+        "optionalDependencies": 88,
+        "totalDependencies": 392
+      }
+    },
+    "production": {
+      "advisories": {},
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "dependencies": 89,
+        "devDependencies": 0,
+        "optionalDependencies": 71,
+        "totalDependencies": 160
+      }
+    }
+  },
+  "ingress": {
+    "schemaVersion": 1,
+    "method": "real ingress middleware with local EventEmitter requests/responses; no sockets, providers, browser state or app mutation",
+    "rejectedCount": 64,
+    "rejectedStatuses": [415],
+    "legitimateStatus": 429,
+    "afterWindowStatus": 200,
+    "passed": 1,
+    "paidRequests": 0
+  },
+  "native": {
+    "node": "v24.19.0",
+    "openssl": "3.5.7",
+    "zlib": "1.3.2.1-motley-3246f1b",
+    "sharp": {
+      "aom": "3.15.1",
+      "archive": "3.8.9",
+      "cairo": "1.18.6",
+      "cgif": "0.5.4",
+      "exif": "0.6.26",
+      "expat": "2.8.5",
+      "ffi": "3.8.0",
+      "fontconfig": "2.18.3",
+      "freetype": "2.14.3",
+      "fribidi": "1.0.17",
+      "glib": "2.90.0",
+      "harfbuzz": "14.5.0",
+      "heif": "1.23.5",
+      "highway": "1.4.0",
+      "imagequant": "2.4.1",
+      "lcms": "2.19.1",
+      "mozjpeg": "0826579",
+      "pango": "1.58.2",
+      "pixman": "0.46.4",
+      "png": "1.6.58",
+      "proxy-libintl": "0.5",
+      "rsvg": "2.63.2",
+      "tiff": "4.7.2",
+      "uhdr": "2.0.2",
+      "vips": "8.18.7",
+      "webp": "1.6.0",
+      "xml2": "2.15.4",
+      "zlib-ng": "2.3.3",
+      "sharp": "0.35.5"
+    }
+  },
+  "debian": {
+    "feed": "https://security-tracker.debian.org/tracker/data/json",
+    "sourcePackages": 63,
+    "versionComparisons": 749,
+    "recordsRemainingBeforeReachability": 121,
+    "fixableRecords": [
+      {
+        "source": "xz-utils",
+        "version": "5.4.1-1+deb12u1",
+        "cve": "TEMP-1147318-639065",
+        "fixed": "5.4.1-1+deb12u2"
+      },
+      {
+        "source": "pcre2",
+        "version": "10.42-1",
+        "cve": "CVE-2026-103111",
+        "fixed": "10.42-1+deb12u2"
+      },
+      {
+        "source": "pcre2",
+        "version": "10.42-1",
+        "cve": "CVE-2026-86145",
+        "fixed": "10.42-1+deb12u1"
+      },
+      {
+        "source": "pcre2",
+        "version": "10.42-1",
+        "cve": "CVE-2026-89156",
+        "fixed": "10.42-1+deb12u1"
+      },
+      {
+        "source": "pcre2",
+        "version": "10.42-1",
+        "cve": "CVE-2026-89157",
+        "fixed": "10.42-1+deb12u1"
+      },
+      {
+        "source": "pcre2",
+        "version": "10.42-1",
+        "cve": "CVE-2026-89158",
+        "fixed": "10.42-1+deb12u1"
+      },
+      {
+        "source": "pcre2",
+        "version": "10.42-1",
+        "cve": "CVE-2026-89160",
+        "fixed": "10.42-1+deb12u1"
+      },
+      {
+        "source": "pcre2",
+        "version": "10.42-1",
+        "cve": "CVE-2026-89161",
+        "fixed": "10.42-1+deb12u1"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2025-15649",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-12087",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-13221",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-19487",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-42496",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-42497",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-48959",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-48962",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-57432",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-57433",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-7010",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-7017",
+        "fixed": "5.36.0-7+deb12u4"
+      },
+      {
+        "source": "perl",
+        "version": "5.36.0-7+deb12u3",
+        "cve": "CVE-2026-8376",
+        "fixed": "5.36.0-7+deb12u4"
+      }
+    ],
+    "limitations": "Source matches are not proof of binary presence or app exploitability; not a full OS/SBOM/native scanner"
+  },
+  "scanner": {
+    "name": "Docker Scout v1.24.0",
+    "result": "Completed both exact local scans after explicit owner approval; each exit 2 with advisories, report successfully written",
+    "authorization": "Owner said do it after clarification of local one-off package identifiers/layer digest transmission; no remedy or publication approval",
+    "previousAttempt": "Initially blocked by automatic review before approval; no upload occurred in the rejected attempt",
+    "summary": "scout-summary.json",
+    "images": {
+      "frontend": {
+        "image": "sha256:f3b6c43d0159d588aaeceb3e3ddd84ecf7a0e0c7397505ef9275e00f3d267a27",
+        "observedAt": "2026-10-13T17:57:24.0958177Z",
+        "role": "frontend",
+        "exitCode": 2,
+        "reportExists": true,
+        "command": "docker scout cves --exit-code --format sarif --output artifacts/local/rtl023-scout-frontend.json local://sha256:f3b6c43d0159d588aaeceb3e3ddd84ecf7a0e0c7397505ef9275e00f3d267a27",
+        "indexedPackages": 198,
+        "reportedPackages": 16,
+        "reportedEntries": 70,
+        "severities": {
+          "UNSPECIFIED": 4,
+          "LOW": 40,
+          "MEDIUM": 9,
+          "HIGH": 13,
+          "CRITICAL": 4
+        },
+        "rawReportSha256": "9884e00ac1162def7124c2f26adbab28352825f88ecedda8edf532d464aa3d39"
+      },
+      "backend": {
+        "image": "sha256:83d596a229f5a5a6929a5242d098fbb84d296eacc371795cf51b315cd10928f0",
+        "role": "backend",
+        "observedAt": "2026-10-13T17:57:29.6026588Z",
+        "reportExists": true,
+        "exitCode": 2,
+        "command": "docker scout cves --exit-code --format sarif --output artifacts/local/rtl023-scout-backend.json local://sha256:83d596a229f5a5a6929a5242d098fbb84d296eacc371795cf51b315cd10928f0",
+        "indexedPackages": 211,
+        "reportedPackages": 16,
+        "reportedEntries": 70,
+        "severities": {
+          "UNSPECIFIED": 4,
+          "LOW": 40,
+          "MEDIUM": 9,
+          "HIGH": 13,
+          "CRITICAL": 4
+        },
+        "rawReportSha256": "9884e00ac1162def7124c2f26adbab28352825f88ecedda8edf532d464aa3d39"
+      }
+    },
+    "limitations": "Scanner package/advisory matches are not proof of website exploitability, static-native coverage, absence of undisclosed flaws or hosted safety"
+  },
+  "securityImplementation": false,
+  "paidRequests": 0,
+  "cloudActions": 0
+}

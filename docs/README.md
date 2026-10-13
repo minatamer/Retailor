@@ -1,16 +1,16 @@
 # Retailor documentation
 
-[RTL-023 post deployment and pre sharing](tickets/RTL-023-post-deployment-and-pre-sharing.md) adds the owner-requested quality audit and a separate manual security-review gate. [Quality dispositions](audits/RTL-023-CODE-QUALITY.md) and [actual validation](validation/RTL-023.md) describe the preserved behavior, targeted fixes and current source-linked Linux candidate. Security findings are audit-only and require manual feedback before implementation.
+[RTL-023 post deployment and pre sharing](tickets/RTL-023-post-deployment-and-pre-sharing.md) records the committed quality audit and subsequent owner-approved security remedies. [Quality dispositions](audits/RTL-023-CODE-QUALITY.md), [security dispositions](audits/RTL-023-SECURITY.md), [PM security view](audits/RTL-023-SECURITY-REVIEW.html) and [security validation](validation/RTL-023-SECURITY.md) identify preserved functionality, bounded origin/fairness/release controls, exact refreshed Linux/scanner proof and external/upstream blockers. No paid call or cloud publication is inferred.
 
 Retailor is a planned clothing-only demo built around a beautiful storefront from supplied product photos. Documentation and the 22-ticket implementation queue are prepared; implementation is underway in fake mode and deployment preparation follows the queue.
 
 ## Current authority
 
-| Document | Use it for |
-| --- | --- |
+| Document                                               | Use it for                                                                                                     |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
 | [Detailed blueprint](RETAILOR_DEMO_SOURCE_OF_TRUTH.md) | Accepted scope, screen flow, domain rules, AI boundaries, architecture, infrastructure, limits and acceptance. |
-| [Visual HTML overview](RETAILOR_OVERVIEW.html) | Concise owner-facing product story and interactive documentation illustrations. |
-| [Implementation ticket queue](tickets/README.md) | All 22 detailed planned packets, dependencies, owner-answer traceability and execution evidence rules. |
+| [Visual HTML overview](RETAILOR_OVERVIEW.html)         | Concise owner-facing product story and interactive documentation illustrations.                                |
+| [Implementation ticket queue](tickets/README.md)       | All 22 detailed planned packets, dependencies, owner-answer traceability and execution evidence rules.         |
 
 The owner has authorized queue execution and ticket-prefixed commits after clean validation. [RTL-001](tickets/RTL-001-initialize-workspace-contracts-and-safe-runtime.md) owns the initial local foundation; consult the queue for the next eligible work. The latest owner instruction governs conflicting historical material; tickets apply the blueprint to a specific outcome and do not own a competing product contract.
 
