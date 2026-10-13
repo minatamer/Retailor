@@ -33,7 +33,11 @@ export function createApp(
     }
     next();
   });
-  app.use(ingress());
+  app.use(
+    ingress(Date.now, (cookie) =>
+      runtime.recognition?.admission.verifiedSafety(cookie),
+    ),
+  );
   app.get("/v1/health", (_req, res) => {
     res.json({
       schemaVersion: 1,

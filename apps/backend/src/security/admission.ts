@@ -110,7 +110,8 @@ export class PaidAdmission {
       return deny("FORBIDDEN", 403);
     }
   }
-  safety(cookie: string | undefined) {
+  /** Verify an issued identity without minting cookies or allocating rate state. */
+  verifiedSafety(cookie: string | undefined): string | undefined {
     if (cookie) {
       try {
         const parsed = CookieSchema.parse(this.unseal(cookie));
@@ -119,11 +120,16 @@ export class PaidAdmission {
           parsed.until > this.clock() &&
           parsed.until <= this.clock() + 7_200_000
         )
-          return { identity: parsed.safety, cookie: undefined };
+          return parsed.safety;
       } catch {
-        /* Issue a fresh bounded safety identity, never trust caller labels. */
+        /* Invalid signatures/boots/expiry never acquire protected ingress. */
       }
     }
+    return undefined;
+  }
+  safety(cookie: string | undefined) {
+    const verified = this.verifiedSafety(cookie);
+    if (verified) return { identity: verified, cookie: undefined };
     const identity = this.id();
     return {
       identity,

@@ -6,6 +6,41 @@ import type { AssistantAction } from "@retailor/contracts/assistant";
 import type { LogoAction } from "@retailor/contracts/brand";
 describe("action-bound one-use paid admission", () => {
   const secret = "s".repeat(32);
+  it("ingress verification never issues identity and rejects forged, expired and previous-boot cookies", () => {
+    let now = 100000;
+    const id = vi.fn(() => "test_identity");
+    const options = {
+      secret,
+      budgetMicroUsd: 0,
+      clock: () => now,
+      id,
+      boot: "current_boot",
+      challenge: { verify: async () => true },
+    };
+    const gate = new PaidAdmission(options);
+    expect(gate.verifiedSafety(undefined)).toBeUndefined();
+    expect(gate.verifiedSafety("invalid")).toBeUndefined();
+    expect(id).not.toHaveBeenCalled();
+    const issued = gate.safety(undefined);
+    expect(gate.verifiedSafety(issued.cookie)).toBe(issued.identity);
+    expect(gate.safety(issued.cookie)).toEqual({
+      identity: issued.identity,
+      cookie: undefined,
+    });
+    expect(id).toHaveBeenCalledTimes(1);
+    expect(
+      gate.verifiedSafety(`${issued.cookie!.slice(0, -1)}x`),
+    ).toBeUndefined();
+    expect(
+      new PaidAdmission({ ...options, boot: "new_boot" }).verifiedSafety(
+        issued.cookie,
+      ),
+    ).toBeUndefined();
+    expect(gate.verifiedSafety("a".repeat(2049))).toBeUndefined();
+    now += 7200000;
+    expect(gate.verifiedSafety(issued.cookie)).toBeUndefined();
+    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 0 });
+  });
   it("caps unspent workspace grants and frees expired control memory without dispatch", async () => {
     let now = Date.now();
     const verify = vi.fn(async () => true);
