@@ -159,6 +159,7 @@ export function Tailor() {
   return (
     <aside
       className={styles.shell}
+      data-compact={!creator && !expanded ? "true" : undefined}
       style={
         viewport.height
           ? ({

@@ -295,12 +295,7 @@ export function BagDialog() {
           <div className={styles.actions}>
             {order ? (
               <>
-                <Button
-                  onClick={() => {
-                    controller.closeBag();
-                    controller.go("dashboard");
-                  }}
-                >
+                <Button onClick={() => controller.showBagOrderInOwner()}>
                   See it in the dashboard
                 </Button>
                 <Button variant="quiet" onClick={() => controller.closeBag()}>

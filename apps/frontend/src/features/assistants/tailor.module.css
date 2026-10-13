@@ -698,6 +698,25 @@
     width: calc(100% - 24px);
     right: 12px;
   }
+  .shell[data-compact="true"] {
+    width: 56px;
+  }
+  .shell[data-compact="true"] .launcher {
+    min-height: 56px;
+    padding: 8px;
+    border-radius: 18px;
+  }
+  .shell[data-compact="true"] .launcher > span:nth-child(2) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .shell[data-compact="true"] .launcher > svg {
+    display: none;
+  }
   .panel {
     border-radius: 20px;
   }

@@ -41,6 +41,28 @@ async function setup(count = 2) {
     product: controller.getSnapshot().state.graph.products[0]!,
   };
 }
+it("takes a placed receipt to its exact owner order despite a remembered Design section, without another mutation", async () => {
+  const { controller, product } = await setup(1);
+  controller.showBagOrderInOwner();
+  expect(controller.getSnapshot().state.stage).toBe("storefront");
+  controller.go("dashboard");
+  controller.ownerNavigate("design");
+  controller.go("storefront");
+  controller.addToBag(product.id, product.variants[0]!.id, 1);
+  controller.reviewBag();
+  const id = controller.placeReviewed(
+    controller.getSnapshot().checkoutReview!,
+  )!;
+  const graph = JSON.stringify(controller.getSnapshot().state.graph);
+  controller.showBagOrderInOwner();
+  expect(controller.getSnapshot().state.stage).toBe("dashboard");
+  expect(controller.getSnapshot().state.ownerView).toBe("orders");
+  expect(controller.getSnapshot().state.ownerSearch).toBe(id);
+  expect(controller.getSnapshot().bagOpen).toBe(false);
+  expect(JSON.stringify(controller.getSnapshot().state.graph)).toBe(graph);
+  controller.showBagOrderInOwner();
+  expect(JSON.stringify(controller.getSnapshot().state.graph)).toBe(graph);
+});
 function ownerCommand(
   env: ReturnType<typeof environment>,
   controller: Awaited<ReturnType<typeof setup>>["controller"],

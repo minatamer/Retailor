@@ -979,6 +979,9 @@
     max-width: 100%;
     flex: 1;
   }
+  .store:not([data-illustration]) .wordmark {
+    flex: 0 0 100%;
+  }
   .bag {
     min-width: 44px;
   }
@@ -1084,6 +1087,26 @@
   .secondHero {
     margin-top: 0;
     aspect-ratio: 1/1;
+  }
+  .store:not([data-illustration])[data-family="gallery"]
+    :is(.heroPhoto, .secondHero) {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    aspect-ratio: auto;
+    align-content: start;
+  }
+  .store:not([data-illustration])[data-family="gallery"]
+    :is(.heroPhoto, .secondHero)
+    img {
+    aspect-ratio: 1;
+    height: auto;
+  }
+  .store:not([data-illustration])[data-family="gallery"]
+    :is(.heroPhotoLabel, .secondHero span) {
+    position: static;
+    padding: 10px 8px;
+    gap: 6px;
+    align-self: stretch;
   }
   .footer {
     align-items: start;

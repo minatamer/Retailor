@@ -2083,6 +2083,19 @@ export class SessionController {
       });
     }
   }
+  showBagOrderInOwner() {
+    if (!this.valid()) return;
+    const id = this.snapshot.bagReceiptId;
+    if (
+      !id ||
+      !this.snapshot.state.graph.orders.some((order) => order.id === id)
+    )
+      return;
+    this.go("dashboard");
+    if (this.snapshot.state.stage !== "dashboard") return;
+    this.ownerNavigate("orders");
+    this.ownerSearch(id);
+  }
   go(stage: Stage) {
     if (!this.valid() || stage === "process") return;
     const state = this.snapshot.state;
