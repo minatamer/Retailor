@@ -10,6 +10,7 @@ import type { PhotoCache, StoredPhoto } from "./cache";
 import { decodePhoto } from "./decode";
 import type { PhotoDecoder } from "./decode";
 import { orderedPhotoProcessing } from "./ordered-processing";
+import { PhotoInputError, photoNotice } from "./errors";
 export interface NamedPhoto {
   blob: Blob;
   name: string;
@@ -175,6 +176,11 @@ export class PhotoController {
       ids.map((id) => this.entries.get(id)!.photo.derivative),
     );
   }
+  private inputNotice(error: unknown, fallback: string) {
+    return error instanceof CacheConflict
+      ? error.message
+      : photoNotice(error, fallback);
+  }
   private current(generation: number) {
     return (
       this.active &&
@@ -222,11 +228,11 @@ export class PhotoController {
           const old = replaceId ? this.entries.get(replaceId) : undefined;
           const name = input.name.slice(0, 120);
           if (select && this.selected.length >= PHOTO_LIMITS.selection && !old)
-            throw new Error(
+            throw new PhotoInputError(
               "Your selection already has 24 photos. Remove one to add another.",
             );
           if (this.entries.size >= PHOTO_LIMITS.sources && !old)
-            throw new Error(
+            throw new PhotoInputError(
               "This demo has 32 cached photos. Remove an unused photo first.",
             );
           const originals =
@@ -235,9 +241,11 @@ export class PhotoController {
               0,
             ) - (old?.original.size ?? 0);
           if (input.blob.size < 1 || input.blob.size > PHOTO_LIMITS.original)
-            throw new Error("Each photo must be at most 4 MiB.");
+            throw new PhotoInputError("Each photo must be at most 4 MiB.");
           if (originals + input.blob.size > PHOTO_LIMITS.originals)
-            throw new Error("Keep original photos under 40 MiB in total.");
+            throw new PhotoInputError(
+              "Keep original photos under 40 MiB in total.",
+            );
           const id = replaceId ?? this.id();
           const decoded = await this.decode(
             { id, original: input.blob },
@@ -303,7 +311,7 @@ export class PhotoController {
                 selectedBytes + decoded.derivative.size >
                   PHOTO_LIMITS.derivatives)
             )
-              throw new Error(
+              throw new PhotoInputError(
                 "The photo previews are full. Remove an unused photo first.",
               );
             let recovery = true;
@@ -332,10 +340,7 @@ export class PhotoController {
             if (!this.current(generation)) return;
             issues.push({
               name,
-              message:
-                error instanceof Error
-                  ? error.message
-                  : "Unable to read this photo.",
+              message: this.inputNotice(error, "Unable to read this photo."),
             });
           } finally {
             if (this.current(generation))
@@ -369,10 +374,7 @@ export class PhotoController {
       if (this.current(generation) && !operation.signal.aborted)
         issues.push({
           name: "Selection",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Unable to check this selection.",
+          message: this.inputNotice(error, "Unable to check this selection."),
         });
     } finally {
       if (this.current(generation)) {
@@ -663,7 +665,7 @@ export class PhotoController {
         JSON.stringify(PhotoSchema.parse(decoded.photo)) !==
         JSON.stringify(expected)
       )
-        throw new Error(
+        throw new PhotoInputError(
           "Choose the exact original photo used by this garment. Different bytes cannot replace its saved identity.",
         );
       const derivatives = [...this.entries.values()].reduce(
@@ -674,7 +676,7 @@ export class PhotoController {
         derivatives + decoded.derivative.size - (prior?.derivative.size ?? 0) >
         PHOTO_LIMITS.cachedDerivatives
       )
-        throw new Error(
+        throw new PhotoInputError(
           "The saved photo previews have reached their cache limit.",
         );
       const stored = { ...decoded, name: file.name.slice(0, 120) };
@@ -703,10 +705,10 @@ export class PhotoController {
     } catch (error) {
       if (this.current(generation))
         this.update({
-          notice:
-            error instanceof Error
-              ? error.message
-              : "This photo could not repair the saved garment.",
+          notice: this.inputNotice(
+            error,
+            "This photo could not repair the saved garment.",
+          ),
         });
     } finally {
       if (this.current(generation)) {

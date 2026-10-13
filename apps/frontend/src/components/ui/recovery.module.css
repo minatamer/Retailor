@@ -1,0 +1,63 @@
+.recovery {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(20px, 5vw, 64px);
+  color: #202523;
+  background: #faf8f2;
+  font-family: Inter, Arial, sans-serif;
+}
+.recovery > div {
+  width: min(100%, 620px);
+}
+.brand {
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  font-size: 24px;
+}
+.recovery h1 {
+  font-size: clamp(32px, 6vw, 56px);
+  line-height: 1.06;
+  letter-spacing: -0.05em;
+  overflow-wrap: anywhere;
+}
+.recovery p {
+  line-height: 1.6;
+}
+.note {
+  color: #515852;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+.actions button,
+.actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 12px 18px;
+  border: 1px solid #2846c4;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+.actions button {
+  color: white;
+  background: #2846c4;
+}
+.actions a {
+  color: #2846c4;
+  background: transparent;
+}
+.actions button:focus-visible,
+.actions a:focus-visible {
+  outline: 3px solid #202523;
+  outline-offset: 4px;
+}

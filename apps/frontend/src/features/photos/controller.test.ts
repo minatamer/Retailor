@@ -90,6 +90,25 @@ const named = (value: string) => ({
   blob: new Blob([value], { type: "image/jpeg" }),
 });
 describe("owned photo selection and partial recovery", () => {
+  it("keeps accepted photos while hiding unknown decoder diagnostics", async () => {
+    const decode: PhotoDecoder = async (task) => {
+      if ((await task.original.text()) === "bad")
+        throw new TypeError("PRIVATE_MARKER worker detail");
+      return processed(task);
+    };
+    const { controller, revoked } = setup(decode);
+    await controller.add([named("good")]);
+    const prior = controller.getSnapshot().items[0]!;
+    await controller.add([named("bad")]);
+    expect(controller.getSnapshot().items).toEqual([prior]);
+    expect(controller.getSnapshot().issues[0]?.message).toBe(
+      "Unable to read this photo.",
+    );
+    expect(JSON.stringify(controller.getSnapshot())).not.toContain(
+      "PRIVATE_MARKER",
+    );
+    expect(revoked).toEqual([]);
+  });
   it("overlaps cached verification while restoring only ordered current rows", async () => {
     const cache = new MemoryCache(),
       seed = setup(processed, cache).controller;
@@ -261,7 +280,7 @@ describe("owned photo selection and partial recovery", () => {
     ).toBe(PHOTO_LIMITS.originals);
     expect(
       controller.getSnapshot().issues.map((issue) => issue.message),
-    ).toEqual(["Invalid source pixels"]);
+    ).toEqual(["Unable to read this photo."]);
   });
   it("reports failed reset cleanup honestly and ignores late remove notices", async () => {
     const cache = new MemoryCache(),
@@ -363,7 +382,7 @@ describe("owned photo selection and partial recovery", () => {
     expect(
       controller.getSnapshot().issues.map((issue) => issue.message),
     ).toEqual([
-      "Corrupt image",
+      "Unable to read this photo.",
       "These exact photo bytes are already here. Kept one copy.",
     ]);
     expect(created).toHaveLength(2);

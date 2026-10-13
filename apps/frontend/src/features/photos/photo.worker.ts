@@ -137,10 +137,7 @@ self.onmessage = (event: MessageEvent<DecodeTask>) => {
     (photo) => self.postMessage(photo),
     (error: unknown) =>
       self.postMessage({
-        error:
-          error instanceof RasterError
-            ? error.message
-            : "This photo could not be decoded or restored. Choose another valid copy.",
+        error: error instanceof RasterError ? error.code : "decode",
       }),
   );
 };

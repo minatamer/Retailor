@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { parseEnvironment } from "./config/environment.js";
 import { composeRuntime } from "./runtime/compose.js";
 import { createApp } from "./http/app.js";
+import { backendDiagnostics } from "./http/diagnostics.js";
 const appRoot = fileURLToPath(new URL("../", import.meta.url));
 try {
   process.loadEnvFile(resolve(appRoot, ".env.local"));
@@ -13,7 +14,7 @@ try {
 }
 const env = parseEnvironment(process.env);
 const runtime = composeRuntime(env, () => `req_${randomUUID()}`);
-const server = createApp(runtime).listen(
+const server = createApp(runtime, backendDiagnostics()).listen(
   env.PORT,
   env.APP_ENV === "production" ? "0.0.0.0" : "127.0.0.1",
   () => {

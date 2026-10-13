@@ -9,7 +9,12 @@ import { logoRoutes } from "../brand/routes.js";
 import { admissionRoutes } from "../security/admission-routes.js";
 import { OperationFailure } from "../security/errors.js";
 import { ingress } from "./ingress.js";
-export function createApp(runtime: Runtime): Express {
+import { failureDiagnostic, reportFailure } from "./diagnostics.js";
+import type { DiagnosticSink } from "./diagnostics.js";
+export function createApp(
+  runtime: Runtime,
+  diagnostics?: DiagnosticSink,
+): Express {
   const app = express();
   app.disable("x-powered-by");
   app.set("trust proxy", false);
@@ -55,7 +60,7 @@ export function createApp(runtime: Runtime): Express {
   app.use((_req, res) => {
     res.status(404).json(publicError("NOT_FOUND", res.locals.requestId));
   });
-  const onError: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
+  const onError: ErrorRequestHandler = (error: unknown, req, res, _next) => {
     if (res.headersSent) return;
     const bodyError =
       error && typeof error === "object" && "type" in error ? error.type : null;
@@ -75,6 +80,10 @@ export function createApp(runtime: Runtime): Express {
           : code === "INVALID_INPUT"
             ? 400
             : 500;
+    reportFailure(
+      diagnostics,
+      failureDiagnostic(error, res.locals.requestId, req.path, code, status),
+    );
     res.status(status).json(publicError(code, res.locals.requestId));
   };
   app.use(onError);

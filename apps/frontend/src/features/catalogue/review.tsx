@@ -2,12 +2,12 @@
 import { useState } from "react";
 import Image from "next/image";
 import { CategorySchema } from "@retailor/contracts/product";
-import type { ProductInput } from "@retailor/contracts/product";
-import { formatUsd, parseUsd } from "@retailor/commerce/money";
+import { formatUsd } from "@retailor/commerce/money";
 import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
 import { useSession } from "../session/context";
 import type { DraftItem } from "./draft";
+import { readCatalogueEdit, catalogueEditNotice } from "./edit-input";
 import styles from "../demo/workspace.module.css";
 export function CatalogueReview() {
   const { controller, state, missingPhotoIds } = useSession(),
@@ -132,52 +132,13 @@ function ReviewCard({
   function save(form: FormData) {
     setError("");
     try {
-      const text = (key: string) => {
-        const value = form.get(key);
-        if (typeof value !== "string") throw new Error("Missing field");
-        return value;
-      };
-      const money = (key: string) => {
-        const result = parseUsd(text(key));
-        if (!result.ok)
-          throw new Error(
-            "Use a valid USD amount with up to two decimal places.",
-          );
-        return result.value;
-      };
-      const primary = text("primary");
-      const edited: ProductInput = {
-        ...product,
-        title: text("title"),
-        description: text("description"),
-        category: CategorySchema.parse(text("category")),
-        imageIds: [primary, ...product.imageIds.filter((id) => id !== primary)],
-        variants: product.variants.map((variant, index) => {
-          const stock = text(`stock_${index}`);
-          if (!/^(0|[1-9]\d{0,4})$/u.test(stock) || Number(stock) > 10000)
-            throw new Error(
-              "Demo stock must be a whole number from 0 to 10,000.",
-            );
-          return {
-            ...variant,
-            size: text(`size_${index}`),
-            colour: text(`colour_${index}`),
-            price: money(`price_${index}`),
-            unitCost: money(`cost_${index}`),
-            openingStock: Number(stock),
-          };
-        }),
-      };
+      const edited = readCatalogueEdit(product, form);
       if (!controller.edit(product.id, edited))
         setError(
           "Keep a valid garment name, supported photo references and distinct clothing options.",
         );
     } catch (error) {
-      setError(
-        error instanceof Error && !error.name.includes("Zod")
-          ? error.message
-          : "Review the garment name, category and demo options.",
-      );
+      setError(catalogueEditNotice(error));
     }
   }
   return (
