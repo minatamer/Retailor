@@ -5,7 +5,7 @@ import { Workspace } from "./workspace";
 import { liveProcessor } from "../catalogue/live-processor";
 import { assistantRequester } from "../assistants/request";
 import { logoRequester } from "../logos/request";
-import { CatalogueRequestError } from "../catalogue/request-error";
+import { ApiRequestError } from "../../http/api-error";
 import { Button } from "../../components/ui/button";
 import styles from "./workspace.module.css";
 interface Challenge {
@@ -53,7 +53,7 @@ export function LiveWorkspace() {
           signal.removeEventListener("abort", abort);
           setChallenge(null);
           if (token) resolve(token);
-          else reject(new CatalogueRequestError("FORBIDDEN"));
+          else reject(new ApiRequestError("FORBIDDEN"));
         };
         signal.addEventListener("abort", abort, { once: true });
         if (signal.aborted) {

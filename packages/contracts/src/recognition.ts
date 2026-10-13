@@ -44,10 +44,6 @@ export function parseCatalogueAction(input: unknown) {
     throw new Error("Original metadata exceeds its envelope.");
   return action;
 }
-export const AdmissionRequestSchema = z.strictObject({
-  action: CatalogueActionSchema,
-  challengeProof: z.string().min(1).max(2048),
-});
 export const AdmissionResultSchema = z.strictObject({
   schemaVersion: z.literal(1),
   operationId: IdSchema,

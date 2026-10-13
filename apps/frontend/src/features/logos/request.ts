@@ -6,9 +6,10 @@ import {
   type LogoContext,
   type LogoResult,
 } from "@retailor/contracts/brand";
-import { CapabilitiesSchema, PublicErrorSchema } from "@retailor/contracts/api";
+import { CapabilitiesSchema } from "@retailor/contracts/api";
 import { AdmissionResultSchema } from "@retailor/contracts/recognition";
-import { CatalogueRequestError } from "../catalogue/request-error";
+import { ApiRequestError } from "../../http/api-error";
+import { readApiJson } from "../../http/response";
 export interface LogoInput {
   mode: "fake" | "live";
   workspaceId: string;
@@ -46,54 +47,17 @@ export function logoRequester(
             }
           : {}),
       });
-      const reader = response.body?.getReader();
-      if (!reader) throw new CatalogueRequestError("UPSTREAM_FAILED");
-      const chunks: Uint8Array[] = [];
-      let bytes = 0;
-      const abort = () => {
-        void reader.cancel().catch(() => undefined);
-      };
-      owned.addEventListener("abort", abort, { once: true });
-      try {
-        for (;;) {
-          const chunk = await reader.read();
-          owned.throwIfAborted();
-          if (chunk.done) break;
-          bytes += chunk.value.length;
-          if (bytes > limit) {
-            await reader.cancel();
-            throw new CatalogueRequestError("UPSTREAM_FAILED");
-          }
-          chunks.push(chunk.value);
-        }
-        const all = new Uint8Array(bytes);
-        let offset = 0;
-        for (const chunk of chunks) {
-          all.set(chunk, offset);
-          offset += chunk.length;
-        }
-        const parsed: unknown = JSON.parse(new TextDecoder().decode(all));
-        if (!response.ok) {
-          const error = PublicErrorSchema.safeParse(parsed);
-          throw new CatalogueRequestError(
-            error.success ? error.data.error.code : "UPSTREAM_FAILED",
-          );
-        }
-        return parsed;
-      } finally {
-        owned.removeEventListener("abort", abort);
-        reader.releaseLock();
-      }
+      return readApiJson(response, limit, owned);
     };
     try {
       const config = CapabilitiesSchema.parse(await json("config"));
       if (config.mode !== input.mode || !config.logos.available)
-        throw new CatalogueRequestError("UNAVAILABLE");
+        throw new ApiRequestError("UNAVAILABLE");
       let action = null,
         grant = null;
       if (input.mode === "live") {
         if (!config.paidEnabled || !config.admissionSiteKey || !proof)
-          throw new CatalogueRequestError("UNAVAILABLE");
+          throw new ApiRequestError("UNAVAILABLE");
         const hash = await crypto.subtle.digest(
           "SHA-256",
           new TextEncoder().encode(input.context.name),
@@ -125,7 +89,7 @@ export function logoRequester(
           admission.operationId !== input.operationId ||
           Date.parse(admission.expiresAt) <= Date.now()
         )
-          throw new CatalogueRequestError("FORBIDDEN");
+          throw new ApiRequestError("FORBIDDEN");
         grant = admission.grant;
       }
       const body = LogoRequestSchema.parse({
@@ -138,7 +102,7 @@ export function logoRequester(
         new TextEncoder().encode(JSON.stringify(body)).length >
         LOGO_LIMITS.bodyBytes
       )
-        throw new CatalogueRequestError("TOO_LARGE");
+        throw new ApiRequestError("TOO_LARGE");
       const result = LogoResultSchema.parse(
         await json("brand/logos", body, LOGO_LIMITS.responseBytes),
       );
@@ -148,7 +112,7 @@ export function logoRequester(
         result.mode !== input.mode ||
         JSON.stringify(result.context) !== JSON.stringify(body.context)
       )
-        throw new CatalogueRequestError("UPSTREAM_FAILED");
+        throw new ApiRequestError("UPSTREAM_FAILED");
       return result;
     } finally {
       clearTimeout(timer);

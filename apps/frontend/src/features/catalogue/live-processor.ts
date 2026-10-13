@@ -1,4 +1,4 @@
-import { CapabilitiesSchema, PublicErrorSchema } from "@retailor/contracts/api";
+import { CapabilitiesSchema } from "@retailor/contracts/api";
 import {
   AdmissionResultSchema,
   RecognitionResultSchema,
@@ -8,53 +8,9 @@ import {
 } from "@retailor/contracts/recognition";
 import { parseDraft } from "@retailor/contracts/catalogue";
 import type { CatalogueProcessor } from "../session/controller";
-import { CatalogueRequestError } from "./request-error";
+import { ApiRequestError } from "../../http/api-error";
+import { readApiJson } from "../../http/response";
 
-async function readJson(
-  response: Response,
-  limit: number,
-  signal: AbortSignal,
-): Promise<unknown> {
-  const reader = response.body?.getReader();
-  if (!reader) throw new CatalogueRequestError("UPSTREAM_FAILED");
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  const abort = () => {
-    void reader.cancel().catch(() => undefined);
-  };
-  signal.addEventListener("abort", abort, { once: true });
-  try {
-    signal.throwIfAborted();
-    for (;;) {
-      const next = await reader.read();
-      signal.throwIfAborted();
-      if (next.done) break;
-      size += next.value.length;
-      if (size > limit) {
-        await reader.cancel();
-        throw new CatalogueRequestError("UPSTREAM_FAILED");
-      }
-      chunks.push(next.value);
-    }
-    const bytes = new Uint8Array(size);
-    let offset = 0;
-    for (const chunk of chunks) {
-      bytes.set(chunk, offset);
-      offset += chunk.length;
-    }
-    const result: unknown = JSON.parse(new TextDecoder().decode(bytes));
-    if (!response.ok) {
-      const error = PublicErrorSchema.safeParse(result);
-      throw new CatalogueRequestError(
-        error.success ? error.data.error.code : "UPSTREAM_FAILED",
-      );
-    }
-    return result;
-  } finally {
-    signal.removeEventListener("abort", abort);
-    reader.releaseLock();
-  }
-}
 export function liveProcessor(
   proof: (siteKey: string, signal: AbortSignal) => Promise<string>,
   fetcher: typeof fetch = fetch,
@@ -82,7 +38,7 @@ export function liveProcessor(
             }
           : {}),
       });
-      return await readJson(response, 8192, combined);
+      return await readApiJson(response, 8192, combined);
     } finally {
       clearTimeout(timer);
       owned.abort();
@@ -100,7 +56,7 @@ export function liveProcessor(
         !config.vision.available ||
         !config.admissionSiteKey
       )
-        throw new CatalogueRequestError("UNAVAILABLE");
+        throw new ApiRequestError("UNAVAILABLE");
       const action = parseCatalogueAction({
         schemaVersion: 1,
         action: "catalogue",
@@ -117,7 +73,7 @@ export function liveProcessor(
         new TextEncoder().encode(JSON.stringify(action)).length >
         RECOGNITION_LIMITS.metadata - 4096
       )
-        throw new CatalogueRequestError("TOO_LARGE");
+        throw new ApiRequestError("TOO_LARGE");
       input.step("Approving this request");
       const challengeProof = await proof(config.admissionSiteKey, input.signal);
       input.signal.throwIfAborted();
@@ -128,7 +84,7 @@ export function liveProcessor(
         admission.operationId !== action.operationId ||
         Date.parse(admission.expiresAt) <= Date.now()
       )
-        throw new CatalogueRequestError("STALE");
+        throw new ApiRequestError("STALE");
       const form = new FormData();
       form.append(
         "manifest",
@@ -141,7 +97,7 @@ export function liveProcessor(
           blob.size !== photo.derivative.bytes ||
           blob.type !== photo.derivative.mime
         )
-          throw new CatalogueRequestError("INVALID_INPUT");
+          throw new ApiRequestError("INVALID_INPUT");
         form.append(photo.id, blob, "preview");
       }
       input.step("Drafting products");
@@ -159,14 +115,14 @@ export function liveProcessor(
         });
         input.step("Validating catalogue");
         const result = RecognitionResultSchema.parse(
-          await readJson(response, RECOGNITION_LIMITS.response, combined),
+          await readApiJson(response, RECOGNITION_LIMITS.response, combined),
         );
         if (
           result.workspaceId !== action.workspaceId ||
           result.operationId !== action.operationId ||
           result.inputRevision !== action.inputRevision
         )
-          throw new CatalogueRequestError("STALE");
+          throw new ApiRequestError("STALE");
         return parseDraft(result.draft);
       } finally {
         clearTimeout(timer);

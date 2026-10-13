@@ -77,7 +77,7 @@ import {
   excludeSource,
 } from "../catalogue/draft";
 import type { CatalogueDraft } from "../catalogue/draft";
-import { CatalogueRequestError } from "../catalogue/request-error";
+import { ApiRequestError } from "../../http/api-error";
 import { BrowseSchema, INITIAL_BROWSE } from "../storefront/browse";
 import type { BrowseState } from "../storefront/browse";
 import {
@@ -1783,7 +1783,7 @@ export class SessionController {
     return !this.aiAttention;
   }
   private recordAiFailure(error: unknown) {
-    if (!(error instanceof CatalogueRequestError)) return undefined;
+    if (!(error instanceof ApiRequestError)) return undefined;
     if (error.code !== "OPERATOR_REQUIRED") return error.message;
     this.aiAttention = true;
     const notice = `${error.message} Reload after AI is restored. Local controls remain ready.`;
@@ -1949,7 +1949,7 @@ export class SessionController {
         this.state(
           { stage: "choose" },
           message
-            ? error instanceof CatalogueRequestError &&
+            ? error instanceof ApiRequestError &&
               error.code === "OPERATOR_REQUIRED"
               ? message
               : `${message} A new attempt requires your instruction.`

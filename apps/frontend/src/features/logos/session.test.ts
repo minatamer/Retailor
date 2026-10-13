@@ -5,7 +5,7 @@ import { LogoResultSchema, type LogoResult } from "@retailor/contracts/brand";
 import type { StoredLogo } from "../photos/cache";
 import type { LogoInput, LogoRequester } from "./request";
 import { SESSION_KEY } from "../session/projection";
-import { CatalogueRequestError } from "../catalogue/request-error";
+import { ApiRequestError } from "../../http/api-error";
 const environments: ReturnType<typeof environment>[] = [];
 afterEach(() => environments.splice(0).forEach((env) => env.dispose()));
 
@@ -15,7 +15,7 @@ it("blocks paid retry after operator attention while preserving wordmark/local e
   const logoRequest = vi.fn<LogoRequester>(
     async (_input, _signal, dispatch) => {
       dispatch();
-      throw new CatalogueRequestError("OPERATOR_REQUIRED");
+      throw new ApiRequestError("OPERATOR_REQUIRED");
     },
   );
   const assistantRequest = vi.fn(async () => {
@@ -68,7 +68,7 @@ it("does not apply a late operator failure to a replacement workspace", async ()
   const operation = controller.generateLogos();
   await vi.waitFor(() => expect(request).toHaveBeenCalledOnce());
   await controller.reset();
-  reject(new CatalogueRequestError("OPERATOR_REQUIRED"));
+  reject(new ApiRequestError("OPERATOR_REQUIRED"));
   await operation;
   expect(controller.canAttemptAi()).toBe(true);
   expect(controller.getSnapshot().logoNotice).toBe("");

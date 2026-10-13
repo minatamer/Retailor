@@ -17,7 +17,6 @@ export const PHOTO_LIMITS = Object.freeze({
   localProcessingConcurrency: 2,
   activeDecodePixels: 24_000_000,
 });
-export const HashSchema = z.string().regex(/^[a-f0-9]{64}$/u);
 export const DerivativeSchema = ImageSchema.refine(
   (image) =>
     Math.max(image.width, image.height) <= PHOTO_LIMITS.derivativeSide &&
