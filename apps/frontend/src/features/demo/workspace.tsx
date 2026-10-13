@@ -83,9 +83,16 @@ function WorkspaceFlow() {
           retailor <Icon name="sparkle" />
         </Link>
         <span className={styles.temporary}>Your temporary clothing studio</span>
-        <Button variant="quiet" onClick={() => controller.askReset()}>
-          Reset demo
-        </Button>
+        <div className={styles.headerActions}>
+          {state.graph.products.length > 0 && (
+            <Button variant="quiet" onClick={() => controller.exportReport()}>
+              Export JSON
+            </Button>
+          )}
+          <Button variant="quiet" onClick={() => controller.askReset()}>
+            Reset demo
+          </Button>
+        </div>
       </header>
       {state.fixture && (
         <p className={styles.fixture}>
@@ -249,6 +256,11 @@ function WorkspaceFlow() {
       <footer className={styles.footer}>
         A clothing demo, made with Retailor. USD is the editable money
         authority. No real payment or shipping.
+        <span>
+          Your workspace lasts two hours from creation. Reset clears owned local
+          work; it cannot recall dispatched AI requests or saved exports.
+          Browser close does not guarantee immediate physical deletion.
+        </span>
       </footer>
       <Tailor />
       <BagDialog />
