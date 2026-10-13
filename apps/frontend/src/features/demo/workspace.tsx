@@ -153,6 +153,7 @@ function WorkspaceFlow() {
                 <PhotoPicker
                   controller={controller.photos}
                   onProcess={() => void controller.draftCatalogue()}
+                  canProcess={controller.canAttemptAi()}
                 />
                 <aside className={styles.sample}>
                   <span className={styles.eyebrow}>Meet FORME</span>

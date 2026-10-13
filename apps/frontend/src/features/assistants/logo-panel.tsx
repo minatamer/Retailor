@@ -50,7 +50,7 @@ export function LogoPanel() {
         <Button onClick={() => controller.keepWordmark()}>
           Keep my wordmark
         </Button>
-        {!logoBusy && state.logos.batches < 2 && (
+        {!logoBusy && controller.canAttemptAi() && state.logos.batches < 2 && (
           <Button variant="secondary" onClick={() => controller.prepareLogo()}>
             {state.logos.batches
               ? "Review explicit logo retry"
@@ -58,7 +58,7 @@ export function LogoPanel() {
           </Button>
         )}
       </div>
-      {preparedLogo && !logoBusy && (
+      {preparedLogo && !logoBusy && controller.canAttemptAi() && (
         <div className={styles.review}>
           <strong>Three directions for {preparedLogo.name}</strong>
           <p>

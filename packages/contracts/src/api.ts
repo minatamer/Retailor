@@ -7,6 +7,7 @@ export const ErrorCodeSchema = z.enum([
   "STALE",
   "BUSY",
   "UNAVAILABLE",
+  "OPERATOR_REQUIRED",
   "UPSTREAM_FAILED",
   "DEADLINE",
   "NOT_FOUND",
@@ -118,6 +119,8 @@ const MESSAGES: Record<ErrorCode, string> = {
   STALE: "Review the current workspace before continuing.",
   BUSY: "The demo is busy. Please try again shortly.",
   UNAVAILABLE: "This capability is currently unavailable. Your work is safe.",
+  OPERATOR_REQUIRED:
+    "AI needs attention from the demo owner. Your work is safe.",
   UPSTREAM_FAILED: "The result could not be completed. Your work is safe.",
   DEADLINE: "This attempt timed out. Your work is safe.",
   NOT_FOUND: "This demo operation does not exist.",

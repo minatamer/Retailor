@@ -17,9 +17,11 @@ export function namedFiles(files: FileList | null): NamedPhoto[] {
 export function PhotoPicker({
   controller,
   onProcess,
+  canProcess = true,
 }: {
   controller: PhotoController;
   onProcess(): void;
+  canProcess?: boolean;
 }) {
   const state = useSyncExternalStore(
     controller.subscribe,
@@ -151,7 +153,7 @@ export function PhotoPicker({
           workspace is temporary.
         </p>
         <Button
-          disabled={state.busy || !state.items.length}
+          disabled={state.busy || !state.items.length || !canProcess}
           onClick={onProcess}
         >
           Review & process {state.items.length || "your"}{" "}

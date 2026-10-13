@@ -16,6 +16,7 @@ import { modelProjection } from "../assistants/context.js";
 import type { AssistantProvider } from "../assistants/provider.js";
 import { ROLE_TOOLS } from "../assistants/tools.js";
 import { deny } from "../security/errors.js";
+import { providerFailure } from "./failure.js";
 
 export const ASSISTANT_MODEL = "gpt-6-luna"; // Existing provisional project family; actual quality/account/pricing acceptance is RTL-020.
 export const ASSISTANT_PROMPT_VERSION = "tailor-grounded-v1";
@@ -129,6 +130,7 @@ export function openAiAssistant(
           if (waiting.size) return deny("UPSTREAM_FAILED", 502);
           const body = {
             model: ASSISTANT_MODEL,
+            service_tier: "default" as const,
             store: false,
             background: false,
             stream: false as const,
@@ -158,10 +160,14 @@ export function openAiAssistant(
           )
             return deny("TOO_LARGE", 413);
           dispatch();
-          const response = await client.responses.create(body, {
-            signal,
-            maxRetries: 0,
-          });
+          const response = await client.responses
+            .create(body, {
+              signal,
+              maxRetries: 0,
+            })
+            .catch((error: unknown) => {
+              throw providerFailure(error, signal);
+            });
           if (response.usage)
             usage({
               input: response.usage.input_tokens,

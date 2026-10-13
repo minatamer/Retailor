@@ -7,6 +7,7 @@ import {
 import type { CatalogueAction } from "@retailor/contracts/recognition";
 import { responsesClient } from "../providers/responses-client.js";
 import { deny } from "../security/errors.js";
+import { providerFailure } from "../providers/failure.js";
 
 export const CATALOGUE_PROMPT_VERSION = "catalogue-evidence-v1";
 export const CATALOGUE_MODEL = "gpt-6-luna"; // Provisional; RTL-020 owns account/quality/billing acceptance.
@@ -56,6 +57,7 @@ export function openAiCatalogue(
         const response = await client.responses.create(
           {
             model: CATALOGUE_MODEL,
+            service_tier: "default",
             store: false,
             background: false,
             stream: false,
@@ -98,11 +100,8 @@ export function openAiCatalogue(
         )
           return deny("UPSTREAM_FAILED", 502);
         return JSON.parse(text) as unknown;
-      } catch {
-        return deny(
-          owned.aborted ? "DEADLINE" : "UPSTREAM_FAILED",
-          owned.aborted ? 504 : 502,
-        );
+      } catch (error) {
+        throw providerFailure(error, owned);
       } finally {
         clearTimeout(timer);
         timerOwner.abort();

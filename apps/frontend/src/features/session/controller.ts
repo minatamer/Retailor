@@ -229,6 +229,7 @@ export class SessionController {
   private logoAssets: LogoAssets | undefined;
   private cancelPrefill: (() => void) | undefined;
   private active = true;
+  private aiAttention = false;
   private recovering = false;
   private resetting = false;
   private unlistenPhotos: (() => void) | undefined;
@@ -1778,6 +1779,20 @@ export class SessionController {
     )
       void this.reset("This temporary demo expired. Start a fresh collection.");
   }
+  canAttemptAi() {
+    return !this.aiAttention;
+  }
+  private recordAiFailure(error: unknown) {
+    if (!(error instanceof CatalogueRequestError)) return undefined;
+    if (error.code !== "OPERATOR_REQUIRED") return error.message;
+    this.aiAttention = true;
+    const notice = `${error.message} Reload after AI is restored. Local controls remain ready.`;
+    this.update(
+      { assistantNotice: notice, logoNotice: notice, preparedLogo: null },
+      false,
+    );
+    return notice;
+  }
   private valid() {
     this.refreshCurrencyValidity();
     if (
@@ -1844,6 +1859,7 @@ export class SessionController {
   async draftCatalogue() {
     if (
       !this.valid() ||
+      !this.canAttemptAi() ||
       this.snapshot.state.stage !== "choose" ||
       this.photos.getSnapshot().busy ||
       this.snapshot.sampleBusy
@@ -1928,13 +1944,18 @@ export class SessionController {
         "Your photo-backed draft is ready. Corrections are local and never rerun processing.",
       );
     } catch (error) {
-      if (current())
+      if (current()) {
+        const message = this.recordAiFailure(error);
         this.state(
           { stage: "choose" },
-          error instanceof CatalogueRequestError
-            ? `${error.message} A new attempt requires your instruction.`
+          message
+            ? error instanceof CatalogueRequestError &&
+              error.code === "OPERATOR_REQUIRED"
+              ? message
+              : `${message} A new attempt requires your instruction.`
             : "The catalogue could not be completed. Your photos are kept; a new attempt requires your instruction.",
         );
+      }
     } finally {
       if (this.operation === operation) this.operation = undefined;
     }
@@ -2399,6 +2420,7 @@ export class SessionController {
   async sendAssistant() {
     if (
       !this.valid() ||
+      !this.canAttemptAi() ||
       this.snapshot.assistantBusy ||
       this.snapshot.logoBusy ||
       !["style", "storefront", "dashboard"].includes(this.snapshot.state.stage)
@@ -2480,16 +2502,17 @@ export class SessionController {
         fence: assistantFence(this.assistantContext()),
       });
     } catch (error) {
-      if (!owner.signal.aborted && this.assistantOperation === owner)
+      if (!owner.signal.aborted && this.assistantOperation === owner) {
+        const message = this.recordAiFailure(error);
         this.update(
           {
             assistantNotice:
-              error instanceof CatalogueRequestError
-                ? error.message
-                : "Tailor couldn’t complete that answer. Your messages and local controls are still here.",
+              message ??
+              "Tailor couldn’t complete that answer. Your messages and local controls are still here.",
           },
           false,
         );
+      }
     } finally {
       if (this.assistantOperation === owner) {
         this.assistantOperation = undefined;
@@ -2805,6 +2828,7 @@ export class SessionController {
     const state = this.snapshot.state;
     if (
       !this.valid() ||
+      !this.canAttemptAi() ||
       !["style", "dashboard"].includes(state.stage) ||
       (state.stage === "dashboard" && !state.designEditing) ||
       !logoEligible(state.setup, state.previewDesign)
@@ -2909,6 +2933,7 @@ export class SessionController {
       assets = this.logoAssets;
     if (
       !this.valid() ||
+      !this.canAttemptAi() ||
       !prepared ||
       !context ||
       !assets ||
@@ -3007,16 +3032,17 @@ export class SessionController {
         false,
       );
     } catch (error) {
-      if (current())
+      if (current()) {
+        const message = this.recordAiFailure(error);
         this.update(
           {
-            logoNotice:
-              error instanceof CatalogueRequestError
-                ? `${error.message} Your wordmark remains ready.`
-                : "The logo batch could not be completed. Your wordmark and previous choices remain. Retry only if you choose.",
+            logoNotice: message
+              ? `${message} Your wordmark remains ready.`
+              : "The logo batch could not be completed. Your wordmark and previous choices remain. Retry only if you choose.",
           },
           false,
         );
+      }
     } finally {
       if (this.logoOperation === owner) {
         this.logoOperation = undefined;
@@ -3320,7 +3346,13 @@ export class SessionController {
     this.snapshot.state = this.fresh();
     await this.attachPhotos();
     this.resetting = false;
-    if (this.active) this.update({ ready: true, notice });
+    if (this.active)
+      this.update({
+        ready: true,
+        notice: this.aiAttention
+          ? `${notice} AI still needs attention from the demo owner; reload after it is restored.`
+          : notice,
+      });
   }
   dispose() {
     this.active = false;

@@ -5,8 +5,74 @@ import { LogoResultSchema, type LogoResult } from "@retailor/contracts/brand";
 import type { StoredLogo } from "../photos/cache";
 import type { LogoInput, LogoRequester } from "./request";
 import { SESSION_KEY } from "../session/projection";
+import { CatalogueRequestError } from "../catalogue/request-error";
 const environments: ReturnType<typeof environment>[] = [];
 afterEach(() => environments.splice(0).forEach((env) => env.dispose()));
+
+it("blocks paid retry after operator attention while preserving wordmark/local entry and inert reload", async () => {
+  const env = environment();
+  environments.push(env);
+  const logoRequest = vi.fn<LogoRequester>(
+    async (_input, _signal, dispatch) => {
+      dispatch();
+      throw new CatalogueRequestError("OPERATOR_REQUIRED");
+    },
+  );
+  const assistantRequest = vi.fn(async () => {
+    throw new Error("Must stay undispatched");
+  });
+  const controller = await env.open({ logoRequest, assistantRequest });
+  await controller.photos.add([file("one")]);
+  await controller.draftCatalogue();
+  controller.publish();
+  controller.useCurrentLook();
+  const products = JSON.stringify(
+    controller.getSnapshot().state.graph.products,
+  );
+  controller.prepareLogo();
+  await controller.generateLogos();
+  expect(controller.canAttemptAi()).toBe(false);
+  expect(controller.getSnapshot().preparedLogo).toBeNull();
+  expect(controller.getSnapshot().logoNotice).toContain("demo owner");
+  controller.prepareLogo();
+  await controller.generateLogos();
+  expect(logoRequest).toHaveBeenCalledOnce();
+  controller.keepWordmark();
+  controller.acceptDesign();
+  expect(controller.getSnapshot().state.stage).toBe("storefront");
+  expect(JSON.stringify(controller.getSnapshot().state.graph.products)).toBe(
+    products,
+  );
+  controller.assistantInput("Show me the jeans");
+  await controller.sendAssistant();
+  expect(assistantRequest).not.toHaveBeenCalled();
+  controller.dispose();
+  const restored = await env.open({ logoRequest, assistantRequest });
+  expect(restored.canAttemptAi()).toBe(true);
+  expect(logoRequest).toHaveBeenCalledOnce();
+  expect(assistantRequest).not.toHaveBeenCalled();
+});
+
+it("does not apply a late operator failure to a replacement workspace", async () => {
+  let reject!: (error: Error) => void;
+  const { controller, request } = await setup(
+    async (_input, _signal, dispatch) => {
+      dispatch();
+      return await new Promise((_resolve, stop) => {
+        reject = stop;
+      });
+    },
+  );
+  controller.useCurrentLook();
+  controller.prepareLogo();
+  const operation = controller.generateLogos();
+  await vi.waitFor(() => expect(request).toHaveBeenCalledOnce());
+  await controller.reset();
+  reject(new CatalogueRequestError("OPERATOR_REQUIRED"));
+  await operation;
+  expect(controller.canAttemptAi()).toBe(true);
+  expect(controller.getSnapshot().logoNotice).toBe("");
+});
 function result(input: LogoInput, at: string): LogoResult {
   return LogoResultSchema.parse({
     schemaVersion: 1,

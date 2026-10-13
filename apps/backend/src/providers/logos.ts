@@ -3,6 +3,7 @@ import type { LogoProvider } from "../brand/provider.js";
 import { logoPrompt } from "../brand/context.js";
 import { imagesClient } from "./images-client.js";
 import { deny } from "../security/errors.js";
+import { providerFailure } from "./failure.js";
 export const LOGO_MODEL = "gpt-image-2.5-flare-2026-09-08";
 export function openAiLogos(
   apiKey: string,
@@ -13,20 +14,24 @@ export function openAiLogos(
     async generate(context, signal, accounting) {
       signal.throwIfAborted();
       accounting.dispatch();
-      const result = await client.images.generate(
-        {
-          model: LOGO_MODEL,
-          prompt: logoPrompt(context),
-          n: 3,
-          size: "1024x1024",
-          quality: "medium",
-          background: "transparent",
-          output_format: "png",
-          moderation: "auto",
-          stream: false,
-        },
-        { signal },
-      );
+      const result = await client.images
+        .generate(
+          {
+            model: LOGO_MODEL,
+            prompt: logoPrompt(context),
+            n: 3,
+            size: "1024x1024",
+            quality: "medium",
+            background: "transparent",
+            output_format: "png",
+            moderation: "auto",
+            stream: false,
+          },
+          { signal },
+        )
+        .catch((error: unknown) => {
+          throw providerFailure(error, signal);
+        });
       signal.throwIfAborted();
       if (result.usage)
         accounting.recordUsage({

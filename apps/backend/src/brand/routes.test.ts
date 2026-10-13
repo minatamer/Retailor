@@ -60,7 +60,7 @@ it("binds actual live payload to the shared admitted action without contacting a
   expect(generate).not.toHaveBeenCalled();
   expect((await send(body.context.name)).status).toBe(200);
   expect(generate).toHaveBeenCalledTimes(1);
-  expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 2000000 });
+  expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 4000000 });
   expect((await send(body.context.name)).status).toBe(403);
   expect(generate).toHaveBeenCalledTimes(1);
 });

@@ -53,7 +53,7 @@ type Workspace = {
   admitted: boolean;
 };
 export const CATALOGUE_RESERVE_MICRO_USD = 1_000_000;
-export const LOGO_RESERVE_MICRO_USD = 2_000_000;
+export const LOGO_RESERVE_MICRO_USD = 4_000_000;
 export interface AdmissionOptions {
   secret: string;
   challenge: ChallengeVerifier;

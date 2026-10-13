@@ -113,7 +113,11 @@ export function ConversationPanel() {
         <div className={styles.composerActions}>
           <button
             type="submit"
-            disabled={assistantBusy || !assistantDraft.trim()}
+            disabled={
+              assistantBusy ||
+              !assistantDraft.trim() ||
+              !controller.canAttemptAi()
+            }
           >
             {assistantBusy
               ? "Investigating…"

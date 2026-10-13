@@ -6,11 +6,57 @@ import type { AssistantAction } from "@retailor/contracts/assistant";
 import type { LogoAction } from "@retailor/contracts/brand";
 describe("action-bound one-use paid admission", () => {
   const secret = "s".repeat(32);
+  it("caps unspent workspace grants and frees expired control memory without dispatch", async () => {
+    let now = Date.now();
+    const verify = vi.fn(async () => true);
+    const gate = new PaidAdmission({
+      secret,
+      budgetMicroUsd: 1000000,
+      clock: () => now,
+      challenge: { verify },
+    });
+    const created = now;
+    const make = (workspaceId: string, at = created) => ({
+      ...action(),
+      workspaceId,
+      createdAt: new Date(at).toISOString(),
+      expiresAt: new Date(at + 7200000).toISOString(),
+    });
+    for (let index = 0; index < 256; index++) {
+      if (index > 0 && index % 12 === 0) now += 60001;
+      await gate.admit(
+        make(`workspace_${index}`),
+        "proof",
+        `safety_${index}`,
+        new AbortController().signal,
+      );
+    }
+    await expect(
+      gate.admit(
+        make("excess_workspace"),
+        "proof",
+        "new_safety",
+        new AbortController().signal,
+      ),
+    ).rejects.toThrow("BUSY");
+    expect(verify).toHaveBeenCalledTimes(256);
+    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 0 });
+    now = created + 7200001;
+    await expect(
+      gate.admit(
+        make("fresh_workspace", now),
+        "proof",
+        "fresh_safety",
+        new AbortController().signal,
+      ),
+    ).resolves.toMatchObject({ schemaVersion: 1 });
+    expect(verify).toHaveBeenCalledTimes(257);
+  });
   it("binds exact logo context, shares paid capacity and retains both batch reservations without a third dispatch", async () => {
     const created = Date.now();
     const gate = new PaidAdmission({
       secret,
-      budgetMicroUsd: 10_000_000,
+      budgetMicroUsd: 20_000_000,
       clock: () => created,
       challenge: { verify: async () => true },
     });
@@ -75,7 +121,7 @@ describe("action-bound one-use paid admission", () => {
     );
     lease.dispatch();
     lease.finish();
-    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 2_000_000 });
+    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 4_000_000 });
     expect(() => gate.beginLogos(first, grant.grant, safety)).toThrow(
       "FORBIDDEN",
     );
@@ -90,7 +136,7 @@ describe("action-bound one-use paid admission", () => {
     second.dispatch();
     second.recordUsage({ input: 100, output: 20000 });
     second.finish();
-    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 4_000_000 });
+    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 8_000_000 });
     expect(gate.usageCounters()).toEqual({
       inputTokens: 100,
       outputTokens: 20000,
@@ -101,7 +147,7 @@ describe("action-bound one-use paid admission", () => {
     ).rejects.toThrow("FORBIDDEN");
     const textLease = gate.beginAssistant(text, textGrant.grant, safety);
     textLease.finish();
-    expect(gate.counters().reservedMicroUsd).toBe(4_000_000);
+    expect(gate.counters().reservedMicroUsd).toBe(8_000_000);
   });
   const textAction = (
     operationId: string,
