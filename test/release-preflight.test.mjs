@@ -143,7 +143,7 @@ describe("release metadata and verdict", () => {
     const env = vi.spyOn(process, "loadEnvFile");
     const result = await preparePreflight();
     expect(result.localVerdict).toBe("matches-local-linux-candidate");
-    expect(result.missingInputs).toHaveLength(21);
+    expect(result.missingInputs).toHaveLength(23);
     expect(result.publicReleaseAccepted).toBe(false);
     expect(result.readOnlyInspectionCommands).toEqual([]);
     expect(fetch).not.toHaveBeenCalled();

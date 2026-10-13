@@ -3,6 +3,10 @@ import { open, lstat, realpath } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import { sourceSnapshot } from "./snapshot.mjs";
+import {
+  evaluateSecurityPolicy,
+  unverifiedSecurityPolicy,
+} from "./security-policy.mjs";
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const { z } = createRequire(
   new URL("../../apps/backend/package.json", import.meta.url),
@@ -77,6 +81,8 @@ export const InputsSchema = z
     grantSecret: secret,
     grantSecretVersion: version,
     turnstileSiteKey: optional(/^[A-Za-z0-9_-]{1,256}$/u),
+    originSecret: secret,
+    originSecretVersion: version,
   })
   .superRefine((value, ctx) => {
     if (value.frontendService && value.frontendService === value.backendService)
@@ -135,9 +141,12 @@ export async function readReleaseJson(path, limit = 32768) {
     throw new Error("Invalid release metadata envelope");
   const permitted = [
     "scripts/release/inputs.example.json",
+    "scripts/release/security.example.json",
     "artifacts/local/release-inputs.json",
+    "artifacts/local/release-security.json",
     "docs/validation/RTL-021/containers.json",
     "docs/validation/RTL-023/containers.json",
+    "docs/validation/RTL-023/security-containers.json",
   ];
   const absolute = resolve(root, path);
   if (!permitted.some((candidate) => resolve(root, candidate) === absolute))
@@ -196,7 +205,7 @@ export function inspectionCommands(input) {
       "--format=json(bindings,etag,version)",
     ]);
   }
-  for (const prefix of ["openai", "turnstile", "grant"])
+  for (const prefix of ["openai", "turnstile", "grant", "origin"])
     if (v[`${prefix}Secret`] && v[`${prefix}SecretVersion`])
       commands.push([
         "gcloud",
@@ -213,7 +222,12 @@ export function inspectionCommands(input) {
   return commands;
 }
 
-export function evaluatePreflight(source, packaged, input) {
+export function evaluatePreflight(
+  source,
+  packaged,
+  input,
+  securityPolicy = unverifiedSecurityPolicy(),
+) {
   const values = InputsSchema.parse(input);
   const missingInputs = Object.entries(values)
     .filter(([key, value]) => !value && !key.startsWith("prior"))
@@ -239,6 +253,7 @@ export function evaluatePreflight(source, packaged, input) {
     publicationAuthorized: false,
     paidRequests: 0,
     networkRequests: 0,
+    security: evaluateSecurityPolicy(securityPolicy, source, packaged),
     externalGates: [
       "Owner authorization for exact cloud resources/publication",
       "Accepted same-candidate RTL-020 live vision/Tailor/account/retention/billing",
@@ -255,10 +270,12 @@ export function evaluatePreflight(source, packaged, input) {
 
 export async function preparePreflight(
   inputPath = "scripts/release/inputs.example.json",
+  securityPath = "scripts/release/security.example.json",
 ) {
   const input = await readReleaseJson(inputPath);
+  const securityPolicy = await readReleaseJson(securityPath);
   const packaged = await readReleaseJson(
-    "docs/validation/RTL-023/containers.json",
+    "docs/validation/RTL-023/security-containers.json",
     131072,
   );
   // Narrow existing evidence checks. A record is not permission or new container execution.
@@ -269,17 +286,22 @@ export async function preparePreflight(
       !/^sha256:[a-f0-9]{64}$/u.test(image.id)
     )
       throw new Error("Invalid local Linux evidence");
-  return evaluatePreflight(await sourceSnapshot(), packaged, input);
+  return evaluatePreflight(
+    await sourceSnapshot(),
+    packaged,
+    input,
+    securityPolicy,
+  );
 }
 if (
   process.argv[1] &&
   resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 ) {
-  if (process.argv.length > 3)
+  if (process.argv.length > 4)
     throw new Error(
-      "Usage: node scripts/release/preflight.mjs [artifacts/local/release-inputs.json]",
+      "Usage: node scripts/release/preflight.mjs [artifacts/local/release-inputs.json] [artifacts/local/release-security.json]",
     );
-  const result = await preparePreflight(process.argv[2]);
+  const result = await preparePreflight(process.argv[2], process.argv[3]);
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   if (!result.candidate.matchesLocalLinuxEvidence) process.exitCode = 1;
 }

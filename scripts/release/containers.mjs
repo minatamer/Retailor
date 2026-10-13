@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { randomUUID } from "node:crypto";
+import { randomUUID, randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import { sourceSnapshot } from "./snapshot.mjs";
+import { publicError } from "@retailor/contracts/api";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 // Explicit local invocation only. No registry push, host ports or provider access.
@@ -21,7 +22,7 @@ export async function verifyContainers(frontendImage, backendImage) {
       stdio: ["ignore", "pipe", "pipe"],
     }).trim();
   const created = [];
-  const prefix = `retailor-rtl021-${randomUUID()}`;
+  const prefix = `retailor-release-${randomUUID()}`;
   const imageRecord = (image) => {
     const [record] = JSON.parse(docker(["image", "inspect", image]));
     return {
@@ -45,7 +46,7 @@ export async function verifyContainers(frontendImage, backendImage) {
     assert.equal(record.user, "node");
     assert.ok(
       !record.environment.some((value) =>
-        /^(?:OPENAI_API_KEY|TURNSTILE_SECRET_KEY|GRANT_SIGNING_SECRET)=/u.test(
+        /^(?:OPENAI_API_KEY|TURNSTILE_SECRET_KEY|GRANT_SIGNING_SECRET|RETAILOR_ORIGIN_SECRET)=/u.test(
           value,
         ),
       ),
@@ -216,6 +217,65 @@ export async function verifyContainers(frontendImage, backendImage) {
       assetRecord.fonts.filter(({ name }) => name.endsWith("-OFL.txt")).length,
       4,
     );
+    const guarded = run("frontend-guarded", [
+      ["PORT", "8080"],
+      ["FRONTEND_ORIGIN", "https://retailor.invalid"],
+      // Test-only local peer verifies full streaming without IAM or provider calls.
+      ["APP_ENV", "test"],
+      ["BACKEND_ORIGIN", "http://127.0.0.1:8081"],
+      ["BACKEND_AUDIENCE", ""],
+      ["RETAILOR_ORIGIN_GUARD", "cloudflare"],
+      ["RETAILOR_ORIGIN_SECRET", randomBytes(32).toString("hex")],
+    ]);
+    await ready(guarded, 8080);
+    const originGuard = execute(
+      guarded,
+      String.raw`
+      import http from 'node:http';
+      const peerFailure=${JSON.stringify(publicError("UNAVAILABLE", "req_probe"))};
+      const origin='http://127.0.0.1:8080', seal=process.env.RETAILOR_ORIGIN_SECRET;
+      const headers={'x-retailor-origin':seal};
+      const home=await fetch(origin+'/',{headers});const html=await home.text();
+      const chunk=html.match(/src="([^"]+\.js[^\"]*)"/);if(!chunk)throw new Error('No guarded static script');
+      const paths=['/','/demo','/demo?_rsc=probe','/sample/forme/F01.webp','/fonts/inter-latin-wght-normal.woff2',chunk[1].replaceAll('&amp;','&'),'/api/retailor/v1/config','/api/retailor/v1/not-an-operation'];
+      const rows=[];for(const path of paths){const rejected=await fetch(origin+path);const body=await rejected.text();if(body.includes(seal))throw new Error('Origin seal reflected');const accepted=await fetch(origin+path,{headers});await accepted.arrayBuffer();rows.push({path,rejected:rejected.status,accepted:accepted.status})}
+      const wrong=await fetch(origin+'/',{headers:{'x-retailor-origin':'0'.repeat(64)}});
+      let received=0,sealForwarded=false;
+      const peer=http.createServer(async(req,res)=>{sealForwarded=req.headers['x-retailor-origin']!==undefined;for await(const chunk of req)received+=chunk.length;res.writeHead(503,{'content-type':'application/json'});res.end(JSON.stringify(peerFailure))});
+      await new Promise(resolve=>peer.listen(8081,'127.0.0.1',resolve));
+      let uploadStatus,uploadCode;
+      try{const upload=await fetch(origin+'/api/retailor/v1/catalogue/interpret',{method:'POST',headers:{...headers,origin:'https://retailor.invalid','content-type':'multipart/form-data; boundary=x'},body:'x'.repeat(10*1024*1024+1),signal:AbortSignal.timeout(12000)});uploadStatus=upload.status;uploadCode=(await upload.json()).error.code}
+      finally{await new Promise((resolve,reject)=>peer.close(error=>error?reject(error):resolve()))}
+      console.log(JSON.stringify({rows,wrong:wrong.status,largeUploadStatus:uploadStatus,largeUploadCode:uploadCode,largeUploadBytes:received,sealForwarded,sealReflected:false,paidRequests:0,environment:'test-only-local-peer'}));
+    `,
+    );
+    for (const row of originGuard.rows) {
+      assert.equal(row.rejected, 403);
+      assert.equal(
+        row.accepted,
+        row.path.includes("not-an-operation")
+          ? 404
+          : row.path.startsWith("/api/")
+            ? 503
+            : 200,
+      );
+    }
+    assert.equal(originGuard.wrong, 403);
+    assert.equal(originGuard.largeUploadStatus, 503);
+    assert.equal(originGuard.largeUploadCode, "UNAVAILABLE");
+    assert.equal(originGuard.largeUploadBytes, 10 * 1024 * 1024 + 1);
+    assert.equal(originGuard.sealForwarded, false);
+    const misconfigured = run("frontend-guard-missing", [
+      ["PORT", "8080"],
+      ["RETAILOR_ORIGIN_GUARD", "cloudflare"],
+    ]);
+    await ready(misconfigured, 8080);
+    const missingGuard = execute(
+      misconfigured,
+      requestProbe(["/", "/api/retailor/v1/config"], 8080),
+    );
+    assert.equal(missingGuard[0].status, 503);
+    assert.equal(missingGuard[1].status, 503);
     const memory = Object.fromEntries(
       [
         ["backend", backend],
@@ -265,6 +325,8 @@ export async function verifyContainers(frontendImage, backendImage) {
         runtime: frontendRuntime,
         http: frontendHttp,
         assets: assetRecord,
+        originGuard,
+        missingGuard,
       },
       memory,
       shutdown,

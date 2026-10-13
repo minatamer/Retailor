@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "scope": "restricted",
+  "paid": "off",
+  "candidate": { "fingerprint": "", "frontendImage": "", "backendImage": "" },
+  "verifiedAt": null,
+  "evidenceReference": "",
+  "paidDisabledVerified": false,
+  "restrictedAudienceVerified": false,
+  "account": {
+    "cutoffRefusalVerified": false,
+    "overlapAndResetVerified": false,
+    "outstandingUsageBounded": false,
+    "evidenceReference": ""
+  },
+  "ingress": {
+    "edgeRulesVerified": false,
+    "originSealEnabled": false,
+    "allOriginUrlsRejected": false,
+    "normalFlowVerified": false,
+    "evidenceReference": ""
+  }
+}

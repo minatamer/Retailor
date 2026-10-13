@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-13T19:06:46.157Z",
+  "image": "sha256:cabcd84a3d3fbddc33d7ffd20670f93b1d502fd49f315614cbb3e09eed85dfd7",
+  "uid": 1000,
+  "versions": {
+    "node": "v24.21.0",
+    "openssl": "3.5.8",
+    "zlib": "1.3.2.1-motley-8002e91",
+    "sharp": "0.35.5",
+    "vips": "8.18.7",
+    "png": "1.6.58",
+    "webp": "1.6.0",
+    "zlib-ng": "2.3.3"
+  },
+  "perl": {
+    "arch": "x86_64-linux-gnu-thread-multi",
+    "pointerBytes": 8,
+    "modules": [
+      {
+        "module": "Pod/Text.pm",
+        "locations": []
+      },
+      {
+        "module": "Archive/Tar.pm",
+        "locations": []
+      },
+      {
+        "module": "IO/Uncompress/Unzip.pm",
+        "locations": []
+      }
+    ]
+  },
+  "packages": [
+    {
+      "name": "libc6:amd64",
+      "version": "2.36-9+deb12u14"
+    },
+    {
+      "name": "libmount1:amd64",
+      "version": "2.38.1-5+deb12u3"
+    },
+    {
+      "name": "libpcre2-8-0:amd64",
+      "version": "10.42-1+deb12u2"
+    },
+    {
+      "name": "perl-base",
+      "version": "5.36.0-7+deb12u4"
+    },
+    {
+      "name": "zlib1g:amd64",
+      "version": "1:1.2.13.dfsg-1"
+    }
+  ],
+  "loadedStartupLibraries": [
+    "/app/node_modules/.pnpm/@img+sharp-libvips-linux-x64@1.3.4/node_modules/@img/sharp-libvips-linux-x64/lib/libvips-cpp.so.8.18.7",
+    "/usr/lib/x86_64-linux-gnu/libresolv.so.2",
+    "/usr/lib/x86_64-linux-gnu/libc.so.6",
+    "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+    "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "/usr/lib/x86_64-linux-gnu/libm.so.6",
+    "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30",
+    "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+    "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
+  ],
+  "paidRequests": 0,
+  "network": "none",
+  "limitations": "Startup module presence/link observations are not exhaustive static-native or exploit/fuzz proof"
+}
