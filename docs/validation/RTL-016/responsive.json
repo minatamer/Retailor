@@ -1,0 +1,142 @@
+[
+  {
+    "actions": [
+      {
+        "height": 44,
+        "right": 196.578125,
+        "text": "Export JSON",
+        "width": 96.234375
+      },
+      {
+        "height": 44,
+        "right": 291,
+        "text": "Reset demo",
+        "width": 90.421875
+      }
+    ],
+    "documentOverflow": -15,
+    "headerOverflow": 0,
+    "height": 430,
+    "width": 320
+  },
+  {
+    "actions": [
+      {
+        "height": 44,
+        "right": 251.578125,
+        "text": "Export JSON",
+        "width": 96.234375
+      },
+      {
+        "height": 44,
+        "right": 346,
+        "text": "Reset demo",
+        "width": 90.421875
+      }
+    ],
+    "documentOverflow": -15,
+    "headerOverflow": 0,
+    "height": 812,
+    "width": 375
+  },
+  {
+    "actions": [
+      {
+        "height": 44.1875,
+        "right": 602.15625,
+        "text": "Export JSON",
+        "width": 122.40625
+      },
+      {
+        "height": 44.1875,
+        "right": 722.28125,
+        "text": "Reset demo",
+        "width": 116.125
+      }
+    ],
+    "documentOverflow": -15,
+    "headerOverflow": 0,
+    "height": 1024,
+    "width": 768
+  },
+  {
+    "actions": [
+      {
+        "height": 44.1875,
+        "right": 847.921875,
+        "text": "Export JSON",
+        "width": 122.40625
+      },
+      {
+        "height": 44.1875,
+        "right": 968.046875,
+        "text": "Reset demo",
+        "width": 116.125
+      }
+    ],
+    "documentOverflow": -15,
+    "headerOverflow": 0,
+    "height": 600,
+    "width": 1024
+  },
+  {
+    "actions": [
+      {
+        "height": 44.1875,
+        "right": 1093.6875,
+        "text": "Export JSON",
+        "width": 122.40625
+      },
+      {
+        "height": 44.1875,
+        "right": 1213.8125,
+        "text": "Reset demo",
+        "width": 116.125
+      }
+    ],
+    "documentOverflow": -15,
+    "headerOverflow": 0,
+    "height": 900,
+    "width": 1280
+  },
+  {
+    "actions": [
+      {
+        "height": 44.1875,
+        "right": 1247.28125,
+        "text": "Export JSON",
+        "width": 122.40625
+      },
+      {
+        "height": 44.1875,
+        "right": 1367.40625,
+        "text": "Reset demo",
+        "width": 116.125
+      }
+    ],
+    "documentOverflow": -15,
+    "headerOverflow": 0,
+    "height": 900,
+    "width": 1440
+  },
+  {
+    "actions": [
+      {
+        "height": 44.1875,
+        "right": 1720.875,
+        "text": "Export JSON",
+        "width": 122.40625
+      },
+      {
+        "height": 44.1875,
+        "right": 1841,
+        "text": "Reset demo",
+        "width": 116.125
+      }
+    ],
+    "documentOverflow": -15,
+    "headerOverflow": 0,
+    "height": 1080,
+    "width": 1920
+  }
+]

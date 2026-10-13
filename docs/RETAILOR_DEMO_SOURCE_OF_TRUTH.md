@@ -4,7 +4,7 @@
 **Prepared:** 11 October 2026.\
 **Product:** Retailor. **Sample clothing brand:** FORME.\
 **Companion:** [Retailor product overview](RETAILOR_OVERVIEW.html).\
-**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–015 locally implemented, next eligible packet RTL-016; owner visual/device/zoom and paid evidence remain separately pending.\
+**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–016 locally implemented, next eligible packet RTL-017; owner visual/device/zoom and paid evidence remain separately pending.\
 **Signature promise:** **Bring your products. See your store.**\
 **Owner decisions incorporated:** all eleven answers on clothing-only scope, researched presets, Tailor-led setup, optional logos, mandatory photos, catalogue integrity, three scenarios, live sample processing, runway direction, image sourcing and USD/EUR; 11 October 2026.
 
@@ -1162,6 +1162,8 @@ Do not clear unrelated origin storage, other active tab data or owner-retained s
 Export one bounded JSON snapshot containing catalogue metadata/provenance, synthetic records, exact amounts, scenario origin, schema version, selected scope and current fact definitions, accepted design/brand metadata and the dated display-currency snapshot. Exclude original/logo image bytes, grants, tokens, credentials, pending executable proposals and full chat by default.
 
 Use a clear filename with product/schema/date, not visitor filenames or private identifiers. Include a synthetic-demo notice inside the export. Export is local and unpaid. Import/replay of exported workspaces is outside the first build.
+
+RTL-016 implements the strict 2-MiB version-1 report, exact scoped facts, accepted look and dated currency metadata. Historical completed catalogue-review provenance is labelled separately from current products. Bag, unposted economic drafts, replay receipts/Undo, images, chat and pending actions are excluded. A single owned download URL/timer is released by replacement, timeout, failure, reset or disposal. Inert provider-category breadcrumbs support interrupted refresh without replay. [Lifecycle ownership and evidence](engineering/LIFECYCLE.md) records actual native refresh/order/two-tab reset checks and separates physical/paid/hosted limits.
 
 ## 17. Architecture and framework
 

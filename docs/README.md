@@ -16,6 +16,8 @@ The owner has authorized queue execution and ticket-prefixed commits after clean
 
 [Accepted FORME photo inputs](research/FORME-PHOTOS.md) records all fifteen original assets, bounded browser decoding/cache handling and actual device/theme checks. [RTL-003 validation](validation/RTL-003.md) records resolved findings, clean final gates and remaining follow-on evidence.
 
+[Temporary workspace lifecycle](engineering/LIFECYCLE.md) inventories resource owners, strict recovery, fixed expiry and the bounded local JSON report. [RTL-016 validation](validation/RTL-016.md) records actual exported-file inspection, refresh/order/reset/two-tab behavior and pending physical/paid/hosted checks.
+
 ## Retained source material
 
 - [Original concept Markdown](retailor.md) and [original concept preview](retailor.html) are archived exploration; their simulations do not prove real recognition or deployed behavior.

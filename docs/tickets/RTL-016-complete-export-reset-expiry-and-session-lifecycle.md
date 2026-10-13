@@ -1,6 +1,6 @@
 # RTL-016 — Complete export, reset, expiry and session recovery
 
-Status: **Planned — not started**\
+Status: **Locally implemented — clean local validation; paid/hosted/physical acceptance pending**\
 Planning date: **11 October 2026**\
 Milestone: **Lifecycle completion**\
 Depends on: [RTL-009](RTL-009-deliver-automatic-usd-eur-storefront-pricing.md), [RTL-011](RTL-011-deliver-three-scenarios-and-owner-operations.md), [RTL-014](RTL-014-deliver-tailor-inline-photo-crud-and-confirmation.md), [RTL-015](RTL-015-deliver-optional-three-logo-generation.md)\
@@ -57,15 +57,15 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] One strict bounded projection recovers all eligible completed state.
-- [ ] Fixed two-hour expiry survives refresh and suspended-tab return correctly.
-- [ ] No refresh automatically repeats paid calls, orders or executable proposals.
-- [ ] Photos/logos recover or use the required honest repair/wordmark paths.
-- [ ] Reset cleans owned resources and late results cannot enter new identity.
-- [ ] Duplicate-tab/cache admission preserves other active owners.
-- [ ] Quota/corrupt/version failures keep safe usable work and useful notices.
-- [ ] Export contains correct structured facts/design/currency and excludes forbidden data.
-- [ ] Handling copy accurately describes local/provider/download boundaries.
+- [x] One strict bounded projection recovers all eligible completed state.
+- [x] Fixed two-hour expiry survives refresh and suspended-tab return correctly.
+- [x] No refresh automatically repeats paid calls, orders or executable proposals.
+- [x] Photos/logos recover or use the required honest repair/wordmark paths.
+- [x] Reset cleans owned resources and late results cannot enter new identity.
+- [x] Duplicate-tab/cache admission preserves other active owners.
+- [x] Quota/corrupt/version failures keep safe usable work and useful notices.
+- [x] Export contains correct structured facts/design/currency and excludes forbidden data.
+- [x] Handling copy accurately describes local/provider/download boundaries.
 
 ## Focused verification and evidence
 
@@ -102,4 +102,4 @@ No account/localStorage merchant library, server session/bucket, ZIP asset expor
 
 Keep this outcome under `RTL-016:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-016.md` and actual check/review evidence under `docs/validation/RTL-016.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Required local implementation is verified in [RTL-016 validation](../validation/RTL-016.md), with paid/hosted/physical checks explicitly pending. The current owner authorized fake-mode execution and ticket-prefixed commits after clean validation; no key access, paid request, push or publication occurred.
