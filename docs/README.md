@@ -36,6 +36,8 @@ The owner has authorized queue execution and ticket-prefixed commits after clean
 
 Current configuration follow-up: [RTL-024](tickets/RTL-024-simplify-paid-ai-configuration.md) removes runtime signoff/logo flags, process dollar reservations and APP_REVISION by owner request; fake/paid-off defaults and actual admission/moderation controls remain. Earlier audit/image records describe their named historical candidate.
 
+[RTL-025](tickets/RTL-025-fix-cross-platform-release-proof-check.md) corrects the supplied Ubuntu CI release-proof mismatch with LF text checkouts and exact binary preservation; fresh canonical-source evidence replaces the Windows CRLF candidate. [Release instructions](operations/RELEASE.md#candidate-construction-and-provenance) retain strict raw byte/image correspondence and distinguish local Linux verification from an actual GitHub run.
+
 ## Future implementation records
 
 Create design, engineering, operations, validation and commit-allocation documents only when they own concrete decisions or real work. Validation must identify actual commands, snapshot/environment and unperformed external checks. Do not fill future folders with empty modules, imaginary passes, visitor uploads, provider payloads or secrets. No paid/cloud operation or Git mutation was performed to create these tickets.

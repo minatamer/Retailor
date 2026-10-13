@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-13T21:18:25.155Z",
+  "scope": "Actual local Linux quality check and exact-byte preflight; not a GitHub run or deployed image",
+  "baselineRevision": "306b3068b21b668f106f8216f10a26700e1e6f9a",
+  "platform": "linux",
+  "distribution": "Debian bookworm",
+  "node": "24.19.0",
+  "pnpm": "11.25.0",
+  "baseImage": "node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df",
+  "command": "docker build --platform linux/amd64 --progress plain -f artifacts/local/rtl025-ci-context/Dockerfile.ci -t retailor/rtl025-ci:local artifacts/local/rtl025-ci-context",
+  "exitCode": 0,
+  "privateDockerfileSha256": "8a9be1b1c65277b0882e2bc75a6b14c3bfef322101e0df209ddd40a9e9517631",
+  "privateLogSha256": "fb7aace4c66cb354ed93c941f2e7b90a58b9dabeeb7e12a6077832ffe7896a90",
+  "privateLog": "artifacts/local/rtl025-linux-gates-final.log",
+  "verificationImageIndexDigest": "sha256:c7a60d898874f6c4af7eb5b5ab5fcac3f2b6e9e801afbc93b932ade476759348",
+  "gates": {
+    "format": "pass",
+    "lint": "pass",
+    "typecheck": "pass",
+    "boundaries": {
+      "result": "pass",
+      "modules": 165
+    },
+    "unit": {
+      "result": "pass",
+      "files": 72,
+      "tests": 381
+    },
+    "build": "pass"
+  },
+  "stress": {
+    "submittedBytes": 18056233,
+    "providerBytes": 9392466,
+    "milliseconds": 31553,
+    "startRss": 99172352,
+    "afterGenerationRss": 205656064,
+    "maxGateRss": 367407104,
+    "rssLimitBytes": 671088640,
+    "rssMeasurement": "Actual process RSS returned unchanged to the real production guard; maximum is sampled at admission, not a guaranteed peak",
+    "nativeDecoder": "actual"
+  },
+  "preflight": {
+    "platform": "linux",
+    "node": "v24.19.0",
+    "fingerprint": "dc7d98dffa86fd6d72ab39c0057019c3a38b0585d4cd4cace5f028257e7930ac",
+    "matchesLocalLinuxEvidence": true,
+    "paidRequests": 0,
+    "networkRequests": 0
+  },
+  "limitations": [
+    "Local Debian container is not Ubuntu/GitHub hosted job acceptance",
+    "Private context uses exact Git-blob export plus ticket changes; original .git and ignored env/uploads/outputs are excluded",
+    "Ephemeral Git commit exists only within verification image; baselineRevision is the source baseline, not that fixture commit",
+    "Frozen install/base tooling can access package registries; unpaid tests prohibit external networking and preflight makes zero paid/network requests",
+    "No production threshold, test skip, low-RSS mock, local service mutation, paid call, push or deployment"
+  ]
+}

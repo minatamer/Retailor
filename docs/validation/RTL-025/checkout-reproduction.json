@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "head": "306b3068b21b668f106f8216f10a26700e1e6f9a",
+  "recordedFingerprint": "d06a9c85580ea0f3ef78f6cb6139bd35533f42fdff8aa809d79b20aabb9d72e0",
+  "gitBlobFingerprint": "dc7d98dffa86fd6d72ab39c0057019c3a38b0585d4cd4cace5f028257e7930ac",
+  "differentFiles": 1,
+  "lineEndingOnly": true,
+  "differences": [
+    {
+      "path": "pnpm-workspace.yaml",
+      "workingBytes": 177,
+      "gitBytes": 167,
+      "lineEndingOnly": true
+    }
+  ],
+  "limits": "Git blob LF projection of the same input inventory; not an actual GitHub job rerun or Linux runtime proof"
+}

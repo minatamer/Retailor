@@ -6,6 +6,8 @@ Latest RTL-024 feedback explicitly removes runtime live/logo signoff flags, the 
 
 The owner subsequently approves the RTL-024 file-level plan and staging/commits for all its validated unstaged paths. Ignored app-local secrets, raw scanner output and generated build/log artifacts stay local; no push, paid or cloud action is included.
 
+RTL-025 fixes the supplied Linux CI source-proof mismatch with repository-owned LF checkout policy and fresh exact-byte Linux evidence. The owner approves staging/commits after its fix/validation loop; no push or actual GitHub rerun is included.
+
 ## Architecture
 
 - pnpm workspace; Node 24; strict ESM TypeScript; Next/React frontend; Express backend.
@@ -37,3 +39,4 @@ Stage explicit ticket-owned paths only after a clean validation result; inspect 
 - Preserve HMAC/boot/expiry classification and bounded unknown/issued/per-identity arrival and active limits. A shape, role, workspace label, raw address or forwarding header is not trusted fairness identity. Keep initial-visitor/edge and cross-process/account limits explicit; no limit removal, background queue or hidden retries.
 - Public origin protection belongs to the server-only seal check and trusted edge overwrite. Never expose/forward/log its secret, exempt a public health route, move 19-MiB uploads into Proxy body cloning, or add a new API/server action that bypasses the guard. Frontend guarded startup uses TCP; actual edge/origin/normal-flow checks remain required.
 - Release security evidence is non-secret metadata bound to the current fingerprint/image pair and date, never independent verification or deployment permission. Keep public/paid release acceptance closed without actual external cutoff/overlap/outstanding-cost and ingress evidence; runtime availability is separately controlled by the owner-selected master plus credentials, with no dollar/signoff flag. Refresh relevant Linux/scanner proof after base/app inputs change; retain unpatched advisory applicability honestly.
+- Preserve `.gitattributes` LF text checkouts and explicit binary exclusions. Build-input fingerprints hash actual bytes; never normalize inside hashing, silently accept source mismatch or skip the preflight regression. Verify existing checkouts are canonical before packaging, preserve pending edits, and never change global Git settings. Cross-platform proof must distinguish a host-side projection, an actual Linux check and an actual GitHub job.
