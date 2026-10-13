@@ -19,21 +19,8 @@ const EnvironmentSchema = z
       .default("development"),
     PORT: z.coerce.number().int().min(1024).max(65535).default(4311),
     FRONTEND_ORIGIN: origin.default("http://127.0.0.1:4310"),
-    APP_REVISION: z
-      .string()
-      .regex(/^[a-zA-Z0-9._-]{1,64}$/u)
-      .default("local"),
     FAKE_MODE: bool.default(true),
     PAID_DEMO_ENABLED: bool.default(false),
-    LIVE_POLICY_APPROVED: bool.default(false),
-    LOGO_GENERATION_ENABLED: bool.default(false),
-    LOGO_POLICY_APPROVED: bool.default(false),
-    PROCESS_BUDGET_MICRO_USD: z.coerce
-      .number()
-      .int()
-      .min(0)
-      .max(100_000_000)
-      .default(0),
     OPENAI_API_KEY: z.string().default(""),
     TURNSTILE_SECRET_KEY: z.string().default(""),
     TURNSTILE_SITE_KEY: z.string().max(256).default(""),

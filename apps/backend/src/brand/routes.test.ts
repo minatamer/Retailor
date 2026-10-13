@@ -9,7 +9,6 @@ import { PaidAdmission } from "../security/admission.js";
 it("binds actual live payload to the shared admitted action without contacting a paid provider", async () => {
   const gate = new PaidAdmission({
     secret: "s".repeat(32),
-    budgetMicroUsd: 5000000,
     challenge: { verify: async () => true },
   });
   const provider = fixtureLogos(),
@@ -60,7 +59,7 @@ it("binds actual live payload to the shared admitted action without contacting a
   expect(generate).not.toHaveBeenCalled();
   expect((await send(body.context.name)).status).toBe(200);
   expect(generate).toHaveBeenCalledTimes(1);
-  expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 4000000 });
+  expect(gate.counters()).toEqual({ active: 0 });
   expect((await send(body.context.name)).status).toBe(403);
   expect(generate).toHaveBeenCalledTimes(1);
 });
@@ -127,8 +126,6 @@ it("leaves unavailable live logos closed and config reveals dispatch nothing", a
   const runtime = composeRuntime(
     parseEnvironment({
       FAKE_MODE: "false",
-      LOGO_GENERATION_ENABLED: "true",
-      LOGO_POLICY_APPROVED: "true",
     }),
     () => "request_test",
     undefined,

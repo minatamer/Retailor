@@ -52,12 +52,9 @@ type Workspace = {
   operations: Map<string, Attempt>;
   admitted: boolean;
 };
-export const CATALOGUE_RESERVE_MICRO_USD = 1_000_000;
-export const LOGO_RESERVE_MICRO_USD = 4_000_000;
 export interface AdmissionOptions {
   secret: string;
   challenge: ChallengeVerifier;
-  budgetMicroUsd: number;
   clock?: () => number;
   id?: () => string;
   boot?: string;
@@ -70,17 +67,12 @@ export class PaidAdmission {
   private readonly workspaces = new Map<string, Workspace>();
   private readonly rates = new Map<string, number[]>();
   private readonly leases = new Map<string, string>();
-  private charged = 0;
   private inputTokens = 0;
   private outputTokens = 0;
   private unknownUsage = 0;
   constructor(private readonly options: AdmissionOptions) {
-    if (
-      options.secret.length < 32 ||
-      !Number.isSafeInteger(options.budgetMicroUsd) ||
-      options.budgetMicroUsd < 0
-    )
-      throw new Error("Admission requires an explicit safe secret and budget.");
+    if (options.secret.length < 32)
+      throw new Error("Admission requires an explicit safe secret.");
     this.clock = options.clock ?? Date.now;
     this.id = options.id ?? randomUUID;
     this.boot = options.boot ?? this.id();
@@ -212,14 +204,6 @@ export class PaidAdmission {
     signal.throwIfAborted();
     this.sweep();
     const { value, digest } = this.action(input);
-    if (
-      !this.hasBudget(
-        value.action === "logos"
-          ? LOGO_RESERVE_MICRO_USD
-          : CATALOGUE_RESERVE_MICRO_USD,
-      )
-    )
-      return deny("UNAVAILABLE", 503);
     if (typeof proof !== "string" || !proof.length || proof.length > 2048)
       return deny("INVALID_INPUT", 400);
     const existing = this.workspaces.get(value.workspaceId);
@@ -279,7 +263,7 @@ export class PaidAdmission {
     }
   }
   /** Reserve before allocating image buffers. Any rejected body consumes its grant,
-   * but only dispatch spends an attempt. Release pre-dispatch reservation on failure. */
+   * but only dispatch spends an attempt. Release the owned slot on completion. */
   begin(input: unknown, grant: string, safety: string) {
     let action: CatalogueAction;
     try {
@@ -339,16 +323,10 @@ export class PaidAdmission {
           : state.attempts >= RECOGNITION_LIMITS.attempts)
     )
       return deny("FORBIDDEN", 403);
-    const reserve =
-      value.action === "logos"
-        ? LOGO_RESERVE_MICRO_USD
-        : CATALOGUE_RESERVE_MICRO_USD; // Provisional allowance, not an actual price claim.
-    if (!this.hasBudget(reserve)) return deny("UNAVAILABLE", 503);
     if (this.leases.has(value.workspaceId) || this.leases.size >= 2)
       return deny("BUSY", 429);
     const lease = this.id();
     this.leases.set(value.workspaceId, lease);
-    this.charged += reserve;
     attempt.status = "consumed";
     let dispatched = false,
       released = false,
@@ -395,17 +373,13 @@ export class PaidAdmission {
         attempt.status = "terminal";
         if (this.leases.get(value.workspaceId) === lease)
           this.leases.delete(value.workspaceId);
-        if (!dispatched) this.charged -= reserve;
-        else if (!observedUsage) this.unknownUsage++;
-        // Until actual pricing/usage acceptance, retain the conservative dispatched
-        // reserve even on success. Never return unknown usage to the spend pool.
+        if (dispatched && !observedUsage) this.unknownUsage++;
       },
     };
   }
   counters() {
     return Object.freeze({
       active: this.leases.size,
-      reservedMicroUsd: this.charged,
     });
   }
   usageCounters() {
@@ -414,8 +388,5 @@ export class PaidAdmission {
       outputTokens: this.outputTokens,
       unknownDispatches: this.unknownUsage,
     });
-  }
-  hasBudget(reserve = CATALOGUE_RESERVE_MICRO_USD) {
-    return this.charged + reserve <= this.options.budgetMicroUsd;
   }
 }

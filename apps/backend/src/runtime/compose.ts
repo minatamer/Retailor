@@ -1,10 +1,6 @@
 import type { Capabilities } from "@retailor/contracts/api";
 import type { Environment } from "../config/environment.js";
-import {
-  PaidAdmission,
-  CATALOGUE_RESERVE_MICRO_USD,
-  LOGO_RESERVE_MICRO_USD,
-} from "../security/admission.js";
+import { PaidAdmission } from "../security/admission.js";
 import { turnstile } from "../security/turnstile.js";
 import { openAiCatalogue } from "../catalogue/provider.js";
 import type { RecognitionRuntime } from "../catalogue/routes.js";
@@ -22,7 +18,6 @@ export interface Runtime {
   capabilities: Capabilities;
   ready: boolean;
   requestId(): string;
-  revision: string;
   frontendOrigin: string;
   recognition?: RecognitionRuntime;
   currency?: CurrencyService;
@@ -37,7 +32,6 @@ export function composeRuntime(
   ) => ({
     admission: new PaidAdmission({
       secret: environment.GRANT_SIGNING_SECRET,
-      budgetMicroUsd: environment.PROCESS_BUDGET_MICRO_USD,
       challenge: turnstile(
         environment.TURNSTILE_SECRET_KEY,
         environment.FRONTEND_ORIGIN,
@@ -75,8 +69,6 @@ export function composeRuntime(
   const enabled =
     !env.FAKE_MODE &&
     env.PAID_DEMO_ENABLED &&
-    env.LIVE_POLICY_APPROVED &&
-    env.PROCESS_BUDGET_MICRO_USD >= CATALOGUE_RESERVE_MICRO_USD &&
     env.GRANT_SIGNING_SECRET.length >= 32 &&
     !!env.OPENAI_API_KEY &&
     !!env.TURNSTILE_SECRET_KEY &&
@@ -92,11 +84,7 @@ export function composeRuntime(
         }
       : undefined;
   const logos: LogoRuntime | undefined =
-    env.FAKE_MODE ||
-    (recognition &&
-      env.LOGO_GENERATION_ENABLED &&
-      env.LOGO_POLICY_APPROVED &&
-      env.PROCESS_BUDGET_MICRO_USD >= LOGO_RESERVE_MICRO_USD)
+    env.FAKE_MODE || recognition
       ? {
           mode,
           provider: logoFactory(env),
@@ -105,44 +93,36 @@ export function composeRuntime(
       : undefined;
   return {
     ready: env.FAKE_MODE || enabled,
-    revision: env.APP_REVISION,
     frontendOrigin: env.FRONTEND_ORIGIN,
     requestId,
     currency,
     ...(recognition ? { recognition } : {}),
     ...(assistant ? { assistant } : {}),
     ...(logos ? { logos } : {}),
-    get capabilities(): Capabilities {
-      const available = enabled && !!recognition?.admission.hasBudget();
-      return {
-        schemaVersion: 1,
-        mode,
-        paidEnabled: enabled,
-        admissionSiteKey: available ? env.TURNSTILE_SITE_KEY : null,
-        vision: enabled
-          ? { available, reason: available ? "ready" : "unavailable" }
-          : env.FAKE_MODE
-            ? { available: false, reason: "paid-disabled" }
-            : unavailable,
-        tailor: env.FAKE_MODE
-          ? { available: true, reason: "fixture" }
-          : enabled
-            ? { available, reason: available ? "ready" : "unavailable" }
-            : unavailable,
-        logos: env.FAKE_MODE
-          ? { available: true, reason: "fixture" }
-          : logos
-            ? {
-                available: !!recognition?.admission.hasBudget(
-                  LOGO_RESERVE_MICRO_USD,
-                ),
-                reason: recognition?.admission.hasBudget(LOGO_RESERVE_MICRO_USD)
-                  ? "ready"
-                  : "unavailable",
-              }
-            : unavailable,
-        eur: { available: true, reason: env.FAKE_MODE ? "fixture" : "ready" },
-      };
+    capabilities: {
+      schemaVersion: 1,
+      mode,
+      paidEnabled: enabled,
+      admissionSiteKey: enabled ? env.TURNSTILE_SITE_KEY : null,
+      vision: enabled
+        ? { available: true, reason: "ready" }
+        : env.FAKE_MODE
+          ? { available: false, reason: "paid-disabled" }
+          : unavailable,
+      tailor: env.FAKE_MODE
+        ? { available: true, reason: "fixture" }
+        : enabled
+          ? { available: true, reason: "ready" }
+          : unavailable,
+      logos: env.FAKE_MODE
+        ? { available: true, reason: "fixture" }
+        : logos
+          ? {
+              available: true,
+              reason: "ready",
+            }
+          : unavailable,
+      eur: { available: true, reason: env.FAKE_MODE ? "fixture" : "ready" },
     },
   };
 }

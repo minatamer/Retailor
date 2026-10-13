@@ -43,7 +43,6 @@ export function createApp(
       schemaVersion: 1,
       service: "retailor-backend",
       status: "alive",
-      revision: runtime.revision,
     });
   });
   app.get("/v1/ready", (_req, res) => {

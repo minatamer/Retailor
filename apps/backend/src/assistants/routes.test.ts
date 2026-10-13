@@ -39,7 +39,6 @@ describe("fixed assistant HTTP roles", () => {
   it("binds actual payload digest/role and spends a single shared lease only on provider dispatch", async () => {
     const gate = new PaidAdmission({
       secret: "s".repeat(32),
-      budgetMicroUsd: 5000000,
       challenge: { verify: async () => true },
     });
     const next = vi.fn(
@@ -112,7 +111,7 @@ describe("fixed assistant HTTP roles", () => {
     expect(next).not.toHaveBeenCalled();
     expect((await send()).status).toBe(200);
     expect(next).toHaveBeenCalledTimes(1);
-    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 1000000 });
+    expect(gate.counters()).toEqual({ active: 0 });
     expect(gate.usageCounters()).toEqual({
       inputTokens: 100,
       outputTokens: 50,

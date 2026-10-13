@@ -37,7 +37,6 @@ async function image(id = "source", colour = "#123456") {
 function harness(sanitizer?: SanitizerPorts) {
   const gate = new PaidAdmission({
     secret: "s".repeat(32),
-    budgetMicroUsd: 10_000_000,
     challenge: { verify: async (proof) => proof === "valid-proof" },
   });
   const provider = {
@@ -103,7 +102,7 @@ describe("bounded admission and actual multipart recognition", () => {
     expect(result.body.error.code).toBe("BUSY");
     expect(h.provider.interpret).not.toHaveBeenCalled();
     expect(capacity.counters()).toEqual({ active: 0, waiting: 0 });
-    expect(h.gate.counters()).toEqual({ active: 0, reservedMicroUsd: 0 });
+    expect(h.gate.counters()).toEqual({ active: 0 });
   });
   it("does not release admission or dispatch the provider while a failed sibling still awaits native termination", async () => {
     const capacity = new ImageCapacity(),
@@ -137,12 +136,12 @@ describe("bounded admission and actual multipart recognition", () => {
     jobs[1]!.reject(new Error("invalid pixels"));
     await vi.waitFor(() => expect(jobs[0]!.signal.aborted).toBe(true));
     expect(capacity.counters()).toEqual({ active: 1, waiting: 0 });
-    expect(h.gate.counters()).toEqual({ active: 1, reservedMicroUsd: 1000000 });
+    expect(h.gate.counters()).toEqual({ active: 1 });
     expect(h.provider.interpret).not.toHaveBeenCalled();
     jobs[0]!.reject(new Error("termination finished"));
     expect((await pending).status).toBe(400);
     expect(capacity.counters()).toEqual({ active: 0, waiting: 0 });
-    expect(h.gate.counters()).toEqual({ active: 0, reservedMicroUsd: 0 });
+    expect(h.gate.counters()).toEqual({ active: 0 });
     expect(h.provider.interpret).not.toHaveBeenCalled();
   });
   it("accepts the exact 24-file plus one-manifest multipart boundary", async () => {
@@ -221,7 +220,7 @@ describe("bounded admission and actual multipart recognition", () => {
       ),
     ).rejects.toMatchObject({ code: "TOO_LARGE", status: 413 });
     incoming.destroy();
-    expect(h.gate.counters()).toEqual({ active: 0, reservedMicroUsd: 0 });
+    expect(h.gate.counters()).toEqual({ active: 0 });
   });
   it("caps streamed transport independently of declared length and limits each file", async () => {
     const h = harness(),
@@ -325,7 +324,6 @@ describe("bounded admission and actual multipart recognition", () => {
     await vi.waitFor(() =>
       expect(h.gate.counters()).toEqual({
         active: 0,
-        reservedMicroUsd: 1_000_000,
       }),
     );
   });
@@ -406,7 +404,7 @@ describe("bounded admission and actual multipart recognition", () => {
       const result = await submit;
       expect(result.status).toBe(400);
       expect(h.provider.interpret).not.toHaveBeenCalled();
-      expect(h.gate.counters()).toEqual({ active: 0, reservedMicroUsd: 0 });
+      expect(h.gate.counters()).toEqual({ active: 0 });
     }
   });
   it("rejects tampered action, proof and oversized metadata without provider work", async () => {
@@ -466,7 +464,6 @@ describe("bounded admission and actual multipart recognition", () => {
     expect(JSON.stringify(result.body)).not.toContain("PRIVATE");
     expect(h.gate.counters()).toEqual({
       active: 0,
-      reservedMicroUsd: 1_000_000,
     });
   });
   it("sanitizes the real 15-photo sample and a distinct 24-image batch within the envelope", async () => {

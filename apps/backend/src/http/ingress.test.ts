@@ -8,7 +8,6 @@ import { PaidAdmission } from "../security/admission.js";
 function sessions(clock: () => number = Date.now) {
   const gate = new PaidAdmission({
     secret: "ingress-test-only-secret".repeat(2),
-    budgetMicroUsd: 0,
     challenge: { verify: async () => true },
     clock,
   });

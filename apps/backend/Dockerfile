@@ -19,7 +19,7 @@ RUN pnpm build:shared && pnpm --filter @retailor/backend build && pnpm --filter 
 FROM base AS runtime
 WORKDIR /app
 RUN rm -rf /usr/local/lib/node_modules /opt/yarn-* /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/yarn /usr/local/bin/yarnpkg
-ENV NODE_ENV=production APP_ENV=production FAKE_MODE=false PAID_DEMO_ENABLED=false LIVE_POLICY_APPROVED=false LOGO_GENERATION_ENABLED=false LOGO_POLICY_APPROVED=false PROCESS_BUDGET_MICRO_USD=0 PORT=4311
+ENV NODE_ENV=production APP_ENV=production FAKE_MODE=false PAID_DEMO_ENABLED=false PORT=4311
 COPY --from=build --chown=node:node /runtime/backend ./
 USER node
 EXPOSE 4311

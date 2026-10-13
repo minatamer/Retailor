@@ -11,7 +11,6 @@ describe("action-bound one-use paid admission", () => {
     const id = vi.fn(() => "test_identity");
     const options = {
       secret,
-      budgetMicroUsd: 0,
       clock: () => now,
       id,
       boot: "current_boot",
@@ -39,14 +38,13 @@ describe("action-bound one-use paid admission", () => {
     expect(gate.verifiedSafety("a".repeat(2049))).toBeUndefined();
     now += 7200000;
     expect(gate.verifiedSafety(issued.cookie)).toBeUndefined();
-    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 0 });
+    expect(gate.counters()).toEqual({ active: 0 });
   });
   it("caps unspent workspace grants and frees expired control memory without dispatch", async () => {
     let now = Date.now();
     const verify = vi.fn(async () => true);
     const gate = new PaidAdmission({
       secret,
-      budgetMicroUsd: 1000000,
       clock: () => now,
       challenge: { verify },
     });
@@ -75,7 +73,7 @@ describe("action-bound one-use paid admission", () => {
       ),
     ).rejects.toThrow("BUSY");
     expect(verify).toHaveBeenCalledTimes(256);
-    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 0 });
+    expect(gate.counters()).toEqual({ active: 0 });
     now = created + 7200001;
     await expect(
       gate.admit(
@@ -87,11 +85,10 @@ describe("action-bound one-use paid admission", () => {
     ).resolves.toMatchObject({ schemaVersion: 1 });
     expect(verify).toHaveBeenCalledTimes(257);
   });
-  it("binds exact logo context, shares paid capacity and retains both batch reservations without a third dispatch", async () => {
+  it("binds exact logo context, shares paid capacity and caps two batches without a third dispatch", async () => {
     const created = Date.now();
     const gate = new PaidAdmission({
       secret,
-      budgetMicroUsd: 20_000_000,
       clock: () => created,
       challenge: { verify: async () => true },
     });
@@ -156,7 +153,7 @@ describe("action-bound one-use paid admission", () => {
     );
     lease.dispatch();
     lease.finish();
-    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 4_000_000 });
+    expect(gate.counters()).toEqual({ active: 0 });
     expect(() => gate.beginLogos(first, grant.grant, safety)).toThrow(
       "FORBIDDEN",
     );
@@ -171,7 +168,7 @@ describe("action-bound one-use paid admission", () => {
     second.dispatch();
     second.recordUsage({ input: 100, output: 20000 });
     second.finish();
-    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 8_000_000 });
+    expect(gate.counters()).toEqual({ active: 0 });
     expect(gate.usageCounters()).toEqual({
       inputTokens: 100,
       outputTokens: 20000,
@@ -182,7 +179,7 @@ describe("action-bound one-use paid admission", () => {
     ).rejects.toThrow("FORBIDDEN");
     const textLease = gate.beginAssistant(text, textGrant.grant, safety);
     textLease.finish();
-    expect(gate.counters().reservedMicroUsd).toBe(8_000_000);
+    expect(gate.counters().active).toBe(0);
   });
   const textAction = (
     operationId: string,
@@ -211,7 +208,6 @@ describe("action-bound one-use paid admission", () => {
       ),
       gate = new PaidAdmission({
         secret,
-        budgetMicroUsd: 20000000,
         clock: () => now,
         challenge: { verify },
       });
@@ -256,14 +252,13 @@ describe("action-bound one-use paid admission", () => {
     await expect(
       gate.admit(textAction("over", start), "proof", safety, signal),
     ).rejects.toThrow("FORBIDDEN");
-    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 12000000 });
+    expect(gate.counters()).toEqual({ active: 0 });
   });
   it("limits text challenges to six per minute without consuming catalogue challenge allowance", async () => {
     const now = Date.now(),
       verify = vi.fn(async () => true),
       gate = new PaidAdmission({
         secret,
-        budgetMicroUsd: 20000000,
         clock: () => now,
         challenge: { verify },
       }),
@@ -291,7 +286,6 @@ describe("action-bound one-use paid admission", () => {
     let now = start;
     const gate = new PaidAdmission({
       secret,
-      budgetMicroUsd: 1_000_000,
       clock: () => now,
       challenge: { verify: async (proof) => proof === "valid" },
     });
@@ -321,7 +315,6 @@ describe("action-bound one-use paid admission", () => {
   it("binds the exact input revision, safety identity, expiry and process boot", async () => {
     const gate = new PaidAdmission({
       secret,
-      budgetMicroUsd: 5_000_000,
       challenge: { verify: async () => true },
     });
     const safety = gate.safety(undefined),
@@ -345,7 +338,6 @@ describe("action-bound one-use paid admission", () => {
     );
     const reboot = new PaidAdmission({
       secret,
-      budgetMicroUsd: 5_000_000,
       challenge: { verify: async () => true },
     });
     expect(() => reboot.begin(value, approval.grant, safety.identity)).toThrow(
@@ -359,7 +351,7 @@ describe("action-bound one-use paid admission", () => {
     expect(() => lease.dispatch()).toThrow("FORBIDDEN");
     lease.finish();
     lease.finish();
-    expect(gate.counters()).toEqual({ active: 0, reservedMicroUsd: 1_000_000 });
+    expect(gate.counters()).toEqual({ active: 0 });
     expect(gate.usageCounters()).toEqual({
       inputTokens: 0,
       outputTokens: 0,
@@ -369,10 +361,9 @@ describe("action-bound one-use paid admission", () => {
       "FORBIDDEN",
     );
   });
-  it("reserves before images, releases only pre-dispatch and enforces two process slots", async () => {
+  it("owns image capacity before allocation, releases once and preserves two slots and usage", async () => {
     const gate = new PaidAdmission({
       secret,
-      budgetMicroUsd: 3_000_000,
       challenge: { verify: async () => true },
     });
     const leases = [];
@@ -389,9 +380,9 @@ describe("action-bound one-use paid admission", () => {
       else
         expect(() => gate.begin(value, approval.grant, safety)).toThrow("BUSY");
     }
-    expect(gate.counters()).toEqual({ active: 2, reservedMicroUsd: 2_000_000 });
+    expect(gate.counters()).toEqual({ active: 2 });
     leases[0]!.finish();
-    expect(gate.counters().reservedMicroUsd).toBe(1_000_000);
+    expect(gate.counters().active).toBe(1);
     leases[1]!.dispatch();
     leases[1]!.recordUsage({ input: 100, output: 200 });
     leases[1]!.recordUsage({ input: 999, output: 999 });
@@ -401,7 +392,7 @@ describe("action-bound one-use paid admission", () => {
       outputTokens: 200,
       unknownDispatches: 0,
     });
-    expect(gate.counters().reservedMicroUsd).toBe(1_000_000);
+    expect(gate.counters().active).toBe(0);
   });
   it("fences concurrent proof replay, caps deliberate dispatches and expires grants", async () => {
     let now = Date.now(),
@@ -414,7 +405,6 @@ describe("action-bound one-use paid admission", () => {
     );
     const gate = new PaidAdmission({
       secret,
-      budgetMicroUsd: 4_000_000,
       clock: () => now,
       challenge: { verify },
     });
@@ -468,17 +458,16 @@ describe("action-bound one-use paid admission", () => {
       "FORBIDDEN",
     );
   });
-  it("keeps explicit zero budget closed and never grants invalid challenges", async () => {
+  it("requires a safe secret and never grants an invalid challenge", async () => {
     const verify = vi.fn(async (proof: string) => proof === "valid");
-    const gate = new PaidAdmission({
-      secret,
-      budgetMicroUsd: 0,
-      challenge: { verify },
-    });
+    expect(
+      () => new PaidAdmission({ secret: "short", challenge: { verify } }),
+    ).toThrow();
+    const gate = new PaidAdmission({ secret, challenge: { verify } });
     const safety = gate.safety(undefined).identity;
     await expect(
       gate.admit(action(), "invalid", safety, new AbortController().signal),
-    ).rejects.toThrow("UNAVAILABLE");
+    ).rejects.toThrow("FORBIDDEN");
     await expect(
       gate.admit(
         action("other"),
@@ -486,9 +475,14 @@ describe("action-bound one-use paid admission", () => {
         safety,
         new AbortController().signal,
       ),
-    ).rejects.toThrow("UNAVAILABLE");
-    expect(verify).not.toHaveBeenCalled();
-    expect(gate.counters().reservedMicroUsd).toBe(0);
+    ).resolves.toMatchObject({ schemaVersion: 1 });
+    expect(verify).toHaveBeenCalledTimes(2);
+    expect(gate.counters()).toEqual({ active: 0 });
+    expect(gate.usageCounters()).toEqual({
+      inputTokens: 0,
+      outputTokens: 0,
+      unknownDispatches: 0,
+    });
   });
 });
 describe("fixed Turnstile validation", () => {

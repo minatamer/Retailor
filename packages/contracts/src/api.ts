@@ -48,7 +48,6 @@ export const HealthSchema = z.strictObject({
   schemaVersion: z.literal(1),
   service: z.literal("retailor-backend"),
   status: z.literal("alive"),
-  revision: z.string().max(64),
 });
 export const ReadinessSchema = z.strictObject({
   schemaVersion: z.literal(1),
