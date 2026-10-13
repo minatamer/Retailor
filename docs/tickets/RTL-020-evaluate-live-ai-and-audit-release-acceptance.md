@@ -1,6 +1,6 @@
 # RTL-020 — Evaluate live AI and audit release acceptance
 
-Status: **Planned — not started**\
+Status: **Locally prepared and audited — paid/account/owner/Linux/hosted acceptance pending**\
 Planning date: **11 October 2026**\
 Milestone: **Live acceptance**\
 Depends on: [RTL-006](RTL-006-deliver-live-catalogue-recognition-and-admission.md), [RTL-009](RTL-009-deliver-automatic-usd-eur-storefront-pricing.md), [RTL-013](RTL-013-deliver-grounded-tailor-conversation-tools-and-tours.md), [RTL-014](RTL-014-deliver-tailor-inline-photo-crud-and-confirmation.md), [RTL-015](RTL-015-deliver-optional-three-logo-generation.md), [RTL-018](RTL-018-harden-privacy-abuse-spend-and-runtime-boundaries.md), [RTL-019](RTL-019-verify-polish-responsive-motion-and-design-matrix.md)\
@@ -58,16 +58,18 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] An explicit bounded evaluation plan and harness exist before any paid operation; default checks remain network-denied and paid-off.
-- [ ] The release audit covers connected domain, UI, provider, privacy and lifecycle boundaries with scoped findings and fixes.
+- [x] An explicit bounded evaluation plan and harness exist before any paid operation; default checks remain network-denied and paid-off.
+- [x] The release audit covers connected domain, UI, provider, privacy and lifecycle boundaries with scoped findings and fixes.
 - [ ] Actual sample photos and provenance are present; the public sample path demonstrably submits those photos for fresh recognition.
-- [ ] Live catalogue and Tailor case evidence is recorded when authorized; unavailable external checks are individually marked pending.
-- [ ] Reviewed photo CRUD and owner/shopper permissions remain enforced during real or fixture-delayed provider output.
-- [ ] Optional logo generation has separate actual evidence or is explicitly unavailable/pending with a usable wordmark path.
-- [ ] The real rate endpoint/schema/source date are verified or EUR remains unavailable; canonical USD behavior is complete.
-- [ ] Timing, usage and spend evidence distinguishes measured results from estimates and does not expose private content.
-- [ ] Every discovered blocking release issue is fixed and checked or blocks the public release verdict.
-- [ ] A candidate revision, settled root checks and precise live/hosted prerequisite handoff are recorded without false completion.
+- [x] Live catalogue and Tailor case evidence is recorded when authorized; unavailable external checks are individually marked pending.
+- [x] Reviewed photo CRUD and owner/shopper permissions remain enforced during real or fixture-delayed provider output.
+- [x] Optional logo generation has separate actual evidence or is explicitly unavailable/pending with a usable wordmark path.
+- [x] The real rate endpoint/schema/source date are verified or EUR remains unavailable; canonical USD behavior is complete.
+- [x] Timing, usage and spend evidence distinguishes measured results from estimates and does not expose private content.
+- [x] Every discovered blocking release issue is fixed and checked or blocks the public release verdict.
+- [x] A candidate revision, settled root checks and precise live/hosted prerequisite handoff are recorded without false completion.
+
+Local evidence: [RTL-020 validation](../validation/RTL-020.md) and [operator evaluation](../operations/EVALUATION.md), real-byte fifteen-photo HTTP fixture, bounded/guarded capture preparation, actual independent ECB-provider quote, fixed response memory/read limits and all six settled gates (336 tests). The public sample's actual fresh **live** recognition remains unchecked. No API key, account evidence, paid budget or hosted authorization was supplied; live semantics/billing, physical/owner quality and Linux/hosted acceptance remain individually pending. Source/API simulations are not live acceptance. RTL-021 packaging is independently eligible; public release remains unaccepted.
 
 ## Focused verification and evidence
 
@@ -109,4 +111,4 @@ Do not add recurring paid evaluations, make a broad model benchmark, relax admis
 
 Keep this outcome under `RTL-020:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-020.md` and actual check/review evidence under `docs/validation/RTL-020.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. Local preparation and named pending acceptance are recorded above. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.

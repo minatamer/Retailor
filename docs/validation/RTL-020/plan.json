@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 1,
+  "candidate": "07bfe9c9d23b23959f3f747532fae3e0cdcdd91f",
+  "paidAuthorized": false,
+  "liveAcceptance": "pending",
+  "execution": "canonical-demo-with-real-admission-and-human-review",
+  "models": {
+    "catalogue": "gpt-6-luna",
+    "assistant": "gpt-6-luna",
+    "logos": "gpt-image-2.5-flare-2026-09-08"
+  },
+  "policies": {
+    "catalogue": "catalogue-evidence-v1",
+    "assistant": "tailor-grounded-v1",
+    "retries": 0,
+    "store": false,
+    "tier": "default",
+    "logos": "clothing-brand-v1/transparent-png-v1"
+  },
+  "inventory": [
+    {
+      "id": "catalogue_sample",
+      "capability": "catalogue",
+      "inputCount": 15
+    },
+    {
+      "id": "catalogue_upload_subset",
+      "capability": "catalogue",
+      "inputCount": 3
+    },
+    {
+      "id": "shopper_category",
+      "capability": "assistant",
+      "role": "shopper"
+    },
+    {
+      "id": "shopper_eur_budget",
+      "capability": "assistant",
+      "role": "shopper"
+    },
+    {
+      "id": "shopper_unknown_material",
+      "capability": "assistant",
+      "role": "shopper"
+    },
+    {
+      "id": "creator_summary",
+      "capability": "assistant",
+      "role": "creator"
+    },
+    {
+      "id": "owner_loss_summary",
+      "capability": "assistant",
+      "role": "owner"
+    },
+    {
+      "id": "owner_photo_form",
+      "capability": "assistant",
+      "role": "owner"
+    },
+    {
+      "id": "shopper_unsupported_tour",
+      "capability": "assistant",
+      "role": "shopper"
+    },
+    {
+      "id": "logos_optional",
+      "capability": "logos",
+      "optional": true,
+      "outputCount": 3
+    }
+  ],
+  "maximum": {
+    "catalogueBatches": 2,
+    "assistantTurns": 7,
+    "logoBatches": 1,
+    "providerRequests": 24,
+    "catalogueOutputTokens": 24000,
+    "assistantOutputTokens": 31500,
+    "logoImages": 3,
+    "reservationMicroUsd": 13000000
+  },
+  "limits": {
+    "catalogue": {
+      "metadata": 65536,
+      "transport": 19922944,
+      "response": 786432,
+      "deadlineMs": 120000,
+      "providerMs": 95000,
+      "grantMs": 120000,
+      "attempts": 2,
+      "outputTokens": 12000,
+      "observationBytes": 98304
+    },
+    "assistant": {
+      "bodyBytes": 786432,
+      "responseBytes": 65536,
+      "promptChars": 2000,
+      "replyChars": 4000,
+      "messages": 40,
+      "recentMessages": 12,
+      "inputTokens": 12000,
+      "outputTokens": 1500,
+      "modelRequests": 3,
+      "tools": 4,
+      "turns": 12,
+      "deadlineMs": 60000,
+      "grantMs": 120000,
+      "modelInputBytes": 11000
+    },
+    "logos": {
+      "count": 3,
+      "batches": 2,
+      "bodyBytes": 65536,
+      "imageBytes": 1048576,
+      "cacheBytes": 3145728,
+      "responseBytes": 4404020,
+      "base64Chars": 1398104,
+      "side": 1024,
+      "deadlineMs": 180000,
+      "providerMs": 150000,
+      "browserMs": 195000,
+      "grantMs": 120000
+    }
+  },
+  "cost": {
+    "measuredMicroUsd": null,
+    "reservationIsBillCeiling": false,
+    "actualVisionInputTokens": "pending",
+    "actualLogoOutputEnvelope": "pending",
+    "optionalLogoApprovable": false,
+    "basis": "docs/operations/PROVIDERS.md — 13 October 2026 official prices; account and usage unverified"
+  },
+  "assets": {
+    "manifestSha256": "fa91bcdddfe1736d54a775ea9d28ef5e45975e3445e2ef5422bfd67150c36d34",
+    "lockSha256": "8a62d4df383b1c266599302531a50be869bc3c7087f7170749477d1bc77e7c85",
+    "provenanceSha256": "b128a7a4dd11e4a062ff918ac8273bd4182dee33ff62cc4b57b8bc3131cf0eeb",
+    "photos": [
+      {
+        "id": "F01",
+        "hash": "1cece25a55b40ca865604049d6dfd351f2261ba0ee6b08b34d8e067b35b1e06f",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 175264,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F02",
+        "hash": "16dd4882013a3ade901a26b050c0fd2d4b0fd2b185401fa12c361c52358aeecc",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 85032,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F03",
+        "hash": "bdbfa926f23b612e5c4586942e6320ac1ff886960b6f0e65ada1f8b37dcc5e9b",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 70614,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F04",
+        "hash": "3f53f55da75732b47f03885c9b82b83836f6f43c6bbff5705f928dba83dc4146",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 120532,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F05",
+        "hash": "780c14b5cc04ffb3ad5e27b7d74ecb2dacfb49816b480ed9323676887439ba3d",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 26440,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F06",
+        "hash": "b8773a56592808e8737c006c3ca43af996d3c6cad51e991a4c4b242a43cc2f00",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 86174,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F07",
+        "hash": "55ec131ef0e5ac6d9bc4db08858a21dde7baa3e78071ae59aec22e781a556338",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 69360,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F08",
+        "hash": "ad5de867adb239d5c28ee338b40faa4bb82a8f212127de39e4969f732539f2e7",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 123974,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F09",
+        "hash": "d99820cddcf457f415ee34eec9c06a949929b47124bd32a0c18c42ca6a425a29",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 59234,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F10",
+        "hash": "19214941f6a8cecc1b4f87fc3b04913c2c2ef55fa500408a83964b03f5275f47",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 92798,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F11",
+        "hash": "46ac9d2da862fb76482192115709a83baa152cbd6213053fbc1226753a7e278e",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 251246,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F12",
+        "hash": "3ebc75ea35a7dfc6df6d5c5e5166021ef05998879ea4030720e8fc919a99d9aa",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 33314,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F13",
+        "hash": "a76a2a46a651d73af604dd68bf92b29256d3ac5f9b54204f4035987668a98576",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 32898,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F14",
+        "hash": "b19a2dd86a5a3511326931731eea8f09f70f8e0bff23f754f0a362d04207bc62",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 123148,
+        "origin": "generated_demo"
+      },
+      {
+        "id": "F15",
+        "hash": "10703c61fdd98328b109066a5e7776910867e06066bad7bbcf17042834a0e8d3",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 55984,
+        "origin": "generated_demo"
+      }
+    ],
+    "photoBytes": 1406012,
+    "fonts": [
+      {
+        "name": "inter-latin-wght-normal.woff2",
+        "bytes": 48256,
+        "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62"
+      },
+      {
+        "name": "dm-sans-latin-wght-normal.woff2",
+        "bytes": 36932,
+        "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543"
+      },
+      {
+        "name": "dm-serif-display-latin-400-normal.woff2",
+        "bytes": 24744,
+        "sha256": "fdf61e20fd2c0108e0ea28da4daca0035205b4b7fc031a3974b865b704de160a"
+      },
+      {
+        "name": "dm-serif-display-latin-400-italic.woff2",
+        "bytes": 24572,
+        "sha256": "ed8b291611e32fa2d2900488dd48fc95faf0957b2ef7ddf1527e8d21dd9cf2df"
+      },
+      {
+        "name": "manrope-latin-wght-normal.woff2",
+        "bytes": 24836,
+        "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+      }
+    ]
+  },
+  "releasePrerequisites": [
+    "owner-paid-budget-and-cases",
+    "account-model-capability",
+    "retention-policy",
+    "real-challenge-and-secret-configuration",
+    "actual-live-quality-and-usage",
+    "Linux-images",
+    "hosted-IAM-origin-domain-capacity",
+    "owner-device-quality"
+  ],
+  "planDigest": "5344f6eb3a416fc3e77d7a34a8f8ed93784126ee6e276e40e0bb433d076e9933",
+  "worktreeDirty": true
+}

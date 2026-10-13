@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "execution": "public-fx-observation",
+  "observedAt": "2026-10-13T13:31:08.903Z",
+  "sourceUrl": "https://api.frankfurter.dev/v2/providers/ecb/rate/usd/eur",
+  "outcome": "pass",
+  "durationMs": 270,
+  "maximumUpstreamRequests": 1,
+  "paidRequests": 0,
+  "quote": {
+    "schemaVersion": 1,
+    "snapshotId": "fx_4b671ca808efe524e21f2833e7ca91f197aef45e",
+    "base": "USD",
+    "quote": "EUR",
+    "rateDecimal": "0.89437",
+    "rateDate": "2026-10-12",
+    "fetchedAt": "2026-10-13T13:31:08.897Z",
+    "sourceId": "frankfurter-ecb-v2"
+  },
+  "example": {
+    "usdCents": 10000,
+    "eurCents": 8944
+  }
+}

@@ -4,7 +4,7 @@
 **Prepared:** 11 October 2026.\
 **Product:** Retailor. **Sample clothing brand:** FORME.\
 **Companion:** [Retailor product overview](RETAILOR_OVERVIEW.html).\
-**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–019 locally implemented, next eligible packet RTL-020; owner visual/device/zoom and paid evidence remain separately pending.\
+**Implementation queue:** [22 detailed tickets](tickets/README.md); RTL-001–019 locally implemented, RTL-020 locally prepared/audited, next eligible packet RTL-021; owner visual/device/zoom and paid evidence remain separately pending.\
 **Signature promise:** **Bring your products. See your store.**\
 **Owner decisions incorporated:** all eleven answers on clothing-only scope, researched presets, Tailor-led setup, optional logos, mandatory photos, catalogue integrity, three scenarios, live sample processing, runway direction, image sourcing and USD/EUR; 11 October 2026.
 
@@ -1444,6 +1444,8 @@ Currency returns a compact strict JSON quote, at most 8 KiB, with source/date/pa
 
 ## 20. Provider integration and evaluation
 
+RTL-020 provides a bounded, paid-off evaluation plan and real-byte protocol harness, guarded operator metadata capture, and a focused release audit. Its fixed ECB-provider adapter was actually observed on 13 October (quote dated 12 October, USD→EUR 0.89437); a retained-chunk resource issue was corrected with a fixed buffer/read limit. [Evaluation guide](operations/EVALUATION.md) and [validation](validation/RTL-020.md) separate fixture results, actual public FX, measured timings, cost components and pending live/account/owner/Linux/hosted evidence. No key, paid budget, capture launch or public release was approved. Packaging preparation may proceed; required live acceptance cannot be replaced with fixtures.
+
 ### 20.1 OpenAI approach
 
 Use foreground Responses API requests for image-to-catalogue drafting and text/tool-assisted replies. The official API supports image inputs, including Base64 data URLs; Retailor's backend can send inspected derivatives without creating an upload library. Keep the provider interface behind a narrow typed adapter. [OpenAI image-input guide](https://developers.openai.com/api/docs/guides/images-vision).
@@ -1981,7 +1983,7 @@ The owner has authorized detailed ticket planning. The [canonical queue](tickets
 | Linux release preparation | [RTL-021](tickets/RTL-021-package-linux-services-and-manual-release-runbook.md) | Reproducible images, fixed private bridge, concrete manual deploy and rollback plan; independent of paid evaluation. |
 | Owner-authorized hosted release | [RTL-022](tickets/RTL-022-deploy-verify-hosted-demo-and-record-rollback.md) | Exact accepted artifacts, actual private IAM/origins, HTTPS walkthrough, usage evidence and recovery readiness. |
 
-RTL-001–019 have verified local implementation, with explicit quality/external checks still pending. The owner-prioritized RTL-003/006 image-concurrency follow-ups have verified local implementation; RTL-020 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
+RTL-001–019 have verified local implementation and RTL-020 has verified local evaluation preparation/audit, with explicit quality/external checks still pending. The owner-prioritized RTL-003/006 image-concurrency follow-ups have verified local implementation; RTL-021 is the next eligible packet; select the lowest numbered eligible packet under the current execution authorization. Eligibility depends on real prerequisite behavior and verification, never unchecked plans or ticket-named commits. The queue does not authorize parallel agents, paid operations, Git mutations or cloud publication.
 
 The first complete local path may use declared development fixtures, but public acceptance requires fresh live recognition for sample and uploads. Security and cleanup start with the first owning feature; later hardening and lifecycle packets complete the combined surface. Optional logo generation follows a polished wordmark path. Domain integrity keeps charts connected to actual products; design evidence proves that all accepted storefront choices look excellent.
 
@@ -2040,12 +2042,12 @@ All eleven answers are incorporated; do not reopen them as unanswered ticket-pla
 | 7 | Healthy profit, near break-even and heavy loss presets | Sections 11–14; reviewed activity replacement |
 | 8 | Live draft every deliberate generation; sample is about fifteen photos | Sections 5, 7, 12, 19, 20, 23 and 25 |
 | 9 | Try storefront runway; preserve other hero concepts for visual feedback | Section 4 and Appendix F |
-| 10 | AI-generated original sample preferred; research stock alternative | Section 12 and Appendix G; assets still awaiting production/acceptance |
+| 10 | AI-generated original sample preferred; research stock alternative | Section 12 and Appendix G; fifteen generated assets produced/verified locally, owner/live acceptance pending |
 | 11 | English, USD authority and optional automatic EUR storefront conversion | Sections 9, 10, 13, 19 and Appendix H |
 
 ### 29.2 Implementation evidence still to obtain
 
-Resolve photo generation/source files and art approval, exact font files/licences and final visual tokens, model IDs and account capability, measured latency/output size and paid budget, external rate endpoint/schema verification, dependency versions, cloud resource IDs/region and domain ownership. These are implementation/release evidence tasks, not missing owner product answers. The intended `tryretailor.com` domain remains unconfirmed. The planned packets record these dependencies without inventing their results; see the queue for each owning outcome.
+Photo source/provenance, bundled font files/licences, approved tokens, pinned dependencies and the fixed reference-rate source have local evidence in their owning packets; final owner/physical art review remains pending. Provisional model IDs are configured, while real account capability, live latency/usage/billing, actual budget/retention and enabled-logo output envelope still need acceptance. Cloud resource IDs/region, exact Linux artifacts, hosted behavior and domain ownership remain release tasks. These are evidence tasks, not missing owner product answers. The intended `tryretailor.com` domain remains unconfirmed; see each packet's actual status and limitations.
 
 Routine composition, labels and token refinements can be decided within accepted scope. Real payments, durable storage, additional product verticals or a different public spend scope require a separate concrete decision. This revision adds the owner-authorized 22-packet ticket queue and performs no application implementation, deployment or paid API operations.
 
