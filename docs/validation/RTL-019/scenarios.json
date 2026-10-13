@@ -1,0 +1,75 @@
+{
+  "views": [
+    {
+      "scenario": "healthy-with-visitor-order",
+      "metrics": [
+        "Net merchandise sales ↗$978.00Merchandise only · Shipping/tax excluded",
+        "Included orders ↗15Order-date period · Currently non-cancelled",
+        "Average merchandise order ↗$65.20Before refunds · Average cents rounded half away from zero",
+        "Simulated operating result ↗$477.90Sales − sold cost − expenses − inventory loss",
+        "Net merchandise sales$978.00",
+        "Simulated operating result$477.90"
+      ],
+      "evidence": {
+        "amount": "$477.90",
+        "numeratorCents": 47790,
+        "contributorCount": 47,
+        "includesVisitorOrder": true
+      },
+      "restoredFocus": "Simulated operating result ↗$477.90Sales − sold cost − expenses − inventory loss"
+    },
+    {
+      "scenario": "near-break-even",
+      "metrics": [
+        "Net merchandise sales ↗$554.00Merchandise only · Shipping/tax excluded",
+        "Included orders ↗8Order-date period · Currently non-cancelled",
+        "Average merchandise order ↗$69.25Before refunds · Average cents rounded half away from zero",
+        "Simulated operating result ↗$34.70Sales − sold cost − expenses − inventory loss",
+        "Net merchandise sales$554.00",
+        "Simulated operating result$34.70"
+      ]
+    },
+    {
+      "scenario": "heavy-loss",
+      "metrics": [
+        "Net merchandise sales ↗$286.40Merchandise only · Shipping/tax excluded",
+        "Included orders ↗6Order-date period · Currently non-cancelled",
+        "Average merchandise order ↗$56.80Before refunds · Average cents rounded half away from zero",
+        "Simulated operating result ↗-$835.90Sales − sold cost − expenses − inventory loss",
+        "Net merchandise sales$286.40",
+        "Simulated operating result-$835.90"
+      ],
+      "evidence": {
+        "amount": "-$835.90",
+        "numeratorCents": -83590,
+        "contributorCount": 22
+      }
+    }
+  ],
+  "retainedGarmentCount": 20,
+  "preservedManualPrice": "12345.67",
+  "invalidPhoto": {
+    "message": "Choose a static JPEG, PNG or WebP photo. HEIC, SVG, GIF and video are unsupported.",
+    "previousPhotoRetained": 1,
+    "reviewEnabled": true
+  },
+  "activeFormRecovery": {
+    "cancelPreservedDraft": true,
+    "confirmedReplaceWarnedAndCleared": true
+  },
+  "actualExpiry": {
+    "observedAt": "2026-10-13T12:27:15.200Z",
+    "notice": "This temporary demo expired. Start a fresh collection.",
+    "selectedPhotos": 0,
+    "oldOwnedBlobImages": 0,
+    "oldTailorPresent": 0
+  },
+  "sparsePeriod": {
+    "netSalesCents": 480,
+    "soldCostCents": 3330,
+    "operatingExpenseCents": 90000,
+    "inventoryLossCents": 3060,
+    "resultCents": -95910,
+    "receivedReturnRate": "Unavailable: denominator unavailable or zero"
+  }
+}

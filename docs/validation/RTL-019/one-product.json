@@ -1,0 +1,141 @@
+{
+  "views": [
+    {
+      "heading": "A collection with a point of view.",
+      "height": 430,
+      "images": [
+        {
+          "loaded": true,
+          "name": ""
+        },
+        {
+          "loaded": true,
+          "name": "Straight-leg jeans"
+        },
+        {
+          "loaded": true,
+          "name": "Straight-leg jeans"
+        }
+      ],
+      "overflow": -15,
+      "width": 320
+    },
+    {
+      "heading": "The collection.",
+      "height": 430,
+      "images": [
+        {
+          "loaded": true,
+          "name": ""
+        },
+        {
+          "loaded": true,
+          "name": "Straight-leg jeans"
+        }
+      ],
+      "overflow": -15,
+      "width": 320
+    },
+    {
+      "heading": "Straight-leg jeans",
+      "height": 430,
+      "images": [
+        {
+          "loaded": true,
+          "name": ""
+        },
+        {
+          "loaded": true,
+          "name": "Straight-leg jeans"
+        },
+        {
+          "loaded": true,
+          "name": "Straight-leg jeans, close-up"
+        }
+      ],
+      "overflow": -15,
+      "width": 320
+    },
+    {
+      "heading": "A collection with a point of view.",
+      "height": 900,
+      "images": [
+        {
+          "loaded": true,
+          "name": ""
+        },
+        {
+          "loaded": true,
+          "name": "Straight-leg jeans"
+        },
+        {
+          "loaded": true,
+          "name": "Straight-leg jeans"
+        }
+      ],
+      "overflow": -15,
+      "width": 1440
+    },
+    {
+      "heading": "The collection.",
+      "height": 900,
+      "images": [
+        {
+          "loaded": true,
+          "name": ""
+        },
+        {
+          "loaded": true,
+          "name": "Straight-leg jeans"
+        }
+      ],
+      "overflow": -15,
+      "width": 1440
+    },
+    {
+      "heading": "Straight-leg jeans",
+      "height": 900,
+      "images": [
+        {
+          "loaded": true,
+          "name": ""
+        },
+        {
+          "loaded": true,
+          "name": "Straight-leg jeans"
+        },
+        {
+          "loaded": true,
+          "name": "Straight-leg jeans, close-up"
+        }
+      ],
+      "overflow": -15,
+      "width": 1440
+    }
+  ],
+  "galleryRestoredFocus": "View closer +",
+  "soldOut": {
+    "option": "28/30",
+    "stockBefore": 15,
+    "stockAfter": 0,
+    "optionEnabled": false
+  },
+  "archive": {
+    "noReplacement": true,
+    "notice": [
+      "\t\t10 text Development fixture · Paid calls disabled · Authored garment drafts for local UI testing, not live recognition.",
+      "\t\t\t\t\t\t80 button Collection",
+      "\t\t\t\t\t88 button ← Back to the collection",
+      "\t\t\t\t\t97 text This garment has been archived. It is no longer available to purchase.",
+      "\t\t\t\t\t98 text Development copy for testing the catalogue journey. Replace with confirmed garment details.",
+      "\t\t\t\t\t109 text Archived garment",
+      "\t\t\t\t\t119 button (disabled) Unavailable",
+      "\t\t\t\t\t120 button (collapsed) Garment details, Secondary Actions: Expand",
+      "\t\t\t\t\t\t121 text Garment details"
+    ]
+  },
+  "activePreviewReset": {
+    "notice": ["\t\t5 text Preparing a fresh workspace…"],
+    "ownedBlobImages": 0
+  }
+}

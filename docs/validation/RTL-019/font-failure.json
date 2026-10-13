@@ -1,0 +1,15 @@
+{
+  "faces": [],
+  "fontCss": [
+    "@font-face { font-family: \"Retailor Inter\"; src: url(\"/fonts/rtl019-missing-inter-latin-wght-normal.woff2\") format(\"woff2\"); font-weight: 100 900; font-style: normal; font-display: swap; }",
+    "@font-face { font-family: \"Retailor DM Sans\"; src: url(\"/fonts/rtl019-missing-dm-sans-latin-wght-normal.woff2\") format(\"woff2\"); font-weight: 100 1000; font-style: normal; font-display: swap; }",
+    "@font-face { font-family: \"Retailor Manrope\"; src: url(\"/fonts/rtl019-missing-manrope-latin-wght-normal.woff2\") format(\"woff2\"); font-weight: 200 800; font-style: normal; font-display: swap; }",
+    "@font-face { font-family: \"Retailor DM Serif\"; src: url(\"/fonts/rtl019-missing-dm-serif-display-latin-400-normal.woff2\") format(\"woff2\"); font-weight: 400; font-style: normal; font-display: swap; }",
+    "@font-face { font-family: \"Retailor DM Serif\"; src: url(\"/fonts/rtl019-missing-dm-serif-display-latin-400-italic.woff2\") format(\"woff2\"); font-weight: 400; font-style: italic; font-display: swap; }"
+  ],
+  "fontSetSize": 9,
+  "headingFont": "\"Retailor Inter\", Arial, sans-serif",
+  "height": 844,
+  "overflow": false,
+  "width": 390
+}

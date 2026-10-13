@@ -1,0 +1,1876 @@
+{
+  "views": [
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        },
+        {
+          "height": 239,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 3,
+      "overflow": 0,
+      "storeWidth": 277,
+      "viewport": [320, 430],
+      "look": "studio/ink/editorial",
+      "page": "home",
+      "capture": "pressure-studio-ink-editorial-home-320.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        },
+        {
+          "height": 44,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 13,
+      "overflow": 0,
+      "storeWidth": 277,
+      "viewport": [320, 430],
+      "look": "studio/ink/editorial",
+      "page": "collection",
+      "capture": "pressure-studio-ink-editorial-collection-320.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        },
+        {
+          "height": 274.84375,
+          "label": "View closer +"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 277,
+      "viewport": [320, 430],
+      "look": "studio/ink/editorial",
+      "page": "product",
+      "capture": "pressure-studio-ink-editorial-product-320.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        },
+        {
+          "height": 309,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 5,
+      "overflow": 0,
+      "storeWidth": 347,
+      "viewport": [390, 844],
+      "look": "studio/ink/editorial",
+      "page": "home",
+      "capture": "pressure-studio-ink-editorial-home-390.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        },
+        {
+          "height": 44,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 15,
+      "overflow": 0,
+      "storeWidth": 347,
+      "viewport": [390, 844],
+      "look": "studio/ink/editorial",
+      "page": "collection",
+      "capture": "pressure-studio-ink-editorial-collection-390.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        },
+        {
+          "height": 355.34375,
+          "label": "View closer +"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 347,
+      "viewport": [390, 844],
+      "look": "studio/ink/editorial",
+      "page": "product",
+      "capture": "pressure-studio-ink-editorial-product-390.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 44,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        },
+        {
+          "height": 634.3905639648438,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 5,
+      "overflow": 0,
+      "storeWidth": 691.546875,
+      "viewport": [768, 1024],
+      "look": "studio/ink/editorial",
+      "page": "home",
+      "capture": "pressure-studio-ink-editorial-home-768.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 44,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        },
+        {
+          "height": 44,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 15,
+      "overflow": 0,
+      "storeWidth": 691.546875,
+      "viewport": [768, 1024],
+      "look": "studio/ink/editorial",
+      "page": "collection",
+      "capture": "pressure-studio-ink-editorial-collection-768.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 44,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        },
+        {
+          "height": 729.546875,
+          "label": "View closer +"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 691.546875,
+      "viewport": [768, 1024],
+      "look": "studio/ink/editorial",
+      "page": "product",
+      "capture": "pressure-studio-ink-editorial-product-768.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 92,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Bag"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 5,
+      "overflow": 0,
+      "storeWidth": 1309.796875,
+      "viewport": [1440, 900],
+      "look": "studio/ink/editorial",
+      "page": "home",
+      "capture": "pressure-studio-ink-editorial-home-1440.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 92,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Bag"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 15,
+      "overflow": 0,
+      "storeWidth": 1309.796875,
+      "viewport": [1440, 900],
+      "look": "studio/ink/editorial",
+      "page": "collection",
+      "capture": "pressure-studio-ink-editorial-collection-1440.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 92,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Bag"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        }
+      ],
+      "canvas": "#f6f4ef",
+      "family": "studio",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 1309.796875,
+      "viewport": [1440, 900],
+      "look": "studio/ink/editorial",
+      "page": "product",
+      "capture": "pressure-studio-ink-editorial-product-1440.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 56,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 62,
+          "label": "Explore the collection"
+        },
+        {
+          "height": 239.00006103515625,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 5,
+      "overflow": 0,
+      "storeWidth": 277,
+      "viewport": [320, 430],
+      "look": "pulse/cobalt/modern",
+      "page": "home",
+      "capture": "pressure-pulse-cobalt-modern-home-320.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 56,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        },
+        {
+          "height": 44,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 15,
+      "overflow": 0,
+      "storeWidth": 277,
+      "viewport": [320, 430],
+      "look": "pulse/cobalt/modern",
+      "page": "collection",
+      "capture": "pressure-pulse-cobalt-modern-collection-320.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 56,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        },
+        {
+          "height": 274.8437805175781,
+          "label": "View closer +"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 277,
+      "viewport": [320, 430],
+      "look": "pulse/cobalt/modern",
+      "page": "product",
+      "capture": "pressure-pulse-cobalt-modern-product-320.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 56,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        },
+        {
+          "height": 308.99993896484375,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 5,
+      "overflow": 0,
+      "storeWidth": 347,
+      "viewport": [390, 844],
+      "look": "pulse/cobalt/modern",
+      "page": "home",
+      "capture": "pressure-pulse-cobalt-modern-home-390.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 56,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        },
+        {
+          "height": 44,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 15,
+      "overflow": 0,
+      "storeWidth": 347,
+      "viewport": [390, 844],
+      "look": "pulse/cobalt/modern",
+      "page": "collection",
+      "capture": "pressure-pulse-cobalt-modern-collection-390.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 56,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        },
+        {
+          "height": 355.34375,
+          "label": "View closer +"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 347,
+      "viewport": [390, 844],
+      "look": "pulse/cobalt/modern",
+      "page": "product",
+      "capture": "pressure-pulse-cobalt-modern-product-390.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 44,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        },
+        {
+          "height": 634.390625,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 5,
+      "overflow": 0,
+      "storeWidth": 691.546875,
+      "viewport": [768, 1024],
+      "look": "pulse/cobalt/modern",
+      "page": "home",
+      "capture": "pressure-pulse-cobalt-modern-home-768.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 44,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        },
+        {
+          "height": 44,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 15,
+      "overflow": 0,
+      "storeWidth": 691.546875,
+      "viewport": [768, 1024],
+      "look": "pulse/cobalt/modern",
+      "page": "collection",
+      "capture": "pressure-pulse-cobalt-modern-collection-768.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 44,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        },
+        {
+          "height": 729.546875,
+          "label": "View closer +"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 691.546875,
+      "viewport": [768, 1024],
+      "look": "pulse/cobalt/modern",
+      "page": "product",
+      "capture": "pressure-pulse-cobalt-modern-product-768.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 92,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Bag"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 5,
+      "overflow": 0,
+      "storeWidth": 1309.796875,
+      "viewport": [1440, 900],
+      "look": "pulse/cobalt/modern",
+      "page": "home",
+      "capture": "pressure-pulse-cobalt-modern-home-1440.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 92,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Bag"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 20,
+      "overflow": 0,
+      "storeWidth": 1309.796875,
+      "viewport": [1440, 900],
+      "look": "pulse/cobalt/modern",
+      "page": "collection",
+      "capture": "pressure-pulse-cobalt-modern-collection-1440.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 92,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Bag"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        }
+      ],
+      "canvas": "#f0f3fc",
+      "family": "pulse",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 1309.796875,
+      "viewport": [1440, 900],
+      "look": "pulse/cobalt/modern",
+      "page": "product",
+      "capture": "pressure-pulse-cobalt-modern-product-1440.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        },
+        {
+          "height": 128.90625,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 4,
+      "overflow": 0,
+      "storeWidth": 277,
+      "viewport": [320, 430],
+      "look": "gallery/oxblood/editorial",
+      "page": "home",
+      "capture": "pressure-gallery-oxblood-editorial-home-320.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        },
+        {
+          "height": 44,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 20,
+      "overflow": 0,
+      "storeWidth": 277,
+      "viewport": [320, 430],
+      "look": "gallery/oxblood/editorial",
+      "page": "collection",
+      "capture": "pressure-gallery-oxblood-editorial-collection-320.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        },
+        {
+          "height": 274.84375,
+          "label": "View closer +"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 277,
+      "viewport": [320, 430],
+      "look": "gallery/oxblood/editorial",
+      "page": "product",
+      "capture": "pressure-gallery-oxblood-editorial-product-320.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        },
+        {
+          "height": 169.734375,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 4,
+      "overflow": 0,
+      "storeWidth": 347,
+      "viewport": [390, 844],
+      "look": "gallery/oxblood/editorial",
+      "page": "home",
+      "capture": "pressure-gallery-oxblood-editorial-home-390.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44.000030517578125,
+          "label": "Filters +"
+        },
+        {
+          "height": 44,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 20,
+      "overflow": 0,
+      "storeWidth": 347,
+      "viewport": [390, 844],
+      "look": "gallery/oxblood/editorial",
+      "page": "collection",
+      "capture": "pressure-gallery-oxblood-editorial-collection-390.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 58,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        },
+        {
+          "height": 355.34375,
+          "label": "View closer +"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 347,
+      "viewport": [390, 844],
+      "look": "gallery/oxblood/editorial",
+      "page": "product",
+      "capture": "pressure-gallery-oxblood-editorial-product-390.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 44,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        },
+        {
+          "height": 359.54693603515625,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 4,
+      "overflow": 0,
+      "storeWidth": 691.546875,
+      "viewport": [768, 1024],
+      "look": "gallery/oxblood/editorial",
+      "page": "home",
+      "capture": "pressure-gallery-oxblood-editorial-home-768.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 44,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        },
+        {
+          "height": 44,
+          "label": "Straight-leg jeans"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 20,
+      "overflow": 0,
+      "storeWidth": 691.546875,
+      "viewport": [768, 1024],
+      "look": "gallery/oxblood/editorial",
+      "page": "collection",
+      "capture": "pressure-gallery-oxblood-editorial-collection-768.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 44,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        },
+        {
+          "height": 729.546875,
+          "label": "View closer +"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 691.546875,
+      "viewport": [768, 1024],
+      "look": "gallery/oxblood/editorial",
+      "page": "product",
+      "capture": "pressure-gallery-oxblood-editorial-product-768.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 92,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Bag"
+        },
+        {
+          "height": 50,
+          "label": "Explore the collection"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 4,
+      "overflow": 0,
+      "storeWidth": 1309.796875,
+      "viewport": [1440, 900],
+      "look": "gallery/oxblood/editorial",
+      "page": "home",
+      "capture": "pressure-gallery-oxblood-editorial-home-1440.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 92,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Bag"
+        },
+        {
+          "height": 44,
+          "label": "Filters +"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "The collection.",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 20,
+      "overflow": 0,
+      "storeWidth": 1309.796875,
+      "viewport": [1440, 900],
+      "look": "gallery/oxblood/editorial",
+      "page": "collection",
+      "capture": "pressure-gallery-oxblood-editorial-collection-1440.jpg"
+    },
+    {
+      "buttons": [
+        {
+          "height": 92,
+          "label": "The Considered Everyday Clothing Company"
+        },
+        {
+          "height": 44,
+          "label": "Home"
+        },
+        {
+          "height": 44,
+          "label": "Collection"
+        },
+        {
+          "height": 44,
+          "label": "Product"
+        },
+        {
+          "height": 44,
+          "label": "USD"
+        },
+        {
+          "height": 44,
+          "label": "EUR"
+        },
+        {
+          "height": 44,
+          "label": "ⓘ"
+        },
+        {
+          "height": 44,
+          "label": "Bag"
+        },
+        {
+          "height": 44,
+          "label": "← Back to the collection"
+        }
+      ],
+      "canvas": "#faf0f0",
+      "family": "gallery",
+      "heading": "Straight-leg denim trousers with a deliberately long name for the responsive storefront layout",
+      "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+      "illustration": null,
+      "images": 2,
+      "overflow": 0,
+      "storeWidth": 1309.796875,
+      "viewport": [1440, 900],
+      "look": "gallery/oxblood/editorial",
+      "page": "product",
+      "capture": "pressure-gallery-oxblood-editorial-product-1440.jpg"
+    }
+  ]
+}

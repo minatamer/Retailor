@@ -1,0 +1,52 @@
+{
+  "buttons": [
+    {
+      "height": 150,
+      "label": "Your collection"
+    },
+    {
+      "height": 44,
+      "label": "Home"
+    },
+    {
+      "height": 44,
+      "label": "Collection"
+    },
+    {
+      "height": 44,
+      "label": "Product"
+    },
+    {
+      "height": 44,
+      "label": "USD"
+    },
+    {
+      "height": 44,
+      "label": "EUR"
+    },
+    {
+      "height": 44,
+      "label": "ⓘ"
+    },
+    {
+      "height": 50,
+      "label": "Explore the collection"
+    },
+    {
+      "height": 239,
+      "label": "Straight-leg jeans"
+    }
+  ],
+  "canvas": "#f6f4ef",
+  "family": "studio",
+  "heading": "A collection with a point of view.",
+  "headingFont": "\"Retailor Inter\", Arial, sans-serif",
+  "illustration": null,
+  "images": 5,
+  "overflow": 0,
+  "storeWidth": 277,
+  "viewport": [320, 812],
+  "look": "studio/ink/inter",
+  "page": "home",
+  "capture": "studio-ink-inter-home-320.jpg"
+}

@@ -1,0 +1,48 @@
+{
+  "views": [
+    {
+      "headerHeight": 189,
+      "headline": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "overflow": 0,
+      "viewport": [320, 430],
+      "wordmark": "The Considered Everyday Clothing Company",
+      "wordmarkRect": {
+        "height": 58,
+        "width": 239
+      }
+    },
+    {
+      "headerHeight": 189,
+      "headline": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "overflow": 0,
+      "viewport": [390, 844],
+      "wordmark": "The Considered Everyday Clothing Company",
+      "wordmarkRect": {
+        "height": 58,
+        "width": 309
+      }
+    },
+    {
+      "headerHeight": 125,
+      "headline": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "overflow": 0,
+      "viewport": [768, 1024],
+      "wordmark": "The Considered Everyday Clothing Company",
+      "wordmarkRect": {
+        "height": 44,
+        "width": 634.390625
+      }
+    },
+    {
+      "headerHeight": 129,
+      "headline": "Clothes for every chapter of your day, from quiet mornings to wherever the evening takes you.",
+      "overflow": 0,
+      "viewport": [1440, 900],
+      "wordmark": "The Considered Everyday Clothing Company",
+      "wordmarkRect": {
+        "height": 92,
+        "width": 601.59375
+      }
+    }
+  ]
+}

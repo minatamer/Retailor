@@ -1,0 +1,3278 @@
+[
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      },
+      {
+        "height": 309,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 347,
+    "viewport": [390, 844],
+    "look": "studio/ink/editorial",
+    "page": "home",
+    "capture": "studio-ink-editorial-home-390.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      },
+      {
+        "height": 44,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 10,
+    "overflow": 0,
+    "storeWidth": 347,
+    "viewport": [390, 844],
+    "look": "studio/ink/editorial",
+    "page": "collection",
+    "capture": "studio-ink-editorial-collection-390.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      },
+      {
+        "height": 355.34375,
+        "label": "View closer +"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 347,
+    "viewport": [390, 844],
+    "look": "studio/ink/editorial",
+    "page": "product",
+    "capture": "studio-ink-editorial-product-390.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      },
+      {
+        "height": 634.390625,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 691.546875,
+    "viewport": [768, 1024],
+    "look": "studio/ink/editorial",
+    "page": "home",
+    "capture": "studio-ink-editorial-home-768.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      },
+      {
+        "height": 44,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 8,
+    "overflow": 0,
+    "storeWidth": 691.546875,
+    "viewport": [768, 1024],
+    "look": "studio/ink/editorial",
+    "page": "collection",
+    "capture": "studio-ink-editorial-collection-768.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      },
+      {
+        "height": 729.546875,
+        "label": "View closer +"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 691.546875,
+    "viewport": [768, 1024],
+    "look": "studio/ink/editorial",
+    "page": "product",
+    "capture": "studio-ink-editorial-product-768.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 1162.59375,
+    "viewport": [1280, 900],
+    "look": "studio/ink/editorial",
+    "page": "home",
+    "capture": "studio-ink-editorial-home-1280.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 12,
+    "overflow": 0,
+    "storeWidth": 1162.59375,
+    "viewport": [1280, 900],
+    "look": "studio/ink/editorial",
+    "page": "collection",
+    "capture": "studio-ink-editorial-collection-1280.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 1162.59375,
+    "viewport": [1280, 900],
+    "look": "studio/ink/editorial",
+    "page": "product",
+    "capture": "studio-ink-editorial-product-1280.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [1920, 1080],
+    "look": "studio/ink/editorial",
+    "page": "home",
+    "capture": "studio-ink-editorial-home-1920.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 12,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [1920, 1080],
+    "look": "studio/ink/editorial",
+    "page": "collection",
+    "capture": "studio-ink-editorial-collection-1920.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [1920, 1080],
+    "look": "studio/ink/editorial",
+    "page": "product",
+    "capture": "studio-ink-editorial-product-1920.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [2560, 1440],
+    "look": "studio/ink/editorial",
+    "page": "home",
+    "capture": "studio-ink-editorial-home-2560.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 12,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [2560, 1440],
+    "look": "studio/ink/editorial",
+    "page": "collection",
+    "capture": "studio-ink-editorial-collection-2560.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [2560, 1440],
+    "look": "studio/ink/editorial",
+    "page": "product",
+    "capture": "studio-ink-editorial-product-2560.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 49.999969482421875,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 927.078125,
+    "viewport": [1024, 600],
+    "look": "studio/ink/editorial",
+    "page": "home",
+    "capture": "studio-ink-editorial-home-1024.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 12,
+    "overflow": 0,
+    "storeWidth": 927.078125,
+    "viewport": [1024, 600],
+    "look": "studio/ink/editorial",
+    "page": "collection",
+    "capture": "studio-ink-editorial-collection-1024.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 43.99999237060547,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 927.078125,
+    "viewport": [1024, 600],
+    "look": "studio/ink/editorial",
+    "page": "product",
+    "capture": "studio-ink-editorial-product-1024.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 761.46875,
+    "viewport": [844, 390],
+    "look": "studio/ink/editorial",
+    "page": "home",
+    "capture": "studio-ink-editorial-home-844.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 12,
+    "overflow": 0,
+    "storeWidth": 761.46875,
+    "viewport": [844, 390],
+    "look": "studio/ink/editorial",
+    "page": "collection",
+    "capture": "studio-ink-editorial-collection-844.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44.00000762939453,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#f6f4ef",
+    "family": "studio",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 761.46875,
+    "viewport": [844, 390],
+    "look": "studio/ink/editorial",
+    "page": "product",
+    "capture": "studio-ink-editorial-product-844.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      },
+      {
+        "height": 309,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 347,
+    "viewport": [390, 844],
+    "look": "pulse/cobalt/modern",
+    "page": "home",
+    "capture": "pulse-cobalt-modern-home-390.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      },
+      {
+        "height": 44,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 12,
+    "overflow": 0,
+    "storeWidth": 347,
+    "viewport": [390, 844],
+    "look": "pulse/cobalt/modern",
+    "page": "collection",
+    "capture": "pulse-cobalt-modern-collection-390.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      },
+      {
+        "height": 355.3437805175781,
+        "label": "View closer +"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 347,
+    "viewport": [390, 844],
+    "look": "pulse/cobalt/modern",
+    "page": "product",
+    "capture": "pulse-cobalt-modern-product-390.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      },
+      {
+        "height": 634.3906860351562,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 691.546875,
+    "viewport": [768, 1024],
+    "look": "pulse/cobalt/modern",
+    "page": "home",
+    "capture": "pulse-cobalt-modern-home-768.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      },
+      {
+        "height": 44,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 12,
+    "overflow": 0,
+    "storeWidth": 691.546875,
+    "viewport": [768, 1024],
+    "look": "pulse/cobalt/modern",
+    "page": "collection",
+    "capture": "pulse-cobalt-modern-collection-768.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      },
+      {
+        "height": 729.546875,
+        "label": "View closer +"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 691.546875,
+    "viewport": [768, 1024],
+    "look": "pulse/cobalt/modern",
+    "page": "product",
+    "capture": "pulse-cobalt-modern-product-768.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 49.999969482421875,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 1162.59375,
+    "viewport": [1280, 900],
+    "look": "pulse/cobalt/modern",
+    "page": "home",
+    "capture": "pulse-cobalt-modern-home-1280.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 15,
+    "overflow": 0,
+    "storeWidth": 1162.59375,
+    "viewport": [1280, 900],
+    "look": "pulse/cobalt/modern",
+    "page": "collection",
+    "capture": "pulse-cobalt-modern-collection-1280.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 1162.59375,
+    "viewport": [1280, 900],
+    "look": "pulse/cobalt/modern",
+    "page": "product",
+    "capture": "pulse-cobalt-modern-product-1280.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [1920, 1080],
+    "look": "pulse/cobalt/modern",
+    "page": "home",
+    "capture": "pulse-cobalt-modern-home-1920.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 15,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [1920, 1080],
+    "look": "pulse/cobalt/modern",
+    "page": "collection",
+    "capture": "pulse-cobalt-modern-collection-1920.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [1920, 1080],
+    "look": "pulse/cobalt/modern",
+    "page": "product",
+    "capture": "pulse-cobalt-modern-product-1920.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [2560, 1440],
+    "look": "pulse/cobalt/modern",
+    "page": "home",
+    "capture": "pulse-cobalt-modern-home-2560.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 15,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [2560, 1440],
+    "look": "pulse/cobalt/modern",
+    "page": "collection",
+    "capture": "pulse-cobalt-modern-collection-2560.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [2560, 1440],
+    "look": "pulse/cobalt/modern",
+    "page": "product",
+    "capture": "pulse-cobalt-modern-product-2560.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 927.078125,
+    "viewport": [1024, 600],
+    "look": "pulse/cobalt/modern",
+    "page": "home",
+    "capture": "pulse-cobalt-modern-home-1024.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 15,
+    "overflow": 0,
+    "storeWidth": 927.078125,
+    "viewport": [1024, 600],
+    "look": "pulse/cobalt/modern",
+    "page": "collection",
+    "capture": "pulse-cobalt-modern-collection-1024.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 927.078125,
+    "viewport": [1024, 600],
+    "look": "pulse/cobalt/modern",
+    "page": "product",
+    "capture": "pulse-cobalt-modern-product-1024.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 5,
+    "overflow": 0,
+    "storeWidth": 761.46875,
+    "viewport": [844, 390],
+    "look": "pulse/cobalt/modern",
+    "page": "home",
+    "capture": "pulse-cobalt-modern-home-844.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 15,
+    "overflow": 0,
+    "storeWidth": 761.46875,
+    "viewport": [844, 390],
+    "look": "pulse/cobalt/modern",
+    "page": "collection",
+    "capture": "pulse-cobalt-modern-collection-844.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#f0f3fc",
+    "family": "pulse",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor Manrope\", Arial, sans-serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 761.46875,
+    "viewport": [844, 390],
+    "look": "pulse/cobalt/modern",
+    "page": "product",
+    "capture": "pulse-cobalt-modern-product-844.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      },
+      {
+        "height": 169.734375,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 4,
+    "overflow": 0,
+    "storeWidth": 347,
+    "viewport": [390, 844],
+    "look": "gallery/oxblood/editorial",
+    "page": "home",
+    "capture": "gallery-oxblood-editorial-home-390.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      },
+      {
+        "height": 44,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 10,
+    "overflow": 0,
+    "storeWidth": 347,
+    "viewport": [390, 844],
+    "look": "gallery/oxblood/editorial",
+    "page": "collection",
+    "capture": "gallery-oxblood-editorial-collection-390.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      },
+      {
+        "height": 355.34375,
+        "label": "View closer +"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 347,
+    "viewport": [390, 844],
+    "look": "gallery/oxblood/editorial",
+    "page": "product",
+    "capture": "gallery-oxblood-editorial-product-390.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      },
+      {
+        "height": 359.5468444824219,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 4,
+    "overflow": 0,
+    "storeWidth": 691.546875,
+    "viewport": [768, 1024],
+    "look": "gallery/oxblood/editorial",
+    "page": "home",
+    "capture": "gallery-oxblood-editorial-home-768.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      },
+      {
+        "height": 44,
+        "label": "Straight-leg jeans"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 10,
+    "overflow": 0,
+    "storeWidth": 691.546875,
+    "viewport": [768, 1024],
+    "look": "gallery/oxblood/editorial",
+    "page": "collection",
+    "capture": "gallery-oxblood-editorial-collection-768.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      },
+      {
+        "height": 729.546875,
+        "label": "View closer +"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 691.546875,
+    "viewport": [768, 1024],
+    "look": "gallery/oxblood/editorial",
+    "page": "product",
+    "capture": "gallery-oxblood-editorial-product-768.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 4,
+    "overflow": 0,
+    "storeWidth": 1162.59375,
+    "viewport": [1280, 900],
+    "look": "gallery/oxblood/editorial",
+    "page": "home",
+    "capture": "gallery-oxblood-editorial-home-1280.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 10,
+    "overflow": 0,
+    "storeWidth": 1162.59375,
+    "viewport": [1280, 900],
+    "look": "gallery/oxblood/editorial",
+    "page": "collection",
+    "capture": "gallery-oxblood-editorial-collection-1280.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 1162.59375,
+    "viewport": [1280, 900],
+    "look": "gallery/oxblood/editorial",
+    "page": "product",
+    "capture": "gallery-oxblood-editorial-product-1280.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 4,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [1920, 1080],
+    "look": "gallery/oxblood/editorial",
+    "page": "home",
+    "capture": "gallery-oxblood-editorial-home-1920.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 10,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [1920, 1080],
+    "look": "gallery/oxblood/editorial",
+    "page": "collection",
+    "capture": "gallery-oxblood-editorial-collection-1920.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [1920, 1080],
+    "look": "gallery/oxblood/editorial",
+    "page": "product",
+    "capture": "gallery-oxblood-editorial-product-1920.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 4,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [2560, 1440],
+    "look": "gallery/oxblood/editorial",
+    "page": "home",
+    "capture": "gallery-oxblood-editorial-home-2560.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 10,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [2560, 1440],
+    "look": "gallery/oxblood/editorial",
+    "page": "collection",
+    "capture": "gallery-oxblood-editorial-collection-2560.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 49,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 1440,
+    "viewport": [2560, 1440],
+    "look": "gallery/oxblood/editorial",
+    "page": "product",
+    "capture": "gallery-oxblood-editorial-product-2560.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 4,
+    "overflow": 0,
+    "storeWidth": 927.078125,
+    "viewport": [1024, 600],
+    "look": "gallery/oxblood/editorial",
+    "page": "home",
+    "capture": "gallery-oxblood-editorial-home-1024.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 10,
+    "overflow": 0,
+    "storeWidth": 927.078125,
+    "viewport": [1024, 600],
+    "look": "gallery/oxblood/editorial",
+    "page": "collection",
+    "capture": "gallery-oxblood-editorial-collection-1024.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44.00000762939453,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 927.078125,
+    "viewport": [1024, 600],
+    "look": "gallery/oxblood/editorial",
+    "page": "product",
+    "capture": "gallery-oxblood-editorial-product-1024.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 50,
+        "label": "Explore the collection"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "A collection with a point of view.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 4,
+    "overflow": 0,
+    "storeWidth": 761.46875,
+    "viewport": [844, 390],
+    "look": "gallery/oxblood/editorial",
+    "page": "home",
+    "capture": "gallery-oxblood-editorial-home-844.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "Filters +"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "The collection.",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 10,
+    "overflow": 0,
+    "storeWidth": 761.46875,
+    "viewport": [844, 390],
+    "look": "gallery/oxblood/editorial",
+    "page": "collection",
+    "capture": "gallery-oxblood-editorial-collection-844.jpg"
+  },
+  {
+    "buttons": [
+      {
+        "height": 44,
+        "label": "Your collection"
+      },
+      {
+        "height": 44,
+        "label": "Home"
+      },
+      {
+        "height": 44,
+        "label": "Collection"
+      },
+      {
+        "height": 44,
+        "label": "Product"
+      },
+      {
+        "height": 44,
+        "label": "USD"
+      },
+      {
+        "height": 44,
+        "label": "EUR"
+      },
+      {
+        "height": 44,
+        "label": "ⓘ"
+      },
+      {
+        "height": 44,
+        "label": "Bag"
+      },
+      {
+        "height": 44,
+        "label": "← Back to the collection"
+      }
+    ],
+    "canvas": "#faf0f0",
+    "family": "gallery",
+    "heading": "Straight-leg jeans",
+    "headingFont": "\"Retailor DM Serif\", Georgia, serif",
+    "illustration": null,
+    "images": 2,
+    "overflow": 0,
+    "storeWidth": 761.46875,
+    "viewport": [844, 390],
+    "look": "gallery/oxblood/editorial",
+    "page": "product",
+    "capture": "gallery-oxblood-editorial-product-844.jpg"
+  }
+]

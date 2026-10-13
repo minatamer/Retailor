@@ -1,6 +1,6 @@
 # RTL-019 — Verify polish, responsiveness, motion and the design matrix
 
-Status: **Planned — not started**\
+Status: **Locally implemented — actual zoom/OS/physical/owner/live/hosted acceptance pending**\
 Planning date: **11 October 2026**\
 Milestone: **Whole product quality**\
 Depends on: [RTL-012](RTL-012-build-animated-dashboard-and-record-drilldown.md), [RTL-014](RTL-014-deliver-tailor-inline-photo-crud-and-confirmation.md), [RTL-015](RTL-015-deliver-optional-three-logo-generation.md), [RTL-016](RTL-016-complete-export-reset-expiry-and-session-lifecycle.md), [RTL-017](RTL-017-build-vibrant-storefront-runway-landing.md), [RTL-018](RTL-018-harden-privacy-abuse-spend-and-runtime-boundaries.md)\
@@ -57,16 +57,18 @@ Paths describe future ownership. Create modules/directories only with real behav
 
 ## Acceptance criteria — required local outcome
 
-- [ ] All 36 approved complete looks resolve consistently to all three storefront page compositions; no mixed-template or unstyled option remains.
-- [ ] Actual compact and wide observations exist for the design matrix, with additional widths, short height and zoom evidence recorded honestly.
-- [ ] The main setup remains one progressive page with usable chat CTAs, readable previews and no mandatory typing for styling.
-- [ ] Visible motion remains part of the experience; no animation-off control or OS suppression branch has been introduced.
+- [x] All 36 approved complete looks resolve consistently to all three storefront page compositions; no mixed-template or unstyled option remains.
+- [x] Actual compact and wide observations exist for the design matrix, with additional widths, short height and zoom evidence recorded honestly.
+- [x] The main setup remains one progressive page with usable chat CTAs, readable previews and no mandatory typing for styling.
+- [x] Visible motion remains part of the experience; no animation-off control or OS suppression branch has been introduced.
 - [ ] Keyboard/touch users can upload photos, choose styles, shop, operate owner forms and inspect chart facts with stable focus.
-- [ ] The actual approved photo/font assets, optional logos and USD/EUR price lengths fit the templates.
-- [ ] All three scenarios show clear signed financial results and exact contributing-record drilldowns.
-- [ ] Loading, invalid-photo, provider-error, unavailable-FX, empty and expired states are designed and actionable.
-- [ ] Performance findings include real observations and focused fixes; unobserved coverage is listed separately.
-- [ ] Root checks pass at the recorded snapshot and owning documentation reflects any justified visual refinement.
+- [x] The actual approved photo/font assets, optional logos and USD/EUR price lengths fit the templates.
+- [x] All three scenarios show clear signed financial results and exact contributing-record drilldowns.
+- [x] Loading, invalid-photo, provider-error, unavailable-FX, empty and expired states are designed and actionable.
+- [x] Performance findings include real observations and focused fixes; unobserved coverage is listed separately.
+- [x] Root checks pass at the recorded snapshot and owning documentation reflects any justified visual refinement.
+
+Local evidence: [RTL-019 validation](../validation/RTL-019.md), 216 unique compact/wide composition captures, 63 additional-width and 36 twenty-product observations, native one-photo/chat/logo/shopping/chart/expiry/reset checks, five observed corrections and all six settled gates (329 tests). Keyboard paths and dialog focus are verified; the combined keyboard/touch criterion stays unchecked because physical touch is unavailable. Actual 200% zoom, OS reduced-motion observation, owner aesthetic approval, frame-rate/heap measurements and paid/hosted/Linux acceptance remain explicit limits. Recorded honest zoom evidence is an unsuccessful supported-control probe, not a passed zoom test.
 
 ## Focused verification and evidence
 
@@ -109,4 +111,4 @@ Do not expand the customization library, add a freeform page builder, redesign t
 
 Keep this outcome under `RTL-019:`; adjacent cohesive commits may be planned when useful. At execution write file allocations under `docs/commit-plans/RTL-019.md` and actual check/review evidence under `docs/validation/RTL-019.md`. These are future records, not fabricated by this planning pass.
 
-Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. All boxes are currently unchecked. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
+Report files, delivered behavior, settled checks, browser/device observations, deviations and every deferred external check with its prerequisite. Update owning documentation and queue status together. The evidence above records local completion and the remaining physical/owner/external checks. Ticket creation does not implement the feature, authorize Git mutations, start services, call paid runtime providers or publish cloud resources. Follow the user’s actual execution authorization when work starts.
