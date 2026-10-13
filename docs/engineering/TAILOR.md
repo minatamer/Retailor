@@ -43,7 +43,7 @@ Owner proposals open authored editable forms. Dirty fields protect the current d
 | Tool result          | 4,000 serialized bytes                                                                       |
 | Live turns           | 12 combined creator/shopper/owner dispatches per fixed workspace                             |
 | Challenge rate       | 6 text proofs/safety identity/minute; 12 proofs/process/minute; separate catalogue allowance |
-| Shared paid capacity | One operation/workspace, two/process, existing capacity/budget owner                         |
+| Shared paid capacity | One operation/workspace, two/process, existing shared capacity owner                         |
 | Grant/workspace      | Up to 2 minutes / fixed 2 hours                                                              |
 
 Older history messages are dropped whole when needed. Current prompt/evidence/function-call chain remain intact. An envelope that still cannot fit fails before its next dispatch. Strict tool investigation and final-reply schemas are sent separately to fit static framing. Live final prose contains references/claims and `usePreparedActions`; any navigation/proposal comes from actual validated tool outputs when acknowledged, then passes the normal grounding check. The final text schema cannot invent action payloads. Financial tools retain exact values, units, formula and total contribution/exclusion counts with one shared scope and two preview references per fact; the native drawer resolves every record. Provider schemas retain strict structure/enums; owning parsers independently enforce value bounds.

@@ -155,4 +155,6 @@ Each packet includes standalone context, entry conditions, ownership, an ordered
 
 Suggested commits use `RTL-###: concrete change`. The existing documentation commit used RTL-000; no artificial RTL-000 implementation packet is needed. Ticket creation does not stage, commit, push, start application services, call paid providers or deploy resources. Apply the owner's actual later execution authorization and prepare any externally consequential plan fully before requesting a missing final approval.
 
+Locally validated/committed owner-requested follow-up: [RTL-024 — simplify paid AI configuration](RTL-024-simplify-paid-ai-configuration.md), [validation/commit record](../validation/RTL-024.md). Removed the four runtime flags/money setting and APP_REVISION while preserving the master, prerequisites, finite admission and actual logo moderation; prior ticket evidence remains historical and live/hosted acceptance remains pending.
+
 RTL-023 approved security work: [dispositions](../audits/RTL-023-SECURITY.md), [PM overview](../audits/RTL-023-SECURITY-REVIEW.html), [actual validation/limits](../validation/RTL-023-SECURITY.md) and [fresh advisory evidence](../audits/RTL-023/scout-after-fixes.json). Owner approval covers local fixes and commits; keys, account enforcement, cloud configuration/publication and vendor patches remain outside the available local evidence.

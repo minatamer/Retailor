@@ -22,7 +22,7 @@ The owner has authorized queue execution and ticket-prefixed commits after clean
 
 [Storefront-runway landing](design/LANDING.md) records the result-first clothing story, real template illustration and retained alternatives. [RTL-017 validation](validation/RTL-017.md) records ten native viewport fits, visible matching-page motion, stable CTA, photo fallback and completed-draft resume; owner/physical/zoom/hosted checks remain separately pending.
 
-[Combined security](engineering/SECURITY.md) traces bounded admission, transport, parser, provider and error/UI boundaries. [Provider operations](operations/PROVIDERS.md) records checked prices, conservative reservations and actual-account prerequisites. [RTL-018 validation](validation/RTL-018.md) separates adversarial/local/native evidence from unperformed paid, Linux and hosted acceptance.
+[Combined security](engineering/SECURITY.md) traces bounded admission, transport, parser, provider and error/UI boundaries. [Provider operations](operations/PROVIDERS.md) records checked prices, current master/credential enablement, private usage diagnostics and actual-account prerequisites; RTL-024 removes monetary reservations. [RTL-018 validation](validation/RTL-018.md) preserves its historical adversarial/local/native evidence and unperformed external checks.
 
 ## Retained source material
 
@@ -33,6 +33,8 @@ The owner has authorized queue execution and ticket-prefixed commits after clean
 - [Original concept Markdown](retailor.md) and [original concept preview](retailor.html) are archived exploration; their simulations do not prove real recognition or deployed behavior.
 - [ClipBuilder lessons](references/LESSONS_LEARNED_FROM_CLIPBUILDER.md), [Retrosum lessons](references/LESSONS_LEARNED_FROM_RETROSUM.md) and [portfolio build playbook](references/PORTFOLIO_DEMO_BUILD_PLAYBOOK.md) supply sibling practices. Their Retailor application notes point to current decisions.
 - Directly inspected sibling ticket examples are linked in the [queue](tickets/README.md#ticket-writing-inspiration-actually-inspected).
+
+Current configuration follow-up: [RTL-024](tickets/RTL-024-simplify-paid-ai-configuration.md) removes runtime signoff/logo flags, process dollar reservations and APP_REVISION by owner request; fake/paid-off defaults and actual admission/moderation controls remain. Earlier audit/image records describe their named historical candidate.
 
 ## Future implementation records
 

@@ -1510,6 +1510,8 @@ Shopper/owner cases include a strict delivered budget, unknown-material exclusio
 
 ## 21. Configuration and local operation
 
+RTL-024 follows the latest owner configuration decision: remove live/logo signoff flags, the separate logo switch, process dollar allowance and APP_REVISION. Keep APP_ENV, fake defaults, the paid master and required keys. Live logos become available with live AI but remain an explicit optional action, moderated by the actual provider and constrained prompt. Health identifies service/liveness only; immutable Git/image/cloud revision identity stays in the operator release records.
+
 ### 21.1 Configuration ownership
 
 Each app owns `.env.example` and its normal ignored `.env.local` loading. Credentials and owner-specific identifiers are blank in committed examples. Parse private configuration once during explicit startup and reject unsafe hosted defaults.
@@ -1521,9 +1523,9 @@ This task does not create or inspect secret files. When implementation needs own
 | Location | Variables/purpose | Rules |
 | --- | --- | --- |
 | Frontend server | `APP_ENV`, `BACKEND_ORIGIN`, `BACKEND_AUDIENCE`, `FRONTEND_ORIGIN`, injected `PORT` | Private fixed destination; no browser exposure |
-| Backend core | `APP_ENV`, `PORT`, `FRONTEND_ORIGIN`, `APP_REVISION` | Validate exact origins and deployment identity |
-| Backend mode | `FAKE_MODE=true`, `PAID_DEMO_ENABLED=false`; `LIVE_POLICY_APPROVED=false`, `PROCESS_BUDGET_MICRO_USD=0` | Committed defaults; master paid-off wins. Vision needs explicit reviewed policy, account/budget and admission prerequisites; a process allowance is not an account-wide quota. |
-| Backend provider | `OPENAI_API_KEY`, reviewed vision/text/image model policy; `LOGO_GENERATION_ENABLED=false` initially | Secret key backend only; optional logos require independently accepted policy; master paid-off wins |
+| Backend core | `APP_ENV`, `PORT`, `FRONTEND_ORIGIN` | Validate runtime mode and exact origin; immutable deployment identity stays in release records |
+| Backend mode | `FAKE_MODE=true`, `PAID_DEMO_ENABLED=false` | Committed defaults; master paid-off wins. Live AI, including logos, needs the paid master plus OpenAI/challenge/signing credentials; no policy/logo switch or process dollar cap. Actual external release acceptance stays separate. |
+| Backend provider | `OPENAI_API_KEY`, reviewed vision/text/image model policy | Secret key backend only; all live AI shares the master; optional logos retain explicit user approval and actual provider moderation |
 | Backend public data | Fixed ECB-provider USD/EUR endpoint and reviewed freshness/cache policy | No user-controlled destination or API credential |
 | Backend admission | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `GRANT_SIGNING_SECRET` | Only the site key may be public capability data |
 | Backend runtime identity | Intended frontend caller identity/audience policy | No service-account JSON key in Git/env/images |
@@ -1574,9 +1576,9 @@ Before each live catalogue batch, typed assistant Send or explicit logo batch:
 2. Verify the server-side challenge result and expected action/hostname.
 3. Issue a short-lived grant bound to the canonical manifest, action, workspace, operation ID and disclosure version.
 4. At execution, validate expiry, binding, replay and the independently inspected input.
-5. Acquire the owning capacity lease and conservative cost reservation.
+5. Acquire the owning capacity lease; there is no process monetary reservation after RTL-024.
 6. Dispatch only after all gates pass.
-7. Release the right lease and reconcile usage on completion; unknown outcomes retain conservative reservation.
+7. Release the owning lease exactly once and record bounded known/unknown usage; dispatched attempts remain consumed.
 
 Proposed grant lifetime is two minutes. An input mutation invalidates its digest. Browser approval is UX evidence; only server verification establishes permission to consume backend capacity.
 
@@ -1628,7 +1630,7 @@ Exclude content, filenames, original hashes where identifying guest content is u
 
 Platform request/build/audit logs have their own metadata and retention. Choose and verify a narrow access/retention policy before public exposure; application sanitization does not delete cloud request metadata.
 
-RTL-018 locally hardens the combined surface with eight bridge slots, four coarse body handlers, bounded content-free ingress/control memory, validated safety-cookie forwarding on every paid route, fixed response buffers and operator-required error/UI handling. [Security](engineering/SECURITY.md) and [provider operations](operations/PROVIDERS.md) document actual boundaries, checked pricing and USD 22 workspace reservations; real logo output costs and account/Linux/hosted enforcement remain pending. [Validation](validation/RTL-018.md) records the final local gates and adversarial/native evidence.
+RTL-018 locally hardens the combined surface with eight bridge slots, four coarse body handlers, bounded content-free ingress/control memory, validated safety-cookie forwarding on every paid route, fixed response buffers and operator-required error/UI handling. [Security](engineering/SECURITY.md) and [provider operations](operations/PROVIDERS.md) document actual boundaries, checked pricing and historical reservation arithmetic (removed by RTL-024); real logo output costs and account/Linux/hosted enforcement remain pending. [Validation](validation/RTL-018.md) records the final local gates and adversarial/native evidence.
 
 ### 22.7 Threat-focused checks
 
@@ -1700,14 +1702,14 @@ release overhead  = builds + registry retention + secrets + domain costs
 
 Apply current model prices and a conservative reserve to the measured maximum context. Do not claim a dollar value before selecting models and testing usage. Free credits/allowances do not change the underlying unit cost.
 
-Track failures, refusals, timeouts and cancelled requests when usage may have occurred. An unknown provider outcome is conservatively treated as consumed reservation. New attempts require new explicit action.
+Track failures, refusals, timeouts and cancelled requests when usage may have occurred. An unknown provider outcome consumes its dispatched attempt and is recorded as unknown usage, with no assumed refund. New attempts require new explicit action.
 
 ### 23.4 Layered spend controls
 
 - Committed fake/paid-off defaults and no-network tests.
 - Master paid switch blocking new dispatches.
 - Verified exact action grants and attempt/turn bounds.
-- Conservative per-operation and per-process reservations.
+- Finite operation/turn/batch counts and shared capacity; no runtime dollar reservation or hidden money cap.
 - Low Cloud Run maximum instances and measured concurrency.
 - Owner-configured provider/project controls and cloud budget monitoring.
 - Content-free usage measurements and a tested emergency disable path.
