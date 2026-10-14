@@ -1,14 +1,24 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Icon } from "../../components/ui/icon";
-import { Runway, StoreIllustration } from "./runway";
-import { RUNWAY_LOOKS } from "./illustration";
+import { Brand } from "../../components/ui/brand";
+import { Runway } from "./runway";
+import { StoreFamilies } from "./families";
+import { OwnerLayoutExample } from "./owner-layout-example";
+import { SectionNavigation } from "./section-navigation";
 import styles from "./landing.module.css";
+
+const CUSTOMER_JEANS = [
+  { src: "/landing/jeans-indigo.webp", alt: "Indigo straight-leg denim jeans" },
+  { src: "/landing/jeans-black.webp", alt: "Black wide-leg denim jeans" },
+  { src: "/landing/jeans-light.webp", alt: "Light-wash wide-leg denim jeans" },
+] as const;
 
 const STEPS = [
   {
     number: "01",
     title: "Bring the clothes.",
-    copy: "Upload clothing photos, or start with our fifteen-photo collection.",
+    copy: "Upload clothing photos, or try our sample collection with multiple views.",
   },
   {
     number: "02",
@@ -30,7 +40,7 @@ const FAQ = [
   {
     question: "What can I bring?",
     answer:
-      "Clothing photos: jeans, tees, hoodies, dresses, formalwear, beachwear and more. Static JPEG, PNG or WebP, up to 4 MiB per image and 24 photos. Every garment needs a valid photograph. You can also start with fifteen original generated sample photos.",
+      "Clothing photos: jeans, tees, hoodies, dresses, formalwear, beachwear and more. Static JPEG, PNG or WebP, up to 4 MiB per image and 24 photos. Every garment needs a valid photograph. You can also try nineteen original generated sample photos, with linked views of the same garment.",
   },
   {
     question: "Is the storefront really mine to customize?",
@@ -71,13 +81,9 @@ export function Landing() {
           className={styles.wordmark}
           aria-label="Retailor home"
         >
-          retailor <Icon name="sparkle" size={24} />
+          <Brand />
         </a>
-        <nav aria-label="Retailor navigation">
-          <a href="#how-it-works">How it works</a>
-          <a href="#storefronts">Storefronts</a>
-          <a href="#owner-view">Owner view</a>
-        </nav>
+        <SectionNavigation />
         <Link className={styles.headerCta} href="/demo" prefetch={false}>
           Try demo <Icon name="arrow" size={16} />
         </Link>
@@ -106,12 +112,14 @@ export function Landing() {
               <Link className={styles.cta} href="/demo" prefetch={false}>
                 Build my demo store <Icon name="arrow" />
               </Link>
-              <p>No signup. No real payments.</p>
             </div>
           </div>
           <Runway />
-          <a className={styles.heroNext} href="#how-it-works">
-            A whole new chapter for your clothes{" "}
+          <a
+            className={styles.heroNext}
+            href="#how-it-works"
+            aria-label="See how it works"
+          >
             <span aria-hidden="true">↓</span>
           </a>
         </section>
@@ -119,6 +127,7 @@ export function Landing() {
         <section
           className={styles.story}
           id="how-it-works"
+          tabIndex={-1}
           aria-labelledby="how-title"
         >
           <div className={styles.sectionIntro}>
@@ -147,6 +156,7 @@ export function Landing() {
         <section
           className={styles.families}
           id="storefronts"
+          tabIndex={-1}
           aria-labelledby="family-title"
         >
           <div className={styles.sectionIntro}>
@@ -157,33 +167,18 @@ export function Landing() {
               <em>All good choices.</em>
             </h2>
             <p>
-              Each family dresses the whole store: home, collection and product
-              detail. Your clothes stay yours.
+              Compare three complete store layouts with the same clothes.
+              Explore each home, collection and product page to find your point
+              of view.
             </p>
           </div>
-          <div className={styles.familyGrid}>
-            {RUNWAY_LOOKS.map((look) => (
-              <article key={look.name}>
-                <div className={styles.familyPreview}>
-                  <StoreIllustration design={look.design} />
-                </div>
-                <div className={styles.familyCaption}>
-                  <span>{look.label}</span>
-                  <h3>{look.name}</h3>
-                  <p>{look.detail}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-          <p className={styles.caption}>
-            Illustrative FORME collection. Three layouts, four colour moods,
-            three type presets. Your real demo starts with your photos.
-          </p>
+          <StoreFamilies />
         </section>
 
         <section
           className={styles.connected}
           id="owner-view"
+          tabIndex={-1}
           aria-labelledby="owner-title"
         >
           <div className={styles.connectedCopy}>
@@ -214,43 +209,16 @@ export function Landing() {
               </li>
             </ul>
           </div>
-          <div
-            className={styles.ownerExample}
-            aria-label="One illustrative jeans order, connected across views"
-          >
-            <div className={styles.ownerExampleTop}>
-              <span>One demo order</span>
-              <Icon name="bag" />
-              <strong>Every view catches up.</strong>
-            </div>
-            <dl>
-              <div>
-                <dt>The store</dt>
-                <dd>
-                  $68<span>One pair of jeans</span>
-                </dd>
-              </div>
-              <div>
-                <dt>The order</dt>
-                <dd>
-                  $74<span>Includes $6 sample delivery</span>
-                </dd>
-              </div>
-              <div>
-                <dt>The stock</dt>
-                <dd>
-                  20 → 19<span>One unit, once</span>
-                </dd>
-              </div>
-            </dl>
-            <div className={styles.connectionLine} aria-hidden="true">
-              <i />
-              <span />
-              <i />
-              <span />
-              <i />
-            </div>
-            <p>Illustrative amounts · No real payment or shipment</p>
+          <div className={styles.faq} id="questions">
+            {FAQ.map((item) => (
+              <details key={item.question}>
+                <summary>
+                  {item.question}
+                  <span aria-hidden="true">+</span>
+                </summary>
+                <p>{item.answer}</p>
+              </details>
+            ))}
           </div>
         </section>
 
@@ -270,8 +238,9 @@ export function Landing() {
               <em>A helping hand.</em>
             </h2>
             <p>
-              Make the look yours, find the right clothes, understand the
-              numbers. One friendly companion across the whole demo.
+              Tailor is here for customers and store owners. Find the right
+              clothes, make your store yours and understand the numbers, with
+              help at every step.
             </p>
             <div className={styles.roles}>
               <span>Your styling guide</span>
@@ -279,62 +248,60 @@ export function Landing() {
               <span>Your business companion</span>
             </div>
           </div>
-          <div
-            className={styles.chatExample}
-            aria-label="Illustrative Tailor conversation"
-          >
-            <header>
-              <span>
-                <Icon name="sparkle" />
-              </span>
-              <div>
-                <strong>Tailor</strong>
-                <small>Let’s make it yours</small>
+          <div className={styles.tailorExamples}>
+            <article
+              className={styles.chatExample}
+              aria-labelledby="tailor-customer-heading"
+            >
+              <header>
+                <span>
+                  <Icon name="sparkle" />
+                </span>
+                <div>
+                  <h3 id="tailor-customer-heading">For customers</h3>
+                  <small>Tailor · Your shopping helper</small>
+                </div>
+              </header>
+              <p className={styles.chatUser}>Show me the jeans.</p>
+              <div className={styles.chatReply}>
+                <p>Here they are. I’ve filtered the collection for you.</p>
+                <div className={styles.chatProducts}>
+                  {CUSTOMER_JEANS.map((jeans) => (
+                    <Image
+                      key={jeans.src}
+                      src={jeans.src}
+                      alt={jeans.alt}
+                      width={216}
+                      height={270}
+                      loading="lazy"
+                      unoptimized
+                    />
+                  ))}
+                </div>
               </div>
-            </header>
-            <p className={styles.chatUser}>Show me the jeans.</p>
-            <p className={styles.chatReply}>
-              Here they are. I’ve filtered your collection for you.
-              <span>
-                Jeans × <Icon name="check" size={14} />
-              </span>
-            </p>
-            <p className={styles.chatUser}>And my store’s look?</p>
-            <p className={styles.chatReply}>
-              Let’s find your point of view. Every choice comes with a real
-              preview.<span>Layout · Colour · Typography</span>
-            </p>
+            </article>
+            <article
+              className={styles.chatExample}
+              aria-labelledby="tailor-owner-heading"
+            >
+              <header>
+                <span>
+                  <Icon name="sparkle" />
+                </span>
+                <div>
+                  <h3 id="tailor-owner-heading">For store owners</h3>
+                  <small>Tailor · Your styling and business companion</small>
+                </div>
+              </header>
+              <p className={styles.chatUser}>Help me choose my store’s look.</p>
+              <OwnerLayoutExample />
+            </article>
             <small className={styles.caption}>
-              Example conversation. Your demo uses your actual catalogue.
+              Example conversations. Your demo uses your actual catalogue.
             </small>
           </div>
         </section>
 
-        <section
-          className={styles.faq}
-          id="questions"
-          aria-labelledby="faq-title"
-        >
-          <div>
-            <p className={styles.eyebrow}>A few good questions</p>
-            <h2 id="faq-title">
-              Before you
-              <br />
-              <em>step inside.</em>
-            </h2>
-          </div>
-          <div>
-            {FAQ.map((item) => (
-              <details key={item.question}>
-                <summary>
-                  {item.question}
-                  <span aria-hidden="true">+</span>
-                </summary>
-                <p>{item.answer}</p>
-              </details>
-            ))}
-          </div>
-        </section>
         <section className={styles.closing}>
           <p className={styles.eyebrow}>Your next chapter is waiting</p>
           <h2>
@@ -349,8 +316,12 @@ export function Landing() {
         </section>
       </main>
       <footer className={styles.footer}>
-        <a className={styles.wordmark} href="#hero-title">
-          retailor <Icon name="sparkle" />
+        <a
+          className={styles.wordmark}
+          href="#hero-title"
+          aria-label="Retailor home"
+        >
+          <Brand />
         </a>
         <p>
           A clothing ecommerce demo. Fictional activity, beautifully connected.

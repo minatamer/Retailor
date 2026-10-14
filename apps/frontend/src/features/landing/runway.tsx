@@ -19,11 +19,13 @@ export function StoreIllustration({
   page = "home",
   onFailure,
   missingIds,
+  presentation = "compact",
 }: {
   design: Design;
   page?: "home" | "collection" | "product";
   onFailure?: (id: string) => void;
   missingIds?: ReadonlySet<string>;
+  presentation?: "compact" | "full";
 }) {
   const [missing, setMissing] = useState<ReadonlySet<string>>(() => new Set());
   const photos = new Map(
@@ -32,10 +34,18 @@ export function StoreIllustration({
     ),
   );
   return (
-    <div className={styles.storeIllustration} inert aria-hidden="true">
+    <div
+      className={
+        presentation === "full"
+          ? styles.fullIllustration
+          : styles.storeIllustration
+      }
+      inert
+      aria-hidden="true"
+    >
       <Storefront
         input={{
-          illustration: true,
+          illustration: presentation,
           design,
           items: ILLUSTRATED_ITEMS,
           photos,
@@ -180,16 +190,7 @@ export function Runway() {
               );
             }}
           >
-            <span
-              style={{
-                background:
-                  choice === 0
-                    ? "#252823"
-                    : choice === 1
-                      ? "#2843c7"
-                      : "#74283f",
-              }}
-            />
+            <span aria-hidden="true" />
             {item.label}
           </button>
         ))}

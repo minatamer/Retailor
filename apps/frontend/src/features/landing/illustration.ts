@@ -5,6 +5,7 @@ import type { Design } from "@retailor/contracts/design";
 import { SAMPLE } from "../photos/sample";
 import type { StorePhoto } from "../storefront/photo";
 import type { StoreItem } from "../storefront/browse";
+import { PALETTES } from "../store-design/presets";
 
 /** Authored marketing props only: never a catalogue response, workspace or stock ledger. */
 export const ILLUSTRATED_CLOTHES = [
@@ -104,19 +105,19 @@ export const RUNWAY_LOOKS = [
   {
     label: "Editorial",
     name: "Studio",
-    detail: "Ink / Paper · Editorial",
+    detail: `${PALETTES.ink.label} · Editorial`,
     design: look("studio", "ink", "editorial", "Clothes worth living in."),
   },
   {
     label: "Bold",
     name: "Pulse",
-    detail: "Cobalt / Cloud · Expressive",
+    detail: `${PALETTES.cobalt.label} · Expressive`,
     design: look("pulse", "cobalt", "modern", "Good clothes. Great energy."),
   },
   {
     label: "Gallery",
     name: "Gallery",
-    detail: "Oxblood / Blush · Editorial",
+    detail: `${PALETTES.oxblood.label} · Editorial`,
     design: look("gallery", "oxblood", "editorial", "Less noise. More you."),
   },
 ] as const;
