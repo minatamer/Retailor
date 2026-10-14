@@ -1,0 +1,226 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 16px 12px;
+  background: var(--platform-text);
+  color: var(--platform-surface);
+  border: 0;
+  border-radius: 18px;
+  overflow: hidden;
+}
+.desktop {
+  position: sticky;
+  top: 20px;
+  height: calc(100dvh - 120px);
+  min-height: 280px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 0 4px 16px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--platform-surface) 20%, transparent);
+  margin-bottom: 16px;
+}
+.mark {
+  flex: 0 0 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--platform-surface);
+  color: var(--platform-text);
+  overflow: hidden;
+}
+.mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 3px;
+}
+.mark > span {
+  font-size: 26px;
+}
+.copy {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  opacity: 1;
+  transition:
+    opacity 180ms,
+    max-width 420ms var(--ease-out);
+  max-width: 180px;
+}
+.copy strong {
+  display: block;
+  font-size: 19px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.copy > span {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  color: color-mix(in srgb, var(--platform-surface) 80%, var(--platform-text));
+  white-space: nowrap;
+}
+.navigation {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--platform-surface) 45%, transparent)
+    transparent;
+  padding: 3px;
+}
+.links {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+}
+.links button,
+.collapse {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: color-mix(in srgb, var(--platform-surface) 85%, var(--platform-text));
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    background 180ms,
+    color 180ms,
+    gap 420ms var(--ease-out),
+    padding 420ms var(--ease-out);
+}
+.links svg,
+.collapse svg {
+  flex-shrink: 0;
+}
+.label {
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0;
+  flex: 1;
+  max-width: 180px;
+  opacity: 1;
+  transition:
+    opacity 180ms,
+    max-width 420ms var(--ease-out);
+}
+.links button:hover,
+.collapse:hover {
+  color: var(--platform-surface);
+  background: color-mix(in srgb, var(--platform-surface) 8%, transparent);
+}
+.links button[aria-current="page"] {
+  background: color-mix(in srgb, var(--platform-surface) 10%, transparent);
+  color: var(--platform-lime);
+  box-shadow: inset 3px 0 0 var(--platform-lime);
+}
+.panel button:focus-visible {
+  outline: 2px solid var(--platform-lime);
+  outline-offset: -2px;
+}
+.collapse {
+  flex-shrink: 0;
+  margin-top: 14px;
+  border-top: 1px solid
+    color-mix(in srgb, var(--platform-surface) 20%, transparent);
+  border-radius: 0 0 10px 10px;
+}
+.collapse svg {
+  transition: transform 420ms var(--ease-out);
+}
+.panel[data-collapsed="true"] .copy {
+  max-width: 0;
+  opacity: 0;
+}
+.panel[data-collapsed="true"] .label {
+  flex: 0;
+  max-width: 0;
+  opacity: 0;
+}
+.panel[data-collapsed="true"] .brand,
+.panel[data-collapsed="true"] .links button,
+.panel[data-collapsed="true"] .collapse {
+  gap: 0;
+}
+.panel[data-collapsed="true"] .links button,
+.panel[data-collapsed="true"] .collapse {
+  padding-inline: 12px;
+}
+.panel[data-collapsed="true"] .collapse svg {
+  transform: rotate(180deg);
+}
+.drawer:not([open]) {
+  display: none;
+}
+.drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(292px, calc(100vw - 24px));
+  max-width: none;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  border-radius: 0 18px 18px 0;
+  padding-top: 24px;
+  animation: drawer-arrive 320ms var(--ease-out) both;
+}
+.drawer .brand {
+  margin-top: 44px;
+}
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--platform-surface) 8%, transparent);
+  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--platform-surface) 20%, transparent);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.drawer::backdrop {
+  background: #242b6070;
+  backdrop-filter: blur(4px);
+  animation: shade-arrive 240ms ease both;
+}
+@media (max-width: 900px) {
+  .desktop {
+    display: none;
+  }
+}
+@keyframes drawer-arrive {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes shade-arrive {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

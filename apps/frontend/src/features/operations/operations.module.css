@@ -8,6 +8,21 @@
   animation: rise 0.3s var(--ease-out) both;
   scroll-margin-top: 20px;
 }
+.dialog {
+  width: min(760px, calc(100% - 32px));
+  max-width: calc(100% - 32px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  color: var(--platform-text);
+  box-shadow: 0 32px 100px #242b6033;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.dialog::backdrop {
+  background: #242b6066;
+  backdrop-filter: blur(5px);
+}
 .inline {
   padding: 16px;
   container-type: inline-size;

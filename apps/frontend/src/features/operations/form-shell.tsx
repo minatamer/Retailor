@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { formatUsd } from "@retailor/commerce/money";
 import { productReferenced } from "@retailor/commerce/selectors";
 import { Button } from "../../components/ui/button";
@@ -48,13 +48,18 @@ export function FormShell({ inline = false }: { inline?: boolean }) {
     state,
   } = useSession();
   const heading = useRef<HTMLHeadingElement>(null),
-    opener = useRef<HTMLElement | null>(null);
+    opener = useRef<HTMLElement | null>(null),
+    dialog = useRef<HTMLDialogElement>(null),
+    titleId = useId();
   useEffect(() => {
+    const node = dialog.current;
     opener.current =
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : null;
+    if (node && !node.open) node.showModal();
     return () => {
+      node?.close();
       if (opener.current?.isConnected)
         opener.current.focus({ preventScroll: true });
       else
@@ -62,11 +67,13 @@ export function FormShell({ inline = false }: { inline?: boolean }) {
           .getElementById("owner-register-heading")
           ?.focus({ preventScroll: true });
     };
-  }, []);
+  }, [inline]);
   useEffect(() => {
     heading.current?.focus({ preventScroll: true });
-    heading.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [ownerForm?.id, ownerReview?.command.id]);
+    if (inline)
+      heading.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    else dialog.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, [inline, ownerForm?.id, ownerReview?.command.id]);
   if (!ownerForm) return null;
   const type = ownerForm.type,
     product = state.graph.products.find((p) => p.id === ownerForm.targetId);
@@ -96,13 +103,22 @@ export function FormShell({ inline = false }: { inline?: boolean }) {
       }
     }
   }
+  const Panel = inline ? "section" : "dialog";
   return (
-    <section
-      className={`${styles.panel} ${inline ? styles.inline : ""}`}
-      aria-label="Current owner operation"
+    <Panel
+      ref={(node) => {
+        dialog.current = node instanceof HTMLDialogElement ? node : null;
+      }}
+      className={`${styles.panel} ${inline ? styles.inline : styles.dialog}`}
+      aria-label={inline ? "Current owner operation" : undefined}
+      aria-labelledby={inline ? undefined : titleId}
+      onCancel={(event) => {
+        event.preventDefault();
+        controller.closeOwnerOperation();
+      }}
     >
       <div className={styles.top}>
-        <h2 ref={heading} tabIndex={-1}>
+        <h2 id={titleId} ref={heading} tabIndex={-1}>
           {OPERATION_LABELS[type]}
         </h2>
         <Button
@@ -248,6 +264,6 @@ export function FormShell({ inline = false }: { inline?: boolean }) {
       <p className={styles.notice} role="status">
         {ownerNotice}
       </p>
-    </section>
+    </Panel>
   );
 }

@@ -38,7 +38,7 @@
 .segmented button[aria-pressed="true"] {
   color: var(--platform-action-text);
   background: var(--platform-action);
-  box-shadow: 0 3px 12px #343bdd20;
+  box-shadow: 0 3px 12px #242b6020;
 }
 .caption {
   color: var(--platform-muted);
@@ -374,7 +374,7 @@
   color: var(--platform-text);
 }
 .drawer::backdrop {
-  background: #142b2570;
+  background: #242b6070;
   backdrop-filter: blur(7px);
 }
 .drawer h2 {
