@@ -18,7 +18,16 @@ describe("release input privacy", () => {
       "apps/backend/src/server.ts",
       "packages/commerce/src/ledger.ts",
       "apps/frontend/public/sample/forme/F15.webp",
+      "apps/frontend/public/sample/forme/F19.webp",
       "apps/frontend/public/fonts/inter-OFL.txt",
+      "apps/frontend/public/landing/jeans-indigo.webp",
+      "apps/frontend/public/landing/jeans-black.webp",
+      "apps/frontend/public/landing/jeans-light.webp",
+      "apps/frontend/public/brand/retailor-cart.svg",
+      "apps/frontend/public/brand/retailor-lockup.svg",
+      "apps/frontend/public/favicon.ico",
+      "apps/frontend/public/favicon-96.png",
+      "apps/frontend/public/apple-touch-icon.png",
     ])
       expect(isBuildInput(path)).toBe(true);
     for (const path of [
@@ -28,7 +37,13 @@ describe("release input privacy", () => {
       "apps/backend/src/server.test.ts",
       "apps/backend/dist/server.js",
       "apps/frontend/public/sample/forme/visitor.webp",
+      "apps/frontend/public/sample/forme/F20.webp",
       "apps/frontend/public/design/reference-shirt.png",
+      "apps/frontend/public/landing/visitor.webp",
+      "apps/frontend/public/landing/.env.local",
+      "apps/frontend/public/brand/visitor.svg",
+      "apps/frontend/public/brand/.env.local",
+      "apps/frontend/public/favicon-visitor.png",
       "artifacts/local/guest.json",
       ".git/config",
     ])
@@ -40,13 +55,18 @@ describe("release input privacy", () => {
     expect(result.files.every(({ path }) => isBuildInput(path))).toBe(true);
     expect(
       result.files.filter(({ path }) => /F\d\d\.webp$/u.test(path)),
-    ).toHaveLength(15);
+    ).toHaveLength(19);
     expect(
       result.files.filter(({ path }) => path.endsWith(".woff2")),
     ).toHaveLength(5);
     expect(
       result.files.filter(({ path }) => path.endsWith("-OFL.txt")),
     ).toHaveLength(4);
+    expect(
+      result.files.filter(({ path }) =>
+        path.startsWith("apps/frontend/public/landing/"),
+      ),
+    ).toHaveLength(3);
   });
   it("keeps exact text and binary hashes equal across fresh Git checkouts while detecting real edits", async () => {
     const temporaryRoot = await realpath(tmpdir());
@@ -74,6 +94,7 @@ describe("release input privacy", () => {
     await mkdir(repository);
     for (const directory of [
       "apps/frontend/public/fonts",
+      "apps/frontend/public/landing",
       "apps/backend",
       "packages/contracts",
       "packages/commerce",
@@ -101,6 +122,10 @@ describe("release input privacy", () => {
     const binary = Buffer.from("font bytes\r\nkeep these exact\r\n");
     await writeFile(
       resolve(repository, "apps/frontend/public/fonts/test.woff2"),
+      binary,
+    );
+    await writeFile(
+      resolve(repository, "apps/frontend/public/landing/jeans-light.webp"),
       binary,
     );
     git(repository, ["init", "--quiet"]);
@@ -149,6 +174,14 @@ describe("release input privacy", () => {
     );
     expect((await sourceSnapshot(changed)).fingerprint).not.toBe(
       checkouts[1].fingerprint,
+    );
+    const beforeAssetEdit = await sourceSnapshot(changed);
+    await writeFile(
+      resolve(changed, "apps/frontend/public/landing/jeans-light.webp"),
+      Buffer.concat([binary, Buffer.from("real thumbnail change")]),
+    );
+    expect((await sourceSnapshot(changed)).fingerprint).not.toBe(
+      beforeAssetEdit.fingerprint,
     );
   });
 });

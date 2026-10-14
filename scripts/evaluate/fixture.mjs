@@ -228,7 +228,7 @@ export async function runFixture(candidate, inputs) {
     "catalogue_sample",
     200,
     () => submit(action, admitted),
-    { inputCount: 15 },
+    { inputCount: inputs.length },
   );
   const interpreted = RecognitionResultSchema.parse(catalogue.body);
   rows.at(-1).outputCount = interpreted.draft.items.length;
@@ -252,7 +252,7 @@ export async function runFixture(candidate, inputs) {
         .set("Cookie", admitted.cookie)
         .field("manifest", JSON.stringify({ action, grant: admitted.grant })),
     {
-      inputCount: 15,
+      inputCount: inputs.length,
     },
   );
   const changedAction = {
@@ -265,7 +265,7 @@ export async function runFixture(candidate, inputs) {
     "catalogue_changed_bytes",
     400,
     () => submit(changedAction, changedAdmission, true),
-    { inputCount: 15 },
+    { inputCount: inputs.length },
   );
   await record("foreign_origin", 403, () =>
     request(app).post("/v1/assistant/shopper").send({}),

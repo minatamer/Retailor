@@ -15,9 +15,17 @@ const fixed = new Set([
   "apps/backend/Dockerfile",
   "apps/frontend/next.config.mjs",
 ]);
+const identityAssets = new Set([
+  "apps/frontend/public/brand/retailor-cart.svg",
+  "apps/frontend/public/brand/retailor-lockup.svg",
+  "apps/frontend/public/favicon.ico",
+  "apps/frontend/public/favicon-96.png",
+  "apps/frontend/public/apple-touch-icon.png",
+]);
 /** Positive build-input inventory. Never open env, visitor or local output files. */
 export function isBuildInput(path) {
   if (fixed.has(path)) return true;
+  if (identityAssets.has(path)) return true;
   if (
     path
       .split("/")
@@ -40,7 +48,7 @@ export function isBuildInput(path) {
     )
   )
     return true;
-  return /^apps\/frontend\/public\/(?:sample\/forme\/(?:F(?:0[1-9]|1[0-5])\.webp|manifest\.json)|fonts\/(?:[a-z0-9-]+\.woff2|[a-z0-9-]+-OFL\.txt|provenance\.json))$/u.test(
+  return /^apps\/frontend\/public\/(?:sample\/forme\/(?:F(?:0[1-9]|1[0-9])\.webp|manifest\.json)|fonts\/(?:[a-z0-9-]+\.woff2|[a-z0-9-]+-OFL\.txt|provenance\.json)|landing\/jeans-(?:indigo|black|light)\.webp)$/u.test(
     path,
   );
 }

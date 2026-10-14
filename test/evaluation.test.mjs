@@ -19,9 +19,9 @@ describe("bounded release evaluation preparation", () => {
   it("freezes actual assets and exercises production gates without paid or external requests", async () => {
     const fetcher = vi.spyOn(globalThis, "fetch");
     const { inputs, publicRecord } = await inspectAssets();
-    expect(publicRecord.photos).toHaveLength(15);
+    expect(publicRecord.photos).toHaveLength(19);
     expect(publicRecord.fonts).toHaveLength(5);
-    expect(publicRecord.photoBytes).toBe(1406012);
+    expect(publicRecord.photoBytes).toBe(1824828);
     const plan = evaluationPlan(candidate, publicRecord);
     expect(plan).toMatchObject({
       paidAuthorized: false,
@@ -40,7 +40,7 @@ describe("bounded release evaluation preparation", () => {
     expect(result.controlledOperatingResultMinor).toBe(-10000);
     expect(
       result.rows.find((row) => row.caseId === "catalogue_sample"),
-    ).toMatchObject({ inputCount: 15, outputCount: 15, httpStatus: 200 });
+    ).toMatchObject({ inputCount: 19, outputCount: 19, httpStatus: 200 });
     expect(
       result.rows.find((row) => row.caseId === "catalogue_changed_bytes"),
     ).toMatchObject({ httpStatus: 400, errorCategory: "INVALID_INPUT" });

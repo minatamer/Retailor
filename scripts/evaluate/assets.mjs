@@ -61,8 +61,22 @@ export async function inspectAssets() {
     publicRecord: {
       manifestSha256: hash(manifestBytes),
       lockSha256: hash(await readFile(new URL("pnpm-lock.yaml", root))),
+      // Exact-byte aggregate covers the original collection and its alternate views.
       provenanceSha256: hash(
-        await readFile(new URL("docs/research/FORME-GENERATION.json", root)),
+        Buffer.concat(
+          await Promise.all(
+            [
+              "docs/research/FORME-GENERATION.json",
+              "docs/research/RTL-042-SAMPLE-VIEWS.json",
+            ].map(async (path) =>
+              Buffer.concat([
+                Buffer.from(`${path}\0`),
+                await readFile(new URL(path, root)),
+                Buffer.from("\0"),
+              ]),
+            ),
+          ),
+        ),
       ),
       photos: manifest.assets.map(({ id, image, origin }) => ({
         id,

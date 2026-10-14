@@ -179,9 +179,9 @@ describe("bounded read-only hosted observations", () => {
   });
   it("loads precisely the approved shipped photos/fonts/licences without guest paths", async () => {
     const assets = await hostedAssetInventory();
-    expect(assets).toHaveLength(26);
+    expect(assets).toHaveLength(30);
     expect(assets.filter(({ path }) => path.endsWith(".webp"))).toHaveLength(
-      15,
+      19,
     );
     expect(assets.filter(({ path }) => path.endsWith(".woff2"))).toHaveLength(
       5,
