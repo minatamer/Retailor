@@ -3,6 +3,7 @@ import { ModelCatalogueSchema } from "@retailor/contracts/recognition";
 import type { CatalogueAction } from "@retailor/contracts/recognition";
 import { parseDraft } from "@retailor/contracts/catalogue";
 import type { DraftItem } from "@retailor/contracts/catalogue";
+import { namedColour } from "@retailor/contracts/product";
 import { deny } from "../security/errors.js";
 
 const visible = new Set(["colour", "pattern", "closure", "sleeve", "neckline"]);
@@ -24,6 +25,7 @@ export function reconcileCatalogue(
   )
     return deny("UPSTREAM_FAILED", 502);
   const productIds = model.garments.map(() => id());
+  let variantCount = 0;
   const items: DraftItem[] = model.garments.map((garment, index) => {
     if (
       new Set(garment.sourceIds).size !== garment.sourceIds.length ||
@@ -38,6 +40,44 @@ export function reconcileCatalogue(
       garment.classification === "clothing" &&
       garment.category !== null &&
       garment.grouping !== "uncertain";
+    const observedColour = garment.attributes.find(
+      (attr) =>
+        attr.name === "colour" &&
+        attr.evidence === "visual" &&
+        attr.value &&
+        attr.value.trim().length <= 32 &&
+        namedColour(attr.value) &&
+        attr.sourceIds.length === garment.sourceIds.length,
+    );
+    const colours =
+      garment.colourways ??
+      (observedColour
+        ? [
+            {
+              colour: observedColour.value!.trim(),
+              sourceIds: observedColour.sourceIds,
+              evidence: "visual" as const,
+            },
+          ]
+        : []);
+    const colourSources = colours.flatMap((row) => row.sourceIds);
+    if (
+      colours.some((row) => !namedColour(row.colour)) ||
+      (colours.length &&
+        (new Set(colours.map((row) => row.colour.toLowerCase())).size !==
+          colours.length ||
+          new Set(colourSources).size !== colourSources.length ||
+          colourSources.length !== garment.sourceIds.length ||
+          colourSources.some(
+            (source) => !garment.sourceIds.includes(source),
+          ))) ||
+      (garment.grouping === "supported_colourways" &&
+        (colours.length < 2 || !garment.reviewReason.trim())) ||
+      (garment.grouping !== "supported_colourways" &&
+        garment.grouping !== "uncertain" &&
+        colours.length > 1)
+    )
+      return deny("UPSTREAM_FAILED", 502);
     const attributes = garment.attributes.map((attr) => {
       if (
         new Set(attr.sourceIds).size !== attr.sourceIds.length ||
@@ -65,10 +105,15 @@ export function reconcileCatalogue(
             : ("draft" as const),
       };
     });
+    variantCount += (colours.length || 1) * 3;
+    if (variantCount > 288) return deny("UPSTREAM_FAILED", 502);
     return {
       included,
       confirmedClothing: garment.classification === "clothing",
       copyOrigin: "generated",
+      ...(garment.sourceIds.length > 1
+        ? { linkOrigin: "recognition" as const }
+        : {}),
       reviewReason: included
         ? garment.reviewReason
         : garment.reviewReason ||
@@ -79,19 +124,32 @@ export function reconcileCatalogue(
         description: garment.description,
         category: garment.category ?? "other-clothing",
         imageIds: garment.sourceIds,
+        ...(colours.length
+          ? {
+              colourPhotos: colours.map((row) => ({
+                colour: row.colour,
+                photoIds: row.sourceIds,
+              })),
+            }
+          : {}),
         sizingSystemId: "alpha-demo",
         archived: false,
         attributes,
-        variants: ["S", "M", "L"].map((size, variant) => ({
-          id: id(),
-          size,
-          colour: "As pictured",
-          sku: `DEMO-${index + 1}-${variant + 1}`,
-          openingStock: 10,
-          price: 4500,
-          unitCost: 2000,
-          archived: false,
-        })),
+        variants: (colours.length
+          ? colours.map((row) => row.colour)
+          : ["As pictured"]
+        ).flatMap((colour, colourIndex) =>
+          ["S", "M", "L"].map((size, variant) => ({
+            id: id(),
+            size,
+            colour,
+            sku: `DEMO-${index + 1}-${colourIndex + 1}-${variant + 1}`,
+            openingStock: 10,
+            price: 4500,
+            unitCost: 2000,
+            archived: false,
+          })),
+        ),
       },
     };
   });

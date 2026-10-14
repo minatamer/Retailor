@@ -48,7 +48,12 @@ export function proposalValid(
     case "design":
       return (
         role !== "shopper" &&
-        !!(proposal.template || proposal.theme || proposal.typography)
+        !!(
+          proposal.template ||
+          proposal.pageTemplates ||
+          proposal.theme ||
+          proposal.typography
+        )
       );
     case "logo-offer":
       return role !== "shopper" && payload.context.designConfirmed;

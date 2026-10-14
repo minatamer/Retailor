@@ -13,12 +13,16 @@ import {
   TemplateSchema,
   ThemeSchema,
   TypographySchema,
+  StorePageSchema,
+  resolvedTemplates,
+  DEFAULT_THEME,
 } from "@retailor/contracts/design";
 import { displayMinor } from "@retailor/commerce/currency";
 import { stockOf } from "@retailor/commerce/selectors";
 import { deny } from "../security/errors.js";
 import type { PreparedAssistantContext } from "./context.js";
 import { operationEligible, operationTargets } from "./operations.js";
+import { BRAND_PALETTE } from "../brand/context.js";
 
 export const ROLE_TOOLS: Record<
   PreparedAssistantContext["payload"]["context"]["role"],
@@ -129,9 +133,18 @@ export function executeAssistantTool(
       return result({
         templates: TemplateSchema.options,
         themes: ThemeSchema.options,
+        defaultTheme: DEFAULT_THEME,
+        themeDirections: Object.fromEntries(
+          ThemeSchema.options.map((theme) => [
+            theme,
+            BRAND_PALETTE[theme].character,
+          ]),
+        ),
         typography: TypographySchema.options,
+        pages: StorePageSchema.options,
+        currentPageTemplates: resolvedTemplates(c.design),
         policy:
-          "Use accepted presets only. Suggestions do not guarantee sales; application preview/acceptance owns changes.",
+          "One template applies to all pages by default. Optional pageTemplates assigns each page independently. Keep shared colour/type and use accepted presets only. Suggestions do not guarantee sales; application preview/acceptance owns changes.",
       });
     case "getProductFacts":
       only(args, ["productId"]);
@@ -250,8 +263,13 @@ export function executeAssistantTool(
         { kind: "tour", role: c.role },
       );
     case "previewStoreDesign":
-      only(args, ["template", "theme", "typography"]);
-      if (!args.template && !args.theme && !args.typography)
+      only(args, ["template", "pageTemplates", "theme", "typography"]);
+      if (
+        !args.template &&
+        !args.pageTemplates &&
+        !args.theme &&
+        !args.typography
+      )
         return deny("INVALID_INPUT", 400);
       return result(
         {
@@ -263,6 +281,7 @@ export function executeAssistantTool(
         {
           kind: "design",
           template: args.template,
+          pageTemplates: args.pageTemplates,
           theme: args.theme,
           typography: args.typography,
         },

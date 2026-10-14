@@ -466,7 +466,7 @@ describe("bounded admission and actual multipart recognition", () => {
       active: 0,
     });
   });
-  it("sanitizes the real 15-photo sample and a distinct 24-image batch within the envelope", async () => {
+  it("sanitizes the real 19-photo sample and a distinct 24-image batch within the envelope", async () => {
     const root = new URL(
       "../../../../apps/frontend/public/sample/forme/",
       import.meta.url,
@@ -482,7 +482,7 @@ describe("bounded admission and actual multipart recognition", () => {
       files,
       new AbortController().signal,
     );
-    expect(prepared.size).toBe(15);
+    expect(prepared.size).toBe(19);
     for (const bytes of prepared.values())
       expect(inspectRaster(bytes).privateMetadata).toBe(false);
     const batch = await Promise.all(

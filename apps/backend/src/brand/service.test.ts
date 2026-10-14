@@ -5,7 +5,8 @@ import { LOGO_LIMITS } from "@retailor/contracts/brand";
 import type { LogoRequest } from "@retailor/contracts/brand";
 import { fixtureLogos } from "./fake.js";
 import { generateLogos, validateLogo } from "./service.js";
-import { prepareLogoContext, logoPrompt } from "./context.js";
+import { prepareLogoContext, logoPrompt, BRAND_PALETTE } from "./context.js";
+import { ThemeSchema, DEFAULT_THEME } from "@retailor/contracts/design";
 const now = "2026-10-12T18:00:00.000Z";
 const request: LogoRequest = {
   schemaVersion: 1,
@@ -27,6 +28,90 @@ const request: LogoRequest = {
 };
 const accounting = () => ({ dispatch: vi.fn(), recordUsage: vi.fn() });
 describe("bounded separate transparent logo batches", () => {
+  it("resolves all five actual merchant contexts into the constrained prompt and real bounded transparent raster sets", async () => {
+    for (const theme of ThemeSchema.options) {
+      const context = { ...request.context, theme };
+      const palette = BRAND_PALETTE[theme];
+      expect(logoPrompt(context)).toContain(
+        `Ink ${palette.ink}; accent ${palette.accent}; it will appear on ${palette.background}`,
+      );
+      let sequence = 0;
+      const result = await generateLogos(
+        { ...request, context },
+        fixtureLogos(),
+        new AbortController().signal,
+        accounting(),
+        () => `theme_${++sequence}`,
+        () => now,
+      );
+      expect(result.context.theme).toBe(theme);
+      expect(new Set(result.candidates.map((row) => row.hash)).size).toBe(3);
+      for (const candidate of result.candidates) {
+        const { data, info } = await sharp(
+          Buffer.from(candidate.data, "base64"),
+        )
+          .ensureAlpha()
+          .raw()
+          .toBuffer({ resolveWithObject: true });
+        const expected = parseInt(palette.ink.slice(1), 16);
+        let found = false;
+        for (let offset = 0; offset < data.length; offset += info.channels)
+          if (
+            data[offset + 3] === 255 &&
+            ((data[offset]! << 16) |
+              (data[offset + 1]! << 8) |
+              data[offset + 2]!) ===
+              expected
+          ) {
+            found = true;
+            break;
+          }
+        expect(found).toBe(true);
+      }
+    }
+    expect(BRAND_PALETTE[DEFAULT_THEME]).toMatchObject({
+      ink: "#242b60",
+      accent: "#d6f578",
+      background: "#ffffff",
+    });
+  });
+  it("makes all three actual monograms responsive to the name initial, palette and type, escaping literal name text", async () => {
+    const provider = fixtureLogos();
+    const make = (patch: Partial<LogoRequest["context"]>) =>
+      provider.generate(
+        { ...request.context, ...patch },
+        new AbortController().signal,
+        accounting(),
+      );
+    const [alpha, zeta, lime, modern, inter, literal] = await Promise.all([
+      make({ name: "Alpha" }),
+      make({ name: "Zlpha" }),
+      make({ name: "Alpha", theme: "cobalt" }),
+      make({ name: "Alpha", typography: "modern" }),
+      make({ name: "Alpha", typography: "inter" }),
+      make({ name: "A & <B>" }),
+    ]);
+    const mark = async (bytes: Uint8Array) =>
+      createHash("sha256")
+        .update(
+          await sharp(bytes)
+            .extract({ left: 80, top: 420, width: 160, height: 180 })
+            .png()
+            .toBuffer(),
+        )
+        .digest("hex");
+    for (let index = 0; index < 3; index++) {
+      const original = await mark(alpha[index]!);
+      expect(await mark(zeta[index]!)).not.toBe(original);
+      expect(await mark(lime[index]!)).not.toBe(original);
+      expect(await mark(modern[index]!)).not.toBe(original);
+      expect(await mark(inter[index]!)).not.toBe(await mark(modern[index]!));
+      expect(
+        (await validateLogo(literal[index]!, new AbortController().signal))
+          .bytes.length,
+      ).toBeLessThanOrEqual(LOGO_LIMITS.imageBytes);
+    }
+  });
   it("decodes three distinct real alpha PNGs, strips empty padding and preserves exact owned metadata", async () => {
     const account = accounting();
     let sequence = 0;

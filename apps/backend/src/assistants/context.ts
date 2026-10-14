@@ -144,7 +144,7 @@ export function modelProjection(prepared: PreparedAssistantContext) {
     role: c.role,
     currency: c.currency,
     scope: c.scope,
-    design: c.role === "creator" ? c.design : null,
+    design: c.role !== "shopper" ? c.design : null,
     products,
     selection: {
       day: c.selectedDay,

@@ -94,6 +94,6 @@ describe("independent backend derivative acceptance", () => {
           files,
         )
       ).length,
-    ).toBe(15);
+    ).toBe(19);
   });
 });

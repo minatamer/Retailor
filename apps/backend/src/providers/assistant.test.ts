@@ -43,6 +43,82 @@ const message = (
   content: [{ type: "output_text", annotations: [], text }],
 });
 describe("bounded assistant Responses transport", () => {
+  it("carries a finite mixed-layout tool through the actual mocked strict transport as a preview-only proposal", async () => {
+    const input = assistantFixture("owner");
+    input.prompt = "Studio home, Pulse collection, Gallery product";
+    const pageTemplates = {
+      home: "studio",
+      collection: "pulse",
+      product: "gallery",
+    };
+    const args = Object.fromEntries(
+      Object.keys(AssistantToolArgumentsSchema.shape).map((key) => [key, null]),
+    );
+    const io = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json(
+          response([
+            {
+              type: "function_call",
+              id: "fc_layout",
+              call_id: "layout",
+              name: "retailor",
+              arguments: JSON.stringify({
+                name: "previewStoreDesign",
+                arguments: { ...args, pageTemplates },
+              }),
+            },
+          ]),
+        ),
+      )
+      .mockResolvedValueOnce(
+        Response.json(
+          response([
+            message(
+              JSON.stringify({
+                text: "Preview the page layouts.",
+                references: [],
+                claims: [],
+                usePreparedActions: true,
+              }),
+            ),
+          ]),
+        ),
+      );
+    const before = JSON.stringify(input);
+    const result = await investigateAssistant(
+      input,
+      openAiAssistant("injected-test-key", io),
+      new AbortController().signal,
+      { dispatch: vi.fn(), recordUsage: vi.fn() },
+      ASSISTANT_NOW,
+    );
+    expect(result.reply.proposal).toMatchObject({
+      kind: "design",
+      template: null,
+      pageTemplates,
+    });
+    const body = JSON.parse(String(io.mock.calls[0]![1]?.body));
+    const argumentSchema = body.tools[0].parameters.properties.arguments;
+    expect(argumentSchema.required).toContain("pageTemplates");
+    expect(argumentSchema.properties.pageTemplates).not.toHaveProperty(
+      "default",
+    );
+    expect(argumentSchema.properties.pageTemplates.anyOf[0].required).toEqual([
+      "home",
+      "collection",
+      "product",
+    ]);
+    expect(
+      argumentSchema.properties.pageTemplates.anyOf[0].additionalProperties,
+    ).toBe(false);
+    expect(body.input[0].content).toContain('"design":{');
+    expect(
+      Buffer.byteLength(String(io.mock.calls[0]![1]?.body)),
+    ).toBeLessThanOrEqual(11000);
+    expect(JSON.stringify(input)).toBe(before);
+  });
   it("accepts acknowledged actions only from validated application tool outputs", async () => {
     const input = assistantFixture("shopper"),
       before = JSON.stringify(input.context.graph);

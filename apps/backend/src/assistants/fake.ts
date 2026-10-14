@@ -8,6 +8,69 @@ import { CategorySchema } from "@retailor/contracts/product";
 import { executeAssistantTool } from "./tools.js";
 import { AssistantToolArgumentsSchema } from "@retailor/contracts/assistant";
 import { fixtureOperation, operationTargets } from "./operations.js";
+import { resolvedTemplates } from "@retailor/contracts/design";
+import type { Design, StorePage } from "@retailor/contracts/design";
+
+/** Only explicit, unambiguous finite palette names; native preview still owns application. */
+function fixtureTheme(prompt: string): Design["theme"] | null {
+  if (
+    /\b(?:not|never|avoid)\b|don't/u.test(prompt) ||
+    !/\b(use|apply|try|switch|choose|theme|palette|colou?r)\b/u.test(prompt)
+  )
+    return null;
+  const aliases: [Design["theme"], RegExp][] = [
+    ["navy", /\b(navy|lime)\b/u],
+    ["ink", /\b(ink|paper)\b/u],
+    ["cobalt", /\b(cobalt|cloud)\b/u],
+    ["oxblood", /\b(oxblood|blush)\b/u],
+    ["pine", /\b(pine|sand)\b/u],
+  ];
+  const matches = aliases.filter(([, pattern]) => pattern.test(prompt));
+  return matches.length === 1 ? matches[0]![0] : null;
+}
+
+/** Explicit finite examples; conflicting or negative requests never choose a layout. */
+function fixtureLayout(prompt: string, design: Design) {
+  if (/\b(?:not|never|avoid)\b|don't/u.test(prompt)) return null;
+  const pages = resolvedTemplates(design),
+    requested = new Map<StorePage, Design["template"]>();
+  let conflicting = false;
+  const assign = (page: StorePage, template: Design["template"]) => {
+    if (requested.has(page) && requested.get(page) !== template)
+      conflicting = true;
+    requested.set(page, template);
+  };
+  for (const match of prompt.matchAll(
+    /\b(?:(studio|pulse|gallery)\s+(?:for\s+)?(?:the\s+)?(home|collection|product)(?:\s+page)?|(home|collection|product)(?:\s+(?:page|layout))?\s*(?::|=|with|in|uses?|to)?\s*(studio|pulse|gallery))\b/gu,
+  ))
+    assign(
+      (match[2] ?? match[3]) as StorePage,
+      (match[1] ?? match[4]) as Design["template"],
+    );
+  if (conflicting) return null;
+  if (
+    requested.size &&
+    [...prompt.matchAll(/\b(home|collection|product)\b/gu)].some(
+      (match) => !requested.has(match[1] as StorePage),
+    )
+  )
+    return null;
+  if (requested.size)
+    return {
+      template: null,
+      pageTemplates: { ...pages, ...Object.fromEntries(requested) },
+    };
+  const choices = [
+    ...new Set(prompt.match(/\b(studio|pulse|gallery)\b/gu) ?? []),
+  ];
+  if (
+    choices.length === 1 &&
+    !/\b(home|collection|product)\b/u.test(prompt) &&
+    /\b(use|apply|try|switch)\b/u.test(prompt)
+  )
+    return { template: choices[0] as Design["template"], pageTemplates: null };
+  return null;
+}
 /** Development examples are a finite grammar over current evidence, never a live failure fallback. */
 export function fixtureAssistant(): AssistantProvider {
   return {
@@ -17,6 +80,9 @@ export function fixtureAssistant(): AssistantProvider {
           signal.throwIfAborted();
           const c = prepared.payload.context,
             prompt = prepared.payload.prompt.toLowerCase();
+          const layout =
+            c.role !== "shopper" ? fixtureLayout(prompt, c.design) : null;
+          const theme = c.role !== "shopper" ? fixtureTheme(prompt) : null;
           let text =
             "Development example: try the contextual shortcuts, a tour, a catalogue category or a business summary. This simulation supports those examples only.";
           let references: AssistantReference[] = [],
@@ -34,6 +100,27 @@ export function fixtureAssistant(): AssistantProvider {
             text =
               "Development example: let us walk through the controls on this page.";
             navigation = { kind: "tour", role: c.role };
+          } else if (
+            c.role !== "shopper" &&
+            (layout ||
+              theme ||
+              /\b(layout|template|mix|theme|palette|colou?r)\b/u.test(prompt))
+          ) {
+            if (layout || theme) {
+              args.template = layout?.template ?? null;
+              args.pageTemplates = layout?.pageTemplates ?? null;
+              args.theme = theme;
+              proposal = executeAssistantTool(
+                prepared,
+                "previewStoreDesign",
+                args,
+              ).proposal;
+              text =
+                "Here is a look to try. Preview it first, then keep it if it feels right. Your clothes and records stay connected.";
+            } else {
+              text =
+                "Choose a palette or layout using the visual controls. Try ‘Use Oxblood / Blush’ or ‘Studio home, Pulse collection, Gallery product’. Every suggestion stays a preview until you choose it.";
+            }
           } else if (c.role === "shopper") {
             const category = CategorySchema.options.find((cat) =>
               prompt.includes(cat.replaceAll("_", " ")),
@@ -142,7 +229,7 @@ export function fixtureAssistant(): AssistantProvider {
               }));
           } else if (c.role === "creator") {
             text =
-              "Development example: each template pairs its home, collection and product pages. Try the visual choices here, then choose a palette and typography. Logo generation is optional after those choices.";
+              "Choose one look for your whole store. Mixing layouts by page is optional, and the visual controls give you a real preview. Then choose your colours and type. Logo generation is optional.";
             if (/logo/.test(prompt) && c.designConfirmed)
               proposal = { kind: "logo-offer" };
           }
