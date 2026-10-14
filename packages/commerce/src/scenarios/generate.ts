@@ -33,6 +33,23 @@ export function generateScenario(
   },
 ) {
   ScenarioPresetSchema.parse(preset);
+  const dailyShop = preset === "healthy",
+    seed = dailyShop ? "retailor-history-v2" : "retailor-history-v1",
+    orderDays = [0, 1, 3, 5, 7, 9, 12, 14, 17, 19, 22, 24, 26, 27],
+    shopperNames = [
+      "Alex Morgan",
+      "Jamie Patel",
+      "Sam Rivera",
+      "Taylor Chen",
+      "Jordan Ellis",
+      "Casey Reed",
+      "Robin Blake",
+      "Morgan Lee",
+      "Riley Parker",
+      "Drew Quinn",
+      "Avery Lane",
+      "Cameron Gray",
+    ];
   const source = parseGraph(input),
     anchor = Date.parse(source.createdAt),
     historyStart = new Date(anchor - 28 * DAY).toISOString();
@@ -65,9 +82,19 @@ export function generateScenario(
       .filter((v) => !v.archived && v.price <= MAX_MINOR_AMOUNT - 600)
       .map((variant) => ({ product, variant })),
   );
+  const groups = available
+    .map((product) => ({
+      product,
+      variants: variants.filter((row) => row.product.id === product.id),
+    }))
+    .filter((group) => group.variants.length);
+  const targetForOrder = (index: number) => {
+    const group = groups[index % groups.length]!;
+    return group.variants[index % group.variants.length]!;
+  };
   // Source-controlled deterministic identifiers, bounded independently of externally supplied ID length.
   let hash = 2166136261;
-  for (const character of `${options.scenarioId}:retailor-history-v1:${preset}`)
+  for (const character of `${options.scenarioId}:${seed}:${preset}`)
     hash = Math.imul(hash ^ character.charCodeAt(0), 16777619) >>> 0;
   const prefix = `s${hash.toString(16).padStart(8, "0")}`;
   const id = (kind: string, index: number) => `${prefix}_${kind}_${index}`;
@@ -91,29 +118,51 @@ export function generateScenario(
   event(anchor - 28 * DAY, "addBuyers", {
     buyers: Array.from({ length: 12 }, (_, index) => ({
       id: id("buyer", index),
-      label: `Demo shopper ${String(index + 1).padStart(2, "0")}`,
+      label: dailyShop
+        ? shopperNames[index]!
+        : `Demo shopper ${String(index + 1).padStart(2, "0")}`,
       origin: "seeded_scenario",
       fictional: true,
     })),
   });
+  let visits = 0;
+  const orderVisits = new Map<number, string>();
   for (let day = 0; day < 28; day++) {
-    event(time(day, 5), "addTraffic", {
-      sessions: Array.from({ length: 6 }, (_, index) => {
-        const at = new Date(time(day, 0)).toISOString(),
-          lastAt = new Date(time(day, 5)).toISOString();
+    const visitCount = dailyShop ? [4, 8, 5, 6, 9, 12, 7][day % 7]! : 6,
+      start = visits,
+      plannedOrder = dailyShop ? orderDays.indexOf(day) : -1;
+    visits += visitCount;
+    orderVisits.set(day, id("visit", start));
+    event(time(day, dailyShop ? 40 : 5), "addTraffic", {
+      sessions: Array.from({ length: visitCount }, (_, index) => {
+        const at = new Date(time(day, dailyShop ? index * 2 : 0)).toISOString(),
+          lastAt = new Date(
+            time(day, dailyShop ? index * 2 + 6 + ((day + index) % 8) : 5),
+          ).toISOString(),
+          stage = (index * 7 + day) % 10,
+          converts =
+            dailyShop &&
+            index === 0 &&
+            plannedOrder >= 0 &&
+            ![3, 8].includes(plannedOrder);
         const target = variants.length
-          ? variants[(day + index) % variants.length]
+          ? dailyShop && plannedOrder >= 0 && index === 0
+            ? targetForOrder(plannedOrder)
+            : variants[(day + index) % variants.length]
           : undefined;
+        const engaged = dailyShop ? index === 0 || stage < 7 : index < 5,
+          bag = dailyShop ? converts || stage < 3 : index < 3,
+          checkout = dailyShop ? converts || stage === 0 : index < 2;
         return {
-          id: id("visit", day * 6 + index),
+          id: id("visit", start + index),
           actor: "shopper",
           origin: "seeded_scenario",
           startedAt: at,
           lastAt,
-          ...(target && index < 5 ? { engagedAt: at } : {}),
-          ...(target && index < 3 ? { bagAt: at } : {}),
-          ...(target && index < 2 ? { checkoutAt: lastAt } : {}),
-          productIds: target && index < 5 ? [target.product.id] : [],
+          ...(target && engaged ? { engagedAt: at } : {}),
+          ...(target && bag ? { bagAt: at } : {}),
+          ...(target && checkout ? { checkoutAt: lastAt } : {}),
+          productIds: target && engaged ? [target.product.id] : [],
         };
       }),
     });
@@ -126,51 +175,177 @@ export function generateScenario(
         : 6
     : 0;
   for (let index = 0; index < count; index++) {
-    const target = variants[index % variants.length]!,
-      day = Math.floor((index * 26) / Math.max(1, count - 1)),
+    const target = dailyShop
+        ? targetForOrder(index)
+        : variants[index % variants.length]!,
+      day = dailyShop
+        ? orderDays[index]!
+        : Math.floor((index * 26) / Math.max(1, count - 1)),
       orderId = id("order", index),
       draftId = id("draft", index);
-    const discount =
-      preset === "loss" ? Math.floor(target.variant.price / 5) : 0;
-    event(time(day, 6), "saveOrderDraft", {
+    const quantity =
+        dailyShop &&
+        [2, 6, 9, 10].includes(index) &&
+        target.variant.price * 2 <= MAX_MINOR_AMOUNT - 600
+          ? 2
+          : 1,
+      lines = [{ variantId: target.variant.id, quantity }];
+    let subtotal = target.variant.price * quantity;
+    if (dailyShop && groups.length > 1 && [2, 5, 8, 10].includes(index)) {
+      const otherIndex =
+          (index + 4) % groups.length === index % groups.length
+            ? index + 1
+            : index + 4,
+        other = targetForOrder(otherIndex);
+      if (subtotal + other.variant.price <= MAX_MINOR_AMOUNT - 600) {
+        lines.push({ variantId: other.variant.id, quantity: 1 });
+        subtotal += other.variant.price;
+      }
+    }
+    const discount = dailyShop
+        ? [5, 8, 10].includes(index)
+          ? Math.floor(subtotal / 10)
+          : 0
+        : preset === "loss"
+          ? Math.floor(target.variant.price / 5)
+          : 0,
+      actor = dailyShop && [3, 8].includes(index) ? "owner" : "shopper";
+    event(time(day, dailyShop ? 42 : 6), "saveOrderDraft", {
       id: draftId,
-      actor: "shopper",
-      buyerId: id("buyer", index % 12),
-      trafficId: id("visit", day * 6),
-      lines: [{ variantId: target.variant.id, quantity: 1 }],
+      actor,
+      buyerId: id(
+        "buyer",
+        dailyShop
+          ? [0, 1, 2, 3, 0, 4, 5, 2, 6, 1, 7, 8, 3, 9][index]!
+          : index % 12,
+      ),
+      ...(actor === "shopper" ? { trafficId: orderVisits.get(day) } : {}),
+      lines,
       discount,
-      delivery: 600,
+      delivery: dailyShop ? [0, 400, 600][index % 3]! : 600,
       tax: 0,
     });
-    event(time(day, 7), "placeOrder", { draftId, orderId });
+    event(time(day, dailyShop ? 43 : 7), "placeOrder", { draftId, orderId });
+    if (dailyShop) {
+      if (index === 1) event(time(day, 50), "cancelOrder", { orderId });
+      else {
+        if (index < count - 2)
+          event(time(Math.min(day + 1, 27), 44), "advanceOrder", {
+            orderId,
+            state: "shipped",
+          });
+        if (index < count - 3) {
+          event(time(Math.min(day + 2, 27), 45), "advanceOrder", {
+            orderId,
+            state: "fulfilled",
+          });
+          event(time(Math.min(day + 3, 27), 53), "addFeedback", {
+            feedback: [
+              {
+                id: id("feedback", index),
+                productId: target.product.id,
+                orderId,
+                origin: "seeded_scenario",
+                at: new Date(time(Math.min(day + 3, 27), 53)).toISOString(),
+                rating: [4, 5, 5, 3, 4][index % 5]!,
+                comment: [
+                  "The photos made choosing easy.",
+                  "Quick checkout and useful order updates.",
+                  "Happy with this addition to my wardrobe.",
+                  "Delivery took a little longer than expected.",
+                  "The size options were easy to compare.",
+                ][index % 5]!,
+                synthetic: true,
+              },
+            ],
+          });
+        }
+      }
+      continue;
+    }
     if (index < count - 1)
       event(time(day, 17), "advanceOrder", { orderId, state: "shipped" });
     if (index < count - 2)
       event(time(day, 27), "advanceOrder", { orderId, state: "fulfilled" });
   }
   // Explicit posted causes; no expense amount is reverse-calculated to force a chosen KPI.
-  for (const [index, category, amount, note] of [
-    [
-      0,
-      "marketing",
-      preset === "healthy" ? 4000 : preset === "breakeven" ? 25000 : 85000,
-      "Authored demo campaign",
-    ],
-    [
-      1,
-      "operations",
-      preset === "healthy" ? 2000 : preset === "breakeven" ? 2000 : 5000,
-      "Authored demo operations",
-    ],
-  ] as const) {
+  const expenses = dailyShop
+    ? ([
+        [0, "marketing", 3200, "Collection launch promotion", 3],
+        [1, "packaging", 2400, "Mailers and packing supplies", 10],
+        [2, "marketing", 1800, "Weekend collection promotion", 18],
+        [3, "platform", 1600, "Monthly demo storefront tools", 27],
+      ] as const)
+    : ([
+        [
+          0,
+          "marketing",
+          preset === "breakeven" ? 25000 : 85000,
+          "Authored demo campaign",
+          27,
+        ],
+        [
+          1,
+          "operations",
+          preset === "breakeven" ? 2000 : 5000,
+          "Authored demo operations",
+          27,
+        ],
+      ] as const);
+  for (const [index, category, amount, note, day] of expenses) {
     const draftId = id("expense", index);
-    event(time(27, 45 + index * 2), "saveExpenseDraft", {
+    event(time(day, 45 + index * 2), "saveExpenseDraft", {
       id: draftId,
       category,
       amount,
       note,
     });
-    event(time(27, 46 + index * 2), "postExpense", { draftId });
+    event(time(day, 46 + index * 2), "postExpense", { draftId });
+  }
+  if (count && dailyShop) {
+    const orderId = id("order", 0),
+      returnId = id("return", 0),
+      line = (g: CommerceGraph, index = 0) =>
+        g.orders.find((o) => o.id === id("order", index))!.lines[0]!;
+    event(time(4, 44), "requestReturn", (g: CommerceGraph) => ({
+      id: returnId,
+      orderId,
+      reason: "sizing",
+      lines: [{ lineId: line(g).id, units: [0] }],
+    }));
+    event(time(4, 45), "advanceReturn", { returnId, state: "approved" });
+    event(time(5, 44), "receiveReturn", (g: CommerceGraph) => ({
+      returnId,
+      restockable: [{ lineId: line(g).id, units: [0] }],
+    }));
+    if (targetForOrder(0).variant.price > 0)
+      event(time(5, 45), "issueRefund", (g: CommerceGraph) => ({
+        id: id("refund", 0),
+        orderId,
+        lines: [{ lineId: line(g).id, amount: line(g).unitNet[0] }],
+        delivery: 0,
+        tax: 0,
+      }));
+    event(time(5, 46), "restockReturn", { returnId });
+    event(time(5, 47), "advanceReturn", { returnId, state: "closed" });
+    event(time(26, 49), "requestReturn", (g: CommerceGraph) => ({
+      id: id("return", 1),
+      orderId: id("order", 10),
+      reason: "changed-mind",
+      lines: [{ lineId: line(g, 10).id, units: [0] }],
+    }));
+    event(time(17, 50), "writeoffStock", {
+      id: id("loss", 0),
+      variantId: variants[0]!.variant.id,
+      quantity: 1,
+      reason: "One available unit damaged during packing",
+    });
+    event(time(20, 50), "adjustStock", {
+      variantId: variants.at(-1)!.variant.id,
+      units: 4,
+      kind: "inbound",
+      reason: "Small restock delivery",
+    });
   }
   if (count && preset === "loss") {
     const orderId = id("order", 0),
@@ -200,7 +375,7 @@ export function generateScenario(
       reason: "Authored available-stock damage; separate from sold return",
     });
   }
-  if (count)
+  if (count && !dailyShop)
     event(time(27, 55), "addFeedback", (g: CommerceGraph) => ({
       feedback: g.orders
         .filter((o) => o.state === "fulfilled")
@@ -274,7 +449,7 @@ export function generateScenario(
     graph,
     info: ScenarioInfoSchema.parse({
       preset,
-      seed: "retailor-history-v1",
+      seed,
       anchorAt: source.createdAt,
       openingUnitsPerActiveVariant: 20,
     }),
