@@ -1,0 +1,54 @@
+{
+  "ticket": "RTL-037",
+  "purpose": "Owner review only; not approved application branding",
+  "geometry": "Seven original locally authored SVG object silhouettes. No Shopify paths/bag/lettering copied.",
+  "font": {
+    "file": "apps/frontend/public/fonts/inter-latin-wght-normal.woff2",
+    "weight": 800,
+    "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+    "license": "SIL Open Font License 1.1; apps/frontend/public/fonts/inter-OFL.txt",
+    "provenance": "apps/frontend/public/fonts/provenance.json",
+    "delivery": "Unmodified local WOFF2 embedded in SVG review masters; editable text, not outlined paths"
+  },
+  "colors": {
+    "navy": "#242b60",
+    "white": "#ffffff"
+  },
+  "concepts": [
+    {
+      "id": "a-cart",
+      "name": "The cart",
+      "tradeoff": "Clear shopping cue; more detail at very small sizes."
+    },
+    {
+      "id": "b-wallet",
+      "name": "The wallet",
+      "tradeoff": "A strong letter; can suggest a finance product."
+    },
+    {
+      "id": "c-card",
+      "name": "The card",
+      "tradeoff": "Reads as payments before it reads as a storefront."
+    },
+    {
+      "id": "d-barcode",
+      "name": "The barcode",
+      "tradeoff": "Most retail-specific of A–D; busier at 16px."
+    },
+    {
+      "id": "e-hanger",
+      "name": "The hanger",
+      "tradeoff": "Strongest clothing link; avoid reading as a laundry service."
+    },
+    {
+      "id": "f-storefront",
+      "name": "The storefront",
+      "tradeoff": "Best fit for the store-building promise; not only clothing."
+    },
+    {
+      "id": "g-receipt",
+      "name": "The receipt",
+      "tradeoff": "Connects shopping and owner records; can feel accounting-led."
+    }
+  ]
+}
