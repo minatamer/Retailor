@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-14",
+  "tool": "Codex built-in imagegen",
+  "usageBasis": "Owner-requested original generated alternate clothing views for the fictional sample; no third-party merchant photographs.",
+  "encoding": "Existing Sharp; full-frame inside1600px without enlargement, metadata stripped, WebP quality86 effort5.",
+  "assets": [
+    {
+      "id": "F16",
+      "source": "F01",
+      "prompt": "Use case: product-mockup. Edit target/reference: the attached original fictional Retailor F01 clothing photograph. Create one additional full-length BACK VIEW photograph of the exact same indigo straight-leg jeans as a companion product angle. Preserve the medium indigo wash, straight cut, seam and hem treatment, waistband and original garment proportions; plausible plain rear patch pockets. Same pale warm studio backdrop and soft diffuse lighting, photorealistic textile texture. Portrait 4:5, entire single pair from waistband to both hems with generous margins. No person, shoes, other garments, labels, branding, text, watermark, collage or UI. Output a distinct actual rear-angle photograph, not a mirrored/cropped front photo.",
+      "generatedFile": "exec-36019d05-b90e-4054-be8a-30feef19e06f.png",
+      "file": "F16.webp",
+      "review": "Actual image inspected: complete single garment; companion angle and original colour/design retained; no people, brands, text, watermarks or collage. Fictional generated views, not evidence about a real garment.",
+      "output": {
+        "path": "apps/frontend/public/sample/forme/F16.webp",
+        "hash": "9e19af76e4040f0cb00efae88ffa3b4f1adfee007032ecc0b3412a14cccc13ee",
+        "bytes": 163602,
+        "width": 1122,
+        "height": 1402
+      },
+      "sourceHash": "df544508081b88af0e4a370ad866df2120b8488bc025a51d8ea24df1137289ed"
+    },
+    {
+      "id": "F17",
+      "source": "F03",
+      "prompt": "Use case: product-mockup. Edit target/reference: the attached original fictional Retailor F03 clothing photograph. Create one additional THREE-QUARTER SIDE-FRONT photograph of the exact same charcoal pullover hoodie as a companion product angle. Preserve the charcoal colour, unbranded pullover design, hood without drawstrings, kangaroo pouch, dropped shoulders and ribbed cuffs/hem. Turn the single garment about45 degrees so one side seam and the depth of hood/pouch are visible, with natural three-dimensional folds. Match the pale neutral studio backdrop and diffuse lighting. Portrait4:5, entire hood to hem and both cuffs inside generous margins. Photorealistic, one garment only, no person/mannequin visible, no additional clothing, words, labels, branding, watermark, collage or UI.",
+      "generatedFile": "exec-41590336-2ca8-475b-841d-ff4d3ecbfcb0.png",
+      "file": "F17.webp",
+      "review": "Actual image inspected: complete single garment; companion angle and original colour/design retained; no people, brands, text, watermarks or collage. Fictional generated views, not evidence about a real garment.",
+      "output": {
+        "path": "apps/frontend/public/sample/forme/F17.webp",
+        "hash": "68eda8004781af7a163f8ebfb309036acb11ba47de0e9e892a90c639ed2f0173",
+        "bytes": 75496,
+        "width": 1122,
+        "height": 1402
+      },
+      "sourceHash": "3061c15ae7b0e026a433131bc6c2cf9619c089e3dcc52c9f81a6db3084b9a06a"
+    },
+    {
+      "id": "F18",
+      "source": "F07",
+      "prompt": "Use case: product-mockup. Edit target/reference: the attached original fictional Retailor F07 clothing photograph. Create one additional THREE-QUARTER SIDE-FRONT photograph of this exact same ivory short-sleeve camp-collar button-front shirt as a companion product angle. Preserve the warm ivory colour, open camp collar, short sleeves, small ivory buttons, plain pocket-free front and the garment proportions. Rotate the single shirt about40 degrees to show its side seam and collar depth while the front buttons remain visible; natural fabric folds. Match warm pale seamless studio background and soft lighting. Portrait4:5, complete collar to hem and both sleeves with generous margins. Photorealistic, garment only with no person, visible mannequin, hanger, other clothes, logo, writing, watermark, collage or UI.",
+      "generatedFile": "exec-99889bfb-f5b1-435e-83ab-c7191cbaee13.png",
+      "file": "F18.webp",
+      "review": "Actual image inspected: complete single garment; companion angle and original colour/design retained; no people, brands, text, watermarks or collage. Fictional generated views, not evidence about a real garment.",
+      "output": {
+        "path": "apps/frontend/public/sample/forme/F18.webp",
+        "hash": "85cd5abf6d0871ce2cdc308fe12d2443dd9f28cd7295b19edf5d508f6e9ee3e4",
+        "bytes": 49282,
+        "width": 1122,
+        "height": 1402
+      },
+      "sourceHash": "f16eaa3d9cc7944e953eb75a6bfbb4670e799fe6a9270f415bdbb9aeddafb09e"
+    }
+  ]
+}

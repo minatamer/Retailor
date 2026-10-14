@@ -1,0 +1,17 @@
+# RTL-048 — polish shopping, visual filters and simulated checkout
+
+Owner14 October2026 authorizes the local fake-mode research/plan/execute scope in this chat. [RTL-047 research](../research/RTL-047-SHOPPING-INTERACTIONS.md) and [settled plan](../design/SHOPPING-REVISION.md) are complete; there is no additional routine owner approval gate for the planned local work. Current raw-byte app baseline is `94e6274d97322d14d699ccf13b614c106493f113d154b6f6550b204fdaafcfdc`,257 inputs; previous pending changes/index preserved.
+
+Acceptance:
+
+- Recompose the actual bag as an animated right drawer with actual photo/size/known colour, one-to-five-unit accessible quantity controls, Remove, concise demo discount and exact subtotal/adjustments/total. Stable usable summary/actions on short phones; no stock reservation or duplicate cart state.
+- Distinct desktop two-column/phone one-column Demo checkout: existing fictional Demo shopper, sample delivery and simulated payment sections, actual item/total summary, Edit/back/close and right-aligned Place demo order. No real address/contact/card input or new API/provider/payment/tax/shipping authority.
+- Receipt uses actual immutable order/reference/currency/quantity/stock effects with short success motion and exact owner-order link. Preserve stale/expired/revision/price/photo/currency review fences, duplicate placement, refresh, reset/expiry/archived/missing/sold-out recovery and all finite commerce/session limits.
+- Visual filter groups for existing category, actual size labels, known colour only, exact scoped price and availability; context-sensitive counts and draft match count, deliberate Apply, Cancel without changes and clear/no-match recovery. Preserve existing filter schema, same-variant matching, search/sort/chips/restoration/currency fences. Do not fabricate material/fit/gender/colour/measurements or add unsupported facets.
+- Omit development placeholder descriptions from newly authored fake fixtures; preserve saved/owner descriptions. Concise useful buying/quote/demo/error/unknown copy; no arbitrary visitor text stripping or raw technical messages.
+- Useful bounded drawer/close/step/selection/result/receipt motion, current navy/lime/white identity and focus/keyboard behavior; no dependencies, flashing, fake progress, delayed/interpolated money or motion-off setting.
+- Actual changed-path responsive/fake-flow screenshots across templates/phone/tablet/laptops/short modal, keyboard/escape/close/reset/refresh and exact connected checkout/owner/stock results. Meaningful facet/currency/boundary regressions plus existing shopping/session tests, all six settled gates, independently checked read-only full-ticket review and actual documentation/index updates.
+
+References: latest owner scope, RTL-047 evidence/plan, [existing SHOPPING authority](../engineering/SHOPPING.md), [RTL-010](RTL-010-connect-shopping-bag-and-simulated-orders.md), root/frontend instructions, current approved RTL-023 quality/security dispositions and installed Next client/CSS guidance. [File allocation](../commit-plans/RTL-048.md).
+
+Status: local implementation, actual fake-flow checks and scoped read-only review complete; [validation](../validation/RTL-048.md) records final results and the existing unrelated full-suite Linux-proof failure. No subagents/other chats, staging/commit/push, paid/live/cloud/publication action. Deferred hero-film production remains deferred. Current-source Linux/scanner/hosted/paid/physical/owner visual acceptance is separate from this fake local work.

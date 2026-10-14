@@ -6,11 +6,11 @@
 
 Retailor uses warm paper, deep ink, confident cobalt and a small lime signature. Merchant identities are scoped independently. Platform controls use Inter; editorial accents use DM Serif Display. Spacing follows 4/8/12/16/24/32/48, moderate platform radii and largely square fashion photography. One original stroke icon vocabulary keeps action meanings consistent. Product photography is the central object, not decoration around a chatbot.
 
-| Direction | Three-page relationship | Reason |
-| --- | --- | --- |
-| Studio | Split editorial opening, balanced collection, gallery beside purchase information | A clear contemporary clothing baseline. |
-| Pulse | Action-colour campaign, tighter grid, boxed purchase panel | Stronger streetwear energy without hiding price or options. |
-| Gallery | Spacious image-led home, staggered collection rhythm, generous gallery and calm detail | More considered premium presentation. |
+| Direction | Three-page relationship                                                                | Reason                                                      |
+| --------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Studio    | Split editorial opening, balanced collection, gallery beside purchase information      | A clear contemporary clothing baseline.                     |
+| Pulse     | Action-colour campaign, tighter grid, boxed purchase panel                             | Stronger streetwear energy without hiding price or options. |
+| Gallery   | Spacious image-led home, staggered collection rhythm, generous gallery and calm detail | More considered premium presentation.                       |
 
 These are original compositions. [COS's current collection](https://www.cos.com/en-us/women/new-arrivals), inspected on 11 October 2026, supports the value of large garment imagery, visible pricing and simple category navigation; no COS assets, identities or copy were reused. [Shopify's Horizon source](https://github.com/Shopify/horizon) is a current ecommerce reference, not a copied framework. [Shopify's colour guidance](https://www.shopify.com/blog/color-psychology) supports choosing colour in brand context; these palettes are not conversion guarantees or global popularity rankings. Three accepted type choices do not claim statistical dominance in 2026.
 
@@ -26,7 +26,7 @@ The three temporary original shirt/hoodie/jeans photographs were generated with 
 
 ## Tokens and contrast
 
-`styles/tokens.css` owns platform/feedback roles; `features/store-design/presets.ts` owns four full merchant palettes and three finite type presets. Rendering derives scoped CSS variables directly from the registry. Canvas, surface, text, muted, action text, hover, selection, decorative border, control border, focus and image grounding have explicit roles. Feedback retains named text/icon meanings independently of an oxblood action. Pale and dark photographs remain distinct against all four canvases.
+`styles/tokens.css` owns platform/feedback roles; `features/store-design/presets.ts` owns five full merchant palettes and three finite type presets under RTL-053. Rendering derives scoped CSS variables directly from the registry. Canvas, surface, text, muted, action text, hover, selection, decorative border, control border, focus and image grounding have explicit roles. Feedback retains named text/icon meanings independently of an oxblood action. Contrast checks cover all five palettes; original four-canvas observations below remain historical.
 
 Measured using the [W3C relative-luminance contrast method](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html): body/muted/action/hover text must be at least 4.5:1; focus and control outlines at least 3:1. Actual registry and stylesheet values are checked, including selected backgrounds. Decorative separators are not claimed to be input outlines. The test caught Pine's initially weak muted-on-selected pairing; its revised muted colour is `#566658`. This is contrast evidence, not full WCAG certification.
 
@@ -51,3 +51,5 @@ Browser zoom shortcuts did not change the tool-controlled layout, so **actual 20
 - [Keyboard chart and exact records](evidence/rtl002-dashboard-keyboard-evidence.jpg)
 
 Additional product viewport captures are retained in the evidence folder. Captures show the actual scroll position inspected; their filenames identify the pressure test, not a claim that every full page is visible in one image. Some intermediate captures predate the final type-size/control refinements; final evidence and gate results are identified in the validation record.
+
+**Current colour revision — 14 October 2026, RTL-053:** Latest owner feedback supersedes RTL-036’s merchant override. Retailor’s platform remains navy `#242b60`, lime `#d6f578` and white. Merchant storefronts independently offer the original **Ink / Paper**, **Cobalt / Cloud**, **Oxblood / Blush** and **Pine / Sand** roles, restored exactly from Git `4de4917`, plus **Navy / Lime** as the visibly marked fresh/reset default. Existing valid saved choices remain editable and are never silently overwritten. The selected store mood scopes Home, Collection, Product, filters, options, wordmark and optional logo context; platform controls and Tailor keep Retailor’s identity. Five palettes × three families × three type presets yield **45 whole-store looks / 135 base page compositions**, before optional page mixing. Selecting a theme dispatches no logo generation. Historical captures/counts retain their original meaning. [Current local evidence and limits](../validation/RTL-053.md).

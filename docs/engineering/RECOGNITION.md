@@ -1,5 +1,7 @@
 # Catalogue recognition and admission
 
+**Current related-photo revision — RTL-051,14 October2026:** Existing single joint call uses catalogue-evidence-v2 and a strict required-nullable colourways field. Supported construction/angle/colour evidence is reconciled against actual complete disjoint source IDs; uncertainty remains held. Application creates bounded size×colour variants with defaults, never model-owned money/stock. Canonical colour-photo mappings, native automatic/manual choices, revision/restore/reset and selected-colour shopping integration are implemented. Fake exact-hash sample now19photos/15 original garments; no arbitrary recognition or live fallback. [Plan](../design/AUTO-PHOTO-LINKING.md), [actual local evidence and pending real-model quality](../validation/RTL-051.md).
+
 RTL-006 implements the production transport and provider adapter with injected local verification. No account key, approved paid budget, real Turnstile widget, paid model output or hosted acceptance has been supplied. The public capability remains unavailable in the committed configuration. The declared development branch retains its authored fixture; live failure cannot select that branch.
 
 ## Deliberate request lifecycle
@@ -34,18 +36,18 @@ Baseline proof admission is limited to two per safety identity per ten minutes a
 
 ## Resource and spend envelope
 
-| Boundary | Enforced local limit |
-| --- | --- |
-| Action/manifest metadata | 64 KiB; unknown fields rejected |
-| Selected input | 24 images; unique IDs and actual submitted hashes |
-| Original metadata | 4 MiB each, 40 MiB aggregate; originals never uploaded |
-| Derivative | Static JPEG/PNG/WebP; 1,600-pixel side, 768 KiB each |
-| Derivative transfer / complete multipart | 18 MiB / 19 MiB, counted while reading |
-| Decode | Two native workers/process, two foreground waiters; 64 MiB JS heap/worker, hard owned ten-second deadline; defensive 640-MiB process RSS check before new native allocation |
-| Backend / provider | 120 seconds / 95 seconds |
-| Provider output | 12,000 output tokens; 768 KiB raw response; 96 KiB observation text |
-| Deliberate vision attempts | Two per fixed workspace; one model call each |
-| Active paid work | One/workspace, two/process |
+| Boundary                                 | Enforced local limit                                                                                                                                                        |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Action/manifest metadata                 | 64 KiB; unknown fields rejected                                                                                                                                             |
+| Selected input                           | 24 images; unique IDs and actual submitted hashes                                                                                                                           |
+| Original metadata                        | 4 MiB each, 40 MiB aggregate; originals never uploaded                                                                                                                      |
+| Derivative                               | Static JPEG/PNG/WebP; 1,600-pixel side, 768 KiB each                                                                                                                        |
+| Derivative transfer / complete multipart | 18 MiB / 19 MiB, counted while reading                                                                                                                                      |
+| Decode                                   | Two native workers/process, two foreground waiters; 64 MiB JS heap/worker, hard owned ten-second deadline; defensive 640-MiB process RSS check before new native allocation |
+| Backend / provider                       | 120 seconds / 95 seconds                                                                                                                                                    |
+| Provider output                          | 12,000 output tokens; 768 KiB raw response; 96 KiB observation text                                                                                                         |
+| Deliberate vision attempts               | Two per fixed workspace; one model call each                                                                                                                                |
+| Active paid work                         | One/workspace, two/process                                                                                                                                                  |
 
 Manifest-first parsing validates and reserves before file chunks accumulate. Named parts, count, duplicate coverage, actual byte lengths and hashes are checked independently of Content-Length. Every submitted image hash/header is checked before any native worker starts; private metadata, unsupported/animated input and descriptor mismatch fail before decoding. Two bounded request loops share a process-wide two-worker/two-waiter resource gate and keep at most one decoded result each until manifest-order commit. Fresh workers fully decode/re-encode metadata-free WebP. A failed image aborts request siblings/queued starts; each decoder settles after termination, and the whole request waits for its work to stop before admission releases. Memory/capacity pressure returns safe BUSY without provider dispatch and releases the unspent reservation. Provider images are never persisted to disk or a server library. Rejected bodies may drain only a 64 KiB already-in-flight tail for at most 250 ms to deliver a useful error; a slow/unbounded remainder closes. Admission's eight-second deadline starts before JSON parsing; server header/request timeouts provide an additional outer boundary.
 

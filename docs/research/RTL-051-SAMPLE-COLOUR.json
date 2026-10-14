@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-14",
+  "tool": "Built-in ImageGen; existing Sharp encoding",
+  "source": "apps/frontend/public/sample/forme/F01.webp",
+  "sourceHash": "1cece25a55b40ca865604049d6dfd351f2261ba0ee6b08b34d8e067b35b1e06f",
+  "generated": "C:/Users/minat/.codex/generated_images/01a13966-5351-7773-a0cc-0786942d172d/exec-0107fd2e-6e3e-4d2e-a5e2-626f1d7ee4eb.png",
+  "generatedHash": "ea8c0ff8ca6a5d5f438659d90b38e51d4c9b4075979c8ff5cd7118aff5e52a68",
+  "output": "apps/frontend/public/sample/forme/F19.webp",
+  "image": {
+    "id": "F19",
+    "hash": "e3841201cd2024e1434c4d750a5b156191c5af80efef576102a7f56638a1fe84",
+    "mime": "image/webp",
+    "width": 1122,
+    "height": 1402,
+    "bytes": 130436
+  },
+  "inspection": "Same front cut, pockets, seams, full legs and studio framing retained; visibly washed black/charcoal denim. Fictional sample, not live recognition proof.",
+  "prompt": "Use case: precise-object-edit. Edit target: the provided front product photograph of straight-leg jeans. Create a fictional second colourway for an e-commerce sample. Change ONLY the blue denim fabric to washed black/charcoal denim. Keep the identical straight-leg cut, front angle, seam placement, pocket/rivet/button details, waistband, leg length, pose, full garment boundaries, neutral beige studio background and lighting/composition. Stitching can be tonal charcoal; the metal button/rivets stay metal. Realistic denim grain, both full legs visible. No model, text, logo, watermark, embellishment or changed garment shape. It should clearly be the same construction in another colour, not another jeans style."
+}

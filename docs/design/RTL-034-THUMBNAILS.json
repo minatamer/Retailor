@@ -1,0 +1,71 @@
+{
+  "ticket": "RTL-034",
+  "date": "2026-10-14",
+  "purpose": "Static illustrative marketing thumbnails, not recognition inputs or visitor catalogue output",
+  "encoding": "Existing backend Sharp, full-frame contain 216x270, WebP quality 86 effort 5; no generative or semantic image editing during encoding",
+  "assets": [
+    {
+      "id": "indigo",
+      "origin": "Accepted RTL-003 original generated photograph; existing asset unchanged",
+      "sourceProvenance": "docs/research/FORME-GENERATION.json",
+      "source": {
+        "file": "apps/frontend/public/sample/forme/F01.webp",
+        "sha256": "1cece25a55b40ca865604049d6dfd351f2261ba0ee6b08b34d8e067b35b1e06f",
+        "bytes": 175264,
+        "width": 1122,
+        "height": 1402
+      },
+      "output": {
+        "file": "apps/frontend/public/landing/jeans-indigo.webp",
+        "url": "/landing/jeans-indigo.webp",
+        "sha256": "6b0f534e071bf92184082f9cdb704170cbd5b6764da5598f93e397e641cdf7fb",
+        "bytes": 5058,
+        "width": 216,
+        "height": 270
+      },
+      "inspection": "Complete single jeans garment with waist and both hems visible; no person, extra garments, promotional text, merchant logo or watermark."
+    },
+    {
+      "id": "black",
+      "origin": "Accepted RTL-003 original generated photograph; existing asset unchanged",
+      "sourceProvenance": "docs/research/FORME-GENERATION.json",
+      "source": {
+        "file": "apps/frontend/public/sample/forme/F02.webp",
+        "sha256": "16dd4882013a3ade901a26b050c0fd2d4b0fd2b185401fa12c361c52358aeecc",
+        "bytes": 85032,
+        "width": 1122,
+        "height": 1402
+      },
+      "output": {
+        "file": "apps/frontend/public/landing/jeans-black.webp",
+        "url": "/landing/jeans-black.webp",
+        "sha256": "9f8c1c3852d47dfa059fce14336f3757116b939ef18e2a01748da25967c302fc",
+        "bytes": 2864,
+        "width": 216,
+        "height": 270
+      },
+      "inspection": "Complete single jeans garment with waist and both hems visible; no person, extra garments, promotional text, merchant logo or watermark."
+    },
+    {
+      "id": "light",
+      "origin": "Codex built-in image_gen original generation, 14 October 2026",
+      "prompt": "Use case: product-mockup. Asset type: original clothing photograph for a small illustrative Tailor shopping-example thumbnail on Retailor's landing page. Primary request: one pair of light-wash blue denim wide-leg jeans, distinctly pale blue and relaxed wide silhouette. Single complete garment from waistband through both hems, front view, centered, no folding or overlapping. Scene/backdrop: clean warm pale stone studio background with soft natural shadow, matching understated editorial ecommerce garment photography. Photorealistic denim texture, plausible five-pocket construction, soft studio daylight, clear silhouette, no person, no mannequin, no shoes, no belt, no extra clothing, no logos, no lettering, no text, no watermark. Portrait 4:5 framing with modest margins; garment fills most of the frame while every edge is visible. This is a fictional product illustration, not a real merchant item.",
+      "source": {
+        "file": "exec-896464d4-93ae-4059-9622-2a08afc23014.png",
+        "sha256": "a410cb08dad88ffd0d480dd2b8f7ab1d04bf4f6ffc2cbdc6818f98ec80809095",
+        "bytes": 2735164,
+        "width": 1122,
+        "height": 1402
+      },
+      "output": {
+        "file": "apps/frontend/public/landing/jeans-light.webp",
+        "url": "/landing/jeans-light.webp",
+        "sha256": "2fc3c8c814e2e4770e62a01da977ee66571297923b73517a4d71b8afaea46cb0",
+        "bytes": 5822,
+        "width": 216,
+        "height": 270
+      },
+      "inspection": "Complete single jeans garment with waist and both hems visible; no person, extra garments, promotional text, merchant logo or watermark."
+    }
+  ]
+}

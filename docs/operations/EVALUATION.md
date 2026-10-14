@@ -4,6 +4,8 @@ RTL-020 prepares local evaluation; it does **not** authorize provider spend or p
 
 ## Commands and candidate freeze
 
+**Current sample/evidence seam — RTL-051:** Preparation and guarded fixture input now decode19 exact fixed public photos (F01–19),15 original garments, including three alternate views and one fictional black colourway. Current prompt is catalogue-evidence-v2. Historical fifteen/eighteen-photo captures below retain their actual dates/builds. Before live acceptance, evaluate supported same construction/different angles, supported colourways with complete disjoint actual-photo mappings, merely similar cuts that must stay separate, ambiguous/multi-garment/non-clothing sources and embedded instruction attempts. Inspect resulting draft/colour labels/size×colour stock and selected bag/order photo; strict mock output is not a semantic accuracy score. No paid/live evaluation is authorized or executed by this update. [Current local validation](../validation/RTL-051.md).
+
 From the repository root with pinned Node 24/pnpm:
 
 ```powershell

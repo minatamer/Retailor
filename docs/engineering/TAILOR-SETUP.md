@@ -1,24 +1,36 @@
 # Tailor setup and owner design
 
+**Current dashboard intro correction — RTL-057, 15 October 2026:** The owner screenshot's introductory eyebrow, “The clothes. The whole picture.” title and USD/demo paragraph are removed. Create a garment remains in a compact right-aligned action row above the scenario controls on all checked sizes. Reset/View storefront stay in the top Retailor header; scenario/view/record controls and their contextual disclosures remain. [Actual local verification](../validation/RTL-057.md).
+
+**Current owner navigation placement — RTL-056, 15 October 2026:** View storefront now sits beside Reset demo in Retailor’s top workspace header throughout the owner stage. Create a garment remains in the owner heading. Existing secondary styling, controller navigation, restore/reset and unsaved-design leave confirmation remain intact. Phone controls wrap together below the brand with 44px targets; tablet/laptop retain one header row. [Actual local verification](../validation/RTL-056.md).
+
+**Current storefront navigation placement — RTL-055,15 October2026:** Revisit the look and Owner dashboard now sit beside Reset demo in the top Retailor workspace header when shopping, replacing the lower storefront action bar. Existing stage/navigation/preview/record authority remains unchanged. Phone layout keeps brand/Reset on the first row and the two equal-width store actions directly below with readable wrapped labels and matching heights. [Actual local verification](../validation/RTL-055.md).
+
+**Current merchant palette revision — RTL-053,14 October2026:** Retailor’s navy/lime/white platform is independent of the store’s colour mood. Five finite themes appear in creator and owner controls: Navy/Lime (marked fresh/reset default), original Ink/Paper, Cobalt/Cloud, Oxblood/Blush and Pine/Sand. Valid saved IDs keep their identity; unknown/obsolete recovery uses the current default without silently confirming it. Native choices preview the real three-page store immediately, preserve product/options/filters/commerce and use existing confirm/Apply/Cancel fences. Fake creator/owner requests recognize explicit unambiguous theme names and return inert previews; live preset discovery exposes IDs, default and a compact character dictionary within the unchanged request-byte envelope. Shopper styling authority remains forbidden. Theme selection never generates logos. [Actual local verification](../validation/RTL-053.md).
+
+**Current naming revision — RTL-052,14 October2026:** The logo microstep now exposes a bounded editable store name beside its live selected-type wordmark, palette/type recap and optional three-logo action. Existing brand draft/dirty fields own it; typing stays in that step, refresh is inert, blank/unsupported actual names block generation/proceed, and explicit keep/generate confirms the name. Renaming clears an old-name raster from the working preview while owner Cancel retains accepted identity. Fake uses one explicit click; live retains prepared-context batch approval. Owner BrandFields supplies the name without a duplicate adjacent field. [Experience plan](../design/STORE-NAME-AND-LOGOS.md), [actual local validation](../validation/RTL-052.md). Earlier description remains historical where superseded.
+
 RTL-008 adds the local creative flow to the actual storefront renderer. Tailor stays mounted outside the keyed workflow stage and changes its authored actions for creator, shopper and owner contexts. RTL-013 adds grounded text conversation and tours to this shell; RTL-015 connects the separate logo intent. Finite styling never needs a text prompt, model response or provider dispatch.
 
 ## One owner, two looks
 
 `SessionController` owns `acceptedDesign`, `previewDesign`, `setup`, `designEditing` and the presentation revision. The existing commerce graph and browse state remain the same objects when presentation changes. The renderer receives actual products, available photo views and the same selected product/variant/filters. There is no copied preview catalogue, independent money state or reseeding side effect.
 
-Design permits exactly Studio / Pulse / Gallery, Ink / Cobalt / Oxblood / Pine, and Inter / Editorial / Expressive type. The existing registry supplies every option, font specimen and complete page bundle. Plain-text name is limited to 40 characters, headline to 100. React renders text; neither field is HTML or CSS. `heroPhotoId` is an optional available owned photo reference. Missing hero bytes fall back to an available catalogue image; mandatory product photos still follow their existing availability rules.
+Design permits exactly Studio / Pulse / Gallery, Navy / Ink / Cobalt / Oxblood / Pine, and Inter / Editorial / Expressive type. The existing registry supplies every option, font specimen and complete page bundle. RTL-049 adds an optional strict `pageTemplates` map for exactly Home / Collection / Product. Missing mapping means the base family everywhere; identical assignments normalize to one family. Colours, typography and brand remain shared. Plain-text name is limited to 40 characters, headline to 100. React renders text; neither field is HTML or CSS. `heroPhotoId` is an optional available owned photo reference. Missing hero bytes fall back to an available catalogue image; mandatory product photos still follow their existing availability rules.
 
 ## Creator conversation
 
 1. **Welcome:** brief local introduction with Let’s style it. Comparison is never blurred.
-2. **Layout:** three visual cards describe home/list/detail bundles. Clicking previews; Use this template confirms that exact ID.
-3. **Colour:** four named multi-swatch cards. Use this colour theme confirms the selected ID.
+2. **Layout:** three visual cards describe home/list/detail bundles and apply one family everywhere. Optional Mix layouts by page reveals three finite choice rows and targeted Preview controls. Clicking previews; Use this template confirms the exact base and resolved three-page assignment. Product Preview targets an actual active garment; explicit creator Preview uncovers the store on narrow screens.
+3. **Colour:** five named multi-swatch cards, with Navy / Lime visibly marked Default. Use this colour theme confirms the selected ID.
 4. **Type:** three actual heading/body/price specimens, using a current product’s USD price. Use this typography confirms the selected ID.
 5. **Brand:** optional controlled name/headline and hero fields. Use these details confirms edits; Keep suggested details retains the valid visible values without typing.
 6. **Mark:** Keep my wordmark or the optional Generate 3 logos intent. Colour and type confirmation must both match the current look; defaults and type-only approval do not qualify.
 7. **Summary:** chosen complete design, supplied/default hero and wordmark; Enter my store accepts the preview.
 
 Use this look explicitly approves the current full preset and valid visible brand details, then visits the optional mark choice and final acceptance. No typing is needed. One main task expands; confirmed choices become compact recap rows with Change. A preview selection is not a confirmation. Changing a confirmed ID invalidates its confirmation. Recovery reconciles a stale logo/summary step to the first missing confirmation rather than leaving an unusable offer.
+
+RTL-049 native layout controls dispatch no provider request. Fake Tailor accepts finite explicit examples such as “Studio home, Pulse collection, Gallery product” or “Use Pulse for the product page”; ambiguous/conflicting/negative examples produce no layout proposal. The existing live tool/prompt/context carries the same strict full mapping for creator/owner, with shopper use forbidden. Responses remain inert until Preview. Whole-family proposals clear overrides; colour/type-only proposals preserve them. A page-only change participates in the existing design fence and invalidates stale actions. Live transport is mocked locally, not claimed as paid-provider quality evidence.
 
 ## Brand and photo ownership
 
@@ -33,6 +45,8 @@ Async upload completion checks the owner, generation, stage and preview revision
 The dashboard’s Design panel uses the same choice cards, fields, registry and controller methods. One field group is open at a time. Wide screens show controls beside the actual renderer; narrower screens place the renderer below with See design preview / Back to design controls. Low-height controls remain in normal flow.
 
 Apply look updates the accepted design; Cancel restores it and resets the brand draft to accepted values. Opening an already open editor is idempotent. Closed owner controls reject late brand/presentation writes. Meaningful changed previews or dirty fields require Keep editing / Discard preview and leave before navigation. This uses the existing single native workspace dialog and never changes commerce records. Opening focuses the Design heading; Apply/Cancel return to Edit store design, with a concise accepted-look recap. The owner editor’s open state and draft restore as editable local state, not an automatically executing action.
+
+Mixed assignments use these same Apply/Cancel paths. Cancel restores exact accepted page confirmation as well as appearance. Expanded layout disclosures release the pinned control column into normal flow so final actions can be reached. Current mixed labels explicitly name Home, Collection and Product rather than claiming the base family applies everywhere. [RTL-049 plan](../design/PAGE-LAYOUTS.md), [actual verification](../validation/RTL-049.md).
 
 ## Responsive surface, focus and motion
 

@@ -1,19 +1,39 @@
 # Retailor storefront runway
 
+**14 October2026, RTL-043:** The actual renderer now presents Studio's paired editorial spread, Pulse's triptych/navy caption band and Gallery's asymmetric lookbook. The complete-family showcase still switches through real Home/Collection/Product views; it inherits their new category rail/catalogue/lookbook and contact-sheet/stage/theatre arrangements. Tailor choice figures and the owner conversation's three interactive SVG figures are updated to match. Small Pulse campaigns use a native swipeable strip; the compact animated marketing renderer retains its triptych. Approved navy/lime/white identity, brand paths, designed motion and deferred hero-film plan are preserved. [Current research](../research/RTL-043-STOREFRONTS.md), [actual validation](../validation/RTL-043.md).
+
 RTL-017 implements the accepted result-first direction for clothing founders. The public page introduces Retailor; FORME is clearly an illustrative collection, not a merchant taking purchases. `Bring your products. See your store.` and `Build my demo store` stay stable while the result preview changes.
 
 ## Current research — 13 October 2026
 
 Primary pages inspected: [Framer](https://www.framer.com/), [Shopify website builder](https://www.shopify.com/website/builder) and [Squarespace template collection](https://www.squarespace.com/templates). Framer foregrounds the idea-to-launch journey and editable website previews. Shopify demonstrates builder/template choice around the store result. Squarespace makes the visual template itself a major part of choosing a direction. These are product-story references, not proof of increased sales or a statistically ranked 2026 design trend. No protected composition, customer logo, testimonial, image or font is copied.
 
-Retailor applies those observations to one original animated viewport: real clothes remain the anchor, while layout, palette and typography visibly change. Warm paper, cobalt and a restrained lime accent belong to the platform; the finite merchant tokens remain scoped inside the preview. The important difference from sibling heroes is that the primary visual object is the storefront itself.
+Retailor applies those observations to one original animated viewport: real clothes remain the anchor, while layout, palette and typography visibly change. RTL-036 owner feedback sets the landing identity to deep navy, lime and white; the same colours apply throughout the app, with finite merchant roles scoped inside the preview. The important difference from sibling heroes is that the primary visual object is the storefront itself.
+
+## Landing palette — owner revision, 14 October 2026
+
+Use the exact closing-section navy `#242b60` and lime `#d6f578`, with white `#ffffff`, muted navy text `#596176` and light text `#d5daef`. The owner's latest RTL-036 steering expands this correction to **all application pages**. Shared platform roles and all four finite merchant palettes now use this family. Broad fields and generic panels are white; rejected washed grey/green fills are removed. Semantic feedback retains meaningful error/success/attention colours.
+
+| Surface                          | Colour use and purpose                                                                                                                                                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Header                           | White surface, navy wordmark/navigation, lime demo action with navy text/border.                                                                                                                                         |
+| Hero                             | Full navy field, white primary headline, lime editorial line/action, light supporting text. Scene controls retain their existing motion/behavior.                                                                        |
+| Process                          | White section, navy headings with lime underline accents, navy step cards with white/light text and lime/navy numbered badges.                                                                                           |
+| Complete family showcase         | Lime selected family, navy toolbar and lime selected page/focus; embedded stores use the actual revised merchant palettes.                                                                                               |
+| Owner overview / FAQ             | Navy copy/headings, lime-backed checks/heading accents, white open answers.                                                                                                                                              |
+| Tailor                           | White section/cards/replies, navy user bubbles with white text, lime assistant badges and selected layout figures. SVG geometry and local selection remain.                                                              |
+| Closing / footer                 | Same navy/lime/white closing; white footer with navy identity.                                                                                                                                                           |
+| Workspace / dashboard / shopping | Shared white base and panels, navy type/focus/controls, lime primary actions, selections, charts and compact promotion accents. Photo placeholders are white; real photographed backgrounds remain photographic content. |
+| Store options                    | Ink / Paper: white with navy actions. Navy / Lime: white with lime actions. Lime / White: lime canvas with white panels. White / Lime: white canvas with lime panels. All use navy type and keep stable theme IDs.       |
+
+Lime text is reserved for navy surfaces; white/green backgrounds use navy text. Focus follows its surface: lime on navy, navy on white/green. Optional logo-prompt colour/mood constants match the revised storefront choices, without provider dispatch. No logo concept is approved and the deferred film hero remains unexecuted. Earlier screenshots are historical; current responsive checks belong to RTL-036.
 
 ## One storyboard
 
 1. A compact source-photo composition introduces the same accepted generated clothes. This is an art reveal, not a fake processing state or promise that recognition already ran.
 2. Studio / Ink / Editorial: quiet split composition with a strong garment and readable brand heading.
-3. Pulse / Cobalt / Expressive: confident campaign treatment with the same collection.
-4. Gallery / Oxblood / Editorial: generous product pairing and quieter typography.
+3. Pulse / Navy–Lime / Expressive: confident campaign treatment with the same collection.
+4. Gallery / Lime–White / Editorial: generous product pairing and quieter typography.
 5. Matching collection glimpse: enough real cards to understand browsing, no tiny overlapping app windows.
 6. Matching product-detail glimpse: actual image/detail composition, while the platform CTA remains available.
 
@@ -23,9 +43,17 @@ The production renderer and accepted image assets underpin the preview. Illustra
 
 ## Responsive and copy decisions
 
-The first-screen budget includes platform navigation, promise, useful short supporting text, stable action/trust line, one readable preview and local scene choices. Recompose around the available width/height rather than scale a whole desktop screenshot into a phone. Reserve all image/wordmark geometry and keep a useful missing-image treatment. Very short/zoomed content uses natural accessible flow if needed; default tested phone/laptop first screens must fit the complete hero.
+The first-screen budget includes platform navigation, promise, useful short supporting text, a stable demo action, one readable preview and local scene choices. Per RTL-033 owner feedback, the hero omits the “No signup. No real payments.” note and “A whole new chapter for your clothes” bottom label. The right-aligned downward link remains with an accessible name. Recompose around the available width/height rather than scale a whole desktop screenshot into a phone. Reserve all image/wordmark geometry and keep a useful missing-image treatment. Very short/zoomed content uses natural accessible flow if needed; default tested phone/laptop first screens must fit the complete hero.
 
-Below: photos → review → Tailor look → store; three complete family examples; shopping and owner continuity; Tailor's useful roles; temporary/synthetic/no-payment FAQ; final canonical CTA. No testimonials, countdown, conversion guarantee, model/cloud internals or borrowed customer logos. One small worked synthetic order explains connected owner value rather than claiming business performance.
+Below: photos → review → Tailor look → store; a complete family showcase; the owner overview paired with the existing FAQ per RTL-029; Tailor's customer/owner examples, now arranged per RTL-041; final canonical CTA. No testimonials, countdown, conversion guarantee, model/cloud internals or borrowed customer logos.
+
+RTL-041 supersedes the earlier Tailor section layout: its eyebrow, two-line title, supporting copy and role chips are centered in an introduction above two equal example cards. For customers and For store owners sit side by side above720px, including tablet portrait, with aligned top/bottom bounds; a centered caption spans both. At720px and below the cards stack customer then owner. Card conversations stay left-aligned with right-aligned visitor bubbles; three small denim photos and all selectable owner figures/status/focus remain. The owner-preview container query still adapts its internal figures at the narrowest widths. No content, color, type, identity, motion or runtime-state changes. [Actual responsive/interaction/gate evidence](../validation/RTL-041.md).
+
+RTL-034 adds three small, static denim-jeans thumbnails inside Tailor's customer reply, below the existing jeans filter chip. The row is capped at 216px, with three equal columns, 8px gaps and complete 4:5 garment photos; it shrinks inside narrow chat bubbles. Indigo straight-leg, black wide-leg and light-wash wide-leg examples remain illustrative, create no catalogue/workspace state and introduce no new actions. The owner example and shared example-conversation caption remain. [Source/generation and exact derivative provenance](RTL-034-THUMBNAILS.json).
+
+RTL-035 supersedes the chip wording above: the owner explicitly removed both “Jeans ×” and “Layout · Colour · Typography” tags. Customer photos remain. The owner reply now offers three compact selectable composition figures: Studio's editorial split, Pulse's action-colour campaign panel and Gallery's centered heading/paired photos. These inline SVG figures reuse existing small clothing assets and canonical template names/descriptions. Native buttons expose selected state and update a local named status; focus remains on the chosen button and no visitor design/session/provider action occurs. Choices sit in one row where space permits and become figure-plus-label rows in containers at or below 210px. They are schematic examples; the separate complete family showcase retains the actual storefront renderer. Shared example-conversation context and all designed motion remain.
+
+RTL-030 replaces the tiny three-card family examples after owner feedback that they did not show the real designs well. Three labelled layout choices feed one full-width viewport of the actual storefront renderer, with Home/Collection/Product choices retained across family changes. Existing accepted FORME images, finite designs and shared product/price data remain illustrative. The viewport is bounded and independently scrollable with keyboard/touch input; switching family/page returns its scroll to the top without moving focus or scrolling the outer page. Its controls are outside the inert store illustration, and Tab can leave the viewport normally. It creates no workspace/provider/commerce state. The hero still uses the compact presentation and its existing animated loop; compact/full presentation is separate from the shared illustration interaction/focus boundary. Real storefronts retain their complete renderer and responsive behavior.
 
 ## Retained alternatives, not additional implementations
 
@@ -33,3 +61,13 @@ Below: photos → review → Tailor look → store; three complete family exampl
 - **Before/after product-to-store:** a simple labelled source/result comparison. Consider if new-founder comprehension remains weak after observing the runway. Art notes: one before/after boundary with keyboard/touch alternatives, the same supplied photos and a real complete storefront; no dragged control required for entry.
 
 Neither alternative is implemented without a preference change. [RTL-017 validation](../validation/RTL-017.md) records the ten native viewport checks, visible transitions, stable CTA, photo failure, semantic anchors and completed-draft resume. Owner visual feedback, physical devices, native zoom and a genuinely cold font-cache failure remain pending; the local build inspection is not hosted performance evidence.
+
+## Prospective marketing-film hero — discussion only
+
+On 14 October the owner requested a substantially different full-background marketing film, with the existing hero headline/lead/CTA over it, and confirmed a fashion-campaign tone with punchy product reveals. [HERO-FILM.md](HERO-FILM.md) records the first proposed script, motion and wide/tablet/phone compositions under [RTL-031](../tickets/RTL-031-plan-marketing-film-hero.md). The owner explicitly defers execution while frontend visual feedback continues. This is a discussion draft, not script/production approval or a change to the implemented hero above. No app/video/project setup, final UI capture, render or integration has occurred for RTL-031.
+
+RTL-036 intake follow-up: /demo combines upload and sample under one white PhotoPicker frame with equally visible desktop columns and stacked phone paths. Lime belongs to the sample button, not its panel. The owner-removed two initial notices and processing disclaimer are absent; actual operational/progress/error/recovery notices and explicit processing remain.
+
+RTL-038 makes the three header hashes explicitly animate with a single bounded, cancellable frame owner (450–900ms), because inspected native anchor navigation ignored the computed CSS smooth value. Global root CSS retains a smooth fallback. Targets retain 24px margins and receive focus without a second scroll. Manual input, new navigation/history and unmount cancel the animation. Native modifiers/fallback and existing responsive visibility remain. [Actual motion and limits](../validation/RTL-038.md).
+
+RTL-042 sample references supersede the original fifteen-photo count: the same15 garments now have18 photos, including three companion views. Landing step/FAQ copy reflects multiple views; intake offers an18-photo sample. [Linking and edit behavior](PHOTO-LINKING.md) applies to the actual demo, with no change to the deferred hero-film plan.

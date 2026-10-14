@@ -6,21 +6,23 @@ RTL-014 uses the owner workspace's 22 forms, detached raw draft, photo controlle
 
 `prepareOperation` is a finite owner-only tool. Creation starts without a target. Existing operations require an exact current eligible ID. Missing targets return `operation-choices`: at most six IDs plus a more-matches flag. No match is an honest empty choice; an ambiguous name never becomes first-match execution. Native cards resolve labels, clothing options, dates and original amounts from the current graph. Selecting a choice opens the real draft locally and spends no model turn. The live tool supports a bounded target query; the declared development grammar covers all operation families and clothing categories, and accepts deliberate literal references. Live natural-language accuracy remains RTL-020 evidence.
 
-| Forms | Target and final authority |
-| --- | --- |
-| Create / update / remove product | No target for creation; exact product for update/removal. Creation/update require available photo bytes. Referenced removal archives and preserves history. |
-| Save / delete / place order draft | New or exact unplaced draft. Save changes no sales/stock; placement captures current snapshots and deducts units once. |
-| Cancel / advance order | Exact eligible placed/shipped order. Immutable placed snapshots remain; cancellation and fulfilment use permitted transitions. |
-| Request / advance / receive / restock return | Exact order or return and explicit unit selection/disposition. Restock applies inspected eligible units once. |
-| Issue refund | Exact non-cancelled refundable order and bounded discounted components. Refund changes money without implicitly returning units or reversing sold cost. |
-| Adjust / write off stock / future unit cost | Exact active variant, editable reason/units/cost. Reasoned movements and immutable sold-cost snapshots remain authoritative. |
-| Save / delete / post expense draft | New/exact unposted draft. Saving/deleting has no posted expense effect; posting reduces result once. |
-| Correct / void expense | Exact original posting, not already voided. Linked adjustments preserve the original history. |
-| Undo | Exact latest eligible receipt only. Unposted draft, copy and bag reversals are bounded; posted orders/refunds/cancellations/movements cannot be erased. |
+| Forms                                        | Target and final authority                                                                                                                                  |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create / update / remove product             | No target for creation; exact product for update/removal. Creation/update require available photo bytes. Referenced removal archives and preserves history. |
+| Save / delete / place order draft            | New or exact unplaced draft. Save changes no sales/stock; placement captures current snapshots and deducts units once.                                      |
+| Cancel / advance order                       | Exact eligible placed/shipped order. Immutable placed snapshots remain; cancellation and fulfilment use permitted transitions.                              |
+| Request / advance / receive / restock return | Exact order or return and explicit unit selection/disposition. Restock applies inspected eligible units once.                                               |
+| Issue refund                                 | Exact non-cancelled refundable order and bounded discounted components. Refund changes money without implicitly returning units or reversing sold cost.     |
+| Adjust / write off stock / future unit cost  | Exact active variant, editable reason/units/cost. Reasoned movements and immutable sold-cost snapshots remain authoritative.                                |
+| Save / delete / post expense draft           | New/exact unposted draft. Saving/deleting has no posted expense effect; posting reduces result once.                                                        |
+| Correct / void expense                       | Exact original posting, not already voided. Linked adjustments preserve the original history.                                                               |
+| Undo                                         | Exact latest eligible receipt only. Unposted draft, copy and bag reversals are bounded; posted orders/refunds/cancellations/movements cannot be erased.     |
 
 ## One draft, one mounted form
 
 `SessionController.ownerForm` owns raw values and dirty fields. `ownerSurface` is memory-only and selects exactly one `FormShell`: Tailor or dashboard. Open full form / Continue in Tailor moves the same form ID, values, dirty fields, selected photos and review. It does not clone them. An edited current draft prevents a new copilot proposal from replacing it. Perspective navigation preserves editable human values while clearing its executable review and stopping suggested fills. Reset, expiry and refresh do not restore a pending form or animation.
+
+RTL-058 presents the dashboard shell as a labelled native modal with bounded internal scrolling; Tailor remains inline. Moving to Tailor closes the old modal before exposing its same draft. Returning to the full form opens the dialog without recreating or submitting the operation. [Actual native validation](../validation/RTL-058.md).
 
 The shared product/order/expense/inventory/return family components remain separate. The inline shell uses the same fields and effects at narrower width, with container-based field reflow, accessible headings, native controls and internal conversation scrolling. Required product-photo and title states appear beside the fields; unavailable/missing photos disable Review. The final create/update command repeats all product and available-photo validation.
 

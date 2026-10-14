@@ -1,0 +1,15 @@
+# RTL-060 — branded collapsible owner sidebar
+
+15 October 2026 owner replaces the pictured horizontal dashboard navigation with a side navigation, using Retrosum's expand/collapse and chosen brand identity as inspiration. Read-only sibling source inspection is authorized; no sibling changes, secrets, service operations or imports.
+
+Acceptance:
+
+- All nine existing owner views move into a persistent desktop sidebar, with icons, current-view highlighting and an accessible expand/collapse control. Smooth width/content/label motion keeps a compact icon rail usable. The latest owner correction withdraws merchant-theme sidebar colours: the whole dashboard, including navigation, uses the unified navy/white/lime platform theme. Retain the top Reset/View storefront and Create action.
+- The sidebar top displays the accepted store name in its chosen typography and the actual selected optional logo. A readable initial fallback supports wordmark-only or unavailable assets. Both rail/drawer use readable platform active/hover/focus states. Apply/Cancel/refresh follow the existing accepted-design and asset authority; no logo generation or parallel business state.
+- On narrow screens, a labelled native modal navigation drawer opens from the owner header, with bounded scrolling, backdrop, Close/Escape, native focus containment/return, and closure on view selection or switching to desktop. Existing records/forms/Tailor remain usable; no document overflow or OS/motion suppression.
+- Preserve owner navigation/search/pagination, default linked activity, canonical money/stock, form dialogs, review/focus and session/reset/restore fences. Local collapse/drawer state is presentation-only; no persistence/schema/provider changes.
+- Actual local fake-mode desktop expanded/collapsed/brand/logo, tablet/phone/short-height navigation, keyboard/focus, form and refresh checks. Focused existing controller/logo/operation tests, six settled root gates, then complete read-only scoped review without edits. No dependencies/delegation/Git mutations/cloud/publication/paid actions.
+
+Precision references: latest request/screenshot; [allocation](../commit-plans/RTL-060.md); [owner operations](../engineering/OWNER-OPERATIONS.md); current OwnerWorkspace/session/accepted logo authority; Retrosum `dashboard-experience.tsx` and `dashboard-shell.module.css` inspected read-only for navigation interaction, not copied branding/architecture. Current Linux/scanner/hosted/live/physical/owner acceptance remains explicit.
+
+Status: local implementation and complete read-only scoped review finished, 15 October 2026, no actionable findings. [Actual validation](../validation/RTL-060.md): focused33/33 and five root code/build gates pass;464/465 units retain only the existing source-proof failure. Native fake branded/logo/wordmark expanded/collapsed, all views, phone/tablet/short-height/breakpoint, keyboard/dismissal/resize, design Apply/Cancel/refresh and garment-dialog checks complete. Current external/physical/live/owner acceptance pending; nothing staged or committed.

@@ -1,0 +1,14 @@
+# RTL-053 — restore independent merchant colour moods
+
+14 October2026 owner corrects RTL-036: Retailor platform keeps navy/lime/white, while merchant stores need different tones. Restore original palettes and keep one screenshot palette as the default. Current RTL-026–052 work remains pending; no Git/delegation/paid/cloud/publication authorization.
+
+Acceptance:
+
+- Restore exact original Ink/Paper, Cobalt/Cloud, Oxblood/Blush and Pine/Sand merchant role values from HEAD4de4917. Retain current Navy/Lime as a fifth finite theme, visibly marked default and used for fresh/reset demos and the development starting look. Preserve existing valid saved theme IDs; never silently overwrite an accepted merchant choice.
+- All five appear in creator and owner shared controls; actual scoped Home/Collection/Product/filters/colour options/wordmark and optional logo context use the selected palette. Platform landing/Tailor/dashboard/creation/recovery/approved Retailor brand remain navy/lime/white. Current embedded merchant previews truthfully use their selected merchant mood; no global CSS rollback.
+- Canonical finite contracts, native choices, server preset discovery, logo prompt/fake palette and explicit fake creator/owner theme proposals accept the new default. Preserve confirmation/preview/Apply/Cancel/revision/refresh/reset/dirty fields/current product/filter/bag/commerce authority and every private/paid/admission/cancel/byte/cache/moderation control. No generation triggered by theme selection, no new endpoint/model/dependency.
+- Original colour roles pass measured contrast. Meaningful default/restore/owner cancel/apply/reset and finite fake/live-shaped theme contracts tests, actual fake responsive theme/menu/three-page preview/owner/refresh checks, six gates and read-only complete-ticket review documented. Current live/account/Linux/scanner/hosted/physical/full visual matrix/owner release acceptance stays pending.
+
+Precision references: latest owner request/screenshot; [allocation](../commit-plans/RTL-053.md); original Git palette blocks; [STOREFRONT-LIBRARY](../design/STOREFRONT-LIBRARY.md), [TAILOR-SETUP](../engineering/TAILOR-SETUP.md), [LOGOS](../engineering/LOGOS.md), root/frontend instructions and RTL-023 approved quality/security preservation. Historical RTL-036 merchant override is superseded, other work remains.
+
+Status: authorized local implementation and read-only scoped review complete,14–15 October2026. Exact four-palette restoration plus Navy/Lime default, real fake responsive/three-page/owner/refresh/bag checks documented in [validation](../validation/RTL-053.md). Focused58/58, final repaired provider/theme17/17, five root code/build gates pass;460/461 units retain only the existing strict historical Linux-source-proof mismatch. No new actionable scoped findings; existing unrelated gate/external/physical/full-matrix/owner release acceptance remains pending. No stage/commit/push/paid/cloud/publication/delegation.

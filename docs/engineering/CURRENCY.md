@@ -1,5 +1,7 @@
 # Exact USD/EUR display
 
+**Current control revision — RTL-054,15 October2026:** Shared storefront/bag picker uses two equal native USD/EUR segments with a smooth moving selected indicator, explicit44px targets, bounded keyboard focus and a separate dated-details button. Selection reflects only the controller’s accepted currency; EUR loading shows a spinner/busy state while USD remains available to cancel. Status is independently bounded and cannot stretch the switch. A currency-change notice mentions cleared price bounds only when a real min/max bound existed. Actual prices, quote reuse/restore, failure/freshness/cancellation, bag/checkout review and canonical USD authority remain unchanged. [Current local evidence](../validation/RTL-054.md); external/physical acceptance remains separate.
+
 RTL-009 provides one dated display projection over canonical integer USD cents. Product inputs, stock costs, orders/refunds and owner facts stay USD. There is no second price catalogue, rate editor, third currency, geolocation or bank/payment API.
 
 ## Verified source and wire shape
