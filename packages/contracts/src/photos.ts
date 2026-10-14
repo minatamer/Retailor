@@ -54,26 +54,48 @@ export const RecognitionManifestSchema = z
     "Selection exceeds the transfer envelope",
   );
 export type RecognitionManifest = z.infer<typeof RecognitionManifestSchema>;
+/** Visitor organization intent. Never recognition or evidence of clothing. */
+export const PhotoLinksSchema = z
+  .array(z.array(IdSchema).min(2).max(8))
+  .max(12)
+  .refine((groups) => {
+    const ids = groups.flat();
+    return (
+      ids.length <= PHOTO_LIMITS.selection && new Set(ids).size === ids.length
+    );
+  }, "Linked photos must be distinct and within the selection limit");
+export type PhotoLinks = z.infer<typeof PhotoLinksSchema>;
 // Public asset metadata describes inspected bytes, never an authored catalogue.
 export const SampleAssetSchema = z.strictObject({
-  id: z.string().regex(/^F(?:0[1-9]|1[0-5])$/u),
-  path: z.string().regex(/^\/sample\/forme\/F(?:0[1-9]|1[0-5])\.webp$/u),
+  id: z.string().regex(/^F(?:0[1-9]|1[0-9])$/u),
+  path: z.string().regex(/^\/sample\/forme\/F(?:0[1-9]|1[0-9])\.webp$/u),
   image: DerivativeSchema,
-  role: z.literal("primary"),
+  role: z.enum(["primary", "alternate", "colourway"]),
+  relatedTo: z
+    .string()
+    .regex(/^F(?:0[1-9]|1[0-5])$/u)
+    .optional(),
   origin: z.literal("generated_demo"),
 });
 export const SampleManifestSchema = z
   .strictObject({
     version: z.literal(1),
-    assets: z.array(SampleAssetSchema).length(15),
+    assets: z.array(SampleAssetSchema).length(19),
   })
   .refine(
     ({ assets }) =>
-      new Set(assets.map((asset) => asset.id)).size === 15 &&
+      new Set(assets.map((asset) => asset.id)).size === 19 &&
       assets.every(
         (asset) =>
           asset.image.id === asset.id &&
-          asset.path === `/sample/forme/${asset.id}.webp`,
+          asset.path === `/sample/forme/${asset.id}.webp` &&
+          (asset.role === "primary"
+            ? asset.relatedTo === undefined
+            : asset.relatedTo !== asset.id &&
+              assets.some(
+                (primary) =>
+                  primary.id === asset.relatedTo && primary.role === "primary",
+              )),
       ),
     "Invalid sample identity",
   );

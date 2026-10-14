@@ -9,6 +9,8 @@ import {
   TemplateSchema,
   ThemeSchema,
   TypographySchema,
+  PageTemplatesSchema,
+  resolvedTemplates,
 } from "./design.js";
 import { ScenarioPresetSchema } from "./scenarios.js";
 
@@ -221,6 +223,7 @@ export const AssistantProposalSchema = z.discriminatedUnion("kind", [
   z.strictObject({
     kind: z.literal("design"),
     template: TemplateSchema.nullable(),
+    pageTemplates: PageTemplatesSchema.nullable().optional(),
     theme: ThemeSchema.nullable(),
     typography: TypographySchema.nullable(),
   }),
@@ -294,6 +297,7 @@ export function assistantFence(c: AssistantContext) {
       c.design.name,
       c.design.headline,
       c.design.heroPhotoId,
+      resolvedTemplates(c.design),
     ]),
     filterKey: JSON.stringify([
       c.query,
@@ -338,6 +342,7 @@ export const AssistantToolArgumentsSchema = z.strictObject({
   operation: OwnerOperationSchema.nullable(),
   quantity: z.number().int().min(1).max(5).nullable(),
   template: TemplateSchema.nullable(),
+  pageTemplates: PageTemplatesSchema.nullable().default(null),
   theme: ThemeSchema.nullable(),
   typography: TypographySchema.nullable(),
   prefill: PrefillSchema.nullable(),

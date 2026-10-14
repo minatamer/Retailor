@@ -13,6 +13,10 @@ import type {
 } from "@retailor/contracts/commerce";
 import { ProductCopySchema } from "@retailor/contracts/commerce";
 import type { ProductInput, Product } from "@retailor/contracts/product";
+import {
+  colourImageIds,
+  relabelColourPhotos,
+} from "@retailor/contracts/product";
 import { MAX_MINOR_AMOUNT } from "@retailor/contracts/core";
 import {
   parseGraph,
@@ -77,6 +81,7 @@ function copyOf(
     | "description"
     | "category"
     | "imageIds"
+    | "colourPhotos"
     | "sizingSystemId"
     | "attributes"
   >,
@@ -86,6 +91,7 @@ function copyOf(
     description: product.description,
     category: product.category,
     imageIds: product.imageIds,
+    colourPhotos: product.colourPhotos ?? [],
     sizingSystemId: product.sizingSystemId,
     attributes: product.attributes,
   });
@@ -210,7 +216,16 @@ function edit(
     case "updateProduct": {
       const old = productOf(graph, command.payload.id),
         replacement = productFrom(
-          command.payload,
+          {
+            ...command.payload,
+            colourPhotos:
+              command.payload.colourPhotos ??
+              relabelColourPhotos(
+                old,
+                command.payload.variants,
+                command.payload.imageIds,
+              ),
+          },
           graph,
           command,
           context,
@@ -241,7 +256,10 @@ function edit(
     case "updateProductCopy": {
       const old = productOf(graph, command.payload.productId),
         before = copyOf(old),
-        copy = copyOf(command.payload);
+        copy = copyOf({
+          ...command.payload,
+          colourPhotos: command.payload.colourPhotos ?? old.colourPhotos,
+        });
       witness(graph, copy.imageIds, context);
       put(graph.products, { ...old, ...copy });
       return {
@@ -390,7 +408,7 @@ function edit(
           id: `${command.id}_line_${index}`,
           productId: product.id,
           variantId: variant.id,
-          photoId: product.imageIds[0]!,
+          photoId: colourImageIds(product, variant.colour)[0]!,
           title: product.title,
           category: product.category,
           size: variant.size,

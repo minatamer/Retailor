@@ -6,6 +6,26 @@ import { stockOf, refundable } from "./selectors.js";
 import { Harness, product, photo, NOW, ANCHOR } from "../test/fixtures.js";
 
 describe("photo-backed clothing and stable variant authority", () => {
+  it("preserves colour-photo copy in serialized undo and explicitly clears a newly added mapping", () => {
+    const h = new Harness(),
+      input = product("shirt");
+    const current = h.graph.products.find((item) => item.id === "shirt")!;
+    const colour = current.variants[0]!.colour;
+    h.step("updateProduct", {
+      ...input,
+      colourPhotos: [{ colour, photoIds: input.imageIds }],
+    });
+    const receipt = h.graph.receipts.at(-1)!;
+    expect(receipt.undo?.type).toBe("product-copy");
+    h.graph = parseGraph(JSON.parse(JSON.stringify(h.graph)));
+    h.step("undo", { receiptId: receipt.id });
+    expect(
+      h.graph.products.find((item) => item.id === "shirt")!.colourPhotos,
+    ).toEqual([]);
+    expect(
+      h.graph.products.find((item) => item.id === "shirt")!.variants,
+    ).toEqual(current.variants);
+  });
   it("removes an unused option from the bag while preserving its product", () => {
     const h = new Harness(),
       input = product("tee", 3800, 1600);
@@ -22,6 +42,44 @@ describe("photo-backed clothing and stable variant authority", () => {
     expect(
       h.graph.products.find((item) => item.id === "tee")!.variants,
     ).toHaveLength(1);
+  });
+  it("keeps colour associations for legacy copy/update callers and rejects foreign mapped photos atomically", () => {
+    const h = new Harness(),
+      input = product("shirt"),
+      mapping = [
+        { colour: input.variants[0]!.colour, photoIds: input.imageIds },
+      ];
+    h.step("updateProduct", { ...input, colourPhotos: mapping });
+    h.step("updateProduct", { ...input, title: "Edited copy" });
+    expect(
+      h.graph.products.find((row) => row.id === "shirt")!.colourPhotos,
+    ).toEqual(mapping);
+    h.step("updateProductCopy", {
+      productId: input.id,
+      title: "Copy only",
+      description: input.description,
+      category: input.category,
+      imageIds: input.imageIds,
+      sizingSystemId: input.sizingSystemId,
+      attributes: input.attributes,
+    });
+    expect(
+      h.graph.products.find((row) => row.id === "shirt")!.colourPhotos,
+    ).toEqual(mapping);
+    const before = JSON.stringify(h.graph);
+    expect(
+      applyCommand(
+        h.graph,
+        h.command("updateProduct", {
+          ...input,
+          colourPhotos: [
+            { colour: input.variants[0]!.colour, photoIds: ["foreign"] },
+          ],
+        }),
+        h.context,
+      ).ok,
+    ).toBe(false);
+    expect(JSON.stringify(h.graph)).toBe(before);
   });
   it("rejects absent/unavailable/non-clothing photos and atomic dangling references", () => {
     const h = new Harness(),

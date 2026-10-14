@@ -81,13 +81,29 @@ export const ModelAttributeSchema = z.strictObject({
   sourceIds: z.array(IdSchema).max(8),
   evidence: z.enum(["visual", "label", "unknown"]),
 });
+export const ModelColourwaysSchema = z
+  .array(
+    z.strictObject({
+      colour: z.string().trim().min(1).max(32),
+      sourceIds: SourceIds,
+      evidence: z.literal("visual"),
+    }),
+  )
+  .min(1)
+  .max(8);
 export const ModelGarmentSchema = z.strictObject({
   sourceIds: SourceIds,
   classification: z.enum(["clothing", "uncertain"]),
   category: CategorySchema.nullable(),
   title: z.string().min(1).max(100),
   description: z.string().max(400),
-  grouping: z.enum(["single", "supported_views", "uncertain"]),
+  grouping: z.enum([
+    "single",
+    "supported_views",
+    "supported_colourways",
+    "uncertain",
+  ]),
+  colourways: ModelColourwaysSchema.nullable().optional(),
   reviewReason: z.string().max(200),
   attributes: z.array(ModelAttributeSchema).max(8),
 });
@@ -106,3 +122,13 @@ export const ModelCatalogueSchema = z.strictObject({
     .max(24),
 });
 export type ModelCatalogue = z.infer<typeof ModelCatalogueSchema>;
+/** Required nullable wire field; the runtime reader also accepts older observations. */
+export const ModelCatalogueProviderSchema = ModelCatalogueSchema.extend({
+  garments: z
+    .array(
+      ModelGarmentSchema.extend({
+        colourways: ModelColourwaysSchema.nullable(),
+      }),
+    )
+    .max(20),
+});

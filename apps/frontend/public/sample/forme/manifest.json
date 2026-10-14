@@ -210,6 +210,66 @@
       },
       "role": "primary",
       "origin": "generated_demo"
+    },
+    {
+      "id": "F16",
+      "path": "/sample/forme/F16.webp",
+      "image": {
+        "id": "F16",
+        "hash": "9e19af76e4040f0cb00efae88ffa3b4f1adfee007032ecc0b3412a14cccc13ee",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 163602
+      },
+      "role": "alternate",
+      "relatedTo": "F01",
+      "origin": "generated_demo"
+    },
+    {
+      "id": "F17",
+      "path": "/sample/forme/F17.webp",
+      "image": {
+        "id": "F17",
+        "hash": "68eda8004781af7a163f8ebfb309036acb11ba47de0e9e892a90c639ed2f0173",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 75496
+      },
+      "role": "alternate",
+      "relatedTo": "F03",
+      "origin": "generated_demo"
+    },
+    {
+      "id": "F18",
+      "path": "/sample/forme/F18.webp",
+      "image": {
+        "id": "F18",
+        "hash": "85cd5abf6d0871ce2cdc308fe12d2443dd9f28cd7295b19edf5d508f6e9ee3e4",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 49282
+      },
+      "role": "alternate",
+      "relatedTo": "F07",
+      "origin": "generated_demo"
+    },
+    {
+      "id": "F19",
+      "path": "/sample/forme/F19.webp",
+      "image": {
+        "id": "F19",
+        "hash": "e3841201cd2024e1434c4d750a5b156191c5af80efef576102a7f56638a1fe84",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 130436
+      },
+      "role": "colourway",
+      "relatedTo": "F01",
+      "origin": "generated_demo"
     }
   ]
 }

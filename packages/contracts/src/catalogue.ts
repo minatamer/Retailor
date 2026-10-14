@@ -8,6 +8,9 @@ export const DraftItemSchema = z.strictObject({
   reviewReason: z.string().max(200),
   confirmedClothing: z.boolean(),
   copyOrigin: z.enum(["generated", "user_supplied"]),
+  linkOrigin: z
+    .enum(["recognition", "development-fixture", "manual"])
+    .optional(),
 });
 const DispositionSchema = z.discriminatedUnion("kind", [
   z.strictObject({

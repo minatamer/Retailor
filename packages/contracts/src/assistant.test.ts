@@ -4,6 +4,7 @@ import {
   parseAssistantAction,
   AssistantToolNameSchema,
   ModelAssistantReplySchema,
+  AssistantProposalSchema,
 } from "./assistant.js";
 const action = {
   schemaVersion: 1,
@@ -20,6 +21,38 @@ const action = {
   digest: "a".repeat(64),
 };
 describe("bounded assistant trust shapes", () => {
+  it("accepts legacy design proposals and strict bounded page maps, not foreign or incomplete mappings", () => {
+    const legacy = {
+      kind: "design",
+      template: "studio",
+      theme: null,
+      typography: null,
+    };
+    expect(AssistantProposalSchema.safeParse(legacy).success).toBe(true);
+    expect(
+      AssistantProposalSchema.safeParse({
+        ...legacy,
+        pageTemplates: {
+          home: "studio",
+          collection: "pulse",
+          product: "gallery",
+        },
+      }).success,
+    ).toBe(true);
+    for (const pageTemplates of [
+      { home: "studio" },
+      { home: "studio", collection: "pulse", product: "arbitrary" },
+      {
+        home: "studio",
+        collection: "pulse",
+        product: "gallery",
+        callback: "run",
+      },
+    ])
+      expect(
+        AssistantProposalSchema.safeParse({ ...legacy, pageTemplates }).success,
+      ).toBe(false);
+  });
   it("binds a small canonical role/context action and rejects expanded lifetime or foreign fields", () => {
     expect(parseAssistantAction(action).role).toBe("owner");
     expect(() =>

@@ -225,13 +225,14 @@ export const FeedbackSchema = z.strictObject({
   comment: z.string().max(160),
   synthetic: z.literal(true),
 });
-export const ProductCopySchema = ProductSchema.pick({
-  title: true,
-  description: true,
-  category: true,
-  imageIds: true,
-  sizingSystemId: true,
-  attributes: true,
+export const ProductCopySchema = z.strictObject({
+  title: ProductSchema.shape.title,
+  description: ProductSchema.shape.description,
+  category: ProductSchema.shape.category,
+  imageIds: ProductSchema.shape.imageIds,
+  colourPhotos: ProductSchema.shape.colourPhotos,
+  sizingSystemId: ProductSchema.shape.sizingSystemId,
+  attributes: ProductSchema.shape.attributes,
 });
 export const UndoSchema = z.discriminatedUnion("type", [
   z.strictObject({
