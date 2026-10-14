@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Design } from "@retailor/contracts/design";
+import { resolvedTemplates } from "@retailor/contracts/design";
 
 export interface Palette {
   label: string;
@@ -18,6 +19,22 @@ export interface Palette {
   image: string;
 }
 export const PALETTES: Record<Design["theme"], Palette> = {
+  navy: {
+    label: "Navy / Lime",
+    mood: "Deep navy with vivid lime actions",
+    canvas: "#ffffff",
+    surface: "#ffffff",
+    text: "#242b60",
+    muted: "#596176",
+    action: "#d6f578",
+    actionText: "#242b60",
+    hover: "#e6ffa4",
+    selected: "#d6f578",
+    border: "#dce1e7",
+    controlBorder: "#242b60",
+    focus: "#242b60",
+    image: "#ffffff",
+  },
   ink: {
     label: "Ink / Paper",
     mood: "Quiet confidence",
@@ -121,17 +138,27 @@ export const TEMPLATES: Record<
 > = {
   studio: {
     label: "Studio",
-    description: "Editorial split. Balanced collection. Clear gallery.",
+    description: "Editorial spread. Category rail. All-view product gallery.",
   },
   pulse: {
     label: "Pulse",
-    description: "Campaign energy. Compact collection. Bold purchase panel.",
+    description:
+      "Photo triptych. Wide catalogue. Product stage and purchase dock.",
   },
   gallery: {
     label: "Gallery",
-    description: "Room to breathe. Curated grid. Generous images.",
+    description:
+      "Asymmetric lookbook. Staggered collection. Image-led product view.",
   },
 };
+export function layoutLabel(
+  design: Pick<Design, "template" | "pageTemplates">,
+) {
+  const pages = resolvedTemplates(design);
+  return pages.home === pages.collection && pages.home === pages.product
+    ? TEMPLATES[pages.home].label
+    : `Home: ${TEMPLATES[pages.home].label} · Collection: ${TEMPLATES[pages.collection].label} · Product: ${TEMPLATES[pages.product].label}`;
+}
 export function merchantStyle(
   design: Pick<Design, "theme" | "typography">,
 ): CSSProperties {

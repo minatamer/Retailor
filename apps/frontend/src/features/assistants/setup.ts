@@ -3,9 +3,12 @@ import {
   TemplateSchema,
   ThemeSchema,
   TypographySchema,
+  PageTemplatesSchema,
+  resolvedTemplates,
 } from "@retailor/contracts/design";
 import type { Design } from "@retailor/contracts/design";
 import { IdSchema } from "@retailor/contracts/core";
+import { LogoContextSchema } from "@retailor/contracts/brand";
 export const BrandDraftSchema = z.strictObject({
   name: z.string().max(40),
   headline: z.string().max(100),
@@ -26,6 +29,7 @@ export const SetupSchema = z.strictObject({
   step: SetupStepSchema,
   expanded: z.boolean(),
   template: TemplateSchema.nullable(),
+  pageTemplates: PageTemplatesSchema.nullable().default(null),
   theme: ThemeSchema.nullable(),
   typography: TypographySchema.nullable(),
   brandConfirmed: z.boolean(),
@@ -45,6 +49,7 @@ export const INITIAL_SETUP: SetupState = {
   step: "introduction",
   expanded: true,
   template: null,
+  pageTemplates: null,
   theme: null,
   typography: null,
   brandConfirmed: false,
@@ -102,14 +107,35 @@ export function updateBrand(
 export function logoEligible(setup: SetupState, design: Design) {
   return setup.theme === design.theme && setup.typography === design.typography;
 }
+/** Validate the actual editable name, never its previous nonempty preview fallback. */
+export function logoNameReady(setup: SetupState, design: Design) {
+  const parsed = LogoContextSchema.shape.name.safeParse(
+    setup.brandDraft?.name ?? design.name,
+  );
+  return parsed.success && parsed.data === design.name;
+}
 export function designConfirmed(setup: SetupState, design: Design) {
-  return setup.template === design.template && logoEligible(setup, design);
+  return layoutConfirmed(setup, design) && logoEligible(setup, design);
+}
+function layoutConfirmed(setup: SetupState, design: Design) {
+  if (setup.template !== design.template) return false;
+  const confirmed = resolvedTemplates({
+    template: setup.template,
+    pageTemplates: setup.pageTemplates ?? undefined,
+  });
+  const current = resolvedTemplates(design);
+  return Object.keys(current).every(
+    (page) =>
+      confirmed[page as keyof typeof current] ===
+      current[page as keyof typeof current],
+  );
 }
 /** A remembered answer confirms that exact preset; merely rendering a default never does. */
 export function reconcileSetup(setup: SetupState, design: Design): SetupState {
   const next = {
     ...setup,
-    template: setup.template === design.template ? setup.template : null,
+    template: layoutConfirmed(setup, design) ? setup.template : null,
+    pageTemplates: layoutConfirmed(setup, design) ? setup.pageTemplates : null,
     theme: setup.theme === design.theme ? setup.theme : null,
     typography:
       setup.typography === design.typography ? setup.typography : null,
@@ -121,7 +147,11 @@ export function reconcileSetup(setup: SetupState, design: Design): SetupState {
       : !next.theme
         ? "theme"
         : "typography";
-  else if (["logo", "summary"].includes(next.step) && !next.brandConfirmed)
+  else if (
+    ["logo", "summary"].includes(next.step) &&
+    !next.brandConfirmed &&
+    !(next.step === "logo" && next.brandDirty.name)
+  )
     next.step = "brand";
   else if (next.step === "summary" && !next.wordmarkKept) next.step = "logo";
   return next;
@@ -135,6 +165,7 @@ export function confirmSetup(
     return {
       ...setup,
       template: design.template,
+      pageTemplates: design.pageTemplates ?? null,
       step:
         setup.theme === design.theme
           ? setup.typography === design.typography

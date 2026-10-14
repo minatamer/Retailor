@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
+import { Brand } from "../../components/ui/brand";
 import { Choice } from "../../components/ui/button";
 import type { Design } from "@retailor/contracts/design";
 import { PALETTES, merchantStyle } from "../store-design/presets";
@@ -11,7 +12,7 @@ import { BrowserPhotoCache } from "./cache";
 import { PhotoController } from "./controller";
 import { PhotoPicker } from "./photo-picker";
 import { MandatoryPhotoField } from "./mandatory-photo-field";
-import { loadSample, SAMPLE } from "./sample";
+import { loadSample, SAMPLE, linkSampleViews } from "./sample";
 import styles from "./photos.module.css";
 export function PhotoLab() {
   const [controller] = useState(() => {
@@ -46,7 +47,10 @@ export function PhotoLab() {
     setLoading(true);
     try {
       const files = await loadSample(request.signal);
-      if (!request.signal.aborted) await controller.add(files);
+      if (!request.signal.aborted) {
+        const accepted = await controller.add(files, undefined, true, "reuse");
+        if (!request.signal.aborted) linkSampleViews(controller, accepted);
+      }
     } catch {
       if (!request.signal.aborted)
         setNotice(
@@ -62,8 +66,8 @@ export function PhotoLab() {
   return (
     <main className={styles.lab}>
       <header className={styles.header}>
-        <Link href="/" className={styles.wordmark}>
-          retailor <Icon name="sparkle" />
+        <Link href="/" className={styles.wordmark} aria-label="Retailor home">
+          <Brand />
         </Link>
         <Link href="/design">
           Design collection <Icon name="arrow" size={16} />
@@ -77,7 +81,7 @@ export function PhotoLab() {
           <em>We’ll bring the canvas.</em>
         </h1>
         <p>
-          Fifteen original studio photos, or something entirely yours. A calm
+          Eighteen original studio photos, or something entirely yours. A calm
           place to start.
         </p>
       </section>
@@ -97,8 +101,9 @@ export function PhotoLab() {
           <p className={styles.eyebrow}>Meet FORME</p>
           <h2>A good collection to begin with.</h2>
           <p>
-            15 independent generated demo photographs. No prewritten
-            catalogue—processing will interpret the actual images.
+            15 garments in 19 generated demo photographs, including alternate
+            views. No prewritten catalogue—processing will interpret the actual
+            images.
           </p>
           <div className={styles.sampleTeaser}>
             {SAMPLE.assets
@@ -118,7 +123,9 @@ export function PhotoLab() {
             onClick={() => void chooseSample()}
             disabled={state.busy || loading}
           >
-            {loading ? "Loading your sample…" : "Use the 15-photo sample"}
+            {loading
+              ? "Loading your sample…"
+              : `Use the ${SAMPLE.assets.length}-photo sample`}
             <Icon name="arrow" />
           </Button>
           {loading && (
@@ -134,7 +141,7 @@ export function PhotoLab() {
             </Button>
           )}
           <details className={styles.contactSheet}>
-            <summary>Look through all 15 photos</summary>
+            <summary>Look through all {SAMPLE.assets.length} photos</summary>
             <div>
               {SAMPLE.assets.map((asset) => (
                 <figure key={asset.id}>
@@ -145,7 +152,12 @@ export function PhotoLab() {
                     height={asset.image.height}
                     sizes="(max-width: 640px) 44vw, 180px"
                   />
-                  <figcaption>{asset.id} · Primary photograph</figcaption>
+                  <figcaption>
+                    {asset.id} ·{" "}
+                    {asset.role === "alternate"
+                      ? `Another view of ${asset.relatedTo}`
+                      : "Primary photograph"}
+                  </figcaption>
                 </figure>
               ))}
             </div>

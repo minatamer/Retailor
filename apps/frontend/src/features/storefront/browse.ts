@@ -3,6 +3,7 @@ import { z } from "zod";
 import { IdSchema } from "@retailor/contracts/core";
 import { CategorySchema } from "@retailor/contracts/product";
 import type { Product, Variant } from "@retailor/contracts/product";
+import { namedColour } from "@retailor/contracts/product";
 import type { CommerceGraph } from "@retailor/contracts/commerce";
 import { stockOf } from "@retailor/commerce/selectors";
 
@@ -55,11 +56,7 @@ export interface StoreItem {
   price: number | null;
   available: boolean;
 }
-export function knownColour(value: string) {
-  return !/^(demo colou?r|unconfirmed( colou?r)?|unknown|not supplied)$/iu.test(
-    value.trim(),
-  );
-}
+export const knownColour = namedColour;
 /** Current projection only: history, stock and prices remain in the domain graph. */
 export function storeItems(
   graph: CommerceGraph,
@@ -167,3 +164,8 @@ export const SIZING_LABELS: Record<Product["sizingSystemId"], string> = {
   "one-size-demo": "One size",
   "pending-demo": "Options awaiting confirmation",
 };
+export function categoryLabel(value: string) {
+  return value
+    .replaceAll("-", " ")
+    .replace(/^./u, (letter) => letter.toUpperCase());
+}

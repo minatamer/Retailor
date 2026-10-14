@@ -7,6 +7,8 @@ import {
   splitDraft,
   includeDraft,
   excludeSource,
+  applyPhotoLinks,
+  reconcileCoverage,
 } from "./draft";
 import { decode, file } from "../../../test/workspace";
 async function draft() {
@@ -19,6 +21,37 @@ async function draft() {
   );
   return developmentDraft(photos, "operation", 3, () => `product_${++next}`);
 }
+it("applies explicit links in chosen cover order while keeping one canonical set of prices and stock", async () => {
+  const input = await draft(),
+    canonical = input.items[0]!.product;
+  const linked = applyPhotoLinks(input, [["two", "one"]]);
+  expect(linked.items).toHaveLength(2);
+  const product = linked.items.find(
+    (item) => item.product.id === canonical.id,
+  )!.product;
+  expect(product.imageIds).toEqual(["two", "one"]);
+  expect(product.variants).toEqual(canonical.variants);
+  expect(
+    linked.corrections.map((correction) => correction.before.imageIds),
+  ).toEqual([["one"], ["two"], ["one", "two"]]);
+  expect(input.items).toHaveLength(3);
+  expect(() => applyPhotoLinks(input, [["one", "one"]])).toThrow();
+});
+it("keeps uncertain, rejected and multi-garment sources separate when applying photo links", async () => {
+  const input = await draft();
+  const uncertain = structuredClone(input);
+  uncertain.items[1]!.confirmedClothing = false;
+  uncertain.items[1]!.included = false;
+  expect(applyPhotoLinks(uncertain, [["one", "two"]]).items).toHaveLength(3);
+  const excluded = includeDraft(input, input.items[1]!.product.id, false);
+  expect(applyPhotoLinks(excluded, [["one", "two"]]).items).toHaveLength(3);
+  const multiple = structuredClone(input);
+  multiple.items[2]!.product.imageIds.push("one");
+  expect(
+    applyPhotoLinks(reconcileCoverage(multiple), [["one", "two"]]).items,
+  ).toHaveLength(3);
+  expect(applyPhotoLinks(input, [["missing", "two"]]).items).toHaveLength(3);
+});
 it("preserves explicit coverage, prior copy and grouping provenance through split/merge/exclude", async () => {
   const original = await draft(),
     first = original.items[0]!;

@@ -45,6 +45,9 @@
   position: sticky;
   top: 14px;
 }
+.controls:has(details[open]) {
+  position: static;
+}
 .tabs {
   display: flex;
   flex-wrap: wrap;

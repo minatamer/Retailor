@@ -13,9 +13,14 @@ import { ConversationSchema } from "../assistants/conversation";
 import { INITIAL_LOGOS, LogoStateSchema } from "../logos/state";
 import { GraphSchema, TimestampSchema } from "@retailor/contracts/commerce";
 import { IdSchema } from "@retailor/contracts/core";
-import { PhotoSchema, PHOTO_LIMITS } from "@retailor/contracts/photos";
+import {
+  PhotoSchema,
+  PhotoLinksSchema,
+  PHOTO_LIMITS,
+} from "@retailor/contracts/photos";
 import {
   DesignSchema,
+  DEFAULT_THEME,
   TemplateSchema,
   ThemeSchema,
   TypographySchema,
@@ -46,6 +51,9 @@ export const ProjectionSchema = z.strictObject({
   stage: StageSchema,
   inputRevision: z.number().int().nonnegative(),
   selectedIds: z.array(IdSchema).max(24),
+  photoLinks: PhotoLinksSchema.default([]),
+  photoLinksInitialized: z.boolean().default(false),
+  autoLinkPhotos: z.boolean().default(true),
   photos: z.array(PhotoSchema).max(32),
   draft: DraftSchema.nullable(),
   acceptedDesign: DesignSchema,
@@ -74,7 +82,7 @@ export const ProjectionSchema = z.strictObject({
 export type Projection = z.infer<typeof ProjectionSchema>;
 export const INITIAL_DESIGN = DesignSchema.parse({
   template: "studio",
-  theme: "ink",
+  theme: DEFAULT_THEME,
   typography: "editorial",
   name: "Your collection",
   headline: "A collection with a point of view.",
@@ -87,7 +95,20 @@ export function restoreProjection(
 ) {
   const repaired = recoverDesignPresets(input);
   const currencyRecovery = recoverCurrency(repaired.input, now, fixtureAllowed);
-  const state = ProjectionSchema.parse(currencyRecovery.input),
+  const previous = currencyRecovery.input;
+  const legacyChoice =
+    previous &&
+    typeof previous === "object" &&
+    !Array.isArray(previous) &&
+    !("autoLinkPhotos" in previous) &&
+    (("photoLinksInitialized" in previous &&
+      previous.photoLinksInitialized === true) ||
+      ("photoLinks" in previous &&
+        Array.isArray(previous.photoLinks) &&
+        previous.photoLinks.length > 0));
+  const state = ProjectionSchema.parse(
+      legacyChoice ? { ...previous, autoLinkPhotos: false } : previous,
+    ),
     graph = parseGraph(state.graph);
   if (
     serializedBytes(state) > SESSION_BYTES ||
@@ -122,6 +143,9 @@ export function restoreProjection(
     photos.size !== state.photos.length ||
     new Set(state.selectedIds).size !== state.selectedIds.length ||
     state.selectedIds.some((id) => !photos.has(id)) ||
+    state.photoLinks.some((group) =>
+      group.some((id) => !state.selectedIds.includes(id)),
+    ) ||
     graph.photos.some(
       (photo) => JSON.stringify(photos.get(photo.id)) !== JSON.stringify(photo),
     )
@@ -209,6 +233,9 @@ export function serializeProjection(state: Projection, now: number) {
     stage: state.stage,
     inputRevision: state.inputRevision,
     selectedIds: state.selectedIds,
+    photoLinks: state.photoLinks,
+    photoLinksInitialized: state.photoLinksInitialized,
+    autoLinkPhotos: state.autoLinkPhotos,
     photos: state.photos,
     draft: state.draft,
     acceptedDesign: state.acceptedDesign,
@@ -262,6 +289,23 @@ export function recoverDesignPresets(input: unknown): {
         design[key] = INITIAL_DESIGN[key];
         repaired = true;
       }
+    }
+    if (
+      design.pageTemplates &&
+      typeof design.pageTemplates === "object" &&
+      !Array.isArray(design.pageTemplates)
+    ) {
+      const pages = { ...design.pageTemplates } as Record<string, unknown>;
+      for (const page of ["home", "collection", "product"] as const) {
+        if (
+          typeof pages[page] === "string" &&
+          !TemplateSchema.safeParse(pages[page]).success
+        ) {
+          pages[page] = design.template;
+          repaired = true;
+        }
+      }
+      design.pageTemplates = pages;
     }
     raw[field] = design;
   }

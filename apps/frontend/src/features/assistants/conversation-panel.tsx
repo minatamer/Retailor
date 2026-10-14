@@ -105,11 +105,13 @@ export function ConversationPanel() {
                 : "Show me the jeans under €80…"
           }
         />
-        <p className={styles.note}>
-          {state.fixture
-            ? "Development examples read this catalogue and support a limited set of prompts. Local shortcuts are always available."
-            : "Send shares this demo’s records, prompt and recent role messages with OpenAI for this one answer. Photos are excluded. A maximum of twelve live turns is shared across roles."}
-        </p>
+        {!state.fixture && (
+          <p className={styles.note}>
+            Send shares this demo’s records, prompt and recent role messages
+            with OpenAI for this one answer. Photos are excluded. A maximum of
+            twelve live turns is shared across roles.
+          </p>
+        )}
         <div className={styles.composerActions}>
           <button
             type="submit"

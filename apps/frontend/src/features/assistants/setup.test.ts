@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { environment, file, decode } from "../../../test/workspace";
 import { PhotoController } from "../photos/controller";
 import { SESSION_KEY } from "../session/projection";
+import { DEFAULT_THEME, ThemeSchema } from "@retailor/contracts/design";
 const environments: ReturnType<typeof environment>[] = [];
 afterEach(() => environments.splice(0).forEach((env) => env.dispose()));
 async function openStore() {
@@ -14,6 +15,54 @@ async function openStore() {
   return { env, controller, graph: controller.getSnapshot().state.graph };
 }
 describe("Tailor finite styling and owner authority", () => {
+  it("starts and resets on Navy/Lime while preserving every merchant palette, product/option/browse state, owner Cancel and explicit Apply across restore", async () => {
+    const { env, controller, graph } = await openStore();
+    expect(controller.getSnapshot().state.previewDesign.theme).toBe("navy");
+    const product = graph.products[0]!;
+    controller.browse({
+      page: "product",
+      productId: product.id,
+      variantId: product.variants[0]!.id,
+    });
+    const browse = controller.getSnapshot().state.browse;
+    for (const theme of ThemeSchema.options) {
+      controller.design({
+        ...controller.getSnapshot().state.previewDesign,
+        theme,
+      });
+      expect(controller.getSnapshot().state.previewDesign.theme).toBe(theme);
+      expect(controller.getSnapshot().state.graph).toBe(graph);
+      expect(controller.getSnapshot().state.browse).toEqual(browse);
+    }
+    controller.useCurrentLook();
+    controller.keepWordmark();
+    controller.acceptDesign();
+    expect(controller.getSnapshot().state.acceptedDesign.theme).toBe("pine");
+    controller.go("dashboard");
+    controller.beginOwnerDesign();
+    controller.design({
+      ...controller.getSnapshot().state.previewDesign,
+      theme: "navy",
+    });
+    controller.cancelDesign();
+    expect(controller.getSnapshot().state.previewDesign.theme).toBe("pine");
+    controller.beginOwnerDesign();
+    controller.design({
+      ...controller.getSnapshot().state.previewDesign,
+      theme: "oxblood",
+    });
+    controller.applyOwnerDesign();
+    controller.dispose();
+    const restored = await env.open();
+    expect(restored.getSnapshot().state.acceptedDesign.theme).toBe("oxblood");
+    expect(restored.getSnapshot().state.previewDesign.theme).toBe("oxblood");
+    expect(restored.getSnapshot().state.graph).toEqual(graph);
+    expect(restored.getSnapshot().state.browse).toEqual(browse);
+    await restored.reset();
+    expect(restored.getSnapshot().state.previewDesign.theme).toBe(
+      DEFAULT_THEME,
+    );
+  });
   it("requires explicit theme and type confirmation, and prepares but never restores executable logo work", async () => {
     const { env, controller, graph } = await openStore();
     controller.prepareLogo();
@@ -29,7 +78,7 @@ describe("Tailor finite styling and owner authority", () => {
     const restored = await env.open();
     expect(restored.getSnapshot().preparedLogo).toBeNull();
     expect(restored.getSnapshot().state.graph).toEqual(graph);
-    expect(restored.getSnapshot().state.setup.theme).toBe("ink");
+    expect(restored.getSnapshot().state.setup.theme).toBe(DEFAULT_THEME);
   });
   it("keeps brand confirmation and pending intent when a late suggestion cannot change any dirty field", async () => {
     const { controller } = await openStore();
@@ -217,7 +266,9 @@ describe("Tailor finite styling and owner authority", () => {
     controller.dispose();
     const restored = await env.open();
     expect(restored.getSnapshot().state.graph).toEqual(graph);
-    expect(restored.getSnapshot().state.previewDesign.theme).toBe("ink");
+    expect(restored.getSnapshot().state.previewDesign.theme).toBe(
+      DEFAULT_THEME,
+    );
     expect(restored.getSnapshot().state.setup.theme).toBeNull();
     expect(restored.getSnapshot().state.hasAcceptedLook).toBe(false);
     expect(restored.getSnapshot().recoveryNotice).toContain(

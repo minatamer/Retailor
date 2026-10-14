@@ -1,13 +1,20 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import type { Design } from "@retailor/contracts/design";
+import type { Design, StorePage } from "@retailor/contracts/design";
+import { resolvedTemplates, DEFAULT_THEME } from "@retailor/contracts/design";
 import { Button, Choice } from "../../components/ui/button";
 import { formatDisplay, formatMinor } from "@retailor/commerce/currency";
 import { selectedScope } from "../currency/display";
 import { Icon } from "../../components/ui/icon";
 import { useSession } from "../session/context";
-import { PALETTES, TEMPLATES, TYPOGRAPHIES } from "../store-design/presets";
+import {
+  PALETTES,
+  TEMPLATES,
+  TYPOGRAPHIES,
+  layoutLabel,
+} from "../store-design/presets";
+import { PageLayouts } from "../store-design/page-layouts";
 import { namedFiles } from "../photos/photo-picker";
 import { GarmentImage } from "../storefront/gallery";
 import { logoEligible, brandValues } from "./setup";
@@ -24,11 +31,11 @@ const PROMPTS: Record<SetupStep, { title: string; text: string }> = {
   },
   template: {
     title: "A home for your collection.",
-    text: "Three complete looks. Each includes a home, a collection and a product page. Try one and watch your actual store change.",
+    text: "Choose one look for your whole store. If you like, mix layouts by page below—every choice has a real preview.",
   },
   theme: {
     title: "Set the mood.",
-    text: "Four considered palettes. Each keeps your clothes in focus, with clear buttons and readable details.",
+    text: "Five distinct moods for your store. Start with Navy / Lime, or choose the tone that feels like your brand.",
   },
   typography: {
     title: "Find your voice.",
@@ -40,7 +47,7 @@ const PROMPTS: Record<SetupStep, { title: string; text: string }> = {
   },
   logo: {
     title: "Your name, beautifully set.",
-    text: "Your wordmark already uses your chosen type. Keep it, or explore the optional three-logo path.",
+    text: "Name your store, then keep your wordmark or explore three logo directions using your chosen look.",
   },
   summary: {
     title: "Your collection. Your look.",
@@ -289,7 +296,7 @@ export function Tailor() {
                       <div className={styles.summary}>
                         <strong>{state.previewDesign.name}</strong>
                         <span>
-                          {TEMPLATES[state.previewDesign.template].label} /{" "}
+                          {layoutLabel(state.previewDesign)} /{" "}
                           {PALETTES[state.previewDesign.theme].label}
                         </span>
                         <span>
@@ -424,7 +431,7 @@ function Recap() {
     setup = state.setup;
   const choices: { step: SetupStep; label: string }[] = [];
   if (setup.template)
-    choices.push({ step: "template", label: TEMPLATES[setup.template].label });
+    choices.push({ step: "template", label: layoutLabel(state.previewDesign) });
   if (setup.theme)
     choices.push({ step: "theme", label: PALETTES[setup.theme].label });
   if (setup.typography)
@@ -460,6 +467,12 @@ export function DesignChoices({
 }) {
   const { controller, state } = useSession(),
     design = state.previewDesign;
+  const assignments = resolvedTemplates(design);
+  const wholeTemplate =
+    assignments.home === assignments.collection &&
+    assignments.home === assignments.product
+      ? assignments.home
+      : null;
   const photoId = state.graph.products.find((p) => !p.archived)?.imageIds[0],
     view = photoId ? controller.photos.view(photoId) : undefined;
   const specimenProduct =
@@ -469,6 +482,19 @@ export function DesignChoices({
   const specimenPrice = specimenProduct?.variants.find(
     (variant) => !variant.archived,
   )?.price;
+  const previewPage = (page: StorePage) =>
+    controller.browse({
+      page,
+      ...(page === "product"
+        ? {
+            productId: specimenProduct?.id ?? null,
+            variantId:
+              state.browse.productId === specimenProduct?.id
+                ? state.browse.variantId
+                : null,
+          }
+        : {}),
+    });
   return (
     <fieldset className={styles.choices} data-tailor-target="tailor-choices">
       <legend>
@@ -482,9 +508,15 @@ export function DesignChoices({
         (Object.keys(TEMPLATES) as Design["template"][]).map((template) => (
           <Choice
             key={template}
-            selected={design.template === template}
+            selected={wholeTemplate === template}
             className={styles.templateCard}
-            onClick={() => controller.design({ ...design, template })}
+            onClick={() =>
+              controller.design({
+                ...design,
+                template,
+                pageTemplates: undefined,
+              })
+            }
           >
             <span
               className={styles.miniature}
@@ -494,6 +526,8 @@ export function DesignChoices({
               <span className={styles.miniHome}>
                 <i />
                 <em />
+                <b />
+                <b />
                 {view && photoId && (
                   <GarmentImage
                     photo={{ ...view, id: photoId }}
@@ -510,6 +544,7 @@ export function DesignChoices({
               <span className={styles.miniProduct}>
                 <i />
                 <em />
+                <b />
               </span>
             </span>
             <span>
@@ -517,7 +552,7 @@ export function DesignChoices({
               <small>{TEMPLATES[template].description}</small>
             </span>
             <span className={styles.selectedMark}>
-              {design.template === template ? (
+              {wholeTemplate === template ? (
                 <Icon name="check" size={14} />
               ) : (
                 "↗"
@@ -525,6 +560,19 @@ export function DesignChoices({
             </span>
           </Choice>
         ))}
+      {kind === "template" && (
+        <PageLayouts
+          design={design}
+          onChange={(next, page) => {
+            controller.design(next);
+            previewPage(page);
+          }}
+          onPreview={(page) => {
+            previewPage(page);
+            if (state.stage === "style") controller.toggleTailor(false);
+          }}
+        />
+      )}
       {kind === "theme" &&
         (Object.keys(PALETTES) as Design["theme"][]).map((theme) => (
           <Choice
@@ -543,7 +591,12 @@ export function DesignChoices({
                 <i key={i} style={{ background: colour }} />
               ))}
             </span>
-            <strong>{PALETTES[theme].label}</strong>
+            <strong className={styles.paletteLabel}>
+              <span>{PALETTES[theme].label}</span>
+              {theme === DEFAULT_THEME && (
+                <span className={styles.defaultBadge}>Default</span>
+              )}
+            </strong>
             <small>{PALETTES[theme].mood}</small>
           </Choice>
         ))}

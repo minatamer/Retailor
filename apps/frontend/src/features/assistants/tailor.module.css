@@ -198,8 +198,8 @@
   background: var(--platform-surface);
   border-radius: 24px;
   box-shadow:
-    0 20px 70px #20291c26,
-    0 3px 12px #20291c0d;
+    0 20px 70px #242b6026,
+    0 3px 12px #242b600d;
   overflow: hidden;
   animation: rise 0.4s var(--ease-out) both;
 }
@@ -316,9 +316,9 @@
   grid-template-columns: 1fr 1fr;
   gap: 3px;
   height: 78px;
-  background: #edece6;
+  background: var(--platform-surface);
   padding: 5px;
-  border: 1px solid #d6d9ce;
+  border: 1px solid var(--platform-line);
   border-radius: 8px;
 }
 .miniHome {
@@ -326,74 +326,166 @@
   position: relative;
   min-height: 36px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  grid-template-columns: 1.2fr 1fr;
+  grid-template-rows: 1fr 5px;
+  gap: 3px;
   overflow: hidden;
-  background: #faf9f4;
+  background: var(--platform-surface);
 }
 .miniHome i {
-  width: 18px;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: 24px;
   height: 2px;
-  margin: 12px 3px;
-  background: #273425;
+  margin: 0;
+  background: var(--platform-action);
 }
 .miniHome em {
-  position: absolute;
-  width: 14px;
-  height: 4px;
-  left: 3px;
-  bottom: 6px;
-  background: #d5dfc6;
+  display: none;
 }
 .miniHome img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  max-height: 36px;
+  max-height: 29px;
+  grid-column: 1;
+  grid-row: 1;
 }
 .miniList {
   display: flex;
   gap: 2px;
+  padding-left: 4px;
+  border-left: 2px solid var(--platform-action);
 }
 .miniList i {
   flex: 1;
-  background: #b5bba8;
+  background: var(--platform-lime);
   border-radius: 1px;
 }
 .miniProduct {
   display: flex;
   gap: 3px;
-  background: #faf9f4;
+  background: var(--platform-surface);
+  position: relative;
 }
 .miniProduct i {
   width: 45%;
-  background: #b5bba8;
+  background: var(--platform-lime);
 }
 .miniProduct em {
-  background: #273425;
+  background: var(--platform-action);
   width: 9px;
   height: 2px;
   margin-top: 6px;
 }
 .miniature[data-template="pulse"] {
-  background: #2843c7;
+  background: var(--platform-action);
 }
 .miniature[data-template="pulse"] .miniHome {
-  background: #172143;
-}
-.miniature[data-template="pulse"] .miniHome i {
-  background: white;
+  background: var(--platform-action);
 }
 .miniature[data-template="pulse"] .miniList {
   gap: 1px;
 }
-.miniature[data-template="gallery"] .miniHome {
-  grid-template-columns: 0.4fr 1fr;
-}
-.miniature[data-template="gallery"] .miniHome em {
+.miniature[data-template="gallery"] .miniList i:last-child {
   display: none;
 }
-.miniature[data-template="gallery"] .miniList i:last-child {
+.miniHome b {
+  grid-column: 2;
+  grid-row: 1;
+  background: var(--platform-line);
+}
+.miniHome b + b {
+  display: none;
+}
+.miniProduct b {
+  width: 15%;
+  background: var(--platform-lime);
+}
+.miniature[data-template="studio"] .miniHome {
+  grid-template-rows: 5px 1fr;
+}
+.miniature[data-template="studio"] .miniHome i {
+  grid-row: 1;
+}
+.miniature[data-template="studio"] .miniHome img,
+.miniature[data-template="studio"] .miniHome b {
+  grid-row: 2;
+}
+.miniature[data-template="pulse"] .miniHome {
+  grid-template-columns: repeat(3, 1fr);
+}
+.miniature[data-template="pulse"] .miniHome b {
+  grid-column: 2;
+  grid-row: 1;
+}
+.miniature[data-template="pulse"] .miniHome b + b {
+  display: block;
+  grid-column: 3;
+}
+.miniature[data-template="pulse"] .miniHome i {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 4px;
+  background: white;
+}
+.miniature[data-template="pulse"] .miniList {
+  padding: 0;
+  border: 0;
+}
+.miniature[data-template="pulse"] .miniProduct {
+  flex-direction: column;
+  gap: 2px;
+}
+.miniature[data-template="pulse"] .miniProduct i {
+  width: 100%;
+  height: 70%;
+}
+.miniature[data-template="pulse"] .miniProduct em {
+  width: 100%;
+  height: 3px;
+  margin: 0;
+}
+.miniature[data-template="pulse"] .miniProduct b {
+  display: none;
+}
+.miniature[data-template="gallery"] .miniHome {
+  grid-template-columns: 0.7fr 1fr 0.5fr;
+  grid-template-rows: 1fr 1fr;
+}
+.miniature[data-template="gallery"] .miniHome i {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  width: 10px;
+  margin-top: 10px;
+}
+.miniature[data-template="gallery"] .miniHome img {
+  grid-column: 2;
+  grid-row: 1 / -1;
+}
+.miniature[data-template="gallery"] .miniHome b {
+  grid-column: 3;
+  grid-row: 1;
+}
+.miniature[data-template="gallery"] .miniHome b + b {
+  display: block;
+  grid-column: 3;
+  grid-row: 2;
+}
+.miniature[data-template="gallery"] .miniList {
+  padding: 0;
+  border: 0;
+}
+.miniature[data-template="gallery"] .miniList i:nth-child(2) {
+  margin-top: 5px;
+}
+.miniature[data-template="gallery"] .miniProduct {
+  flex-direction: row-reverse;
+}
+.miniature[data-template="gallery"] .miniProduct i {
+  width: 70%;
+}
+.miniature[data-template="gallery"] .miniProduct b {
   display: none;
 }
 .selectedMark {
@@ -418,6 +510,22 @@
 }
 .swatches i {
   flex: 1;
+}
+.paletteCard .paletteLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.defaultBadge {
+  flex: none;
+  border: 1px solid var(--platform-control-line);
+  border-radius: 999px;
+  padding: 2px 7px;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--platform-text);
+  background: var(--platform-surface);
 }
 .typeCard {
   width: 100%;
@@ -621,7 +729,7 @@
   border-radius: 20px;
   color: var(--platform-text);
   background: var(--platform-surface);
-  box-shadow: 0 8px 32px #20291c20;
+  box-shadow: 0 8px 32px #242b6020;
   cursor: pointer;
   animation: rise 0.3s var(--ease-out) both;
 }

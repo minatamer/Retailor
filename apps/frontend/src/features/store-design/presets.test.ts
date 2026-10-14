@@ -82,5 +82,12 @@ describe("actual palette roles meet measured contrast targets", () => {
     expect(
       ratio(color("platform-action-text"), color("platform-action-hover")),
     ).toBeGreaterThanOrEqual(4.5);
+    for (const background of ["platform-lime", "platform-lime-hover"])
+      expect(
+        ratio(color("platform-action"), color(background)),
+      ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      ratio(color("platform-on-navy-muted"), color("platform-action")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 });

@@ -3,7 +3,7 @@
   pointer-events: none;
   border: 2px solid var(--platform-action);
   border-radius: 16px;
-  box-shadow: 0 0 0 7px #6b805121;
+  box-shadow: 0 0 0 7px #242b6021;
   z-index: 41;
   transition:
     top 0.24s var(--ease-out),
@@ -18,7 +18,7 @@
   border: 1px solid var(--platform-line);
   border-radius: 20px;
   background: var(--platform-surface);
-  box-shadow: 0 14px 50px #20291c2a;
+  box-shadow: 0 14px 50px #242b602a;
   max-height: calc(100dvh - 32px);
   overflow: auto;
   animation: enter 0.3s var(--ease-out) both;

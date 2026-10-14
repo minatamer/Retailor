@@ -5,6 +5,7 @@ import type { CurrencyScope } from "@retailor/contracts/currency";
 import { exactSum, exactProduct } from "@retailor/commerce/allocation";
 import { stockOf } from "@retailor/commerce/selectors";
 import { projectComponents } from "@retailor/commerce/currency";
+import { colourImageIds } from "@retailor/contracts/product";
 export interface BagEntry {
   variantId: string;
   productId: string | null;
@@ -29,7 +30,11 @@ export function bagEntries(
       ),
       variant = product?.variants.find((item) => item.id === line.variantId);
     const stock = variant ? stockOf(graph, variant.id) : 0;
-    const photoId = product?.imageIds.find((id) => photos.has(id)) ?? null;
+    const photoId = product
+      ? (colourImageIds(product, variant?.colour).find((id) =>
+          photos.has(id),
+        ) ?? null)
+      : null;
     const unavailable =
       !product || !variant
         ? "This option is unavailable."

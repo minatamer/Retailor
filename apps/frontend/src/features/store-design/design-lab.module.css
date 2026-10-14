@@ -32,9 +32,6 @@
   align-items: center;
   gap: 8px;
 }
-.platformWordmark svg {
-  color: var(--platform-action);
-}
 .referenceTag {
   font-size: 10px;
   padding: 7px 10px;
@@ -109,7 +106,7 @@
   display: flex;
   gap: 4px;
   padding: 4px;
-  background: #e8e9e2;
+  background: var(--platform-surface);
   border-radius: 10px;
 }
 .pageChoices button {
@@ -121,8 +118,8 @@
   background: transparent;
 }
 .pageChoices button[aria-pressed="true"] {
-  background: var(--platform-surface);
-  box-shadow: 0 1px 4px #20232112;
+  background: var(--platform-selected);
+  box-shadow: 0 1px 4px #242b6012;
   color: var(--platform-action);
 }
 .lookLabel {
@@ -134,7 +131,7 @@
   border: 1px solid var(--platform-line);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 12px 40px #20232108;
+  box-shadow: 0 12px 40px #242b6008;
 }
 .preview:focus-visible {
   outline: 3px solid var(--platform-focus);
@@ -170,7 +167,7 @@
   background: var(--platform-surface);
   border: 1px solid var(--platform-line);
   border-radius: 18px;
-  box-shadow: 0 20px 70px #20232124;
+  box-shadow: 0 20px 70px #242b6024;
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -293,7 +290,7 @@
   width: 58px;
   height: 66px;
   flex: 0 0 58px;
-  background: #f0ece3;
+  background: var(--platform-surface);
   border-radius: 3px;
   padding: 7px;
   display: grid;
@@ -302,25 +299,25 @@
 }
 .templateMini i {
   display: block;
-  background: #b4b8a8;
+  background: var(--platform-action);
 }
 .studio i:first-child {
-  background: #d2d7c8;
+  background: var(--platform-lime);
 }
 .studio i:last-child {
   grid-column: span 2;
   height: 15px;
 }
 .pulse {
-  background: #313bdd;
+  background: var(--platform-action);
   grid-template-columns: 1fr;
 }
 .pulse i:first-child {
   height: 9px;
-  background: #d6f578;
+  background: var(--platform-lime);
 }
 .pulse i:nth-child(2) {
-  background: #e3e6f4;
+  background: var(--platform-surface);
 }
 .pulse i:last-child {
   display: none;
@@ -335,7 +332,7 @@
 .gallery i:last-child {
   height: 3px;
   grid-column: span 2;
-  background: #7b806f;
+  background: var(--platform-action);
 }
 .selectedMark {
   margin-left: auto;
@@ -376,7 +373,7 @@
 .swatches {
   display: flex;
   height: 33px;
-  border: 1px solid #91948a;
+  border: 1px solid var(--platform-control-line);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -728,7 +725,7 @@
   bottom: max(24px, env(safe-area-inset-bottom));
   right: 24px;
   z-index: 10;
-  box-shadow: 0 8px 30px #343bdd40;
+  box-shadow: 0 8px 30px #242b6040;
   animation: tailor-in 350ms var(--ease-out) both;
 }
 @media (max-width: 1100px) {

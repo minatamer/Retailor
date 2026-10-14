@@ -3,6 +3,7 @@ import {
   PHOTO_LIMITS,
   RecognitionManifestSchema,
   requireAvailablePhotos,
+  PhotoLinksSchema,
 } from "@retailor/contracts/photos";
 import type { Photo } from "@retailor/contracts/photos";
 import { CacheConflict } from "./cache";
@@ -22,6 +23,9 @@ export interface PhotoView {
 }
 export interface PhotoSnapshot {
   items: readonly PhotoView[];
+  links: readonly (readonly string[])[];
+  linksInitialized: boolean;
+  autoLink: boolean;
   busy: boolean;
   progress: number;
   total: number;
@@ -47,6 +51,7 @@ export class PhotoController {
   private readonly expires: number;
   private entries = new Map<string, StoredPhoto & { url: string }>();
   private selected: string[] = [];
+  private links: string[][] = [];
   private listeners = new Set<() => void>();
   private operation: AbortController | undefined;
   private generation = 0;
@@ -56,10 +61,13 @@ export class PhotoController {
   private failedIds = new Set<string>();
   private snapshot: PhotoSnapshot = {
     items: [],
+    links: [],
+    linksInitialized: false,
+    autoLink: true,
     busy: false,
     progress: 0,
     total: 0,
-    notice: "Photos stay on this device until you choose to process them.",
+    notice: "",
     issues: [],
     revision: 0,
   };
@@ -82,9 +90,14 @@ export class PhotoController {
     };
   };
   private update(patch: Partial<PhotoSnapshot>, changed = false) {
+    const selected = new Set(this.selected);
+    this.links = this.links
+      .map((row) => row.filter((id) => selected.has(id)))
+      .filter((row) => row.length > 1);
     this.snapshot = {
       ...this.snapshot,
       ...patch,
+      links: this.links.map((row) => [...row]),
       items: this.selected.flatMap((id) => {
         const item = this.entries.get(id);
         return item
@@ -94,6 +107,123 @@ export class PhotoController {
       revision: this.snapshot.revision + (changed ? 1 : 0),
     };
     for (const listener of this.listeners) listener();
+  }
+  /** Session restore/review synchronization: same owned resource state, no input event. */
+  restoreLinks(
+    input: readonly (readonly string[])[],
+    initialized = input.length > 0,
+    autoLink = this.snapshot.autoLink,
+  ) {
+    const parsed = PhotoLinksSchema.parse(input),
+      selected = new Set(this.selected);
+    this.links = parsed
+      .map((row) => row.filter((id) => selected.has(id)))
+      .filter((row) => row.length > 1);
+    this.snapshot = {
+      ...this.snapshot,
+      links: this.links.map((row) => [...row]),
+      linksInitialized: initialized,
+      autoLink,
+    };
+  }
+  setAutoLink(enabled: boolean) {
+    if (
+      !this.valid() ||
+      this.snapshot.busy ||
+      typeof enabled !== "boolean" ||
+      enabled === this.snapshot.autoLink
+    )
+      return;
+    this.update(
+      {
+        autoLink: enabled,
+        notice: enabled
+          ? "Matching views and colours can be linked when you process photos."
+          : "Automatic linking is off. Your manual photo groups are kept.",
+      },
+      true,
+    );
+  }
+  link(ids: readonly string[], automatic = false) {
+    if (!this.valid() || this.snapshot.busy) return false;
+    const members = [
+      ...new Set(
+        ids.flatMap((id) => this.links.find((row) => row.includes(id)) ?? [id]),
+      ),
+    ];
+    if (
+      new Set(ids).size !== ids.length ||
+      ids.length < 2 ||
+      members.length > 8 ||
+      members.some(
+        (id) => !this.selected.includes(id) || !this.availableIds().has(id),
+      )
+    ) {
+      this.update({
+        notice:
+          "Choose photos of the same product, up to 8 photos per product.",
+      });
+      return false;
+    }
+    this.links = PhotoLinksSchema.parse([
+      ...this.links.filter((row) => !row.some((id) => members.includes(id))),
+      members,
+    ]);
+    this.update(
+      {
+        notice: `${members.length} photos linked as one product. Open the card to edit its photos.`,
+        linksInitialized: true,
+        autoLink: automatic ? this.snapshot.autoLink : false,
+      },
+      true,
+    );
+    return true;
+  }
+  unlink(id: string) {
+    if (
+      !this.valid() ||
+      this.snapshot.busy ||
+      !this.links.some((row) => row.includes(id))
+    )
+      return;
+    this.links = this.links
+      .map((row) => row.filter((member) => member !== id))
+      .filter((row) => row.length > 1);
+    this.update(
+      {
+        notice: "Photo unlinked. It is kept as a separate product photo.",
+        linksInitialized: true,
+        autoLink: false,
+      },
+      true,
+    );
+  }
+  cover(id: string) {
+    if (!this.valid() || this.snapshot.busy) return;
+    const row = this.links.find((group) => group.includes(id));
+    if (!row || row[0] === id) return;
+    this.links = this.links.map((group) =>
+      group === row ? [id, ...group.filter((member) => member !== id)] : group,
+    );
+    this.update(
+      { notice: "Cover photo updated.", linksInitialized: true },
+      true,
+    );
+  }
+  moveLinked(id: string, direction: -1 | 1) {
+    if (!this.valid() || this.snapshot.busy) return;
+    const group = this.links.find((row) => row.includes(id));
+    if (!group) return;
+    const index = group.indexOf(id),
+      target = index + direction;
+    if (target < 0 || target >= group.length) return;
+    const next = [...group];
+    [next[index], next[target]] = [next[target]!, next[index]!];
+    this.links = this.links.map((row) => (row === group ? next : row));
+    this.update(
+      { notice: "Photo order updated.", linksInitialized: true },
+      true,
+    );
   }
   activate() {
     this.active = true;
@@ -192,6 +322,7 @@ export class PhotoController {
     files: readonly NamedPhoto[],
     replaceId?: string,
     select = true,
+    duplicatePolicy: "report" | "reuse" = "report",
   ): Promise<string[]> {
     if (!this.valid() || this.snapshot.busy) return [];
     if (
@@ -283,11 +414,15 @@ export class PhotoController {
             if (duplicate) {
               if (select && !this.selected.includes(duplicate.photo.id))
                 this.selected.push(duplicate.photo.id);
-              issues.push({
-                name,
-                message:
-                  "These exact photo bytes are already here. Kept one copy.",
-              });
+              if (
+                duplicatePolicy === "report" ||
+                this.failedIds.has(duplicate.photo.id)
+              )
+                issues.push({
+                  name,
+                  message:
+                    "These exact photo bytes are already here. Kept one copy.",
+                });
               accepted.push(duplicate.photo.id);
               this.update({}, true);
               return;
@@ -725,7 +860,17 @@ export class PhotoController {
     this.selected = [];
     this.protectedIds.clear();
     this.failedIds.clear();
-    this.update({ issues: [], progress: 0, total: 0, notice }, true);
+    this.update(
+      {
+        issues: [],
+        progress: 0,
+        total: 0,
+        notice,
+        linksInitialized: false,
+        autoLink: true,
+      },
+      true,
+    );
     let cleared = true;
     await this.cache.clear().catch(() => {
       cleared = false;
@@ -751,7 +896,7 @@ export class PhotoController {
     for (const item of this.entries.values()) this.urls.revoke(item.url);
     this.entries.clear();
     this.selected = [];
-    this.update({ busy: false }, true);
+    this.update({ busy: false, linksInitialized: false, autoLink: true }, true);
     void this.cache.close().catch(() => undefined);
   }
 }

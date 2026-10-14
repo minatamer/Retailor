@@ -1,6 +1,7 @@
 import type { Photo } from "@retailor/contracts/photos";
 import type { ProductInput } from "@retailor/contracts/product";
-import { parseDraft } from "./draft";
+import { parseDraft, mergeDraft } from "./draft";
+import { SAMPLE } from "../photos/sample";
 import type { CatalogueDraft } from "./draft";
 const CATEGORIES: ProductInput["category"][] = [
   "jeans",
@@ -48,18 +49,36 @@ export function developmentDraft(
   id: () => string,
 ): CatalogueDraft {
   const items = photos.slice(0, 20).map((photo, index) => {
+    const asset = SAMPLE.assets.find(
+      (row) => row.image.hash === photo.source.hash,
+    );
+    const originalIndex = asset
+      ? Number((asset.relatedTo ?? asset.id).slice(1)) - 1
+      : index;
+    const colour =
+      asset && originalIndex === 0
+        ? asset.id === "F19"
+          ? "Black"
+          : "Blue"
+        : asset && originalIndex === 2
+          ? "Charcoal"
+          : asset && originalIndex === 6
+            ? "Ivory"
+            : "Demo colour";
     const productId = id(),
-      price = PRICES[index] ?? 5400,
-      category = CATEGORIES[index] ?? "other-clothing";
+      price = PRICES[originalIndex] ?? 5400,
+      category = CATEGORIES[originalIndex] ?? "other-clothing";
     const waist = category === "jeans" || category === "trousers";
     return {
       product: {
         id: productId,
-        title: TITLES[index] ?? "Clothing draft",
-        description:
-          "Development copy for testing the catalogue journey. Replace with confirmed garment details.",
+        title: TITLES[originalIndex] ?? "Clothing draft",
+        description: "",
         category,
         imageIds: [photo.id],
+        ...(colour !== "Demo colour"
+          ? { colourPhotos: [{ colour, photoIds: [photo.id] }] }
+          : {}),
         sizingSystemId: waist
           ? ("waist-inseam-demo" as const)
           : ("alpha-demo" as const),
@@ -67,7 +86,7 @@ export function developmentDraft(
           (size, option) => ({
             id: `${productId}_v${option}`,
             size,
-            colour: "Demo colour",
+            colour,
             sku: `DEMO-${index + 1}-${option + 1}`,
             openingStock: 10,
             price,
@@ -85,7 +104,7 @@ export function developmentDraft(
       copyOrigin: "generated" as const,
     };
   });
-  return parseDraft({
+  let draft = parseDraft({
     schemaVersion: 1,
     operationId,
     inputRevision,
@@ -107,4 +126,26 @@ export function developmentDraft(
     }),
     corrections: [],
   });
+  for (const primary of ["F01", "F03", "F07"]) {
+    const hashes = new Set(
+      SAMPLE.assets
+        .filter((asset) => asset.id === primary || asset.relatedTo === primary)
+        .map((asset) => asset.image.hash),
+    );
+    const sourceIds = new Set(
+      photos
+        .filter((photo) => hashes.has(photo.source.hash))
+        .map((photo) => photo.id),
+    );
+    const members = draft.items.filter((item) =>
+      item.product.imageIds.some((id) => sourceIds.has(id)),
+    );
+    if (members.length > 1)
+      draft = mergeDraft(
+        draft,
+        members.map((item) => item.product.id),
+        "development-fixture",
+      );
+  }
+  return draft;
 }

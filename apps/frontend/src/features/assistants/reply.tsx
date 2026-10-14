@@ -14,6 +14,7 @@ import { stockOf } from "@retailor/commerce/selectors";
 import { formatUsd } from "@retailor/commerce/money";
 import styles from "./tailor.module.css";
 import { OPERATION_LABELS } from "../operations/form-shell";
+import { layoutLabel } from "../store-design/presets";
 export function Reply({
   message,
   context,
@@ -141,6 +142,15 @@ export function Reply({
                       ? "Optional separate logo batch. Your wordmark stays ready to use."
                       : "Preview these choices before accepting your look."}
           </p>
+          {result.reply.proposal.kind === "design" &&
+            result.reply.proposal.pageTemplates && (
+              <p>
+                {layoutLabel({
+                  ...context.design,
+                  pageTemplates: result.reply.proposal.pageTemplates,
+                })}
+              </p>
+            )}
           {result.reply.proposal.kind === "operation-choices" ? (
             <>
               <div className={styles.referenceList}>

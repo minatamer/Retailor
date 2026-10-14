@@ -1,11 +1,12 @@
 "use client";
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import { useSession } from "../session/context";
 import styles from "./picker.module.css";
 export function CurrencyPicker({ inline = false }: { inline?: boolean }) {
   const { controller, state, currencyBusy, currencyNotice } = useSession();
   const dialog = useRef<HTMLDialogElement>(null),
     opener = useRef<HTMLButtonElement>(null);
+  const noticeId = useId();
   const quote = state.currency.acceptedSnapshot;
   const rateDate = quote
     ? new Intl.DateTimeFormat("en-US", {
@@ -17,20 +18,36 @@ export function CurrencyPicker({ inline = false }: { inline?: boolean }) {
     : null;
   return (
     <div className={styles.currency}>
-      <div className={styles.choices} aria-label="Store display currency">
-        {(["USD", "EUR"] as const).map((currency) => (
-          <button
-            key={currency}
-            aria-pressed={state.currency.selected === currency}
-            disabled={currency === "EUR" && currencyBusy}
-            onClick={() => void controller.selectCurrency(currency)}
-          >
-            {currency === "EUR" && currencyBusy ? "EUR…" : currency}
-          </button>
-        ))}
+      <div className={styles.toolbar}>
+        <div
+          className={styles.choices}
+          role="group"
+          aria-label="Store display currency"
+          aria-busy={currencyBusy}
+          data-selected={state.currency.selected}
+        >
+          {(["USD", "EUR"] as const).map((currency) => (
+            <button
+              key={currency}
+              type="button"
+              className={styles.choice}
+              aria-pressed={state.currency.selected === currency}
+              aria-describedby={noticeId}
+              disabled={currency === "EUR" && currencyBusy}
+              onClick={() => void controller.selectCurrency(currency)}
+            >
+              {currency === "EUR" && currencyBusy && (
+                <span className={styles.spinner} aria-hidden="true" />
+              )}
+              {currency}
+            </button>
+          ))}
+        </div>
         {!inline && (
           <button
             ref={opener}
+            type="button"
+            className={styles.info}
             aria-label="Currency details"
             onClick={() => dialog.current?.showModal()}
           >
@@ -38,7 +55,7 @@ export function CurrencyPicker({ inline = false }: { inline?: boolean }) {
           </button>
         )}
       </div>
-      <span className={styles.status} role="status">
+      <span id={noticeId} className={styles.status} role="status">
         {currencyNotice}
       </span>
       {inline ? (
@@ -55,6 +72,7 @@ export function CurrencyPicker({ inline = false }: { inline?: boolean }) {
           onClose={() => opener.current?.focus({ preventScroll: true })}
         >
           <button
+            type="button"
             className={styles.close}
             autoFocus
             aria-label="Close currency details"

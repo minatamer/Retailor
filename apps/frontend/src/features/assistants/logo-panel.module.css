@@ -14,11 +14,70 @@
   font-size: clamp(1.3rem, 4vw, 2rem);
   text-align: center;
   overflow-wrap: anywhere;
+  border: 1px solid var(--platform-line);
+  transition:
+    color 220ms ease,
+    background 220ms ease;
+}
+.nameField {
+  display: grid;
+  gap: 0.45rem;
+}
+.nameField label {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.nameField small {
+  color: var(--platform-muted);
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+.nameField input {
+  min-width: 0;
+  width: 100%;
+  min-height: 46px;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--platform-control-line);
+  border-radius: 0.75rem;
+  color: var(--platform-text);
+  background: white;
+  font: inherit;
+  font-size: 1rem;
+}
+.nameField input:focus-visible {
+  outline: 2px solid var(--platform-focus);
+  outline-offset: 3px;
+}
+.nameField input[aria-invalid="true"] {
+  border-color: var(--feedback-error);
+}
+.nameField p,
+.example {
+  color: var(--platform-muted);
+}
+.look {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  line-height: 1.6;
+}
+.look > span:not(:last-child) {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border: 1px solid var(--platform-line);
+  border-radius: 50%;
 }
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
+  justify-content: flex-end;
 }
 .actions > * {
   min-width: 0;
@@ -28,22 +87,27 @@
   gap: 0.7rem;
   padding: 1rem;
   border-radius: 1rem;
-  background: #f2f4ed;
-  border: 1px solid #dfe4d7;
+  background: var(--platform-surface);
+  border: 1px solid var(--platform-line);
   overflow-wrap: anywhere;
 }
 .processing {
   display: grid;
   gap: 0.8rem;
   padding: 1rem;
-  background: #f5f4f9;
+  background: var(--platform-surface);
   border-radius: 1rem;
   font-size: 0.85rem;
 }
 .processing span {
   height: 3px;
   width: 100%;
-  background: linear-gradient(90deg, #d7dcff, #6055d2, #d7dcff);
+  background: linear-gradient(
+    90deg,
+    var(--platform-lime),
+    var(--platform-action),
+    var(--platform-lime)
+  );
   background-size: 200%;
   animation: sweep 1.8s ease-in-out infinite;
 }
@@ -57,14 +121,14 @@
   display: grid;
   gap: 0.7rem;
   padding: 0.85rem;
-  border: 1px solid #e2e2df;
+  border: 1px solid var(--platform-line);
   border-radius: 1.2rem;
   background: white;
   animation: enter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 .candidate[data-selected="true"] {
-  border-color: #6450b8;
-  box-shadow: 0 0 0 2px #6450b826;
+  border-color: var(--platform-action);
+  box-shadow: 0 0 0 2px #242b6026;
 }
 .candidate > strong {
   font-size: 0.8rem;
@@ -111,7 +175,7 @@
   margin-top: 0.25rem;
   width: 18px;
   height: 18px;
-  accent-color: #6450b8;
+  accent-color: var(--platform-action);
 }
 @keyframes sweep {
   to {

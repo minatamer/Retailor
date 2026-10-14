@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
+import { Brand } from "../../components/ui/brand";
 import { PhotoPicker, namedFiles } from "../photos/photo-picker";
 import { SAMPLE } from "../photos/sample";
 import { SessionProvider, useSession } from "../session/context";
@@ -78,29 +79,46 @@ function WorkspaceFlow() {
     );
   return (
     <main className={styles.workspace}>
-      <header className={styles.header}>
-        <Link href="/" className={styles.wordmark}>
-          retailor <Icon name="sparkle" />
+      <header
+        className={styles.header}
+        data-store-actions={state.stage === "storefront" ? "true" : undefined}
+      >
+        <Link href="/" className={styles.wordmark} aria-label="Retailor home">
+          <Brand />
         </Link>
-        <span className={styles.temporary}>Your temporary clothing studio</span>
         <div className={styles.headerActions}>
-          {state.graph.products.length > 0 && (
-            <Button variant="quiet" onClick={() => controller.exportReport()}>
-              Export JSON
-            </Button>
-          )}
           <Button variant="quiet" onClick={() => controller.askReset()}>
             Reset demo
           </Button>
+          {state.stage === "dashboard" && (
+            <Button
+              variant="secondary"
+              onClick={() => controller.go("storefront")}
+            >
+              View storefront
+            </Button>
+          )}
+          {state.stage === "storefront" && (
+            <>
+              <Button
+                variant="secondary"
+                onClick={() => controller.go("style")}
+              >
+                Revisit the look
+              </Button>
+              <Button onClick={() => controller.go("dashboard")}>
+                Owner dashboard <Icon name="arrow" />
+              </Button>
+            </>
+          )}
         </div>
       </header>
-      {state.fixture && (
-        <p className={styles.fixture}>
-          Development fixture · Paid calls disabled · Authored garment drafts
-          for local UI testing, not live recognition.
-        </p>
-      )}
-      <div className={styles.main}>
+      <div
+        className={styles.main}
+        data-tailor-preview={
+          state.stage === "style" && state.setup.expanded ? "true" : undefined
+        }
+      >
         {!["storefront", "dashboard"].includes(state.stage) && (
           <ol className={styles.steps} aria-label="Store creation progress">
             {["Photos", "Draft", "Review", "Make it yours"].map(
@@ -127,20 +145,6 @@ function WorkspaceFlow() {
         >
           {state.stage === "choose" && (
             <>
-              <div className={styles.intro}>
-                <span className={styles.eyebrow}>
-                  From photographs to possibility
-                </span>
-                <h1>
-                  Bring the clothes.
-                  <br />
-                  <em>Meet their next chapter.</em>
-                </h1>
-                <p>
-                  A collection of your own, or fifteen beautiful photos to begin
-                  with.
-                </p>
-              </div>
               {state.draft && (
                 <Button
                   variant="secondary"
@@ -149,70 +153,64 @@ function WorkspaceFlow() {
                   Continue your saved draft
                 </Button>
               )}
-              <div className={styles.selectionLayout}>
-                <PhotoPicker
-                  controller={controller.photos}
-                  onProcess={() => void controller.draftCatalogue()}
-                  canProcess={controller.canAttemptAi()}
-                />
-                <aside className={styles.sample}>
-                  <span className={styles.eyebrow}>Meet FORME</span>
-                  <h2>
-                    Your first collection
-                    <br />
-                    is already here.
-                  </h2>
-                  <div className={styles.samplePhotos}>
-                    {SAMPLE.assets
-                      .filter((asset) =>
-                        ["F01", "F07", "F12"].includes(asset.id),
-                      )
-                      .map((asset) => (
-                        <Image
-                          key={asset.id}
-                          src={asset.path}
-                          width={asset.image.width}
-                          height={asset.image.height}
-                          alt={`Generated sample clothing ${asset.id}`}
-                          sizes="(max-width: 900px) 25vw, 120px"
-                        />
-                      ))}
-                  </div>
-                  <p>
-                    15 original generated clothing photos. Every deliberate
-                    draft interprets the selected inputs.
-                  </p>
-                  <Button
-                    disabled={sampleBusy}
-                    onClick={() => void controller.sample()}
-                  >
-                    {sampleBusy ? "Loading photos…" : "Use the 15-photo sample"}
-                    <Icon name="arrow" />
-                  </Button>
-                  {sampleBusy && (
-                    <Button variant="quiet" onClick={() => controller.cancel()}>
-                      Cancel sample loading
+              <PhotoPicker
+                headingLevel={1}
+                controller={controller.photos}
+                onProcess={() => void controller.draftCatalogue()}
+                canProcess={controller.canAttemptAi()}
+                alternative={
+                  <aside className={styles.sample}>
+                    <h3>Try the sample collection</h3>
+                    <p>
+                      No photos handy? Try 15 garments in 19 photos, with linked
+                      views ready to explore.
+                    </p>
+                    <div className={styles.samplePhotos}>
+                      {SAMPLE.assets
+                        .filter((asset) =>
+                          ["F01", "F07", "F12"].includes(asset.id),
+                        )
+                        .map((asset) => (
+                          <Image
+                            key={asset.id}
+                            src={asset.path}
+                            width={asset.image.width}
+                            height={asset.image.height}
+                            alt={`Generated sample clothing ${asset.id}`}
+                            sizes="80px"
+                          />
+                        ))}
+                    </div>
+                    <Button
+                      disabled={sampleBusy}
+                      onClick={() => void controller.sample()}
+                    >
+                      {sampleBusy
+                        ? "Loading photos…"
+                        : `Use the ${SAMPLE.assets.length}-photo sample`}
+                      <Icon name="arrow" />
                     </Button>
-                  )}
-                  <p className={styles.finePrint}>
-                    Use photos you own or have permission to use. Live AI
-                    processing sends selected previews to OpenAI. This demo is
-                    temporary.
-                  </p>
-                </aside>
-              </div>
+                    {sampleBusy && (
+                      <Button
+                        variant="quiet"
+                        onClick={() => controller.cancel()}
+                      >
+                        Cancel sample loading
+                      </Button>
+                    )}
+                    <p className={styles.finePrint}>
+                      Original generated photos from FORME. Your draft starts
+                      with this collection, ready for you to edit.
+                    </p>
+                  </aside>
+                }
+              />
             </>
           )}
           {state.stage === "process" && <Processing step={processStep} />}
           {state.stage === "catalogue" && <CatalogueReview />}
           {(state.stage === "style" || state.stage === "storefront") && (
-            <div
-              className={
-                state.stage === "style" && state.setup.expanded
-                  ? styles.styleLayout
-                  : ""
-              }
-            >
+            <div className={styles.styleLayout}>
               <CollectionCanvas />
             </div>
           )}
@@ -255,13 +253,9 @@ function WorkspaceFlow() {
         )}
       </div>
       <footer className={styles.footer}>
-        A clothing demo, made with Retailor. USD is the editable money
-        authority. No real payment or shipping.
-        <span>
-          Your workspace lasts two hours from creation. Reset clears owned local
-          work; it cannot recall dispatched AI requests or saved exports.
-          Browser close does not guarantee immediate physical deletion.
-        </span>
+        <Link href="/" className={styles.wordmark} aria-label="Retailor home">
+          <Brand />
+        </Link>
       </footer>
       <Tailor />
       <BagDialog />
@@ -372,16 +366,6 @@ function CollectionCanvas() {
           owner: () => controller.go(preview ? "catalogue" : "dashboard"),
         }}
       />
-      {state.stage === "storefront" && (
-        <div className={styles.actionBar}>
-          <Button variant="secondary" onClick={() => controller.go("style")}>
-            Revisit the look
-          </Button>
-          <Button onClick={() => controller.go("dashboard")}>
-            Owner dashboard <Icon name="arrow" />
-          </Button>
-        </div>
-      )}
     </>
   );
 }

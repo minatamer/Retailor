@@ -6,7 +6,7 @@ import { useSession } from "../session/context";
 import { DesignChoices, BrandFields } from "../assistants/tailor";
 import { LogoPanel } from "../assistants/logo-panel";
 import { logoEligible } from "../assistants/setup";
-import { TEMPLATES, PALETTES, TYPOGRAPHIES } from "./presets";
+import { layoutLabel, PALETTES, TYPOGRAPHIES } from "./presets";
 import styles from "./owner-design.module.css";
 const FIELDS = {
   template: "Layout",
@@ -58,8 +58,7 @@ export function OwnerDesign({ preview }: { preview: ReactNode }) {
       </header>
       {!state.designEditing && (
         <p>
-          {state.acceptedDesign.name} ·{" "}
-          {TEMPLATES[state.acceptedDesign.template].label} ·{" "}
+          {state.acceptedDesign.name} · {layoutLabel(state.acceptedDesign)} ·{" "}
           {PALETTES[state.acceptedDesign.theme].label} ·{" "}
           {TYPOGRAPHIES[state.acceptedDesign.typography].label}
         </p>
@@ -95,7 +94,7 @@ export function OwnerDesign({ preview }: { preview: ReactNode }) {
                       Confirm colour & type for optional logos
                     </Button>
                   )}
-                  <LogoPanel />
+                  <LogoPanel showNameInput={false} />
                 </div>
               ) : (
                 <DesignChoices kind={field} />

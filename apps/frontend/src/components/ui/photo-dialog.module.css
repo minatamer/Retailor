@@ -1,0 +1,343 @@
+.dialog {
+  width: min(1080px, calc(100% - 32px));
+  max-width: calc(100% - 32px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--platform-line);
+  border-radius: 20px;
+  background: white;
+  color: var(--platform-text);
+  box-shadow: 0 32px 100px #242b6033;
+  overflow: hidden;
+  animation: arrive 220ms var(--ease-out) both;
+}
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+  height: min(820px, calc(100dvh - 32px));
+}
+.dialog::backdrop {
+  background: #242b6066;
+  backdrop-filter: blur(5px);
+}
+.header {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--platform-line);
+  background: white;
+  flex-shrink: 0;
+}
+.header h2 {
+  margin: 0;
+  font: 400 clamp(24px, 3vw, 34px)/1.15 var(--font-editorial);
+  letter-spacing: -0.025em;
+  outline: none;
+  overflow-wrap: anywhere;
+}
+.body {
+  flex: 1;
+  min-height: 0;
+}
+.editorLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+}
+.galleryPane,
+.editPane {
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 24px;
+  scrollbar-gutter: stable;
+}
+.editPane {
+  border-left: 1px solid var(--platform-line);
+}
+.paneHeading {
+  font-size: 15px;
+  margin: 0 0 18px;
+}
+.carousel {
+  min-width: 0;
+}
+.viewer {
+  position: relative;
+  border: 1px solid var(--platform-line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.viewer:focus-visible {
+  outline: 3px solid var(--platform-text);
+  outline-offset: 3px;
+}
+.slide {
+  margin: 0;
+  animation: photoReveal 220ms var(--ease-out) both;
+}
+.slide img,
+.slide > p {
+  display: block;
+  width: 100%;
+  height: clamp(180px, 43dvh, 470px);
+  object-fit: contain;
+}
+.slide > p {
+  display: grid;
+  place-content: center;
+}
+.slide figcaption {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 7px 10px;
+  border: 1px solid var(--platform-line);
+  border-radius: 30px;
+  font-size: 11px;
+  background: white;
+}
+.carouselNavigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-top: 1px solid var(--platform-line);
+}
+.carouselNavigation button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+.carouselNavigation span {
+  font-size: 12px;
+}
+.thumbnails {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 3px;
+  margin-top: 8px;
+}
+.thumbnails button {
+  position: relative;
+  flex: 0 0 62px;
+  height: 76px;
+  border: 1px solid var(--platform-line);
+  border-radius: 8px;
+  padding: 4px;
+  background: white;
+  color: var(--platform-text);
+  cursor: pointer;
+  transition:
+    border-color 180ms,
+    transform 180ms;
+}
+.thumbnails button[aria-pressed="true"] {
+  border: 2px solid var(--platform-text);
+  box-shadow: 0 0 0 2px var(--platform-selected);
+}
+.thumbnails button:focus-visible {
+  outline: 2px solid var(--platform-text);
+  outline-offset: 2px;
+}
+.thumbnails button:active {
+  transform: scale(0.96);
+}
+.thumbnails img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.thumbnails button > span {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  padding: 2px 4px;
+  font-size: 9px;
+  background: white;
+  border-radius: 3px;
+}
+.photoName {
+  font-size: 11px;
+  color: var(--platform-muted);
+  overflow-wrap: anywhere;
+  margin: 6px 0 18px;
+}
+.editPane .footer {
+  position: sticky;
+  bottom: -24px;
+  background: white;
+  padding-bottom: 20px;
+  z-index: 2;
+}
+.intro {
+  margin: 0 0 24px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--platform-muted);
+}
+.photoActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.photoActions button {
+  font-size: 11px;
+}
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-top: 1px solid var(--platform-line);
+  margin-top: 24px;
+  padding-top: 20px;
+}
+.footer > :first-child:not(:last-child) {
+  margin-right: auto;
+}
+.form {
+  display: grid;
+  gap: 16px;
+}
+.form label {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+}
+.form input,
+.form select,
+.form textarea {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--platform-control-line);
+  border-radius: 8px;
+  color: var(--platform-text);
+  background: white;
+  font: inherit;
+}
+.form textarea {
+  resize: vertical;
+}
+.form fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--platform-line);
+  border-radius: 10px;
+}
+.form legend {
+  padding: 0 5px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.optionFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.colourRow {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  margin: 10px 0;
+}
+.colourPreview {
+  padding: 4px;
+  height: 76px;
+  border: 1px solid var(--platform-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.colourPreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.evidence {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--platform-muted);
+  padding-left: 16px;
+}
+.error {
+  color: var(--feedback-error);
+  font-size: 13px;
+  line-height: 1.6;
+}
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes photoReveal {
+  from {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (max-width: 700px) {
+  .dialog {
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    max-height: calc(100dvh - 20px);
+    border-radius: 14px;
+  }
+  .header {
+    padding: 14px 16px;
+  }
+  .body {
+    overflow: auto;
+  }
+  .dialog[open] {
+    height: calc(100dvh - 20px);
+  }
+  .editorLayout {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .galleryPane,
+  .editPane {
+    overflow: visible;
+    padding: 16px;
+    scrollbar-gutter: auto;
+  }
+  .editPane {
+    border-left: 0;
+    border-top: 1px solid var(--platform-line);
+  }
+  .editPane .footer {
+    position: static;
+  }
+  .slide img,
+  .slide > p {
+    height: clamp(160px, 32dvh, 300px);
+  }
+}
+@media (max-width: 360px) {
+  .optionFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

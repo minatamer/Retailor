@@ -1,8 +1,39 @@
 import { SampleManifestSchema } from "@retailor/contracts/photos";
 import manifest from "../../../public/sample/forme/manifest.json";
-import type { NamedPhoto } from "./controller";
+import type { NamedPhoto, PhotoController } from "./controller";
 import { orderedPhotoProcessing } from "./ordered-processing";
 export const SAMPLE = SampleManifestSchema.parse(manifest);
+/** Relate only accepted sample bytes. Never overwrites a visitor's existing links. */
+export function linkSampleViews(
+  controller: PhotoController,
+  accepted: readonly string[],
+) {
+  const { items: views, linksInitialized } = controller.getSnapshot();
+  for (const asset of SAMPLE.assets.filter(
+    (item) => item.role === "alternate",
+  )) {
+    const primary = SAMPLE.assets.find((item) => item.id === asset.relatedTo)!;
+    const first = views.find(
+      (item) => item.photo.source.hash === primary.image.hash,
+    );
+    const alternate = views.find(
+      (item) => item.photo.source.hash === asset.image.hash,
+    );
+    if (
+      first &&
+      alternate &&
+      (!linksInitialized || accepted.includes(alternate.photo.id)) &&
+      !controller
+        .getSnapshot()
+        .links.some(
+          (group) =>
+            group.includes(first.photo.id) ||
+            group.includes(alternate.photo.id),
+        )
+    )
+      controller.link([first.photo.id, alternate.photo.id], true);
+  }
+}
 /** Fixed local release assets only; never accepts a visitor URL. */
 export async function loadSample(
   signal: AbortSignal,

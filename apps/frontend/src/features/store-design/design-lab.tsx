@@ -2,8 +2,10 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import type { Design } from "@retailor/contracts/design";
+import { DEFAULT_THEME } from "@retailor/contracts/design";
 import { Button, Choice } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
+import { Brand } from "../../components/ui/brand";
 import { PALETTES, TEMPLATES, TYPOGRAPHIES } from "./presets";
 import {
   StoreComposition,
@@ -51,7 +53,7 @@ const REFERENCE_PRODUCTS: readonly StorePresentation[] = [
 const INITIAL_DESIGN: Design = {
   heroPhotoId: null,
   template: "studio",
-  theme: "ink",
+  theme: DEFAULT_THEME,
   typography: "editorial",
   name: "FORME",
   headline: "Good clothes. Great days.",
@@ -66,7 +68,7 @@ export function DesignLab() {
   const [chatOpen, setChatOpen] = useState(false);
   const [pressure, setPressure] = useState(false);
   const [notice, setNotice] = useState(
-    "Studio, Ink / Paper, Editorial. A considered place to start.",
+    "Studio, Navy / Lime, Editorial. A considered place to start.",
   );
   const products = pressure
     ? REFERENCE_PRODUCTS.map((product, index) =>
@@ -98,9 +100,12 @@ export function DesignLab() {
         Skip to store preview
       </a>
       <header className={styles.platformHeader}>
-        <Link href="/" className={styles.platformWordmark}>
-          retailor
-          <Icon name="sparkle" size={23} />
+        <Link
+          href="/"
+          className={styles.platformWordmark}
+          aria-label="Retailor home"
+        >
+          <Brand />
         </Link>
         <span className={styles.referenceTag}>The design collection / 01</span>
         <Link className={styles.workspaceLink} href="/demo">

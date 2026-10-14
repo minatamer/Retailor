@@ -29,7 +29,7 @@ it("rejects an already-cancelled sample operation without fetching or returning 
   await expect(loadSample(AbortSignal.abort(), fetcher)).rejects.toThrow();
   expect(fetcher).not.toHaveBeenCalled();
 });
-it("loads two actual release photos at once and preserves the full fifteen-photo manifest order", async () => {
+it("loads two actual release photos at once and preserves the full nineteen-photo manifest order", async () => {
   const { fetcher, calls } = heldFetch(),
     pending = loadSample(new AbortController().signal, fetcher);
   await vi.waitFor(() => expect(calls).toHaveLength(2));
@@ -45,7 +45,7 @@ it("loads two actual release photos at once and preserves the full fifteen-photo
   expect(result.map((file) => file.blob.size)).toEqual(
     SAMPLE.assets.map((asset) => asset.image.bytes),
   );
-  expect(fetcher).toHaveBeenCalledTimes(15);
+  expect(fetcher).toHaveBeenCalledTimes(19);
 });
 it("cancels both active sample transfers and never starts queued paths", async () => {
   const { fetcher, calls } = heldFetch(),

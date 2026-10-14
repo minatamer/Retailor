@@ -1,11 +1,13 @@
 import Image from "next/image";
 import type { Design } from "@retailor/contracts/design";
+import { pageTemplate } from "@retailor/contracts/design";
 import { formatUsd } from "@retailor/commerce/money";
 import { Icon } from "../../components/ui/icon";
 import { merchantStyle } from "./presets";
 import styles from "./store-composition.module.css";
 
-export type StorePage = "home" | "collection" | "product";
+export type { StorePage } from "@retailor/contracts/design";
+import type { StorePage } from "@retailor/contracts/design";
 export interface StorePresentation {
   id: string;
   title: string;
@@ -17,7 +19,7 @@ export interface StorePresentation {
   available: boolean;
 }
 export function StoreComposition({
-  design,
+  design: suppliedDesign,
   page,
   products,
   activeProduct,
@@ -31,6 +33,10 @@ export function StoreComposition({
   onPage(page: StorePage): void;
   onProduct(product: StorePresentation): void;
 }) {
+  const design = {
+    ...suppliedDesign,
+    template: pageTemplate(suppliedDesign, page),
+  };
   const heroProduct = products[0] ?? activeProduct;
   return (
     <section

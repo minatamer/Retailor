@@ -122,6 +122,129 @@ async function setup(requester?: LogoRequester) {
   controller.publish();
   return { env, request, verify, controller };
 }
+it("edits and confirms the logo-step name in the sole draft, restores without dispatch and uses current name/style context", async () => {
+  const { env, request, verify, controller } = await setup();
+  controller.useCurrentLook();
+  const previous = controller.getSnapshot().state;
+  controller.logoNameInput("  Sunday Studio  ");
+  const edited = controller.getSnapshot().state;
+  expect(edited.setup.step).toBe("logo");
+  expect(edited.setup.brandConfirmed).toBe(false);
+  expect(edited.setup.brandDirty.name).toBe(true);
+  expect(edited.previewDesign.name).toBe("Sunday Studio");
+  expect(edited.previewDesign.headline).toBe(previous.previewDesign.headline);
+  expect(edited.previewDesign.heroPhotoId).toBe(
+    previous.previewDesign.heroPhotoId,
+  );
+  expect(edited.acceptedDesign).toBe(previous.acceptedDesign);
+  expect(edited.graph).toBe(previous.graph);
+  controller.brandInput({ name: "Late replacement" }, "suggestion");
+  expect(controller.getSnapshot().state.setup.brandDraft?.name).toBe(
+    "  Sunday Studio  ",
+  );
+  expect(request).not.toHaveBeenCalled();
+  controller.dispose();
+  const restored = await env.open({ logoRequest: request, logoVerify: verify });
+  expect(restored.getSnapshot().state.setup.step).toBe("logo");
+  expect(restored.getSnapshot().state.setup.brandDraft?.name).toBe(
+    "  Sunday Studio  ",
+  );
+  expect(restored.getSnapshot().preparedLogo).toBeNull();
+  expect(restored.prepareNamedLogo()).toBe(true);
+  expect(request).not.toHaveBeenCalled();
+  await restored.generateLogos();
+  expect(request).toHaveBeenCalledOnce();
+  expect(request.mock.calls[0]![0].context).toMatchObject({
+    name: "Sunday Studio",
+    theme: edited.previewDesign.theme,
+    typography: edited.previewDesign.typography,
+  });
+  expect(restored.getSnapshot().state.setup.brandConfirmed).toBe(true);
+});
+it("blocks blank, whitespace, control and oversized names from every logo/proceed path without using the previous preview name", async () => {
+  const { request, controller } = await setup();
+  controller.useCurrentLook();
+  for (const name of ["", "   ", "Bad\u0000name"]) {
+    controller.logoNameInput(name);
+    expect(controller.getSnapshot().state.setup.step).toBe("logo");
+    expect(controller.prepareNamedLogo()).toBe(false);
+    controller.prepareLogo();
+    await controller.generateLogos();
+    controller.keepWordmark();
+    controller.keepNamedWordmark();
+    controller.acceptDesign();
+    expect(controller.getSnapshot().state.stage).toBe("style");
+    expect(controller.getSnapshot().state.setup.wordmarkKept).toBe(false);
+    expect(controller.getSnapshot().preparedLogo).toBeNull();
+  }
+  const before = controller.getSnapshot().state.previewDesign;
+  controller.logoNameInput("A".repeat(41));
+  expect(controller.getSnapshot().state.previewDesign).toBe(before);
+  expect(request).not.toHaveBeenCalled();
+  controller.logoNameInput("Étude & Co");
+  controller.keepNamedWordmark();
+  controller.acceptDesign();
+  expect(controller.getSnapshot().state.acceptedDesign.name).toBe("Étude & Co");
+  expect(controller.getSnapshot().state.stage).toBe("storefront");
+});
+it("immediately cancels a dispatched logo batch on cleared name and rejects its late old-name output", async () => {
+  let finish!: () => void, signal!: AbortSignal;
+  const { request, controller } = await setup(
+    async (input, owned, dispatch) => {
+      signal = owned;
+      dispatch();
+      return new Promise((resolve) => {
+        finish = () => resolve(result(input, input.createdAt));
+      });
+    },
+  );
+  controller.useCurrentLook();
+  controller.logoNameInput("Sunday Studio");
+  controller.prepareNamedLogo();
+  const pending = controller.generateLogos();
+  await vi.waitFor(() => expect(request).toHaveBeenCalledOnce());
+  controller.logoNameInput("");
+  expect(signal.aborted).toBe(true);
+  expect(controller.getSnapshot().logoBusy).toBe(false);
+  expect(controller.getSnapshot().preparedLogo).toBeNull();
+  finish();
+  await pending;
+  expect(controller.getSnapshot().state.logos.candidates).toEqual([]);
+  expect(controller.getSnapshot().state.logos.batches).toBe(1);
+  expect(controller.prepareNamedLogo()).toBe(false);
+});
+it("renames the working image to its new wordmark while owner Cancel preserves accepted identity and Apply commits only a valid name", async () => {
+  const { controller } = await setup();
+  controller.useCurrentLook();
+  controller.logoNameInput("Sunday");
+  controller.prepareNamedLogo();
+  await controller.generateLogos();
+  const candidate = controller.getSnapshot().state.logos.candidates[0]!.id;
+  controller.reviewLogo(candidate, true);
+  controller.previewLogo(candidate);
+  controller.useLogo(candidate);
+  controller.acceptDesign();
+  controller.go("dashboard");
+  controller.beginOwnerDesign();
+  const accepted = controller.getSnapshot().state.acceptedDesign;
+  controller.logoNameInput("Atelier");
+  expect(controller.getSnapshot().state.previewDesign.logoId).toBeNull();
+  expect(controller.getSnapshot().state.previewDesign.name).toBe("Atelier");
+  controller.previewLogo(candidate);
+  expect(controller.getSnapshot().state.previewDesign.logoId).toBeNull();
+  expect(controller.getSnapshot().state.acceptedDesign).toBe(accepted);
+  controller.cancelDesign();
+  expect(controller.getSnapshot().state.previewDesign).toEqual(accepted);
+  controller.beginOwnerDesign();
+  controller.logoNameInput(" ");
+  controller.applyOwnerDesign();
+  expect(controller.getSnapshot().state.designEditing).toBe(true);
+  controller.logoNameInput("Atelier");
+  controller.applyOwnerDesign();
+  expect(controller.getSnapshot().state.acceptedDesign.name).toBe("Atelier");
+  expect(controller.getSnapshot().state.acceptedDesign.logoId).toBeNull();
+  expect(controller.getSnapshot().state.designEditing).toBe(false);
+});
 it("offers preparation only after explicit type and colour, requires human review plus preview, restores inertly and falls back if bytes disappear", async () => {
   const { env, request, verify, controller } = await setup();
   controller.prepareLogo();

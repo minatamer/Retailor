@@ -1,20 +1,34 @@
 "use client";
 import { useState } from "react";
-import Image from "next/image";
-import { CategorySchema } from "@retailor/contracts/product";
 import { formatUsd } from "@retailor/commerce/money";
 import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
 import { useSession } from "../session/context";
-import type { DraftItem } from "./draft";
-import { readCatalogueEdit, catalogueEditNotice } from "./edit-input";
+import { PhotoStack } from "../photos/photo-stack";
+import { ProductEditor } from "./product-editor";
 import styles from "../demo/workspace.module.css";
+import photoStyles from "../photos/photos.module.css";
+
 export function CatalogueReview() {
-  const { controller, state, missingPhotoIds } = useSession(),
-    [mergeIds, setMergeIds] = useState<string[]>([]);
+  const { controller, state, missingPhotoIds } = useSession();
+  const [linking, setLinking] = useState(false),
+    [chosen, setChosen] = useState<string[]>([]),
+    [editing, setEditing] = useState<string | null>(null);
   const draft = state.draft;
   if (!draft) return null;
   const included = draft.items.filter((item) => item.included).length;
+  const selected = chosen.filter((id) =>
+    draft.items.some(
+      (item) =>
+        item.product.id === id && item.included && item.confirmedClothing,
+    ),
+  );
+  const selectedPhotos = new Set(
+    draft.items
+      .filter((item) => selected.includes(item.product.id))
+      .flatMap((item) => item.product.imageIds),
+  );
+  const edited = draft.items.find((item) => item.product.id === editing);
   return (
     <>
       <div className={styles.reviewHeading}>
@@ -24,8 +38,8 @@ export function CatalogueReview() {
             Looking like <em>your store.</em>
           </h1>
           <p>
-            {included} garments included. Open a card if you want to fine-tune
-            anything.
+            {included} garments included. Click a card to edit its photos and
+            details.
           </p>
         </div>
         <span className={styles.count}>
@@ -33,11 +47,6 @@ export function CatalogueReview() {
           <small>garments</small>
         </span>
       </div>
-      <p className={styles.assumptions}>
-        Titles and copy are drafts. Price, stock, costs and size options are
-        disclosed demo defaults. Fabric, care and measurements stay unknown
-        unless confirmed by you.
-      </p>
       <div className={`${styles.actionBar} ${styles.reviewActions}`}>
         <Button variant="quiet" onClick={() => controller.go("choose")}>
           Back to photos
@@ -53,41 +62,141 @@ export function CatalogueReview() {
           Make it my own <Icon name="arrow" />
         </Button>
       </div>
-      {mergeIds.length > 0 && (
-        <div className={styles.selectionBar}>
+      <div className={photoStyles.linkHeading}>
+        <div>
+          <h2>One product. Every angle.</h2>
           <p>
-            {mergeIds.length} selected · merge only when these photos show the
-            same garment.
+            Keep matching angles and colour options together in one product.
+            Open a card to review or change its links.
+          </p>
+        </div>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            setLinking(!linking);
+            setChosen([]);
+          }}
+        >
+          {linking ? "Cancel linking" : "Link photos"}
+        </Button>
+      </div>
+      {linking && (
+        <div className={photoStyles.linkBar}>
+          <p>
+            {selectedPhotos.size
+              ? `${selectedPhotos.size} photos selected`
+              : "Select two or more cards of the same product."}
+            {selectedPhotos.size > 0
+              ? ". The first selected card keeps its product details."
+              : ""}
+            {selectedPhotos.size > 8
+              ? " Keep up to 8 photos in one product."
+              : ""}
           </p>
           <Button
-            disabled={mergeIds.length < 2}
+            disabled={selected.length < 2 || selectedPhotos.size > 8}
             onClick={() => {
-              controller.merge(mergeIds);
-              setMergeIds([]);
+              if (controller.linkProducts(selected)) {
+                setChosen([]);
+                setLinking(false);
+              }
             }}
           >
-            Merge garment views
-          </Button>
-          <Button variant="quiet" onClick={() => setMergeIds([])}>
-            Clear
+            Link {selectedPhotos.size || "selected"} photos
           </Button>
         </div>
       )}
       <div className={styles.catalogueGrid}>
-        {draft.items.map((item) => (
-          <ReviewCard
-            key={item.product.id}
-            item={item}
-            mergeSelected={mergeIds.includes(item.product.id)}
-            onSelect={() =>
-              setMergeIds((ids) =>
-                ids.includes(item.product.id)
-                  ? ids.filter((id) => id !== item.product.id)
-                  : [...ids, item.product.id],
-              )
-            }
-          />
-        ))}
+        {draft.items.map((item) => {
+          const product = item.product,
+            photos = product.imageIds.flatMap(
+              (id) => controller.photos.view(id) ?? [],
+            ),
+            checked = selected.includes(product.id);
+          return (
+            <article
+              key={product.id}
+              className={`${styles.reviewCard} ${!item.included ? styles.excluded : ""}`}
+            >
+              <button
+                type="button"
+                className={photoStyles.openPhoto}
+                onClick={() => setEditing(product.id)}
+                aria-label={`Edit ${product.title}`}
+              >
+                <PhotoStack
+                  photos={photos}
+                  count={product.imageIds.length}
+                  label={product.title}
+                />
+                <span className={styles.cardBody}>
+                  <small>
+                    {product.category.replaceAll("-", " ")} ·{" "}
+                    {item.copyOrigin === "user_supplied"
+                      ? "edited by you"
+                      : "draft"}
+                  </small>
+                  <span
+                    role="heading"
+                    aria-level={2}
+                    className={styles.productTitle}
+                  >
+                    {product.title}
+                  </span>
+                  <span>
+                    {formatUsd(product.variants[0]!.price)} · Click to edit
+                  </span>
+                </span>
+              </button>
+              {linking && (
+                <label className={photoStyles.reviewCheck}>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    disabled={!item.included || !item.confirmedClothing}
+                    aria-label={`Select ${product.title} photos to link`}
+                    onChange={() =>
+                      setChosen(
+                        checked
+                          ? selected.filter((id) => id !== product.id)
+                          : [...selected, product.id],
+                      )
+                    }
+                  />
+                  <span>
+                    {!item.included || !item.confirmedClothing
+                      ? "Include and confirm this garment before linking"
+                      : checked
+                        ? "Selected"
+                        : "Select photos"}
+                  </span>
+                </label>
+              )}
+              <div className={styles.cardMeta}>
+                <span>
+                  {product.imageIds.length > 1 &&
+                  (item.linkOrigin === "recognition" ||
+                    item.linkOrigin === "development-fixture")
+                    ? item.included
+                      ? "Auto-linked · "
+                      : "Review links · "
+                    : ""}
+                  {product.imageIds.length}{" "}
+                  {product.imageIds.length === 1 ? "photo" : "linked photos"}
+                  {(product.colourPhotos?.length ?? 0) > 1
+                    ? ` · ${product.colourPhotos!.length} colours`
+                    : ""}
+                </span>
+                <Button
+                  variant="quiet"
+                  onClick={() => controller.include(product.id, !item.included)}
+                >
+                  {item.included ? "Exclude" : "Include garment"}
+                </Button>
+              </div>
+            </article>
+          );
+        })}
       </div>
       <div className={styles.coverage}>
         <h2>Every photo has a place.</h2>
@@ -113,215 +222,18 @@ export function CatalogueReview() {
             </div>
           ))}
       </div>
+      {edited && (
+        <ProductEditor
+          key={edited.product.id}
+          item={edited}
+          onClose={() => setEditing(null)}
+          onLink={() => {
+            setEditing(null);
+            setLinking(true);
+            setChosen([edited.product.id]);
+          }}
+        />
+      )}
     </>
-  );
-}
-function ReviewCard({
-  item,
-  mergeSelected,
-  onSelect,
-}: {
-  item: DraftItem;
-  mergeSelected: boolean;
-  onSelect(): void;
-}) {
-  const { controller } = useSession(),
-    product = item.product,
-    photo = controller.photos.view(product.imageIds[0]!);
-  const [error, setError] = useState("");
-  function save(form: FormData) {
-    setError("");
-    try {
-      const edited = readCatalogueEdit(product, form);
-      if (!controller.edit(product.id, edited))
-        setError(
-          "Keep a valid garment name, supported photo references and distinct clothing options.",
-        );
-    } catch (error) {
-      setError(catalogueEditNotice(error));
-    }
-  }
-  return (
-    <article
-      className={`${styles.reviewCard} ${!item.included ? styles.excluded : ""}`}
-    >
-      <div className={styles.cardPhoto}>
-        {photo ? (
-          <Image
-            src={photo.url}
-            alt={`Source photo for ${product.title}`}
-            width={photo.photo.derivative.width}
-            height={photo.photo.derivative.height}
-            unoptimized
-          />
-        ) : (
-          <span>Photo needs repair</span>
-        )}
-        <button
-          className={styles.mergeCheck}
-          type="button"
-          aria-pressed={mergeSelected}
-          aria-label={`Select ${product.title} for grouping`}
-          onClick={onSelect}
-        >
-          {mergeSelected ? <Icon name="check" size={16} /> : "+"}
-        </button>
-        <span className={styles.photoCount}>
-          {product.imageIds.length}{" "}
-          {product.imageIds.length === 1 ? "photo" : "views"}
-        </span>
-      </div>
-      <div className={styles.cardBody}>
-        <small>
-          {product.category.replaceAll("-", " ")} ·{" "}
-          {item.copyOrigin === "user_supplied" ? "edited by you" : "draft"}
-        </small>
-        <h2>{product.title}</h2>
-        <div className={styles.cardMeta}>
-          <span>{formatUsd(product.variants[0]!.price)}</span>
-          <Button
-            variant="quiet"
-            onClick={() => controller.include(product.id, !item.included)}
-          >
-            {item.included ? "Exclude" : "Include garment"}
-          </Button>
-        </div>
-        <details>
-          <summary>
-            Fine-tune & sources <Icon name="arrow" size={16} />
-          </summary>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              save(new FormData(event.currentTarget));
-            }}
-            className={styles.editForm}
-          >
-            <label>
-              Garment name
-              <input
-                name="title"
-                defaultValue={product.title}
-                required
-                maxLength={100}
-              />
-            </label>
-            <label>
-              Clothing category
-              <select name="category" defaultValue={product.category}>
-                {CategorySchema.options.map((category) => (
-                  <option key={category} value={category}>
-                    {category.replaceAll("-", " ")}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Draft copy
-              <textarea
-                name="description"
-                defaultValue={product.description}
-                maxLength={1000}
-                rows={3}
-              />
-            </label>
-            <label>
-              Primary photo
-              <select name="primary" defaultValue={product.imageIds[0]}>
-                {product.imageIds.map((id, index) => (
-                  <option key={id} value={id}>
-                    Source photo {index + 1}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <p className={styles.finePrint}>
-              {item.reviewReason || "Review only what matters to you."}
-            </p>
-            <p className={styles.finePrint}>
-              Details without supported source evidence remain unknown. Options
-              below are editable demo assumptions.
-            </p>
-            {product.variants.map((variant, index) => (
-              <fieldset key={variant.id}>
-                <legend>Demo option {index + 1}</legend>
-                <div className={styles.optionFields}>
-                  <label>
-                    Size
-                    <input
-                      name={`size_${index}`}
-                      defaultValue={variant.size}
-                      required
-                      maxLength={16}
-                    />
-                  </label>
-                  <label>
-                    Colour
-                    <input
-                      name={`colour_${index}`}
-                      defaultValue={variant.colour}
-                      required
-                      maxLength={32}
-                    />
-                  </label>
-                  <label>
-                    Price · USD
-                    <input
-                      name={`price_${index}`}
-                      defaultValue={(variant.price / 100).toFixed(2)}
-                      inputMode="decimal"
-                      required
-                    />
-                  </label>
-                  <label>
-                    Unit cost · USD
-                    <input
-                      name={`cost_${index}`}
-                      defaultValue={(variant.unitCost / 100).toFixed(2)}
-                      inputMode="decimal"
-                      required
-                    />
-                  </label>
-                  <label>
-                    Opening units
-                    <input
-                      name={`stock_${index}`}
-                      defaultValue={variant.openingStock}
-                      inputMode="numeric"
-                      required
-                    />
-                  </label>
-                </div>
-              </fieldset>
-            ))}
-            {product.attributes.length > 0 && (
-              <ul className={styles.finePrint}>
-                {product.attributes.map((attr) => (
-                  <li key={attr.name}>
-                    {attr.name}: {attr.value ?? "Unknown"} ·{" "}
-                    {attr.provenance.replaceAll("_", " ")} · {attr.review}
-                  </li>
-                ))}
-              </ul>
-            )}
-            {error && (
-              <p role="alert" className={styles.error}>
-                {error}
-              </p>
-            )}
-            <Button type="submit">Save corrections</Button>
-          </form>
-          {product.imageIds.slice(1).map((id, index) => (
-            <Button
-              key={id}
-              variant="quiet"
-              onClick={() => controller.split(product.id, id)}
-            >
-              Split source photo {index + 2} into a new garment
-            </Button>
-          ))}
-        </details>
-      </div>
-    </article>
   );
 }

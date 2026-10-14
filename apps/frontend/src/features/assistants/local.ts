@@ -48,7 +48,7 @@ export function localReply(
     };
   if (role === "creator")
     return {
-      text: "Each template includes a home, collection and product page. Try the visual cards, choose a palette and typography, then make the wordmark your own. These are previews until you confirm your look; a logo batch is optional.",
+      text: "Choose one look for the whole store, or mix layouts by page using the optional visual controls. Colours, type and clothes stay shared. Preview your choices, then confirm your look. A logo batch is optional.",
       references: [],
       claims: [],
       navigation: null,

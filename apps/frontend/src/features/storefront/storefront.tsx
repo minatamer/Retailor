@@ -8,28 +8,32 @@ import {
   displayMinor,
   formatDisplay,
   formatMinor,
-  parseDisplay,
 } from "@retailor/commerce/currency";
 import type { Design } from "@retailor/contracts/design";
+import { pageTemplate } from "@retailor/contracts/design";
 import type { Variant } from "@retailor/contracts/product";
+import { colourImageIds } from "@retailor/contracts/product";
 import { Icon } from "../../components/ui/icon";
 import { merchantStyle } from "../store-design/presets";
 import {
   collection,
   EMPTY_FILTERS,
-  FiltersSchema,
   filterOptions,
   knownColour,
   SIZING_LABELS,
   matchingOption,
+  categoryLabel,
 } from "./browse";
 import type { BrowseState, Filters, StoreItem } from "./browse";
 import { GarmentGallery, GarmentImage } from "./gallery";
+import { PhotoStack } from "../photos/photo-stack";
+import { HomeCampaign } from "./home";
+import { FilterSheet } from "./filter-sheet";
 import type { StorePhoto } from "./gallery";
 import styles from "./storefront.module.css";
 
 export interface StorefrontInput {
-  illustration?: boolean;
+  illustration?: "compact" | "full";
   design: Design;
   items: readonly StoreItem[];
   browse: BrowseState;
@@ -49,12 +53,19 @@ export interface StorefrontActions {
   addToBag?: (productId: string, variantId: string, quantity: number) => void;
 }
 export function Storefront({
-  input,
+  input: suppliedInput,
   actions,
 }: {
   input: StorefrontInput;
   actions: StorefrontActions;
 }) {
+  const input = {
+    ...suppliedInput,
+    design: {
+      ...suppliedInput.design,
+      template: pageTemplate(suppliedInput.design, suppliedInput.browse.page),
+    },
+  };
   const { design, browse, items, preview } = input;
   const current = items.filter((item) => !item.product.archived);
   const scope = input.currency ?? USD_SCOPE;
@@ -64,9 +75,6 @@ export function Storefront({
   const picked = items.find((item) => item.product.id === browse.productId);
   const first = current.find((item) => item.photoIds.length) ?? current[0];
   const price = (cents: number) => formatDisplay(cents, scope);
-  const suppliedHero = design.heroPhotoId
-    ? input.photos.get(design.heroPhotoId)
-    : undefined;
   const body = useRef<HTMLDivElement>(null),
     frame = useRef<HTMLDivElement>(null);
   const previous = useRef(`${browse.page}:${browse.productId ?? ""}`);
@@ -100,7 +108,7 @@ export function Storefront({
       className={styles.store}
       style={merchantStyle(design)}
       data-family={design.template}
-      data-illustration={input.illustration ? "true" : undefined}
+      data-illustration={input.illustration}
       aria-label={`${design.name} storefront`}
     >
       <div className={styles.storeFrame} ref={frame}>
@@ -159,6 +167,7 @@ export function Storefront({
         </header>
         <div
           className={styles.page}
+          data-page={browse.page}
           key={browse.page}
           ref={body}
           tabIndex={-1}
@@ -173,80 +182,14 @@ export function Storefront({
           {browse.page === "home" && (
             <>
               {first ? (
-                <div className={styles.hero}>
-                  <div className={styles.heroCopy}>
-                    <span className={styles.eyebrow}>
-                      A wardrobe. A point of view.
-                    </span>
-                    <h1>{design.headline || "Made for your everyday."}</h1>
-                    <p>
-                      {design.template === "pulse"
-                        ? "Find your next favourite. Make it your own."
-                        : design.template === "gallery"
-                          ? "A considered collection, seen in a new light."
-                          : "Good clothes. A little perspective. Discover the collection."}
-                    </p>
-                    <button
-                      className={styles.primary}
-                      onClick={() => openCollection()}
-                    >
-                      Explore the collection <Icon name="arrow" />
-                    </button>
-                    <span className={styles.heroIndex}>
-                      {String(current.length).padStart(2, "0")} garments · One
-                      collection
-                    </span>
-                  </div>
-                  <button
-                    className={styles.heroPhoto}
-                    onClick={() =>
-                      suppliedHero ? openCollection() : select(first.product.id)
-                    }
-                    aria-label={
-                      suppliedHero
-                        ? "Explore the collection"
-                        : `Discover ${first.product.title}`
-                    }
-                  >
-                    {(suppliedHero ?? photoFor(first, input)) ? (
-                      <GarmentImage
-                        photo={(suppliedHero ?? photoFor(first, input))!}
-                        title={
-                          suppliedHero
-                            ? `Supplied hero image for ${design.name}`
-                            : first.product.title
-                        }
-                        eager
-                        onFailure={actions.photoFailed}
-                      />
-                    ) : (
-                      <span>Photo needs repair</span>
-                    )}
-                    <span className={styles.heroPhotoLabel}>
-                      {suppliedHero
-                        ? "Your collection, your world"
-                        : first.product.title}
-                      <Icon name="arrow" />
-                    </span>
-                  </button>
-                  {design.template === "gallery" && current[1] && (
-                    <button
-                      className={styles.secondHero}
-                      aria-label={`Discover ${current[1].product.title}`}
-                      onClick={() => select(current[1]!.product.id)}
-                    >
-                      {photoFor(current[1], input) && (
-                        <GarmentImage
-                          photo={photoFor(current[1], input)!}
-                          title={current[1].product.title}
-                          eager
-                          onFailure={actions.photoFailed}
-                        />
-                      )}
-                      <span>{current[1].product.title}</span>
-                    </button>
-                  )}
-                </div>
+                <HomeCampaign
+                  design={design}
+                  items={current}
+                  photos={input.photos}
+                  select={select}
+                  explore={() => openCollection()}
+                  onFailure={actions.photoFailed}
+                />
               ) : (
                 <Empty
                   title="A new chapter starts here."
@@ -305,7 +248,7 @@ export function Storefront({
             </>
           )}
           {browse.page === "collection" && (
-            <>
+            <div className={styles.collectionLayout}>
               <div className={styles.collectionHeading}>
                 <span className={styles.eyebrow}>{design.name} / Clothing</span>
                 <h1>
@@ -313,96 +256,129 @@ export function Storefront({
                     ? categoryLabel(browse.filters.category)
                     : "The collection."}
                 </h1>
-                <p>Your next favourite is in the details.</p>
+                <p>
+                  {design.template === "gallery"
+                    ? "A closer look, one garment at a time."
+                    : "Find your kind of clothing."}
+                </p>
               </div>
-              <div className={styles.collectionTools}>
-                <label className={styles.search}>
-                  <Icon name="search" />
-                  <span className={styles.srOnly}>Search garments</span>
-                  <input
-                    type="search"
-                    maxLength={100}
-                    placeholder="Search the collection"
-                    value={browse.filters.search}
-                    onChange={(event) =>
+              <nav
+                className={styles.collectionCategories}
+                aria-label="Collection categories"
+              >
+                <span className={styles.eyebrow}>Browse clothing</span>
+                {[null, ...filterOptions(items).categories].map((category) => (
+                  <button
+                    key={category ?? "all"}
+                    aria-pressed={browse.filters.category === category}
+                    onClick={() =>
                       actions.browse({
-                        filters: {
-                          ...browse.filters,
-                          search: event.target.value,
-                        },
-                      })
-                    }
-                  />
-                </label>
-                <FilterSheet input={input} actions={actions} />
-                <label className={styles.sort}>
-                  <span>Sort</span>
-                  <select
-                    aria-label="Sort collection"
-                    value={browse.sort}
-                    onChange={(event) =>
-                      actions.browse({
-                        sort: event.target.value as BrowseState["sort"],
+                        filters: { ...browse.filters, category },
                       })
                     }
                   >
-                    <option value="recommended">Collection order</option>
-                    <option value="price-low">Price: low to high</option>
-                    <option value="price-high">Price: high to low</option>
-                    <option value="title">Name: A–Z</option>
-                  </select>
-                </label>
-              </div>
-              <AppliedFilters
-                filters={browse.filters}
-                price={(cents) => formatMinor(cents, scope.currency)}
-                onChange={(filters) => actions.browse({ filters }, scope)}
-              />
-              <p className={styles.resultCount} role="status">
-                {filtered.length}{" "}
-                {filtered.length === 1 ? "garment" : "garments"}
-                {filtered.length !== current.length
-                  ? ` of ${current.length}`
-                  : ""}
-              </p>
-              {filtered.length ? (
-                <div className={styles.grid}>
-                  {filtered.map((item) => (
-                    <ProductCard
-                      key={item.product.id}
-                      item={item}
-                      input={input}
-                      onSelect={select}
-                      onFailure={actions.photoFailed}
-                      price={price}
+                    {category ? categoryLabel(category) : "All clothing"}
+                    <span>
+                      {
+                        current.filter(
+                          (item) =>
+                            !category || item.product.category === category,
+                        ).length
+                      }
+                    </span>
+                  </button>
+                ))}
+              </nav>
+              <div className={styles.collectionResults}>
+                <div className={styles.collectionTools}>
+                  <label className={styles.search}>
+                    <Icon name="search" />
+                    <span className={styles.srOnly}>Search garments</span>
+                    <input
+                      type="search"
+                      maxLength={100}
+                      placeholder="Search the collection"
+                      value={browse.filters.search}
+                      onChange={(event) =>
+                        actions.browse({
+                          filters: {
+                            ...browse.filters,
+                            search: event.target.value,
+                          },
+                        })
+                      }
                     />
-                  ))}
+                  </label>
+                  <FilterSheet input={input} actions={actions} />
+                  <label className={styles.sort}>
+                    <span>Sort</span>
+                    <select
+                      aria-label="Sort collection"
+                      value={browse.sort}
+                      onChange={(event) =>
+                        actions.browse({
+                          sort: event.target.value as BrowseState["sort"],
+                        })
+                      }
+                    >
+                      <option value="recommended">Collection order</option>
+                      <option value="price-low">Price: low to high</option>
+                      <option value="price-high">Price: high to low</option>
+                      <option value="title">Name: A–Z</option>
+                    </select>
+                  </label>
                 </div>
-              ) : (
-                <Empty
-                  title={
-                    current.length
-                      ? "A little less filtering?"
-                      : "Your collection has room to grow."
-                  }
-                  copy={
-                    current.length
-                      ? "No garments match these choices. Try clearing a filter to see more."
-                      : "Add a garment with its photograph in the owner workspace."
-                  }
-                  action={
-                    current.length
-                      ? "Clear all filters"
-                      : "Open owner workspace"
-                  }
-                  onAction={() =>
-                    current.length
-                      ? actions.browse({ filters: { ...EMPTY_FILTERS } })
-                      : actions.owner()
-                  }
+                <AppliedFilters
+                  filters={browse.filters}
+                  price={(cents) => formatMinor(cents, scope.currency)}
+                  onChange={(filters) => actions.browse({ filters }, scope)}
                 />
-              )}
-            </>
+                <p className={styles.resultCount} role="status">
+                  {filtered.length}{" "}
+                  {filtered.length === 1 ? "garment" : "garments"}
+                  {filtered.length !== current.length
+                    ? ` of ${current.length}`
+                    : ""}
+                </p>
+                {filtered.length ? (
+                  <div className={styles.grid}>
+                    {filtered.map((item) => (
+                      <ProductCard
+                        key={item.product.id}
+                        item={item}
+                        input={input}
+                        onSelect={select}
+                        onFailure={actions.photoFailed}
+                        price={price}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Empty
+                    title={
+                      current.length
+                        ? "A little less filtering?"
+                        : "Your collection has room to grow."
+                    }
+                    copy={
+                      current.length
+                        ? "No garments match these choices. Try clearing a filter to see more."
+                        : "Add a garment with its photograph in the owner workspace."
+                    }
+                    action={
+                      current.length
+                        ? "Clear all filters"
+                        : "Open owner workspace"
+                    }
+                    onAction={() =>
+                      current.length
+                        ? actions.browse({ filters: { ...EMPTY_FILTERS } })
+                        : actions.owner()
+                    }
+                  />
+                )}
+              </div>
+            </div>
           )}
           {browse.page === "product" &&
             (picked ? (
@@ -438,14 +414,6 @@ export function Storefront({
       </div>
     </section>
   );
-}
-function photoFor(item: StoreItem, input: StorefrontInput) {
-  return item.photoIds.map((id) => input.photos.get(id)).find(Boolean);
-}
-function categoryLabel(value: string) {
-  return value
-    .replaceAll("-", " ")
-    .replace(/^./u, (letter) => letter.toUpperCase());
 }
 function Empty({
   title,
@@ -484,9 +452,12 @@ function ProductCard({
   price(cents: number): string;
 }) {
   const [view, setView] = useState(0),
-    photos = item.photoIds.flatMap((id) =>
-      input.photos.get(id) ? [input.photos.get(id)!] : [],
+    shownIds = new Set(
+      colourImageIds(item.product, input.browse.filters.colour ?? undefined),
     ),
+    photos = item.photoIds
+      .filter((id) => shownIds.has(id))
+      .flatMap((id) => (input.photos.get(id) ? [input.photos.get(id)!] : [])),
     photo = photos[view % Math.max(1, photos.length)];
   const sizes = [
     ...new Set(
@@ -505,7 +476,17 @@ function ProductCard({
           aria-label={`View ${item.product.title}`}
           onClick={() => onSelect(item.product.id)}
         >
-          {photo ? (
+          {photo && photos.length > 1 ? (
+            <PhotoStack
+              photos={[
+                ...photos.slice(view % photos.length),
+                ...photos.slice(0, view % photos.length),
+              ]}
+              label={item.product.title}
+              showCount={false}
+              onFailure={onFailure}
+            />
+          ) : photo ? (
             <GarmentImage
               photo={photo}
               title={item.product.title}
@@ -517,7 +498,7 @@ function ProductCard({
         </button>
         {!item.available && (
           <span className={styles.stockBadge}>
-            {photos.length !== item.product.imageIds.length
+            {item.photoIds.length !== item.product.imageIds.length
               ? "Photo needs repair"
               : "Sold out"}
           </span>
@@ -566,9 +547,15 @@ function ProductDetail({
     ({ variant }) => variant.id === input.browse.variantId,
   );
   const [quantity, setQuantity] = useState(1);
-  const photos = item.photoIds.flatMap((id) =>
-    input.photos.get(id) ? [input.photos.get(id)!] : [],
-  );
+  const activeColour =
+    selected?.variant.colour ??
+    item.variants.find(
+      ({ variant }) => variant.colour === input.browse.filters.colour,
+    )?.variant.colour;
+  const shownIds = new Set(colourImageIds(item.product, activeColour));
+  const photos = item.photoIds
+    .filter((id) => shownIds.has(id))
+    .flatMap((id) => (input.photos.get(id) ? [input.photos.get(id)!] : []));
   const colours = [
     ...new Set(item.variants.map(({ variant }) => variant.colour)),
   ];
@@ -582,6 +569,21 @@ function ProductDetail({
     selected &&
     selected.stock >= quantity &&
     !!actions.addToBag;
+  const heading = (
+    <div className={styles.productHeading}>
+      <span className={styles.eyebrow}>
+        {categoryLabel(item.product.category)}
+      </span>
+      <h1>{item.product.title}</h1>
+      <p className={styles.detailPrice}>
+        {selected
+          ? price(selected.variant.price)
+          : item.price === null
+            ? "Options unavailable"
+            : price(item.price)}
+      </p>
+    </div>
+  );
   return (
     <>
       <button
@@ -590,25 +592,25 @@ function ProductDetail({
       >
         ← Back to the collection
       </button>
+      <div className={styles.productIntro}>
+        {input.design.template === "pulse" && heading}
+      </div>
       <div className={styles.detail}>
         <GarmentGallery
           key={item.product.id}
           photos={photos}
           title={item.product.title}
+          presentation={
+            input.design.template === "studio"
+              ? "contact"
+              : input.design.template === "pulse"
+                ? "stage"
+                : "theatre"
+          }
           onFailure={actions.photoFailed}
         />
         <section className={styles.purchase}>
-          <span className={styles.eyebrow}>
-            {categoryLabel(item.product.category)}
-          </span>
-          <h1>{item.product.title}</h1>
-          <p className={styles.detailPrice}>
-            {selected
-              ? price(selected.variant.price)
-              : item.price === null
-                ? "Options unavailable"
-                : price(item.price)}
-          </p>
+          {input.design.template !== "pulse" && heading}
           {item.product.archived && (
             <p className={styles.problem}>
               This garment has been archived. It is no longer available to
@@ -623,12 +625,14 @@ function ProductDetail({
               </button>
             </p>
           )}
-          <p className={styles.description}>{item.product.description}</p>
+          {item.product.description && (
+            <p className={styles.description}>{item.product.description}</p>
+          )}
           <fieldset className={styles.options} disabled={item.product.archived}>
             <legend>
               Colour{" "}
-              {selected && knownColour(selected.variant.colour)
-                ? `· ${selected.variant.colour}`
+              {activeColour && knownColour(activeColour)
+                ? `· ${activeColour}`
                 : ""}
             </legend>
             {colours.filter(knownColour).length ? (
@@ -636,7 +640,8 @@ function ProductDetail({
                 {colours.filter(knownColour).map((colour) => (
                   <button
                     key={colour}
-                    aria-pressed={selected?.variant.colour === colour}
+                    aria-label={`Colour: ${colour}`}
+                    aria-pressed={activeColour === colour}
                     onClick={() =>
                       choose(
                         item.variants.find(
@@ -650,6 +655,24 @@ function ProductDetail({
                       )
                     }
                   >
+                    {(() => {
+                      const photoId = item.product.colourPhotos?.find(
+                        (row) =>
+                          row.colour.toLowerCase() === colour.toLowerCase(),
+                      )?.photoIds[0];
+                      const photo = photoId
+                        ? input.photos.get(photoId)
+                        : undefined;
+                      return photo ? (
+                        <span className={styles.colourPhoto}>
+                          <GarmentImage
+                            photo={photo}
+                            title=""
+                            onFailure={actions.photoFailed}
+                          />
+                        </span>
+                      ) : null;
+                    })()}
                     {colour}
                   </button>
                 ))}
@@ -665,11 +688,7 @@ function ProductDetail({
             </legend>
             <div>
               {sizes.map((size) => {
-                const match = matchingOption(
-                  item,
-                  size,
-                  selected?.variant.colour,
-                );
+                const match = matchingOption(item, size, activeColour);
                 return (
                   <button
                     key={size}
@@ -691,7 +710,7 @@ function ProductDetail({
           <p className={styles.availability} role="status">
             {item.product.archived
               ? "Archived garment"
-              : photos.length !== item.product.imageIds.length
+              : item.photoIds.length !== item.product.imageIds.length
                 ? "A saved photo needs repair"
                 : !item.available
                   ? "Currently sold out"
@@ -824,175 +843,4 @@ function AppliedFilters({
       </button>
     </div>
   ) : null;
-}
-function FilterSheet({
-  input,
-  actions,
-}: {
-  input: StorefrontInput;
-  actions: StorefrontActions;
-}) {
-  const ref = useRef<HTMLDialogElement>(null),
-    opener = useRef<HTMLButtonElement>(null),
-    [error, setError] = useState("");
-  const { filters } = input.browse,
-    options = filterOptions(input.items),
-    scope = input.currency ?? USD_SCOPE;
-  const close = () => ref.current?.close();
-  return (
-    <>
-      <button
-        ref={opener}
-        className={styles.filterButton}
-        onClick={() => {
-          setError("");
-          ref.current?.showModal();
-        }}
-      >
-        Filters +
-      </button>
-      <dialog
-        ref={ref}
-        className={styles.filterDialog}
-        aria-labelledby="store-filters-heading"
-        onClose={() => opener.current?.focus({ preventScroll: true })}
-      >
-        <div className={styles.sheetHeading}>
-          <h2 id="store-filters-heading">Find your favourite.</h2>
-          <button autoFocus aria-label="Close filters" onClick={close}>
-            ×
-          </button>
-        </div>
-        <form
-          key={JSON.stringify([
-            filters,
-            scope.currency,
-            scope.snapshot?.snapshotId,
-          ])}
-          onSubmit={(event) => {
-            event.preventDefault();
-            const data = new FormData(event.currentTarget);
-            const minimum = String(data.get("minPrice") ?? "").trim(),
-              maximum = String(data.get("maxPrice") ?? "").trim();
-            const min = minimum ? parseDisplay(minimum) : null,
-              max = maximum ? parseDisplay(maximum) : null;
-            if ((min && !min.ok) || (max && !max.ok)) {
-              setError(
-                `Use a valid ${scope.currency} price with up to two decimal places.`,
-              );
-              return;
-            }
-            const parsed = FiltersSchema.safeParse({
-              ...filters,
-              category: data.get("category") || null,
-              colour: data.get("colour") || null,
-              size: data.get("size") || null,
-              minPrice: min?.ok ? min.value : null,
-              maxPrice: max?.ok ? max.value : null,
-              available: data.get("available") === "on",
-            });
-            if (!parsed.success) {
-              setError(
-                "The minimum price must be no greater than the maximum.",
-              );
-              return;
-            }
-            actions.browse({ filters: parsed.data }, scope);
-            close();
-          }}
-        >
-          <label>
-            Category
-            <select name="category" defaultValue={filters.category ?? ""}>
-              <option value="">All clothing</option>
-              {options.categories.map((value) => (
-                <option key={value} value={value}>
-                  {categoryLabel(value)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Colour
-            <select name="colour" defaultValue={filters.colour ?? ""}>
-              <option value="">All known colours</option>
-              {options.colours.map((value) => (
-                <option key={value}>{value}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Size
-            <select name="size" defaultValue={filters.size ?? ""}>
-              <option value="">All size labels</option>
-              {options.sizes.map((value) => (
-                <option key={value}>{value}</option>
-              ))}
-            </select>
-          </label>
-          <fieldset className={styles.priceFields}>
-            <legend>Price range · {scope.currency}</legend>
-            <label>
-              Minimum
-              <input
-                name="minPrice"
-                inputMode="decimal"
-                maxLength={15}
-                placeholder="0.00"
-                defaultValue={
-                  filters.minPrice === null
-                    ? ""
-                    : formatMinor(filters.minPrice, scope.currency)
-                        .slice(1)
-                        .replaceAll(",", "")
-                }
-              />
-            </label>
-            <label>
-              Maximum
-              <input
-                name="maxPrice"
-                inputMode="decimal"
-                maxLength={15}
-                placeholder="Any price"
-                defaultValue={
-                  filters.maxPrice === null
-                    ? ""
-                    : formatMinor(filters.maxPrice, scope.currency)
-                        .slice(1)
-                        .replaceAll(",", "")
-                }
-              />
-            </label>
-          </fieldset>
-          <label className={styles.check}>
-            <input
-              name="available"
-              type="checkbox"
-              defaultChecked={filters.available}
-            />{" "}
-            In stock with an available photograph
-          </label>
-          {error && (
-            <p className={styles.problem} role="alert">
-              {error}
-            </p>
-          )}
-          <button className={styles.primary} type="submit">
-            Show my matches <Icon name="arrow" />
-          </button>
-          <button
-            className={styles.textButton}
-            type="button"
-            onClick={() => {
-              actions.browse({ filters: { ...EMPTY_FILTERS } });
-              close();
-            }}
-          >
-            Clear all filters
-          </button>
-        </form>
-      </dialog>
-    </>
-  );
 }

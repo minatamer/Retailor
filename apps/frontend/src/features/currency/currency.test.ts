@@ -103,6 +103,57 @@ async function storeWithPlacedOrder(advance = 0, rateDate = "2026-10-05") {
   return { env, controller };
 }
 describe("one accepted currency display snapshot", () => {
+  it("switches both ways without claiming nonexistent price bounds were cleared or changing other filters and records", async () => {
+    const { controller, getter } = await openStore();
+    controller.browse({
+      filters: {
+        ...controller.getSnapshot().state.browse.filters,
+        category: "jeans",
+        search: "denim",
+      },
+    });
+    const { browse, graph } = controller.getSnapshot().state;
+    await controller.selectCurrency("EUR");
+    expect(controller.getSnapshot().state.currency.selected).toBe("EUR");
+    expect(controller.getSnapshot().currencyNotice).toBe(
+      "Prices are shown in EUR.",
+    );
+    await controller.selectCurrency("USD");
+    expect(controller.getSnapshot().state.currency.selected).toBe("USD");
+    expect(controller.getSnapshot().currencyNotice).toBe(
+      "Prices are shown in USD.",
+    );
+    expect(controller.getSnapshot().state.browse).toEqual(browse);
+    expect(controller.getSnapshot().state.graph).toBe(graph);
+    await controller.selectCurrency("EUR");
+    expect(getter).toHaveBeenCalledTimes(1);
+    expect(controller.getSnapshot().currencyNotice).toBe(
+      "Prices are shown in EUR.",
+    );
+  });
+  it("clears an actual lower or upper price bound on currency change with a truthful notice", async () => {
+    for (const bound of ["minPrice", "maxPrice"] as const) {
+      const { controller } = await openStore();
+      controller.browse({
+        filters: {
+          ...controller.getSnapshot().state.browse.filters,
+          [bound]: 1000,
+          category: "jeans",
+        },
+      });
+      const graph = controller.getSnapshot().state.graph;
+      await controller.selectCurrency("EUR");
+      expect(controller.getSnapshot().state.browse.filters).toMatchObject({
+        minPrice: null,
+        maxPrice: null,
+        category: "jeans",
+      });
+      expect(controller.getSnapshot().currencyNotice).toBe(
+        "Prices are shown in EUR. Price bounds were cleared for this currency.",
+      );
+      expect(controller.getSnapshot().state.graph).toBe(graph);
+    }
+  });
   it("checks confirmation scope after freshness validation rather than recording an expired EUR witness", async () => {
     const { env, controller } = await storeWithPlacedOrder(
       5 * 3600_000 + 59 * 60_000,

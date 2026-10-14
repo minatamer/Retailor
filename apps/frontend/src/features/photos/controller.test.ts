@@ -89,6 +89,50 @@ const named = (value: string) => ({
   name: `${value}.jpg`,
   blob: new Blob([value], { type: "image/jpeg" }),
 });
+describe("linked photo organization", () => {
+  it("links, reorders and replaces photos without copying resources, and prunes links on remove/reset", async () => {
+    const decode = vi.fn(processed),
+      { controller, created, revoked } = setup(decode);
+    await controller.add([named("front"), named("back"), named("side")]);
+    const ids = controller.getSnapshot().items.map((item) => item.photo.id);
+    expect(controller.link(ids)).toBe(true);
+    expect(controller.getSnapshot().links).toEqual([ids]);
+    controller.cover(ids[1]!);
+    controller.moveLinked(ids[2]!, -1);
+    expect(controller.getSnapshot().links).toEqual([[ids[1], ids[2], ids[0]]]);
+    expect(decode).toHaveBeenCalledTimes(3);
+    expect(created).toHaveLength(3);
+    expect(revoked).toEqual([]);
+    await controller.add([named("replacement")], ids[1]);
+    expect(controller.getSnapshot().links[0]![0]).toBe(ids[1]);
+    controller.unlink(ids[2]!);
+    expect(controller.getSnapshot().links).toEqual([[ids[1], ids[0]]]);
+    await controller.remove(ids[0]!);
+    expect(controller.getSnapshot().links).toEqual([]);
+    expect(controller.link([ids[1]!, ids[2]!])).toBe(true);
+    await controller.reset();
+    expect(controller.getSnapshot().links).toEqual([]);
+    expect(created).toHaveLength(revoked.length);
+  });
+  it("refuses unavailable, repeated or excessive members without invalidating accepted input", async () => {
+    const { controller } = setup();
+    await controller.add(
+      Array.from({ length: 9 }, (_, index) => named(`angle${index}`)),
+    );
+    const ids = controller.getSnapshot().items.map((item) => item.photo.id),
+      revision = controller.getSnapshot().revision;
+    for (const invalid of [[ids[0]!, ids[0]!], [ids[0]!, "missing"], ids])
+      expect(controller.link(invalid)).toBe(false);
+    controller.unlink("missing");
+    controller.cover("missing");
+    expect(controller.getSnapshot().revision).toBe(revision);
+    expect(controller.link(ids.slice(0, 8))).toBe(true);
+    expect(controller.link([ids[0]!, ids[8]!])).toBe(false);
+    expect(controller.getSnapshot().links).toEqual([ids.slice(0, 8)]);
+    controller.reportUnavailable(ids[0]!);
+    expect(controller.link([ids[0]!, ids[8]!])).toBe(false);
+  });
+});
 describe("owned photo selection and partial recovery", () => {
   it("keeps accepted photos while hiding unknown decoder diagnostics", async () => {
     const decode: PhotoDecoder = async (task) => {

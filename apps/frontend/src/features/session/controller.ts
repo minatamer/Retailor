@@ -46,7 +46,7 @@ import type {
 import { INITIAL_SHOPPING, SHOPPER_INACTIVITY_MS } from "../bag/state";
 import type { CheckoutReview } from "../bag/state";
 import { bagEntries, bagWitness, bagTotals } from "../bag/quote";
-import { DesignSchema } from "@retailor/contracts/design";
+import { DesignSchema, withPageTemplates } from "@retailor/contracts/design";
 import type { Design } from "@retailor/contracts/design";
 import type { CommerceGraph } from "@retailor/contracts/commerce";
 import type { Photo } from "@retailor/contracts/photos";
@@ -67,12 +67,14 @@ import { logoRequester, type LogoRequester } from "../logos/request";
 import type { PhotoCache } from "../photos/cache";
 import { PhotoController } from "../photos/controller";
 import type { NamedPhoto } from "../photos/controller";
-import { loadSample } from "../photos/sample";
+import { loadSample, SAMPLE, linkSampleViews } from "../photos/sample";
 import {
   parseDraft,
   reviseDraft,
   includeDraft,
   mergeDraft,
+  applyPhotoLinks,
+  automaticLinkPolicy,
   splitDraft,
   excludeSource,
 } from "../catalogue/draft";
@@ -85,6 +87,7 @@ import {
   confirmSetup,
   reconcileSetup,
   logoEligible,
+  logoNameReady,
   designConfirmed,
   SetupStepSchema,
   updateBrand,
@@ -289,6 +292,9 @@ export class SessionController {
       stage: "choose",
       inputRevision: 0,
       selectedIds: [],
+      photoLinks: [],
+      photoLinksInitialized: false,
+      autoLinkPhotos: true,
       photos: [],
       draft: null,
       acceptedDesign: { ...INITIAL_DESIGN },
@@ -472,7 +478,7 @@ export class SessionController {
       ready: true,
       notice: interrupted
         ? "A request was interrupted. Its provider outcome may be unknown; completed work is kept. Nothing was repeated. Retry only when you choose."
-        : "Your temporary workspace is ready. Photos are processed only on your instruction.",
+        : "",
     });
     this.timer = setInterval(() => this.checkExpiry(), 5000);
   }
@@ -574,6 +580,11 @@ export class SessionController {
         this.snapshot.state.selectedIds,
         this.snapshot.state.photos,
       );
+    this.photos.restoreLinks(
+      this.snapshot.state.photoLinks,
+      this.snapshot.state.photoLinksInitialized,
+      this.snapshot.state.autoLinkPhotos,
+    );
     this.recovering = false;
     if (!this.active) return;
     this.lastPhotoRevision = this.photos.getSnapshot().revision;
@@ -587,7 +598,21 @@ export class SessionController {
       this.lastPhotoRevision = photoState.revision;
       const selectedIds = photoState.items.map((item) => item.photo.id);
       const changed =
-        selectedIds.join("|") !== this.snapshot.state.selectedIds.join("|");
+        selectedIds.join("|") !== this.snapshot.state.selectedIds.join("|") ||
+        JSON.stringify(photoState.links) !==
+          JSON.stringify(this.snapshot.state.photoLinks) ||
+        photoState.linksInitialized !==
+          this.snapshot.state.photoLinksInitialized ||
+        photoState.autoLink !== this.snapshot.state.autoLinkPhotos ||
+        photoState.items.some(
+          (item) =>
+            JSON.stringify(item.photo) !==
+            JSON.stringify(
+              this.snapshot.state.photos.find(
+                (photo) => photo.id === item.photo.id,
+              ),
+            ),
+        );
       if (changed) {
         if (this.snapshot.state.stage === "process") this.cancelOperation();
         const retained = new Map(
@@ -598,6 +623,9 @@ export class SessionController {
         this.state(
           {
             selectedIds,
+            photoLinks: photoState.links.map((group) => [...group]),
+            photoLinksInitialized: photoState.linksInitialized,
+            autoLinkPhotos: photoState.autoLink,
             photos: [...retained.values()],
             draft: null,
             inputRevision: this.snapshot.state.inputRevision + 1,
@@ -621,7 +649,10 @@ export class SessionController {
     acceptedSnapshot = this.snapshot.state.currency.acceptedSnapshot,
   ) {
     const state = this.snapshot.state,
-      changed = selected !== state.currency.selected;
+      changed = selected !== state.currency.selected,
+      clearedBounds =
+        state.browse.filters.minPrice !== null ||
+        state.browse.filters.maxPrice !== null;
     this.state({
       currency: { selected, acceptedSnapshot },
       ...(changed
@@ -649,7 +680,7 @@ export class SessionController {
     this.update(
       {
         currencyNotice: changed
-          ? `Prices are shown in ${selected}. Price bounds were cleared for this currency.`
+          ? `Prices are shown in ${selected}.${clearedBounds ? " Price bounds were cleared for this currency." : ""}`
           : "",
       },
       false,
@@ -1537,8 +1568,7 @@ export class SessionController {
         {
           bagOpen: true,
           bagReceiptId: null,
-          bagNotice:
-            "Added to your bag. Stock updates only when you place a demo order.",
+          bagNotice: "Added to your bag.",
         },
         false,
       );
@@ -1562,7 +1592,7 @@ export class SessionController {
       this.update(
         {
           bagNotice: quantity
-            ? "Bag updated. Review current prices before placing your order."
+            ? "Bag updated."
             : "Garment removed from your bag.",
         },
         false,
@@ -1664,8 +1694,7 @@ export class SessionController {
     this.update({
       state: freeze({ ...this.snapshot.state, graph, shopping }),
       checkoutReview: freeze(review),
-      bagNotice:
-        "Review your exact total and selected options. No stock has been deducted.",
+      bagNotice: "Check your items and total.",
     });
   }
   placeReviewed(review: CheckoutReview) {
@@ -1723,8 +1752,7 @@ export class SessionController {
       }),
       checkoutReview: null,
       bagReceiptId: review.command.payload.orderId,
-      bagNotice:
-        "Demo order placed. Your stock and owner figures now reflect this exact order.",
+      bagNotice: "Demo order placed. Your dashboard is up to date.",
     });
     return review.command.payload.orderId;
   }
@@ -1831,8 +1859,27 @@ export class SessionController {
     this.update({ sampleBusy: true });
     try {
       const files = await loadSample(operation.signal);
-      if (this.active && generation === this.generation)
-        await this.photos.add(files);
+      if (this.active && generation === this.generation) {
+        const available = this.photos.availableIds(),
+          selectedSources = new Set(
+            this.photos
+              .getSnapshot()
+              .items.filter((item) => available.has(item.photo.id))
+              .map((item) => item.photo.source.hash),
+          );
+        const accepted = await this.photos.add(
+          files.filter(
+            (_file, index) =>
+              !selectedSources.has(SAMPLE.assets[index]!.image.hash),
+          ),
+          undefined,
+          true,
+          "reuse",
+        );
+        if (this.active && generation === this.generation) {
+          linkSampleViews(this.photos, accepted);
+        }
+      }
     } catch {
       if (this.active && generation === this.generation)
         this.update({
@@ -1939,9 +1986,18 @@ export class SessionController {
       for (const item of draft.items.filter((item) => item.included))
         this.photos.require(item.product.imageIds);
       this.update({ processStep: "Preparing your preview" });
+      const linked = applyPhotoLinks(
+        automaticLinkPolicy(draft, this.snapshot.state.autoLinkPhotos, this.id),
+        this.snapshot.state.photoLinks,
+      );
       this.state(
-        { draft, stage: "catalogue" },
-        "Your photo-backed draft is ready. Corrections are local and never rerun processing.",
+        {
+          draft: linked,
+          photoLinks: this.syncDraftLinks(linked),
+          photoLinksInitialized: true,
+          stage: "catalogue",
+        },
+        "",
       );
     } catch (error) {
       if (current()) {
@@ -1967,15 +2023,52 @@ export class SessionController {
     this.review((draft) => includeDraft(draft, productId, included));
   }
   merge(ids: readonly string[]) {
-    this.review((draft) => mergeDraft(draft, ids));
+    this.review((draft) => mergeDraft(draft, ids), true);
+  }
+  linkProducts(ids: readonly string[]) {
+    const draft = this.snapshot.state.draft;
+    if (
+      !draft ||
+      ids.some(
+        (id) =>
+          !draft.items.some(
+            (item) =>
+              item.product.id === id && item.included && item.confirmedClothing,
+          ),
+      )
+    )
+      return false;
+    return this.review((current) => mergeDraft(current, ids), true);
+  }
+  private syncDraftLinks(
+    draft: CatalogueDraft,
+    autoLink = this.snapshot.state.autoLinkPhotos,
+  ) {
+    const counts = new Map<string, number>();
+    for (const item of draft.items)
+      for (const id of item.product.imageIds)
+        counts.set(id, (counts.get(id) ?? 0) + 1);
+    const links = draft.items.flatMap((item) => {
+      const ids = item.product.imageIds;
+      if (ids.length < 2 || ids.some((id) => counts.get(id)! > 1)) return [];
+      return [[...ids]];
+    });
+    this.photos.restoreLinks(links, true, autoLink);
+    return this.photos.getSnapshot().links.map((row) => [...row]);
   }
   split(productId: string, photoId: string) {
-    this.review((draft) => splitDraft(draft, productId, photoId, this.id()));
+    this.review(
+      (draft) => splitDraft(draft, productId, photoId, this.id()),
+      true,
+    );
   }
   excludeSource(photoId: string) {
     this.review((draft) => excludeSource(draft, photoId));
   }
-  private review(change: (draft: CatalogueDraft) => CatalogueDraft) {
+  private review(
+    change: (draft: CatalogueDraft) => CatalogueDraft,
+    manualGrouping = false,
+  ) {
     if (
       !this.valid() ||
       this.snapshot.state.stage !== "catalogue" ||
@@ -1983,9 +2076,20 @@ export class SessionController {
     )
       return false;
     try {
+      const draft = change(this.snapshot.state.draft);
+      const autoLinkPhotos = manualGrouping
+        ? false
+        : this.snapshot.state.autoLinkPhotos;
       this.state(
-        { draft: change(this.snapshot.state.draft) },
-        "Catalogue updated locally. Your source photos and review history are preserved.",
+        {
+          draft,
+          photoLinks: this.syncDraftLinks(draft, autoLinkPhotos),
+          photoLinksInitialized: true,
+          autoLinkPhotos,
+        },
+        manualGrouping
+          ? "Photo links updated. Automatic linking is off for future processing; you can turn it on again in Photos."
+          : "Catalogue updated locally. Your source photos and review history are preserved.",
       );
       return true;
     } catch {
@@ -2249,6 +2353,10 @@ export class SessionController {
     try {
       const previewDesign = DesignSchema.parse({
         ...design,
+        logoId:
+          design.name !== this.snapshot.state.previewDesign.name
+            ? null
+            : design.logoId,
         revision: this.snapshot.state.previewDesign.revision + 1,
       });
       if (
@@ -2276,7 +2384,11 @@ export class SessionController {
         this.snapshot.state.previewDesign,
       ) ||
       !this.snapshot.state.setup.brandConfirmed ||
-      !this.snapshot.state.setup.wordmarkKept
+      !this.snapshot.state.setup.wordmarkKept ||
+      !logoNameReady(
+        this.snapshot.state.setup,
+        this.snapshot.state.previewDesign,
+      )
     )
       return;
     this.cancelOperation();
@@ -2304,6 +2416,7 @@ export class SessionController {
           ? {
               ...state.setup,
               template: state.acceptedDesign.template,
+              pageTemplates: state.acceptedDesign.pageTemplates ?? null,
               theme: state.acceptedDesign.theme,
               typography: state.acceptedDesign.typography,
               brandConfirmed: true,
@@ -2684,12 +2797,21 @@ export class SessionController {
     } else if (proposal.kind === "design") {
       if (roleOf(this.snapshot.state) === "owner") this.beginOwnerDesign();
       const design = this.snapshot.state.previewDesign;
+      const layout = proposal.pageTemplates
+        ? withPageTemplates(design, proposal.pageTemplates)
+        : proposal.template
+          ? { ...design, template: proposal.template, pageTemplates: undefined }
+          : design;
       this.design({
-        ...design,
-        template: proposal.template ?? design.template,
+        ...layout,
         theme: proposal.theme ?? design.theme,
         typography: proposal.typography ?? design.typography,
       });
+      if (
+        this.snapshot.state.stage === "style" &&
+        (proposal.template || proposal.pageTemplates)
+      )
+        this.stylingStep("template");
     } else if (proposal.kind === "logo-offer") {
       if (roleOf(this.snapshot.state) === "owner") this.beginOwnerDesign();
       this.prepareLogo();
@@ -2729,7 +2851,7 @@ export class SessionController {
     const state = this.snapshot.state;
     if (!this.valid() || state.stage !== "style" || state.setup.step !== step)
       return;
-    if (step === "brand" && state.setup.brandDraft?.name.trim() === "") {
+    if (step === "brand" && !logoNameReady(state.setup, state.previewDesign)) {
       this.update({
         notice: "Choose a store name, or keep the suggested details.",
       });
@@ -2799,6 +2921,62 @@ export class SessionController {
     });
     this.confirmStyle("brand");
   }
+  logoNameInput(name: string) {
+    const state = this.snapshot.state;
+    if (
+      !this.valid() ||
+      !logoEligible(state.setup, state.previewDesign) ||
+      !(
+        state.stage === "style" ||
+        (state.stage === "dashboard" && state.designEditing)
+      )
+    )
+      return;
+    this.cancelLogos(false);
+    this.brandInput({ name });
+    const latest = this.snapshot.state;
+    if (latest.setup.brandDraft?.name !== name) return;
+    this.state({
+      setup: {
+        ...latest.setup,
+        step: latest.stage === "style" ? "logo" : latest.setup.step,
+        brandConfirmed: false,
+        wordmarkKept: false,
+      },
+    });
+  }
+  private confirmLogoName() {
+    const state = this.snapshot.state;
+    if (
+      !this.valid() ||
+      !logoEligible(state.setup, state.previewDesign) ||
+      !logoNameReady(state.setup, state.previewDesign) ||
+      !(
+        state.stage === "style" ||
+        (state.stage === "dashboard" && state.designEditing)
+      )
+    )
+      return false;
+    this.state({
+      setup: {
+        ...state.setup,
+        brandDraft: {
+          ...(state.setup.brandDraft ?? brandValues(state.previewDesign)),
+          name: state.previewDesign.name,
+        },
+        brandConfirmed: true,
+      },
+    });
+    return true;
+  }
+  keepNamedWordmark() {
+    if (this.confirmLogoName()) this.keepWordmark();
+  }
+  prepareNamedLogo() {
+    if (!this.canAttemptAi() || !this.confirmLogoName()) return false;
+    this.prepareLogo();
+    return this.snapshot.preparedLogo !== null;
+  }
   useCurrentLook() {
     const state = this.snapshot.state;
     if (!this.valid() || state.stage !== "style") return;
@@ -2806,6 +2984,7 @@ export class SessionController {
       setup: {
         ...state.setup,
         template: state.previewDesign.template,
+        pageTemplates: state.previewDesign.pageTemplates ?? null,
         theme: state.previewDesign.theme,
         typography: state.previewDesign.typography,
         brandConfirmed: true,
@@ -2826,6 +3005,7 @@ export class SessionController {
         (state.stage === "dashboard" && state.designEditing)
       ) ||
       !designConfirmed(state.setup, state.previewDesign) ||
+      !logoNameReady(state.setup, state.previewDesign) ||
       (state.stage === "style" && !state.setup.brandConfirmed)
     )
       return;
@@ -2891,6 +3071,7 @@ export class SessionController {
       setup: {
         ...state.setup,
         template: state.previewDesign.template,
+        pageTemplates: state.previewDesign.pageTemplates ?? null,
         theme: state.previewDesign.theme,
         typography: state.previewDesign.typography,
         brandConfirmed: true,
@@ -2902,6 +3083,7 @@ export class SessionController {
       design = state.previewDesign;
     if (
       !logoEligible(state.setup, design) ||
+      !logoNameReady(state.setup, design) ||
       !(
         state.stage === "style" ||
         (state.stage === "dashboard" && state.designEditing)
@@ -3171,7 +3353,7 @@ export class SessionController {
     const state = this.snapshot.state;
     if (!this.valid() || state.stage !== "dashboard" || !state.designEditing)
       return;
-    if (state.setup.brandDraft?.name.trim() === "") {
+    if (!logoNameReady(state.setup, state.previewDesign)) {
       this.update({ notice: "Choose a store name before applying this look." });
       return;
     }
@@ -3184,6 +3366,7 @@ export class SessionController {
       setup: {
         ...state.setup,
         template: state.previewDesign.template,
+        pageTemplates: state.previewDesign.pageTemplates ?? null,
         theme: state.previewDesign.theme,
         typography: state.previewDesign.typography,
         brandConfirmed: true,
@@ -3312,6 +3495,7 @@ export class SessionController {
     if (!this.active || this.resetting) return;
     this.resetting = true;
     this.cancelOperation();
+    const generation = this.generation;
     this.download.clear();
     this.logoAssets?.dispose();
     this.unlistenPhotos?.();
@@ -3344,28 +3528,48 @@ export class SessionController {
       checkoutReview: null,
       preparedLogo: null,
     });
-    const previous = this.photos;
-    const cleared = await previous.reset();
-    if (!cleared)
-      this.snapshot.recoveryNotice =
-        "This demo was cleared from memory. Earlier cached bytes could not be removed and retain their original fixed expiry.";
-    previous.dispose();
+    const cleanupNotices: string[] = [];
     try {
       this.options.storage?.removeItem(SESSION_KEY);
     } catch {
-      this.snapshot.recoveryNotice =
-        "Saved metadata could not be cleared; its original fixed expiry still applies.";
+      cleanupNotices.push(
+        "Saved metadata could not be cleared; its original fixed expiry still applies.",
+      );
     }
+    const previous = this.photos;
+    const cleared = await previous.reset();
+    if (!cleared)
+      cleanupNotices.push(
+        "This demo was cleared from memory. Earlier cached bytes could not be removed and retain their original fixed expiry.",
+      );
+    previous.dispose();
     this.snapshot.state = this.fresh();
     await this.attachPhotos();
     this.resetting = false;
-    if (this.active)
+    if (this.active) {
+      const recoveryNotice = [...cleanupNotices, this.snapshot.recoveryNotice]
+        .filter(Boolean)
+        .join(" ");
       this.update({
         ready: true,
+        recoveryNotice,
         notice: this.aiAttention
           ? `${notice} AI still needs attention from the demo owner; reload after it is restored.`
           : notice,
       });
+      if (
+        this.active &&
+        this.generation === generation &&
+        recoveryNotice &&
+        this.snapshot.recoveryNotice !== recoveryNotice
+      )
+        this.update(
+          {
+            recoveryNotice: `${recoveryNotice} ${this.snapshot.recoveryNotice}`,
+          },
+          false,
+        );
+    }
   }
   dispose() {
     this.active = false;

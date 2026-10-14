@@ -31,16 +31,18 @@ export function GarmentImage({
 export function GarmentGallery({
   photos,
   title,
+  presentation = "stage",
   onFailure,
 }: {
   photos: readonly StorePhoto[];
   title: string;
+  presentation?: "contact" | "stage" | "theatre";
   onFailure(id: string): void;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null),
     [zoom, setZoom] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null),
-    opener = useRef<HTMLButtonElement>(null);
+    opener = useRef<HTMLButtonElement | null>(null);
   const selected = photos.find((photo) => photo.id === selectedId) ?? photos[0];
   const index = selected ? photos.indexOf(selected) : 0;
   useEffect(() => {
@@ -53,28 +55,64 @@ export function GarmentGallery({
     setSelectedId(photos[(index + offset + photos.length) % photos.length]!.id);
   if (!selected)
     return (
-      <div className={styles.noPhoto}>
-        <span>Photo unavailable</span>
-        <p>Reselect the original in the owner workspace.</p>
+      <div className={styles.gallery}>
+        <div className={styles.noPhoto}>
+          <span>Photo unavailable</span>
+          <p>Reselect the original in the owner workspace.</p>
+        </div>
       </div>
     );
   return (
-    <div className={styles.gallery}>
-      <button
-        className={styles.mainPhoto}
-        ref={opener}
-        aria-label={`Zoom ${title}`}
-        onClick={() => setZoom(true)}
-      >
-        <GarmentImage
-          photo={selected}
-          title={title}
-          eager
-          onFailure={onFailure}
-        />
-        <span className={styles.zoomHint}>View closer +</span>
-      </button>
-      {photos.length > 1 && (
+    <div
+      className={styles.gallery}
+      data-presentation={presentation}
+      data-photo-count={photos.length}
+    >
+      {presentation === "contact" ? (
+        <div
+          className={styles.contactPhotos}
+          aria-label="Supplied garment views"
+        >
+          {photos.map((photo, i) => (
+            <button
+              key={photo.id}
+              className={styles.mainPhoto}
+              aria-label={`Zoom view ${i + 1} of ${title}`}
+              onClick={(event) => {
+                opener.current = event.currentTarget;
+                setSelectedId(photo.id);
+                setZoom(true);
+              }}
+            >
+              <GarmentImage
+                photo={photo}
+                title={`${title}, supplied view ${i + 1}`}
+                eager={i === 0}
+                onFailure={onFailure}
+              />
+              <span className={styles.zoomHint}>0{i + 1} / View closer +</span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <button
+          className={styles.mainPhoto}
+          aria-label={`Zoom ${title}`}
+          onClick={(event) => {
+            opener.current = event.currentTarget;
+            setZoom(true);
+          }}
+        >
+          <GarmentImage
+            photo={selected}
+            title={title}
+            eager
+            onFailure={onFailure}
+          />
+          <span className={styles.zoomHint}>View closer +</span>
+        </button>
+      )}
+      {photos.length > 1 && presentation !== "contact" && (
         <div className={styles.thumbnails} aria-label="Supplied garment views">
           {photos.map((photo, i) => (
             <button
@@ -95,7 +133,9 @@ export function GarmentGallery({
       <p className={styles.caption}>
         {photos.length === 1
           ? "One supplied photograph. Zoom for a closer look."
-          : `${index + 1} / ${photos.length} supplied views`}
+          : presentation === "contact"
+            ? `${photos.length} supplied views. Select any photograph to look closer.`
+            : `${index + 1} / ${photos.length} supplied views`}
       </p>
       <dialog
         ref={dialog}

@@ -3,6 +3,7 @@ import { IdSchema } from "@retailor/contracts/core";
 import {
   CategorySchema,
   ProductInputSchema,
+  relabelColourPhotos,
 } from "@retailor/contracts/product";
 import type { CommerceGraph } from "@retailor/contracts/commerce";
 import {
@@ -267,6 +268,16 @@ export function ownerIntent(
     case "createProduct":
     case "updateProduct": {
       const current = graph.products.find((p) => p.id === target);
+      const variants = form.variants.map((v) => ({
+        id: v.id,
+        size: v.size,
+        colour: v.colour,
+        sku: v.sku,
+        price: amount(v.price),
+        unitCost: amount(v.cost),
+        openingStock: integer(v.stock),
+        archived: v.archived,
+      }));
       return {
         type: form.type,
         payload: ProductInputSchema.parse({
@@ -275,21 +286,15 @@ export function ownerIntent(
           description: get("description"),
           category: CategorySchema.parse(get("category")),
           imageIds: form.photoIds,
+          colourPhotos: current
+            ? relabelColourPhotos(current, variants, form.photoIds)
+            : undefined,
           sizingSystemId: get("sizingSystemId"),
           attributes: current?.attributes ?? [],
           archived:
             z.enum(["active", "archived"]).parse(get("productState")) ===
             "archived",
-          variants: form.variants.map((v) => ({
-            id: v.id,
-            size: v.size,
-            colour: v.colour,
-            sku: v.sku,
-            price: amount(v.price),
-            unitCost: amount(v.cost),
-            openingStock: integer(v.stock),
-            archived: v.archived,
-          })),
+          variants,
         }),
       };
     }
