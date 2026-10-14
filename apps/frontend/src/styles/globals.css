@@ -4,6 +4,7 @@
 html {
   background: var(--platform-canvas);
   color: var(--platform-text);
+  scroll-behavior: smooth;
 }
 body {
   margin: 0;
@@ -54,7 +55,7 @@ textarea {
   align-items: center;
 }
 .wordmark span {
-  color: #6256e8;
+  color: var(--platform-action);
 }
 .eyebrow {
   text-transform: uppercase;
@@ -71,21 +72,21 @@ h1 {
 h1 em {
   font-family: Georgia, serif;
   font-weight: 400;
-  color: #6256e8;
+  color: var(--platform-action);
 }
 .intro {
   font-size: clamp(16px, 1.5vw, 23px);
   max-width: 600px;
   line-height: 1.6;
-  color: #61656c;
+  color: var(--platform-muted);
 }
 .primary {
   display: inline-flex;
   gap: 22px;
   align-items: center;
   padding: 18px 24px;
-  background: #252c36;
-  color: #fff;
+  background: var(--platform-lime);
+  color: var(--platform-action);
   border-radius: 999px;
   margin-top: 14px;
   transition:
@@ -94,12 +95,12 @@ h1 em {
 }
 .primary:hover {
   transform: translateY(-3px);
-  background: #6256e8;
+  background: var(--platform-lime-hover);
 }
 .fixture-note {
   font-size: 11px;
   line-height: 1.5;
-  color: #61656c;
+  color: var(--platform-muted);
 }
 @media (max-height: 500px) {
   .foundation {

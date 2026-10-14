@@ -23,11 +23,12 @@
   transform: translateY(0) scale(0.98);
 }
 .primary {
-  background: var(--platform-action);
-  color: var(--platform-action-text);
+  border-color: var(--platform-action);
+  background: var(--platform-lime);
+  color: var(--platform-action);
 }
 .primary:hover:not(:disabled) {
-  background: var(--platform-action-hover);
+  background: var(--platform-lime-hover);
 }
 .secondary {
   background: var(--platform-surface);

@@ -1,0 +1,29 @@
+{
+  "approved": "RTL-037 draft03 option A, owner selected 14 October 2026",
+  "colors": ["#242b60", "#ffffff"],
+  "letter": "Unmodified local Inter variable font instantiated at wght800, outlined with fontTools4.60.1",
+  "fontSha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+  "geometry": "Original approved128px cart; identical coordinates, R52/70 at48px. White rounded tile only on favicon/touch exports.",
+  "assets": [
+    {
+      "path": "apps/frontend/public/brand/retailor-cart.svg",
+      "bytes": 1434,
+      "sha256": "282197fe5c86160b94055cbea72fac54a9d558e2e1130c56ce042f3bb9e0a2e7"
+    },
+    {
+      "path": "apps/frontend/public/favicon-96.png",
+      "bytes": 2110,
+      "sha256": "a887ca6b8155fc6caa3258804e7300c658e6371356dd903d1ce77274b79a203d"
+    },
+    {
+      "path": "apps/frontend/public/apple-touch-icon.png",
+      "bytes": 4219,
+      "sha256": "f38c728721d4a845fe3798d59a545029386b7914f06fb9319006cb778e95587c"
+    },
+    {
+      "path": "apps/frontend/public/favicon.ico",
+      "bytes": 2577,
+      "sha256": "c3039abd92cb35af084cb8895fd7bb697ae831ed88222bc50f9ea25b6d6ec1a4"
+    }
+  ]
+}

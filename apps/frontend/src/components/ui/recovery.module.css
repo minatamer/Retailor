@@ -3,9 +3,9 @@
   display: grid;
   place-items: center;
   padding: clamp(20px, 5vw, 64px);
-  color: #202523;
-  background: #faf8f2;
-  font-family: Inter, Arial, sans-serif;
+  color: #242b60;
+  background: #ffffff;
+  font-family: "Retailor Inter", Arial, sans-serif;
 }
 .recovery > div {
   width: min(100%, 620px);
@@ -25,7 +25,7 @@
   line-height: 1.6;
 }
 .note {
-  color: #515852;
+  color: #596176;
 }
 .actions {
   display: flex;
@@ -41,7 +41,7 @@
   min-height: 44px;
   max-width: 100%;
   padding: 12px 18px;
-  border: 1px solid #2846c4;
+  border: 1px solid #242b60;
   border-radius: 12px;
   font: inherit;
   font-weight: 650;
@@ -49,15 +49,15 @@
   cursor: pointer;
 }
 .actions button {
-  color: white;
-  background: #2846c4;
+  color: #242b60;
+  background: #d6f578;
 }
 .actions a {
-  color: #2846c4;
+  color: #242b60;
   background: transparent;
 }
 .actions button:focus-visible,
 .actions a:focus-visible {
-  outline: 3px solid #202523;
+  outline: 3px solid #242b60;
   outline-offset: 4px;
 }

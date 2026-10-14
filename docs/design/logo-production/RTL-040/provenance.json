@@ -1,0 +1,14 @@
+{
+  "approved": "RTL-037 draft03 A; same cart as RTL-039",
+  "wordmark": "Existing Inter800, HarfBuzz shaping, -.045em tracking; paths only",
+  "fontSha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+  "cartSha256": "282197fe5c86160b94055cbea72fac54a9d558e2e1130c56ce042f3bb9e0a2e7",
+  "lockupSha256": "aa130b420a91d1fcc9b65cfdc2f01e5480af9a1b0ea098cdffad969792859b89",
+  "width": 482.636,
+  "height": 128,
+  "widthEm": 4.71324219,
+  "tools": {
+    "fontTools": "4.60.1",
+    "uharfbuzz": "0.53.0"
+  }
+}

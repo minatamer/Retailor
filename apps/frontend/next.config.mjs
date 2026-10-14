@@ -5,6 +5,7 @@ const nextConfig = {
   outputFileTracingRoot: fileURLToPath(new URL("../../", import.meta.url)),
   distDir: process.env.RETAILOR_DEV === "true" ? ".next-dev" : ".next",
   poweredByHeader: false,
+  devIndicators: false,
   // Fixed API uploads bypass Proxy; other routes have no body-driven actions.
   experimental: { proxyClientMaxBodySize: 16384 },
   async headers() {

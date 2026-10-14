@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { Brand } from "./brand";
 import styles from "./recovery.module.css";
 export function ViewRecovery({ retry }: { retry: () => void }) {
   return (
     <main className={styles.recovery}>
       <div>
-        <p className={styles.brand}>Retailor</p>
+        <p className={styles.brand}>
+          <Brand />
+        </p>
         <h1>Let’s try that again.</h1>
         <p>
           We couldn’t open this view. Try again, or return to the start of your
