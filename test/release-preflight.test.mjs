@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { readFile } from "node:fs/promises";
+import * as snapshot from "../scripts/release/snapshot.mjs";
 import {
   InputsSchema,
   httpsOrigin,
@@ -136,15 +137,79 @@ describe("release metadata and verdict", () => {
       readReleaseJson("docs/validation/RTL-021/containers.json", 16),
     ).rejects.toThrow("envelope");
   });
-  it("default preflight reads only public local evidence and never loads app env or networks", async () => {
+  it.each([
+    {
+      state: "matching",
+      matches: true,
+      verdict: "matches-local-linux-candidate",
+    },
+    { state: "stale", matches: false, verdict: "source-mismatch" },
+  ])(
+    "prepared preflight rejects stale evidence and reports $state source exactly",
+    async ({ matches, verdict }) => {
+      const packaged = await readReleaseJson(
+        "docs/validation/RTL-025/containers.json",
+        131072,
+      );
+      const fingerprint = matches
+        ? packaged.source.fingerprint
+        : (packaged.source.fingerprint === "a".repeat(64) ? "b" : "a").repeat(
+            64,
+          );
+      // Only the source port is a fixture; saved Linux proof and real preparation stay untouched.
+      const source = vi.spyOn(snapshot, "sourceSnapshot").mockResolvedValue({
+        fingerprint,
+        gitRevision: "b".repeat(40),
+        dirty: true,
+      });
+      const fetch = vi.spyOn(globalThis, "fetch");
+      const env = vi.spyOn(process, "loadEnvFile");
+      const result = await preparePreflight();
+      expect(source).toHaveBeenCalledExactlyOnceWith();
+      expect(result.localVerdict).toBe(verdict);
+      expect(result.candidate).toMatchObject({
+        fingerprint,
+        packagedFingerprint: packaged.source.fingerprint,
+        matchesLocalLinuxEvidence: matches,
+        frontendLocalImage: packaged.images.frontend.id,
+        backendLocalImage: packaged.images.backend.id,
+      });
+      expect(result.publicReleaseAccepted).toBe(false);
+      expect(result.publicationAuthorized).toBe(false);
+      expect(result.paidRequests).toBe(0);
+      expect(result.networkRequests).toBe(0);
+      expect(fetch).not.toHaveBeenCalled();
+      expect(env).not.toHaveBeenCalled();
+    },
+  );
+  it("default preflight compares actual current bytes with public Linux evidence without env or networks", async () => {
     const fetch = vi
       .spyOn(globalThis, "fetch")
       .mockRejectedValue(new Error("No network"));
     const env = vi.spyOn(process, "loadEnvFile");
+    const source = await snapshot.sourceSnapshot();
+    const packaged = await readReleaseJson(
+      "docs/validation/RTL-025/containers.json",
+      131072,
+    );
     const result = await preparePreflight();
-    expect(result.localVerdict).toBe("matches-local-linux-candidate");
+    const matches = source.fingerprint === packaged.source.fingerprint;
+    expect(result.candidate).toMatchObject({
+      fingerprint: source.fingerprint,
+      packagedFingerprint: packaged.source.fingerprint,
+      matchesLocalLinuxEvidence: matches,
+      frontendLocalImage: packaged.images.frontend.id,
+      backendLocalImage: packaged.images.backend.id,
+    });
+    // Source changes correctly invalidate old image proof; that is a release verdict, not a broken unit test.
+    expect(result.localVerdict).toBe(
+      matches ? "matches-local-linux-candidate" : "source-mismatch",
+    );
     expect(result.missingInputs).toHaveLength(23);
     expect(result.publicReleaseAccepted).toBe(false);
+    expect(result.publicationAuthorized).toBe(false);
+    expect(result.paidRequests).toBe(0);
+    expect(result.networkRequests).toBe(0);
     expect(result.readOnlyInspectionCommands).toEqual([]);
     expect(fetch).not.toHaveBeenCalled();
     expect(env).not.toHaveBeenCalled();
