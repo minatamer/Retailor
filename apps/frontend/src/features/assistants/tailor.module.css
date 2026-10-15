@@ -1,12 +1,28 @@
+@property --tailor-size-progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
 .shell {
+  --tailor-panel-limit: calc(var(--tailor-height, 100dvh) - 40px);
+  --tailor-panel-peek: 78dvh;
   position: fixed;
   right: max(20px, env(safe-area-inset-right));
   bottom: calc(
     max(20px, env(safe-area-inset-bottom)) + var(--keyboard-inset, 0px)
   );
   width: min(392px, calc(100% - 32px));
+  max-width: calc(100% - 32px);
   z-index: 30;
   color: var(--platform-text);
+}
+.shell:has(.panel[data-enlarged="true"]) {
+  width: min(760px, calc(100% - 32px));
+}
+@media (min-width: 501px) {
+  .shell {
+    transition: width 420ms var(--ease-out);
+  }
 }
 .chat {
   margin-top: 24px;
@@ -199,9 +215,19 @@
   }
 }
 .panel {
+  --tailor-size-progress: 0;
+  --tailor-normal-height: min(
+    var(--tailor-panel-peek),
+    var(--tailor-panel-limit)
+  );
   display: flex;
   flex-direction: column;
-  max-height: min(78dvh, calc(var(--tailor-height, 100dvh) - 40px));
+  min-height: calc(var(--tailor-size-progress) * var(--tailor-panel-limit));
+  max-height: calc(
+    var(--tailor-normal-height) +
+      (var(--tailor-panel-limit) - var(--tailor-normal-height)) *
+      var(--tailor-size-progress)
+  );
   border: 1px solid var(--platform-line);
   background: var(--platform-surface);
   border-radius: 24px;
@@ -210,6 +236,10 @@
     0 3px 12px #242b600d;
   overflow: hidden;
   animation: rise 0.4s var(--ease-out) both;
+  transition: --tailor-size-progress 420ms var(--ease-out);
+}
+.panel[data-enlarged="true"] {
+  --tailor-size-progress: 1;
 }
 .header {
   display: flex;
@@ -239,6 +269,9 @@
   background: transparent;
   font-size: 22px;
   cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
 }
 .avatar {
   width: 38px;
@@ -251,6 +284,7 @@
   flex-shrink: 0;
 }
 .conversation {
+  flex: 1;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -616,7 +650,7 @@
 }
 .footer {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
   gap: 6px;
@@ -630,6 +664,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  min-width: 0;
 }
 .footer button {
   border: 0;
@@ -638,6 +673,11 @@
   font-size: 11px;
   min-height: 44px;
   cursor: pointer;
+  width: 44px;
+  padding: 0;
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
 }
 .liveDot {
   height: 5px;
@@ -812,19 +852,22 @@
 }
 @media (max-width: 1000px) {
   .shell {
+    --tailor-panel-limit: calc(var(--tailor-height, 100dvh) - 24px);
+    --tailor-panel-peek: 58dvh;
     right: 16px;
     bottom: calc(
       max(12px, env(safe-area-inset-bottom)) + var(--keyboard-inset, 0px)
     );
   }
-  .panel {
-    max-height: min(58dvh, calc(var(--tailor-height, 100dvh) - 24px));
-  }
 }
 @media (max-width: 500px) {
   .shell {
     width: calc(100% - 24px);
+    max-width: calc(100% - 24px);
     right: 12px;
+  }
+  .shell:has(.panel[data-enlarged="true"]) {
+    width: calc(100% - 24px);
   }
   .shell[data-compact="true"] {
     width: 56px;
@@ -869,8 +912,9 @@
   }
 }
 @media (max-height: 450px) and (min-width: 501px) {
-  .panel {
-    max-height: calc(var(--tailor-height, 100dvh) - 24px);
+  .shell {
+    --tailor-panel-limit: calc(var(--tailor-height, 100dvh) - 24px);
+    --tailor-panel-peek: var(--tailor-panel-limit);
   }
   .header {
     padding-block: 5px;

@@ -98,6 +98,15 @@
   color: var(--store-muted);
   font-size: 11px;
 }
+.author {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.author strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
 .review > p {
   font-size: 14px;
   line-height: 1.7;

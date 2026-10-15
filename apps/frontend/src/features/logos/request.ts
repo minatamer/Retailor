@@ -56,7 +56,7 @@ export function logoRequester(
       let action = null,
         grant = null;
       if (input.mode === "live") {
-        if (!config.paidEnabled || !config.admissionSiteKey || !proof)
+        if (!config.admissionSiteKey || !proof)
           throw new ApiRequestError("UNAVAILABLE");
         const hash = await crypto.subtle.digest(
           "SHA-256",
@@ -77,9 +77,8 @@ export function logoRequester(
           typography: input.context.typography,
           designRevision: input.context.designRevision,
           count: 3,
-          promptPolicy: "clothing-brand-v1",
+          generatorPolicy: "local-fonts-v1",
           outputPolicy: "transparent-png-v1",
-          disclosureVersion: "brand-context-v1",
         });
         const challengeProof = await proof(config.admissionSiteKey, owned),
           admission = AdmissionResultSchema.parse(

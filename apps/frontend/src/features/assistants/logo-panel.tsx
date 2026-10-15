@@ -11,8 +11,7 @@ export function LogoPanel({
 }: {
   showNameInput?: boolean;
 }) {
-  const { controller, state, preparedLogo, logoBusy, logoNotice } =
-      useSession(),
+  const { controller, state, logoBusy, logoNotice } = useSession(),
     design = state.previewDesign,
     name = state.setup.brandDraft?.name ?? design.name,
     nameReady = logoNameReady(state.setup, design),
@@ -79,8 +78,12 @@ export function LogoPanel({
         </span>
       </div>
       <p>
-        Keep this wordmark, or create three simple logos inspired by your name,
-        first initial and chosen look.
+        Keep this wordmark, or create three logo directions using your name,
+        chosen type and colours.
+      </p>
+      <p className={styles.example}>
+        Logo directions support Latin lettering. For other scripts, keep your
+        wordmark.
       </p>
       {nameReady && oldChoice && (
         <p role="status">
@@ -96,12 +99,12 @@ export function LogoPanel({
         >
           Keep my wordmark
         </Button>
-        {controller.canAttemptAi() && state.logos.batches < 2 && (
+        {state.logos.batches < 2 && (
           <Button
             variant="secondary"
             disabled={!nameReady || logoBusy}
             onClick={() => {
-              if (controller.prepareNamedLogo() && state.fixture)
+              if (controller.prepareNamedLogo())
                 void controller.generateLogos();
             }}
           >
@@ -109,31 +112,6 @@ export function LogoPanel({
           </Button>
         )}
       </div>
-      {preparedLogo &&
-        !state.fixture &&
-        !logoBusy &&
-        controller.canAttemptAi() && (
-          <div className={styles.review}>
-            <strong>Three directions for {preparedLogo.name}</strong>
-            <p>
-              {PALETTES[preparedLogo.theme].label} ·{" "}
-              {TYPOGRAPHIES[preparedLogo.typography].label}
-            </p>
-            <p>
-              Only your store name, chosen palette and typography direction go
-              to OpenAI. This requests one image batch of three separate marks.
-              Image lettering can vary; review the spelling before choosing.
-            </p>
-            <p>
-              {state.logos.batches
-                ? "This is your final explicit batch. A complete valid result replaces the previous three choices."
-                : "One initial batch and one optional explicit retry per temporary workspace."}
-            </p>
-            <Button onClick={() => void controller.generateLogos()}>
-              Approve & generate 3 logos
-            </Button>
-          </div>
-        )}
       {logoBusy && (
         <div className={styles.processing} role="status">
           <span />
@@ -145,9 +123,7 @@ export function LogoPanel({
       )}
       {logoNotice && <p role="status">{logoNotice}</p>}
       {state.fixture && candidates.length > 0 && (
-        <p className={styles.example}>
-          Three local examples for your chosen look.
-        </p>
+        <p className={styles.example}>Three directions for your chosen look.</p>
       )}
       <div className={styles.candidates}>
         {candidates.map((candidate, index) => {
@@ -220,8 +196,8 @@ export function LogoPanel({
       </div>
       {state.logos.batches >= 2 && (
         <p>
-          Both explicit requests have been sent. Their provider outcome can be
-          unknown. Keep one reviewed direction or your wordmark.
+          You’ve used both logo batches. Keep a reviewed direction or your
+          wordmark.
         </p>
       )}
     </section>

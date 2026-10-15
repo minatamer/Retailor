@@ -20,7 +20,7 @@ const review = (
 describe("product reviews use the existing feedback records", () => {
   it("isolates a product, retains comments and calculates its real half-star mean without mutating records", () => {
     const rows = [
-      review("first", "shirt", 4),
+      { ...review("first", "shirt", 4), reviewerName: "Maya Thompson" },
       review("other", "jeans", 1),
       review("second", "shirt", 5, "2026-10-15T13:00:00.000Z"),
     ];
@@ -29,6 +29,7 @@ describe("product reviews use the existing feedback records", () => {
     expect(summary).toMatchObject({ count: 2, average: 4.5 });
     expect(summary.reviews.map((row) => row.id)).toEqual(["second", "first"]);
     expect(summary.reviews[0]).toBe(rows[2]);
+    expect(summary.reviews[1]!.reviewerName).toBe("Maya Thompson");
     expect(starFills(summary.average)).toEqual([100, 100, 100, 100, 50]);
     expect(rows).toEqual(before);
   });

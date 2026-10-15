@@ -239,13 +239,28 @@ export function ProductEditor({
               <Button
                 variant="quiet"
                 onClick={(event) => {
-                  focusPhotoDialog(event.currentTarget);
-                  controller.split(product.id, activeId);
+                  const form = event.currentTarget.form;
+                  if (form)
+                    save(form, () => {
+                      if (controller.split(product.id, activeId)) onClose();
+                      else
+                        setError(
+                          (state.draft?.items.length ?? 0) >= 20
+                            ? "This draft has reached 20 garments. Link matching cards before separating another photo."
+                            : "This photo could not be separated. Your saved edits are kept; review the current draft and try again.",
+                        );
+                    });
                 }}
               >
-                Unlink photo
+                Separate photo
               </Button>
             </div>
+          )}
+          {images.length > 1 && (
+            <p className={styles.intro}>
+              Separating creates another draft garment. Review and include it
+              before continuing.
+            </p>
           )}
           {evidence.length > 0 && (
             <ul className={styles.evidence}>

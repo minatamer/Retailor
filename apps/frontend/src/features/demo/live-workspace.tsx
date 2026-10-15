@@ -140,7 +140,7 @@ function ChallengeDialog({ challenge }: { challenge: Challenge }) {
         {challenge.action === "catalogue"
           ? "Verify this deliberate draft request. Only selected photo previews go to OpenAI; originals stay in your browser."
           : challenge.action === "logos"
-            ? "Verify this deliberate three-logo batch. Only your store name, selected palette and typography direction go to OpenAI."
+            ? "Verify this logo batch. Your name and styling stay on this server; no AI provider receives them."
             : "Verify this deliberate Tailor turn. This demo’s records, prompt and recent role messages provide context. Photos are excluded."}
       </p>
       <div ref={container} />

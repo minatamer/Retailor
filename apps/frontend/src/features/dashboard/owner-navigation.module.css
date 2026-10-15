@@ -18,6 +18,9 @@
   overflow-y: auto;
   transition: width 420ms var(--ease-out);
 }
+.desktop[data-collapsed="true"] {
+  padding-inline: 4px;
+}
 .desktop .brand {
   flex-shrink: 0;
 }
@@ -25,8 +28,11 @@
   flex: 0 0 auto;
   overflow: visible;
 }
-.desktop .collapse {
+.desktop .utilities {
   margin-top: auto;
+}
+.desktop .collapse {
+  margin-top: 8px;
 }
 .brand {
   display: flex;
@@ -96,6 +102,13 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 2px;
+}
+.utilities {
+  flex-shrink: 0;
+  margin-top: 14px;
+  padding: 10px 3px 0;
+  border-top: 1px solid
+    color-mix(in srgb, var(--platform-surface) 20%, transparent);
 }
 .links button,
 .collapse {
@@ -171,6 +184,7 @@
 .panel[data-collapsed="true"] .links button,
 .panel[data-collapsed="true"] .collapse {
   gap: 0;
+  justify-content: center;
 }
 .panel[data-collapsed="true"] .links button,
 .panel[data-collapsed="true"] .collapse {

@@ -1,4 +1,8 @@
 import {
+  CheckoutIdentityResultSchema,
+  CheckoutResultSchema,
+} from "@retailor/contracts/checkout";
+import {
   API_ROUTES,
   isApiRoute,
   publicError,
@@ -218,30 +222,34 @@ export async function forward(
       return fail(error.data.error.code, response.status);
     }
     const schema =
-      path === "health"
-        ? HealthSchema
-        : path === "ready"
-          ? ReadinessSchema
-          : path === "config"
-            ? CapabilitiesSchema
-            : path === "currency/usd-eur"
-              ? FxSnapshotSchema
-              : path === "admission"
-                ? AdmissionResultSchema
-                : path === "catalogue/interpret"
-                  ? RecognitionResultSchema
-                  : path.startsWith("assistant/")
-                    ? AssistantResultSchema
-                    : path === "brand/logos"
-                      ? LogoResultSchema
-                      : null;
+      path === "checkout/identity"
+        ? CheckoutIdentityResultSchema
+        : path.startsWith("checkout/")
+          ? CheckoutResultSchema
+          : path === "health"
+            ? HealthSchema
+            : path === "ready"
+              ? ReadinessSchema
+              : path === "config"
+                ? CapabilitiesSchema
+                : path === "currency/usd-eur"
+                  ? FxSnapshotSchema
+                  : path === "admission"
+                    ? AdmissionResultSchema
+                    : path === "catalogue/interpret"
+                      ? RecognitionResultSchema
+                      : path.startsWith("assistant/")
+                        ? AssistantResultSchema
+                        : path === "brand/logos"
+                          ? LogoResultSchema
+                          : null;
     const validated = schema?.safeParse(parsed);
     if (validated && !validated.success) return fail("UPSTREAM_FAILED", 502);
     const outputHeaders = new Headers({
       "Cache-Control": "no-store",
       "X-Content-Type-Options": "nosniff",
     });
-    if (path === "admission") {
+    if (path === "admission" || path === "checkout/identity") {
       const cookie = response.headers.get("set-cookie")?.split(";")[0];
       if (cookie) {
         if (

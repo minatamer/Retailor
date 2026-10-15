@@ -36,11 +36,11 @@ export function CatalogueReview() {
         <div>
           <span className={styles.eyebrow}>Your collection, in focus</span>
           <h1>
-            Looking like <em>your store.</em>
+            Review your <em>product draft.</em>
           </h1>
           <p>
-            {included} garments included. Click a card to edit its photos and
-            details.
+            {included} garments included. Check the suggested groups, then edit
+            each garment’s photos and details before personalizing your store.
           </p>
           <div className={styles.coverage}>
             <p role="status" aria-label="Photo status">
@@ -97,10 +97,10 @@ export function CatalogueReview() {
       </div>
       <div className={photoStyles.linkHeading}>
         <div>
-          <h2>One product. Every angle.</h2>
+          <h2>Matching photos, together.</h2>
           <p>
-            Keep matching angles and colour options together in one product.
-            Open a card to review or change its links.
+            Link cards showing the same garment. To separate a photo into its
+            own draft garment, open its card and choose Separate photo.
           </p>
         </div>
         <Button
@@ -211,7 +211,7 @@ export function CatalogueReview() {
                   (item.linkOrigin === "recognition" ||
                     item.linkOrigin === "development-fixture")
                     ? item.included
-                      ? "Auto-linked · "
+                      ? "Suggested group · "
                       : "Review links · "
                     : ""}
                   {product.imageIds.length}{" "}

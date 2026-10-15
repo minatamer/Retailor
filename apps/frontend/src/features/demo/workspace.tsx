@@ -17,7 +17,6 @@ import { storeItems } from "../storefront/browse";
 import type { StorePhoto } from "../storefront/gallery";
 import { Tailor } from "../assistants/tailor";
 import { BagDialog } from "../bag/bag-dialog";
-import { CurrencyPicker } from "../currency/picker";
 import { selectedScope } from "../currency/display";
 import { OwnerWorkspace } from "../dashboard/owner-workspace";
 import { OwnerDesign } from "../store-design/owner-design";
@@ -93,7 +92,11 @@ function WorkspaceFlow() {
             <Brand />
           </Link>
           <div className={styles.headerActions}>
-            <Button variant="quiet" onClick={() => controller.askReset()}>
+            <Button
+              variant="quiet"
+              onClick={() => controller.askReset()}
+              data-tailor-target="demo-reset"
+            >
               Reset demo
             </Button>
           </div>
@@ -148,8 +151,9 @@ function WorkspaceFlow() {
                   <aside className={styles.sample}>
                     <h3>Try the sample collection</h3>
                     <p>
-                      No photos handy? Try 15 garments in 19 photos, with linked
-                      views ready to explore.
+                      No photos handy? Try 19 photos of 15 garments, including
+                      different views and colours. Preview them first, then
+                      create your product draft.
                     </p>
                     <div className={styles.samplePhotos}>
                       {SAMPLE.assets
@@ -185,8 +189,8 @@ function WorkspaceFlow() {
                       </Button>
                     )}
                     <p className={styles.finePrint}>
-                      Original generated photos from FORME. Your draft starts
-                      with this collection, ready for you to edit.
+                      Original generated photos from FORME. Garments and
+                      matching photos are suggested when you create the draft.
                     </p>
                   </aside>
                 }
@@ -242,28 +246,42 @@ function WorkspaceFlow() {
         className={styles.footer}
         data-full-page={fullPage ? "true" : undefined}
       >
-        {fullPage ? (
-          <>
-            <p className={styles.attribution}>
-              Powered by <Link href="/">Retailor</Link>
-            </p>
-            <nav className={styles.footerActions} aria-label="Demo controls">
-              {state.stage === "dashboard" ? (
-                <button onClick={() => controller.go("storefront")}>
-                  View storefront
-                </button>
-              ) : (
-                <button onClick={() => controller.go("style")}>
-                  Personalize
-                </button>
-              )}
-              <button onClick={() => controller.askReset()}>Reset demo</button>
-            </nav>
-          </>
-        ) : (
-          <Link href="/" className={styles.wordmark} aria-label="Retailor home">
+        <p className={styles.attribution}>
+          Powered by{" "}
+          <Link href="/" aria-label="Retailor home">
             <Brand />
           </Link>
+        </p>
+        {fullPage && (
+          <nav className={styles.footerActions} aria-label="Demo controls">
+            {state.stage === "dashboard" ? (
+              <button onClick={() => controller.go("storefront")}>
+                View storefront
+              </button>
+            ) : (
+              <button
+                onClick={() => controller.go("style")}
+                data-tailor-target="demo-personalize"
+              >
+                Personalize
+              </button>
+            )}
+            <button
+              onClick={() => controller.askReset()}
+              data-tailor-target="demo-reset"
+            >
+              Reset demo
+            </button>
+            {state.stage === "storefront" && (
+              <button
+                type="button"
+                onClick={() => controller.go("dashboard")}
+                data-tailor-target="store-owner"
+              >
+                Owner workspace ↗
+              </button>
+            )}
+          </nav>
         )}
       </footer>
       <Tailor />
@@ -332,19 +350,17 @@ function CollectionCanvas() {
     if (photo) photos.set(id, { ...photo, id });
   }
   const preview = state.stage === "style" || state.designEditing;
+  const design = preview ? state.previewDesign : state.acceptedDesign;
+  const logoUrl = controller.logoUrl(design.logoId);
+  const logo = state.logos.candidates.find(({ id }) => id === design.logoId);
   return (
     <>
       <Storefront
         input={{
-          design: preview ? state.previewDesign : state.acceptedDesign,
-          ...(controller.logoUrl(
-            (preview ? state.previewDesign : state.acceptedDesign).logoId,
-          )
-            ? {
-                logoUrl: controller.logoUrl(
-                  (preview ? state.previewDesign : state.acceptedDesign).logoId,
-                )!,
-              }
+          design,
+          ...(logoUrl ? { logoUrl } : {}),
+          ...(logo
+            ? { logoSize: { width: logo.width, height: logo.height } }
             : {}),
           items,
           photos,
@@ -357,7 +373,6 @@ function CollectionCanvas() {
             (sum, line) => sum + line.quantity,
             0,
           ),
-          ...(!preview ? { currencyControl: <CurrencyPicker /> } : {}),
         }}
         actions={{
           browse: (patch, expectedCurrency) =>

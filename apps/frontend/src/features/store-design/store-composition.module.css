@@ -84,6 +84,7 @@
   align-items: flex-start;
 }
 .kicker {
+  display: block;
   font-family: var(--store-body);
   font-size: 10px;
   line-height: 1.6;
@@ -100,7 +101,7 @@
   letter-spacing: var(--store-tracking);
   font-size: clamp(40px, 6.4cqi, 82px);
   line-height: 1.02;
-  margin: 22px 0;
+  margin: 0 0 16px;
   text-wrap: balance;
 }
 .hero p {
@@ -189,7 +190,7 @@
   font-weight: var(--store-heading-weight);
   letter-spacing: -0.035em;
   font-size: clamp(24px, 3cqi, 40px);
-  margin: 10px 0 0;
+  margin: 0 0 10px;
   line-height: 1.1;
 }
 .collectionIntro > button {
@@ -288,7 +289,7 @@
   padding: 60px 5% 34px;
 }
 .collectionHeading h2 {
-  margin: 12px 0;
+  margin: 0 0 12px;
   font-size: clamp(36px, 6cqi, 76px);
 }
 .collectionHeading p {
@@ -333,7 +334,7 @@
 .purchase h2 {
   font-size: clamp(28px, 4cqi, 50px);
   line-height: 1.08;
-  margin: 16px 0;
+  margin: 0 0 12px;
 }
 .price {
   font-size: 22px;

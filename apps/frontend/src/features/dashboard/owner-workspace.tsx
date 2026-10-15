@@ -23,6 +23,7 @@ import { ExpenseRegister } from "./expense-register";
 import { RecordPhoto, MetricStrip } from "./record-photo";
 import { inventorySummary } from "./register-model";
 import { StarRating } from "../storefront/reviews";
+import { CurrencyPicker } from "../currency/picker";
 import styles from "./owner-workspace.module.css";
 export const utc = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
@@ -739,6 +740,8 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
                       </div>
                     </div>
                     <blockquote className={styles.reviewQuote}>
+                      <strong>{f.reviewerName ?? "Demo shopper"}</strong>
+                      <br />
                       {f.comment}
                     </blockquote>
                     <details>
@@ -764,7 +767,10 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
                   Finish or cancel the current form to personalize your store.
                 </p>
               ) : (
-                design
+                <>
+                  <CurrencyPicker />
+                  {design}
+                </>
               )
             ) : null}
             {count > 20 && (

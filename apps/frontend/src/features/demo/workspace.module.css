@@ -215,7 +215,16 @@
   gap: 4px;
   padding-block: 12px max(20px, env(safe-area-inset-bottom));
 }
+.workspace[data-storefront-workspace="true"] .footer {
+  border-top: 0;
+  padding-top: 0;
+  gap: 16px;
+}
 .attribution {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   margin: 0;
   color: var(--platform-muted);
   font-size: 12px;
@@ -227,6 +236,7 @@
   min-height: 44px;
   color: var(--platform-text);
   font-weight: 650;
+  font-size: 16px;
 }
 .footerActions {
   display: flex;
@@ -245,6 +255,11 @@
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+@media (min-width: 621px) and (max-width: 1160px) {
+  .workspace[data-storefront-workspace="true"] .footer {
+    padding-bottom: max(104px, env(safe-area-inset-bottom));
+  }
 }
 .processing {
   text-align: center;
@@ -353,9 +368,23 @@
     border-color 0.3s,
     box-shadow 0.3s;
 }
-.reviewCard:hover {
+.reviewCard:hover,
+.reviewCard:has(> button:focus-visible) {
   border-color: var(--platform-control-line);
   box-shadow: 0 14px 30px #242b600a;
+}
+.reviewCard > button {
+  border-radius: 14px 14px 0 0;
+}
+.reviewCard > button:hover {
+  box-shadow: none;
+}
+.reviewCard > button:focus-visible {
+  outline: none;
+}
+.reviewCard:has(> button:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--platform-focus);
+  outline-offset: var(--focus-ring-offset);
 }
 .excluded {
   border-style: dashed;

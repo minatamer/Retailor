@@ -14,11 +14,13 @@ export function PhotoCarousel({
   photos,
   activeId,
   label,
+  coverPhoto = true,
   onSelect,
 }: {
   photos: EditorPhoto[];
   activeId: string | undefined;
   label: string;
+  coverPhoto?: boolean;
   onSelect(id: string): void;
 }) {
   const index = Math.max(
@@ -26,8 +28,7 @@ export function PhotoCarousel({
       photos.findIndex((photo) => photo.id === activeId),
     ),
     active = photos[index];
-  if (!active)
-    return <p className={styles.intro}>No photos remain in this group.</p>;
+  if (!active) return <p className={styles.intro}>No photos are available.</p>;
   function select(offset: -1 | 1) {
     const next = photos[index + offset];
     if (next) onSelect(next.id);
@@ -49,7 +50,7 @@ export function PhotoCarousel({
           {active.image ? (
             <Image
               src={active.image.url}
-              alt={`${label}, ${index === 0 ? "cover" : `view ${index + 1}`}`}
+              alt={`${label}, ${coverPhoto && index === 0 ? "cover" : `photo ${index + 1}`}`}
               width={active.image.width}
               height={active.image.height}
               unoptimized
@@ -58,7 +59,7 @@ export function PhotoCarousel({
             <p>Photo needs repair</p>
           )}
           <figcaption>
-            {index === 0 ? "Cover photo" : `Photo ${index + 1}`}
+            {coverPhoto && index === 0 ? "Cover photo" : `Photo ${index + 1}`}
           </figcaption>
         </figure>
         {photos.length > 1 && (
@@ -95,7 +96,7 @@ export function PhotoCarousel({
             <button
               key={photo.id}
               type="button"
-              aria-label={`Show photo ${position + 1}${position === 0 ? ", cover" : ""}`}
+              aria-label={`Show photo ${position + 1}${coverPhoto && position === 0 ? ", cover" : ""}`}
               aria-pressed={photo.id === active.id}
               onClick={() => onSelect(photo.id)}
             >

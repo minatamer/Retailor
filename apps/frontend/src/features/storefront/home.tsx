@@ -32,23 +32,16 @@ export function HomeCampaign({
   );
   return (
     <section className={styles.campaign} data-tiles={tiles.length}>
-      <div className={styles.campaignMeta}>
-        <span>{design.name} / The collection</span>
-        <span>
-          {String(items.length).padStart(2, "0")}{" "}
-          {items.length === 1 ? "garment" : "garments"}
-        </span>
-      </div>
-      <div className={styles.campaignCaption}>
+      <div className={styles.campaignCaption} data-tailor-target="store-home">
         <div>
-          <span className={styles.eyebrow}>
-            {design.template === "gallery"
-              ? "A wardrobe, in focus"
-              : design.template === "pulse"
-                ? "Find your next favourite"
-                : "Clothing, considered"}
-          </span>
           <h1>{design.headline || "Made for your everyday."}</h1>
+          <div className={styles.campaignMeta}>
+            <span>{design.name} / The collection</span>
+            <span>
+              {String(items.length).padStart(2, "0")}{" "}
+              {items.length === 1 ? "garment" : "garments"}
+            </span>
+          </div>
         </div>
         <button className={styles.primary} onClick={explore}>
           Shop the collection <Icon name="arrow" />

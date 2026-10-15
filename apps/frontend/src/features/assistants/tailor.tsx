@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { Design, StorePage } from "@retailor/contracts/design";
 import {
   resolvedTemplates,
@@ -73,6 +73,11 @@ export function Tailor() {
   const visible = ["style", "storefront", "dashboard"].includes(state.stage);
   const creator = state.stage === "style",
     expanded = state.setup.expanded;
+  const companion = creator
+    ? "Your personalization guide"
+    : state.stage === "dashboard"
+      ? "Owner companion"
+      : "Store companion";
   const launcher = useRef<HTMLButtonElement>(null),
     heading = useRef<HTMLHeadingElement>(null),
     conversation = useRef<HTMLDivElement>(null);
@@ -119,26 +124,32 @@ export function Tailor() {
     };
   }, []);
   useEffect(() => {
-    const pane = conversation.current,
-      active = document.activeElement;
-    if (
-      !pane ||
-      !(active instanceof HTMLElement) ||
-      !pane.contains(active) ||
-      !active.matches("input,textarea,[contenteditable=true]")
-    )
-      return;
-    const input = active.getBoundingClientRect(),
-      bounds = pane.getBoundingClientRect();
-    const delta =
-      input.bottom > bounds.bottom - 8
-        ? input.bottom - bounds.bottom + 8
-        : input.top < bounds.top + 8
-          ? input.top - bounds.top - 8
-          : 0;
-    if (delta)
-      pane.scrollTo({ top: pane.scrollTop + delta, behavior: "smooth" });
-  }, [viewport.height]);
+    const pane = conversation.current;
+    if (!expanded || !pane) return;
+    const revealField = () => {
+      const active = document.activeElement;
+      if (
+        !(active instanceof HTMLElement) ||
+        !pane.contains(active) ||
+        !active.matches("input,textarea,[contenteditable=true]")
+      )
+        return;
+      const input = active.getBoundingClientRect(),
+        bounds = pane.getBoundingClientRect();
+      const delta =
+        input.bottom > bounds.bottom - 8
+          ? input.bottom - bounds.bottom + 8
+          : input.top < bounds.top + 8
+            ? input.top - bounds.top - 8
+            : 0;
+      if (delta)
+        pane.scrollTo({ top: pane.scrollTop + delta, behavior: "smooth" });
+    };
+    const observer = new ResizeObserver(revealField);
+    observer.observe(pane);
+    revealField();
+    return () => observer.disconnect();
+  }, [expanded, viewport.height]);
   useEffect(() => {
     const last = previous.current;
     if (visible && last.expanded && !expanded)
@@ -180,6 +191,7 @@ export function Tailor() {
           : undefined
       }
       aria-label="Tailor assistant"
+      data-tailor-target="tailor-panel"
     >
       {!expanded ? (
         <button
@@ -191,42 +203,13 @@ export function Tailor() {
             <Icon name="sparkle" />
           </span>
           <span>
-            <strong>
-              {creator ? "Personalize with Tailor" : "Meet Tailor"}
-            </strong>
-            <small>
-              {creator
-                ? LABELS[state.setup.step]
-                : state.stage === "dashboard"
-                  ? "Your collection, at a glance"
-                  : "Find your next favourite"}
-            </small>
+            <strong>Tailor</strong>
+            <small>{companion}</small>
           </span>
           <Icon name="arrow" />
         </button>
       ) : (
-        <section className={styles.panel} aria-labelledby="tailor-title">
-          <header className={styles.header}>
-            <span className={styles.avatar}>
-              <Icon name="sparkle" />
-            </span>
-            <div>
-              <strong>Tailor</strong>
-              <small>
-                {creator
-                  ? "Your personalization guide"
-                  : state.stage === "dashboard"
-                    ? "Owner companion"
-                    : "Store companion"}
-              </small>
-            </div>
-            <button
-              onClick={() => controller.toggleTailor(false)}
-              aria-label="Collapse Tailor and see full preview"
-            >
-              ↓
-            </button>
-          </header>
+        <TailorPanel companion={companion}>
           <div className={styles.conversation} ref={conversation}>
             {creator ? (
               <>
@@ -431,14 +414,56 @@ export function Tailor() {
                 ? "Preview changes instantly"
                 : "One collection, one companion"}
             </span>
-            <button onClick={() => controller.toggleTailor(false)}>
-              See full preview
+            <button
+              type="button"
+              onClick={() => controller.toggleTailor(false)}
+              aria-label="Collapse Tailor and see full preview"
+              title="Collapse Tailor"
+            >
+              <Icon name="down" size={16} />
             </button>
           </footer>
-        </section>
+        </TailorPanel>
       )}
       <Tour />
     </aside>
+  );
+}
+function TailorPanel({
+  companion,
+  children,
+}: {
+  companion: string;
+  children: ReactNode;
+}) {
+  const [enlarged, setEnlarged] = useState(false);
+  const action = enlarged ? "Restore chat size" : "Expand chat";
+  return (
+    <section
+      className={styles.panel}
+      data-enlarged={enlarged ? "true" : undefined}
+      aria-labelledby="tailor-title"
+    >
+      <header className={styles.header}>
+        <span className={styles.avatar}>
+          <Icon name="sparkle" />
+        </span>
+        <div>
+          <strong>Tailor</strong>
+          <small>{companion}</small>
+        </div>
+        <button
+          type="button"
+          onClick={() => setEnlarged((value) => !value)}
+          aria-label={action}
+          title={action}
+          aria-pressed={enlarged}
+        >
+          <Icon name={enlarged ? "restore" : "expand"} />
+        </button>
+      </header>
+      {children}
+    </section>
   );
 }
 function PromptText({ text, delay = 180 }: { text: string; delay?: number }) {

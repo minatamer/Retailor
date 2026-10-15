@@ -78,10 +78,10 @@ export function StoreComposition({
           <>
             <div className={styles.hero}>
               <div className={styles.heroCopy}>
+                <h2>{design.headline || "Good clothes. Great days."}</h2>
                 <span className={styles.kicker}>
                   The everyday collection / 01
                 </span>
-                <h2>{design.headline || "Good clothes. Great days."}</h2>
                 <p>
                   A little more considered. A little more you. Find your
                   everyday, beautifully reimagined.
@@ -119,8 +119,8 @@ export function StoreComposition({
             </div>
             <div className={styles.collectionIntro}>
               <div>
-                <span className={styles.kicker}>The collection</span>
                 <h3>Fewer things. Better choices.</h3>
+                <span className={styles.kicker}>The collection</span>
               </div>
               <button onClick={() => onPage("collection")}>
                 Discover all {products.length} <Icon name="arrow" />
@@ -132,10 +132,10 @@ export function StoreComposition({
         {page === "collection" && (
           <>
             <div className={styles.collectionHeading}>
+              <h2>The everyday edit.</h2>
               <span className={styles.kicker}>
                 Considered from the first stitch
               </span>
-              <h2>The everyday edit.</h2>
               <p>{products.length} pieces. A wardrobe of possibilities.</p>
             </div>
             <div className={styles.filterLine}>
@@ -164,10 +164,10 @@ export function StoreComposition({
                 />
               </div>
               <div className={styles.purchase}>
+                <h2>{activeProduct.title}</h2>
                 <span className={styles.kicker}>
                   {activeProduct.category} / The everyday collection
                 </span>
-                <h2>{activeProduct.title}</h2>
                 <p className={styles.price}>
                   {formatUsd(activeProduct.priceMinor)}
                 </p>
@@ -213,7 +213,6 @@ export function StoreComposition({
       </div>
       <footer className={styles.footer}>
         <span>{design.name}</span>
-        <span>Clothing, considered.</span>
         <span>Design reference · No real orders</span>
       </footer>
     </section>

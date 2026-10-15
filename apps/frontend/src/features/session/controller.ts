@@ -1,4 +1,17 @@
 import {
+  CHECKOUT_LIMITS,
+  CheckoutControlSchema,
+} from "@retailor/contracts/checkout";
+import type {
+  PendingCheckout,
+  CheckoutResult,
+  CheckoutStart,
+} from "@retailor/contracts/checkout";
+import { checkoutQuote } from "@retailor/commerce/checkout";
+import { checkoutRequester, checkoutBase64 } from "../checkout/request";
+import type { CheckoutRequester } from "../checkout/request";
+import { checkoutCurrent } from "../checkout/state";
+import {
   CurrencySchema,
   CurrencyScopeSchema,
   INITIAL_CURRENCY,
@@ -55,7 +68,14 @@ import {
 import type { OwnerFieldIssue } from "../operations/validation";
 import { SUCCESS_LABELS } from "../operations/presentation";
 import type { CheckoutReview } from "../bag/state";
-import { bagEntries, bagWitness, bagTotals } from "../bag/quote";
+import {
+  bagEntries,
+  bagWitness,
+  bagTotals,
+  bagPromoDiscount,
+  BAG_PROMO_CODE,
+  displayedOrder,
+} from "../bag/quote";
 import {
   DesignSchema,
   withPageTemplates,
@@ -84,7 +104,7 @@ import { logoRequester, type LogoRequester } from "../logos/request";
 import type { PhotoCache } from "../photos/cache";
 import { PhotoController } from "../photos/controller";
 import type { NamedPhoto } from "../photos/controller";
-import { loadSample, SAMPLE, linkSampleViews } from "../photos/sample";
+import { loadSample, SAMPLE } from "../photos/sample";
 import {
   parseDraft,
   reviseDraft,
@@ -137,6 +157,7 @@ import type {
 import { appendMessage, replyCurrent } from "../assistants/conversation";
 import type { ChatMessage } from "../assistants/conversation";
 import { currentAssistantContext, roleOf } from "../assistants/context";
+import { TOUR_STEPS } from "../assistants/tour-targets";
 import { localReply } from "../assistants/local";
 import type { LocalShortcut } from "../assistants/local";
 import { assistantRequester } from "../assistants/request";
@@ -164,6 +185,8 @@ export interface CatalogueProcessor {
   }): Promise<CatalogueDraft>;
 }
 interface SessionOptions {
+  checkoutRequest?: CheckoutRequester;
+  checkoutNavigate?: (url: string) => void;
   download?: DownloadPort;
   logoRequest?: LogoRequester;
   logoVerify?: LogoVerifier;
@@ -190,12 +213,16 @@ export type ScenarioReview = ReturnType<typeof generateScenario> & {
   photoWitness: string;
 };
 export interface SessionSnapshot {
+  checkoutBusy: boolean;
+  checkoutAvailable: boolean | null;
+  checkoutNotice: string;
+  checkoutOutcome: CheckoutResult["status"] | null;
   logoBusy: boolean;
   logoNotice: string;
   assistantDraft: string;
   assistantBusy: boolean;
   assistantNotice: string;
-  tour: { role: AssistantRole; index: number } | null;
+  tour: { role: AssistantRole; index: number; from?: number } | null;
   dialog: "reset" | "rebuild" | "leave-design" | null;
   state: Projection;
   notice: string;
@@ -259,6 +286,8 @@ export class SessionController {
   private timer: ReturnType<typeof setInterval> | undefined;
   private lastPhotoRevision = 0;
   private snapshot: SessionSnapshot;
+  private checkoutOperation: AbortController | undefined;
+  private checkoutCapability: AbortController | undefined;
   photos!: PhotoController;
   private constructor(private readonly options: SessionOptions) {
     this.clock = options.clock ?? Date.now;
@@ -267,6 +296,10 @@ export class SessionController {
     this.download = new ReportDownload(options.download);
     options.signal?.addEventListener("abort", this.aborted, { once: true });
     this.snapshot = {
+      checkoutBusy: false,
+      checkoutAvailable: null,
+      checkoutNotice: "",
+      checkoutOutcome: null,
       logoBusy: false,
       logoNotice: "",
       assistantDraft: "",
@@ -328,10 +361,13 @@ export class SessionController {
       browse: structuredClone(INITIAL_BROWSE),
       setup: structuredClone(INITIAL_SETUP),
       hasAcceptedLook: false,
+      tourSeen: { preview: false, storefront: false },
       designEditing: false,
       currency: structuredClone(INITIAL_CURRENCY),
       orderDisplays: [],
       shopping: structuredClone(INITIAL_SHOPPING),
+      stripeCheckout: null,
+      checkoutOrders: [],
       scenario: null,
       ownerView: "overview",
       ownerSearch: "",
@@ -404,6 +440,19 @@ export class SessionController {
     }
     if (state.stage !== this.snapshot.state.stage)
       patch = { ...patch, tour: null, assistantDraft: "" };
+    const checkout = this.snapshot.state.stripeCheckout;
+    if (
+      this.checkoutOperation &&
+      checkout &&
+      (!state.stripeCheckout ||
+        !checkoutCurrent(
+          checkout,
+          state,
+          this.photos.availableIds(),
+          this.clock(),
+        ))
+    )
+      this.checkoutOperation.abort();
     this.snapshot = {
       ...this.snapshot,
       ...patch,
@@ -704,9 +753,10 @@ export class SessionController {
       );
     this.update(
       {
-        currencyNotice: changed
-          ? `Prices are shown in ${selected}.${clearedBounds ? " Price bounds were cleared for this currency." : ""}`
-          : "",
+        currencyNotice:
+          changed && clearedBounds
+            ? "Price bounds were cleared for this currency."
+            : "",
       },
       false,
     );
@@ -1445,6 +1495,8 @@ export class SessionController {
           source: null,
         },
         shopping: structuredClone(INITIAL_SHOPPING),
+        stripeCheckout: null,
+        checkoutOrders: [],
         orderDisplays: [],
       }),
       scenarioReview: null,
@@ -1632,9 +1684,11 @@ export class SessionController {
   }
   openBag() {
     if (!this.shoppingAllowed()) return;
-    const tracked = this.shopper(
-      this.snapshot.state.graph.bag.length ? "bag" : "visit",
-    );
+    void this.checkCheckoutAvailability();
+    const pending = this.snapshot.state.stripeCheckout;
+    const tracked =
+      (pending && this.currentCheckout(pending)) ||
+      this.shopper(this.snapshot.state.graph.bag.length ? "bag" : "visit");
     this.update(
       {
         bagOpen: true,
@@ -1642,15 +1696,19 @@ export class SessionController {
           ? null
           : this.snapshot.state.shopping.lastOrderId,
         checkoutReview: null,
+        checkoutNotice: "",
         bagNotice: tracked ? "" : this.snapshot.bagNotice,
       },
       false,
     );
   }
   closeBag() {
+    this.checkoutOperation?.abort();
+    this.checkoutCapability?.abort();
     this.update({ bagOpen: false, checkoutReview: null }, false);
   }
   editBag() {
+    this.checkoutOperation?.abort();
     this.update({ checkoutReview: null }, false);
   }
   addToBag(productId: string, variantId: string, quantity: number) {
@@ -1722,8 +1780,482 @@ export class SessionController {
         false,
       );
   }
+  private checkoutPort() {
+    return this.options.checkoutRequest ?? checkoutRequester();
+  }
+  private async checkCheckoutAvailability() {
+    this.checkoutCapability?.abort();
+    const owner = new AbortController();
+    const generation = this.generation;
+    let timedOut = false;
+    this.checkoutCapability = owner;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      owner.abort();
+    }, 5000);
+    try {
+      const available = await this.checkoutPort().available(owner.signal);
+      if (
+        this.active &&
+        generation === this.generation &&
+        this.checkoutCapability === owner &&
+        !owner.signal.aborted
+      )
+        this.update({ checkoutAvailable: available }, false);
+    } catch {
+      if (
+        this.active &&
+        generation === this.generation &&
+        this.checkoutCapability === owner &&
+        (!owner.signal.aborted || timedOut)
+      )
+        this.update(
+          {
+            checkoutAvailable: null,
+            checkoutNotice: "Checkout couldn’t load. Please try again.",
+          },
+          false,
+        );
+    } finally {
+      clearTimeout(timer);
+      if (this.checkoutCapability === owner)
+        this.checkoutCapability = undefined;
+    }
+  }
+  private currentCheckout(pending: PendingCheckout) {
+    return (
+      this.active &&
+      this.snapshot.state.stripeCheckout?.attemptId === pending.attemptId &&
+      checkoutCurrent(
+        pending,
+        this.snapshot.state,
+        this.photos.availableIds(),
+        this.clock(),
+      )
+    );
+  }
+  async checkout(discount = 0) {
+    if (
+      !this.shoppingAllowed() ||
+      this.snapshot.checkoutBusy ||
+      !this.snapshot.checkoutReview ||
+      !this.snapshot.bagOpen
+    )
+      return;
+    const generation = this.generation;
+    if (this.snapshot.checkoutAvailable === null) {
+      this.update({ checkoutBusy: true, checkoutNotice: "" }, false);
+      await this.checkCheckoutAvailability();
+      if (!this.active || generation !== this.generation) return;
+      this.update({ checkoutBusy: false }, false);
+      if (
+        !this.snapshot.bagOpen ||
+        !this.shoppingAllowed() ||
+        this.snapshot.checkoutAvailable === null
+      )
+        return;
+    }
+    const pending = this.snapshot.state.stripeCheckout;
+    if (
+      pending &&
+      this.currentCheckout(pending) &&
+      this.snapshot.checkoutOutcome !== "open"
+    )
+      await this.resumeStripeCheckout(pending.attemptId, false);
+    else if (this.snapshot.checkoutAvailable)
+      await this.startStripeCheckout(discount);
+    else if (!pending && this.snapshot.checkoutReview)
+      this.placeReviewed(this.snapshot.checkoutReview);
+  }
+  private settleStripeOrder(pending: PendingCheckout) {
+    if (!this.currentCheckout(pending)) throw new ApiRequestError("STALE");
+    const state = this.snapshot.state;
+    const availablePhotoIds = this.photos.availableIds();
+    const entries = bagEntries(state.graph, availablePhotoIds);
+    const paidQuote = checkoutQuote(
+      state.graph,
+      availablePhotoIds,
+      pending.scope,
+      pending.promoApplied,
+    );
+    if (
+      paidQuote.total !== pending.total ||
+      paidQuote.currency !== pending.scope.currency
+    )
+      throw new ApiRequestError("STALE");
+    const discount = bagPromoDiscount(
+      entries,
+      pending.promoApplied ? BAG_PROMO_CODE : "",
+    );
+    const totals = bagTotals(entries, discount);
+    let graph = state.graph;
+    const shopping = { ...state.shopping };
+    const apply = (command: CommerceCommand) => {
+      const result = applyCommand(graph, command, {
+        now: new Date(this.clock()).toISOString(),
+        availablePhotoIds,
+      });
+      if (!result.ok) throw new ApiRequestError("STALE");
+      graph = result.graph;
+    };
+    const previousVisit = graph.traffic.find(
+      (visit) => visit.id === shopping.visitId,
+    );
+    if (
+      !previousVisit ||
+      this.clock() -
+        Date.parse(shopping.lastActivityAt ?? previousVisit.lastAt) >=
+        SHOPPER_INACTIVITY_MS
+    ) {
+      shopping.visitId = this.id();
+      const at = new Date(this.clock()).toISOString();
+      apply(
+        this.makeCommand(graph, "addTraffic", {
+          sessions: [
+            {
+              id: shopping.visitId,
+              actor: "shopper",
+              origin: "guest_action",
+              startedAt: at,
+              lastAt: at,
+              productIds: [],
+            },
+          ],
+        }),
+      );
+    }
+    apply(
+      this.makeCommand(graph, "touchTraffic", {
+        sessionId: shopping.visitId!,
+        stage: "checkout",
+        productId: entries[0]!.productId!,
+      }),
+    );
+    shopping.lastActivityAt = new Date(this.clock()).toISOString();
+    if (!shopping.buyerId) {
+      shopping.buyerId = this.id();
+      apply(
+        this.makeCommand(graph, "addBuyers", {
+          buyers: [
+            {
+              id: shopping.buyerId,
+              label: "Demo shopper",
+              origin: "guest_action",
+              fictional: true,
+            },
+          ],
+        }),
+      );
+    }
+    const draftId = shopping.draftId ?? this.id();
+    const orderId = pending.orderId ?? this.id();
+    apply(
+      this.makeCommand(graph, "saveOrderDraft", {
+        id: draftId,
+        actor: "shopper",
+        buyerId: shopping.buyerId,
+        ...(shopping.visitId ? { trafficId: shopping.visitId } : {}),
+        lines: entries.map((row) => ({
+          variantId: row.variantId,
+          quantity: row.quantity,
+        })),
+        discount,
+        delivery: totals.delivery,
+        tax: totals.tax,
+      }),
+    );
+    apply(this.makeCommand(graph, "placeOrder", { draftId, orderId }));
+    const order = graph.orders.find((item) => item.id === orderId)!;
+    if (displayedOrder(order, pending.scope).total !== pending.total)
+      throw new ApiRequestError("STALE");
+    this.update({
+      state: freeze({
+        ...state,
+        graph,
+        shopping: { ...shopping, draftId: null, lastOrderId: orderId },
+        stripeCheckout: null,
+        checkoutOrders: [
+          ...state.checkoutOrders,
+          { attemptId: pending.attemptId, orderId },
+        ],
+        orderDisplays: [
+          ...state.orderDisplays,
+          { orderId, scope: pending.scope },
+        ],
+      }),
+      checkoutReview: null,
+      bagOpen: true,
+      bagReceiptId: orderId,
+      bagNotice: "",
+      checkoutNotice: "",
+      checkoutOutcome: "complete",
+    });
+    return orderId;
+  }
+  async startStripeCheckout(discount = 0) {
+    if (!this.shoppingAllowed() || this.snapshot.checkoutBusy) return;
+    const owner = new AbortController();
+    let handedOff = false;
+    const timer = setTimeout(
+      () => owner.abort(),
+      CHECKOUT_LIMITS.deadlineMs + 10_000,
+    );
+    this.checkoutOperation = owner;
+    const abortNavigation = () => {
+      clearTimeout(timer);
+      if (handedOff && this.checkoutOperation === owner) {
+        this.checkoutOperation = undefined;
+        if (this.active) this.update({ checkoutBusy: false }, false);
+      }
+    };
+    owner.signal.addEventListener("abort", abortNavigation, { once: true });
+    let result: CheckoutResult | undefined;
+    let pending: PendingCheckout | undefined;
+    let phase: "save" | "photos" | "gateway" | "navigate" = "save";
+    try {
+      const state = this.snapshot.state;
+      const photos = this.photos.availableIds();
+      const scope = selectedScope(state.currency);
+      if (
+        Date.parse(state.graph.expiresAt) - this.clock() <
+        CHECKOUT_LIMITS.sessionMs + 5000
+      )
+        throw new ApiRequestError("STALE");
+      const entries = bagEntries(state.graph, photos);
+      const promoApplied = discount > 0;
+      const quote = checkoutQuote(state.graph, photos, scope, promoApplied);
+      if (
+        discount !==
+        (promoApplied ? bagPromoDiscount(entries, BAG_PROMO_CODE) : 0)
+      )
+        throw new ApiRequestError("STALE");
+      const brand = {
+        name: state.acceptedDesign.name,
+        theme: state.acceptedDesign.theme,
+      };
+      const previous = state.stripeCheckout;
+      pending =
+        previous &&
+        previous.promoApplied === promoApplied &&
+        this.currentCheckout(previous)
+          ? previous
+          : {
+              attemptId: this.id(),
+              orderId: this.id(),
+              workspaceId: state.graph.workspaceId,
+              scenarioId: state.graph.scenarioId,
+              revision: state.graph.revision,
+              witness: bagWitness(state.graph, photos),
+              scope,
+              total: quote.total,
+              expiresAt: new Date(
+                this.clock() + CHECKOUT_LIMITS.sessionMs,
+              ).toISOString(),
+              promoApplied,
+              brand,
+            };
+      this.update({
+        state: freeze({ ...state, stripeCheckout: pending }),
+        checkoutBusy: true,
+        checkoutNotice: "",
+        checkoutOutcome: null,
+      });
+      // Full-page checkout is safe only after a recoverable local attempt has been saved.
+      const stored = this.options.storage?.getItem(SESSION_KEY);
+      if (
+        !stored ||
+        JSON.parse(stored).stripeCheckout?.attemptId !== pending.attemptId
+      )
+        throw new ApiRequestError("UNAVAILABLE");
+      phase = "photos";
+      const selected = [...new Set(quote.lines.map((line) => line.photoId))];
+      const submitted: CheckoutStart["photos"] = [];
+      for (const id of selected) {
+        const photo = this.photos.get(id);
+        if (!photo || !photos.has(id)) throw new ApiRequestError("STALE");
+        submitted.push({
+          image: photo.photo.derivative,
+          base64: await checkoutBase64(photo.derivative, owner.signal),
+        });
+      }
+      if (!this.currentCheckout(pending)) throw new ApiRequestError("STALE");
+      phase = "gateway";
+      result = await this.checkoutPort().start(
+        {
+          schemaVersion: 1,
+          attemptId: pending.attemptId,
+          graph: state.graph,
+          availablePhotoIds: [...photos],
+          scope,
+          promoApplied,
+          expectedTotal: quote.total,
+          brand,
+          photos: submitted,
+        },
+        owner.signal,
+      );
+      if (
+        owner.signal.aborted ||
+        !this.currentCheckout(pending) ||
+        result.attemptId !== pending.attemptId ||
+        result.total !== pending.total ||
+        result.currency !== pending.scope.currency ||
+        result.status !== "open" ||
+        !result.url
+      )
+        throw new ApiRequestError("STALE");
+      this.update({
+        state: freeze({
+          ...this.snapshot.state,
+          stripeCheckout: { ...pending, expiresAt: result.expiresAt },
+        }),
+        checkoutNotice: "",
+      });
+      phase = "navigate";
+      handedOff = true;
+      (this.options.checkoutNavigate ?? ((url) => window.location.assign(url)))(
+        result.url,
+      );
+    } catch (error) {
+      handedOff = false;
+      if (result?.status === "open")
+        await this.checkoutPort()
+          .status(result.attemptId, true, AbortSignal.timeout(25_000))
+          .catch(() => undefined);
+      if (this.active && this.checkoutOperation === owner)
+        this.update({
+          state: freeze({ ...this.snapshot.state, stripeCheckout: null }),
+          checkoutNotice:
+            error instanceof ApiRequestError && error.code === "STALE"
+              ? "Your bag changed or this session is nearly over. Review it before trying Stripe again."
+              : phase === "save"
+                ? "Allow browser storage to keep your order when you return."
+                : phase === "photos"
+                  ? "A selected photo could not be prepared. Reopen its upload before trying checkout again."
+                  : error instanceof ApiRequestError &&
+                      error.code === "FORBIDDEN"
+                    ? "This demo has reached its checkout limit. Your bag is saved."
+                    : error instanceof ApiRequestError &&
+                        error.code === "INVALID_INPUT"
+                      ? "These checkout details could not be accepted. Review your selected garments and photos."
+                      : "Checkout couldn’t open. Please try again.",
+        });
+    } finally {
+      if (!handedOff) {
+        clearTimeout(timer);
+        owner.signal.removeEventListener("abort", abortNavigation);
+      }
+      if (!handedOff && this.checkoutOperation === owner) {
+        this.checkoutOperation = undefined;
+        if (this.active) this.update({ checkoutBusy: false }, false);
+      }
+    }
+  }
+  async resumeStripeCheckout(attemptId: string, cancel: boolean) {
+    if (!this.shoppingAllowed() || this.snapshot.checkoutBusy) return;
+    const completed = this.snapshot.state.checkoutOrders.find(
+      (item) => item.attemptId === attemptId,
+    );
+    if (completed) {
+      this.update(
+        {
+          bagOpen: true,
+          bagReceiptId: completed.orderId,
+          checkoutReview: null,
+          checkoutOutcome: "complete",
+          checkoutNotice: "",
+          bagNotice: "",
+        },
+        false,
+      );
+      return completed.orderId;
+    }
+    void this.checkCheckoutAvailability();
+    const pending = this.snapshot.state.stripeCheckout;
+    if (
+      !CheckoutControlSchema.safeParse({ schemaVersion: 1, attemptId })
+        .success ||
+      !pending ||
+      pending.attemptId !== attemptId ||
+      !this.currentCheckout(pending)
+    ) {
+      this.update(
+        {
+          checkoutNotice: "",
+          bagOpen: true,
+          checkoutOutcome: null,
+        },
+        false,
+      );
+      return;
+    }
+    const owner = new AbortController();
+    const timer = setTimeout(() => owner.abort(), 30_000);
+    this.checkoutOperation = owner;
+    this.update(
+      {
+        bagOpen: true,
+        bagReceiptId: null,
+        checkoutReview: null,
+        checkoutBusy: true,
+        checkoutNotice: "",
+        checkoutOutcome: null,
+      },
+      false,
+    );
+    try {
+      const result = await this.checkoutPort().status(
+        attemptId,
+        cancel,
+        owner.signal,
+      );
+      if (
+        owner.signal.aborted ||
+        !this.currentCheckout(pending) ||
+        result.attemptId !== pending.attemptId ||
+        result.currency !== pending.scope.currency ||
+        result.total !== pending.total
+      )
+        throw new ApiRequestError("STALE");
+      if (result.status === "complete") return this.settleStripeOrder(pending);
+      this.update(
+        {
+          ...(result.status !== "open"
+            ? {
+                state: freeze({ ...this.snapshot.state, stripeCheckout: null }),
+              }
+            : {}),
+          checkoutOutcome: result.status,
+          checkoutNotice:
+            result.status === "cancelled"
+              ? ""
+              : result.status === "expired"
+                ? "That checkout expired. Your bag is saved."
+                : "",
+        },
+        false,
+      );
+    } catch {
+      if (this.active && this.checkoutOperation === owner)
+        this.update(
+          {
+            checkoutNotice: "Checkout couldn’t finish. Please try again.",
+            checkoutOutcome: null,
+          },
+          false,
+        );
+    } finally {
+      clearTimeout(timer);
+      if (this.checkoutOperation === owner) {
+        this.checkoutOperation = undefined;
+        if (this.active) this.update({ checkoutBusy: false }, false);
+      }
+    }
+  }
   reviewBag(discount = 0) {
     if (!this.shoppingAllowed()) return;
+    if (this.snapshot.checkoutAvailable === null && !this.checkoutCapability)
+      void this.checkCheckoutAvailability();
     const entries = bagEntries(
       this.snapshot.state.graph,
       this.photos.availableIds(),
@@ -1752,6 +2284,31 @@ export class SessionController {
       );
       return;
     }
+    const pending = this.snapshot.state.stripeCheckout;
+    if (
+      pending &&
+      this.currentCheckout(pending) &&
+      pending.promoApplied === discount > 0
+    ) {
+      // A retry must preserve the graph revision bound to the hosted payment.
+      this.update(
+        {
+          checkoutReview: freeze({
+            command: this.makeCommand(this.snapshot.state.graph, "placeOrder", {
+              draftId: this.snapshot.state.shopping.draftId ?? this.id(),
+              orderId: pending.orderId ?? this.id(),
+            }),
+            scope: pending.scope,
+            witness: pending.witness,
+            discount,
+          }),
+          bagNotice: "",
+        },
+        false,
+      );
+      return;
+    }
+    if (pending) this.state({ stripeCheckout: null });
     if (!this.shopper("checkout", entries[0]!.productId ?? undefined)) return;
     let graph = this.snapshot.state.graph;
     const shopping = { ...this.snapshot.state.shopping };
@@ -1822,6 +2379,7 @@ export class SessionController {
     });
   }
   placeReviewed(review: CheckoutReview) {
+    if (this.snapshot.checkoutBusy) return;
     if (!this.shoppingAllowed()) return;
     const state = this.snapshot.state;
     // A previously successful click returns the same local confirmation without replaying any effect.
@@ -1939,10 +2497,7 @@ export class SessionController {
     if (error.code !== "OPERATOR_REQUIRED") return error.message;
     this.aiAttention = true;
     const notice = `${error.message} Reload after AI is restored. Local controls remain ready.`;
-    this.update(
-      { assistantNotice: notice, logoNotice: notice, preparedLogo: null },
-      false,
-    );
+    this.update({ assistantNotice: notice }, false);
     return notice;
   }
   private valid() {
@@ -1958,6 +2513,11 @@ export class SessionController {
     return true;
   }
   private cancelOperation() {
+    this.checkoutOperation?.abort();
+    this.checkoutCapability?.abort();
+    this.checkoutOperation = undefined;
+    this.checkoutCapability = undefined;
+    this.snapshot = { ...this.snapshot, checkoutBusy: false };
     this.cancelLogos(false);
     this.stopOwnerPrefill();
     this.assistantOperation?.abort();
@@ -1991,7 +2551,7 @@ export class SessionController {
               .items.filter((item) => available.has(item.photo.id))
               .map((item) => item.photo.source.hash),
           );
-        const accepted = await this.photos.add(
+        await this.photos.add(
           files.filter(
             (_file, index) =>
               !selectedSources.has(SAMPLE.assets[index]!.image.hash),
@@ -2000,9 +2560,6 @@ export class SessionController {
           true,
           "reuse",
         );
-        if (this.active && generation === this.generation) {
-          linkSampleViews(this.photos, accepted);
-        }
       }
     } catch {
       if (this.active && generation === this.generation)
@@ -2181,7 +2738,7 @@ export class SessionController {
     return this.photos.getSnapshot().links.map((row) => [...row]);
   }
   split(productId: string, photoId: string) {
-    this.review(
+    return this.review(
       (draft) => splitDraft(draft, productId, photoId, this.id()),
       true,
     );
@@ -2212,7 +2769,7 @@ export class SessionController {
           autoLinkPhotos,
         },
         manualGrouping
-          ? "Photo links updated. Automatic linking is off for future processing; you can turn it on again in Photos."
+          ? "Photo groups updated. Your choices are kept if you create the draft again."
           : "Catalogue updated locally. Your source photos and review history are preserved.",
       );
       return true;
@@ -2297,11 +2854,17 @@ export class SessionController {
           stage: "style",
           orderDisplays: [],
           shopping: structuredClone(INITIAL_SHOPPING),
+          stripeCheckout: null,
+          checkoutOrders: [],
         },
         "Catalogue accepted. This is your local demo; no website was published externally.",
       );
       this.protectDesignPhotos();
       this.update({ dialog: null }, false);
+      if (!state.tourSeen.preview) {
+        this.state({ tourSeen: { ...state.tourSeen, preview: true } });
+        this.startTour();
+      }
     } catch {
       this.update({
         notice:
@@ -2528,6 +3091,12 @@ export class SessionController {
     });
     this.protectDesignPhotos();
     this.update({ preparedLogo: null, heroBusy: false }, false);
+    if (!this.snapshot.state.tourSeen.storefront) {
+      this.state({
+        tourSeen: { ...this.snapshot.state.tourSeen, storefront: true },
+      });
+      this.startTour(4);
+    }
   }
   cancelDesign() {
     if (this.valid()) {
@@ -2942,24 +3511,55 @@ export class SessionController {
       this.prepareLogo();
     } else this.prepareScenario(proposal.preset);
   }
-  startTour() {
-    if (this.valid())
-      this.update(
-        { tour: { role: roleOf(this.snapshot.state), index: 0 } },
-        false,
-      );
+  startTour(index = 0) {
+    if (
+      !this.valid() ||
+      !["style", "storefront", "dashboard"].includes(this.snapshot.state.stage)
+    )
+      return;
+    const role = roleOf(this.snapshot.state);
+    if (!Number.isInteger(index) || !TOUR_STEPS[role][index]) return;
+    this.toggleTailor(false);
+    this.update(
+      { tour: { role, index, ...(index > 0 ? { from: index } : {}) } },
+      false,
+    );
   }
   tourStep(index: number) {
     if (
       this.snapshot.tour &&
       Number.isInteger(index) &&
-      index >= 0 &&
-      index < 9
-    )
-      this.update({ tour: { ...this.snapshot.tour, index } }, false);
+      index >= (this.snapshot.tour.from ?? 0) &&
+      TOUR_STEPS[this.snapshot.tour.role][index] &&
+      this.valid()
+    ) {
+      const tour = this.snapshot.tour;
+      const step = TOUR_STEPS[tour.role][index]!;
+      if (tour.role === "owner" && this.snapshot.state.ownerView !== "overview")
+        this.ownerNavigate("overview");
+      if (step.page) {
+        const products = this.snapshot.state.graph.products.filter(
+          (product) => !product.archived,
+        );
+        const productId =
+          products.find(
+            (product) => product.id === this.snapshot.state.browse.productId,
+          )?.id ??
+          products[0]?.id ??
+          null;
+        this.browse({
+          page: step.page,
+          ...(step.page === "product" ? { productId } : {}),
+        });
+      }
+      this.update({ tour: { ...tour, index } }, false);
+    }
   }
   finishTour() {
+    const creator = this.snapshot.tour?.role === "creator";
     this.update({ tour: null }, false);
+    if (creator && this.snapshot.state.stage === "style")
+      this.toggleTailor(true);
   }
   stylingStep(step: SetupStep) {
     const state = this.snapshot.state;
@@ -3100,7 +3700,7 @@ export class SessionController {
     if (this.confirmLogoName()) this.keepWordmark();
   }
   prepareNamedLogo() {
-    if (!this.canAttemptAi() || !this.confirmLogoName()) return false;
+    if (!this.confirmLogoName()) return false;
     this.prepareLogo();
     return this.snapshot.preparedLogo !== null;
   }
@@ -3148,7 +3748,6 @@ export class SessionController {
     const state = this.snapshot.state;
     if (
       !this.valid() ||
-      !this.canAttemptAi() ||
       !["style", "dashboard"].includes(state.stage) ||
       (state.stage === "dashboard" && !state.designEditing) ||
       !logoEligible(state.setup, state.previewDesign)
@@ -3255,7 +3854,6 @@ export class SessionController {
       assets = this.logoAssets;
     if (
       !this.valid() ||
-      !this.canAttemptAi() ||
       !prepared ||
       !context ||
       !assets ||
@@ -3355,7 +3953,8 @@ export class SessionController {
       );
     } catch (error) {
       if (current()) {
-        const message = this.recordAiFailure(error);
+        const message =
+          error instanceof ApiRequestError ? error.message : undefined;
         this.update(
           {
             logoNotice: message
@@ -3652,6 +4251,10 @@ export class SessionController {
     this.unlistenPhotos = undefined;
     this.update({
       logoBusy: false,
+      checkoutBusy: false,
+      checkoutAvailable: null,
+      checkoutNotice: "",
+      checkoutOutcome: null,
       logoNotice: "",
       recoveryNotice: "",
       assistantDraft: "",
@@ -3725,6 +4328,8 @@ export class SessionController {
     }
   }
   dispose() {
+    this.checkoutOperation?.abort();
+    this.checkoutCapability?.abort();
     this.active = false;
     this.options.signal?.removeEventListener("abort", this.aborted);
     this.cancelOperation();

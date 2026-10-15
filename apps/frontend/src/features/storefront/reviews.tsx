@@ -91,7 +91,10 @@ function ReviewList({ reviews }: { reviews: readonly ProductFeedback[] }) {
           <li key={review.id}>
             <article className={styles.review} aria-label="Demo review">
               <header>
-                <StarRating rating={review.rating} />
+                <div className={styles.author}>
+                  <strong>{review.reviewerName ?? "Demo shopper"}</strong>
+                  <StarRating rating={review.rating} />
+                </div>
                 <time dateTime={review.at}>
                   {new Intl.DateTimeFormat("en", {
                     month: "short",

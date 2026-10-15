@@ -117,12 +117,21 @@
 }
 .campaignMeta {
   display: flex;
-  justify-content: space-between;
-  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px 16px;
+  text-align: left;
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   line-height: 1.6;
+}
+.campaignMeta > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.campaignMeta > span:last-child {
+  white-space: nowrap;
 }
 .campaignCaption {
   display: flex;
@@ -147,7 +156,7 @@
 .campaign h1 {
   font-size: clamp(34px, 5.2cqw, 76px);
   line-height: 1.04;
-  margin: 10px 0 0;
+  margin: 0 0 16px;
   max-width: 17ch;
 }
 .campaignCaption > button {
@@ -378,7 +387,7 @@
 .collectionHeading h1 {
   font-size: clamp(38px, 6cqw, 90px);
   line-height: 1.05;
-  margin: 12px 0;
+  margin: 0 0 12px;
 }
 .collectionHeading p {
   color: var(--store-muted);
@@ -705,28 +714,29 @@
   padding: 30px clamp(18px, 4cqw, 64px);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.footer > div {
-  display: flex;
   flex-direction: column;
-  gap: 6px;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
 }
 .footer strong {
+  max-width: 100%;
   font-family: var(--store-heading);
   font-size: 22px;
+  line-height: 1.35;
   overflow-wrap: anywhere;
 }
-.footer span,
-.footer p,
+.footerLogo {
+  display: block;
+  width: min(240px, 100%);
+  height: auto;
+  max-height: 56px;
+  object-fit: contain;
+}
 .footer button {
   font-size: 10px;
   line-height: 1.6;
   color: var(--store-muted);
-}
-.footer button {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -1063,7 +1073,11 @@
 .productHeading h1 {
   font-size: clamp(30px, 3.6cqw, 56px);
   line-height: 1.08;
-  margin: 12px 0;
+  margin: 0 0 12px;
+}
+.productHeading .eyebrow {
+  display: block;
+  margin-bottom: 12px;
 }
 .productIntro:empty {
   display: none;
@@ -1153,6 +1167,7 @@
   width: 100%;
 }
 .store[data-family="pulse"] .collectionHeading h1 {
+  width: 100%;
   font-size: clamp(38px, 5cqw, 72px);
   margin: 0;
 }
@@ -1201,6 +1216,8 @@
 }
 .store[data-family="pulse"] .productHeading .eyebrow {
   width: 100%;
+  order: 2;
+  margin-bottom: 0;
 }
 .store[data-family="pulse"] .productHeading h1 {
   max-width: 24ch;
@@ -1208,6 +1225,7 @@
   text-transform: uppercase;
 }
 .store[data-family="pulse"] .detailPrice {
+  order: 1;
   margin: 0;
 }
 .store[data-family="pulse"] .detail {
@@ -1260,16 +1278,16 @@
   align-items: center;
   gap: 20px 36px;
 }
-.store[data-family="gallery"] .campaignMeta {
-  grid-column: 1 / -1;
-}
 .store[data-family="gallery"] .campaignCaption {
   flex-direction: column;
   align-items: start;
   grid-column: 1;
-  grid-row: 2;
+  grid-row: 1;
   order: initial;
   gap: 25px;
+}
+.store[data-family="gallery"] .campaignCaption > div {
+  width: 100%;
 }
 .store[data-family="gallery"] .campaign h1 {
   max-width: 10ch;
@@ -1277,7 +1295,7 @@
 }
 .store[data-family="gallery"] .campaignImages {
   grid-column: 2;
-  grid-row: 2;
+  grid-row: 1;
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.8fr);
   gap: 22px 14px;
   align-items: center;
@@ -1474,7 +1492,7 @@
   }
   .campaignMeta {
     font-size: 9px;
-    gap: 12px;
+    gap: 8px 12px;
   }
   .campaignNumber {
     top: 8px;
@@ -1494,7 +1512,7 @@
     gap: 22px;
   }
   .store[data-family="gallery"] .campaignCaption {
-    grid-row: 2;
+    grid-row: 1;
     grid-column: 1;
     text-align: center;
     align-items: center;
@@ -1503,9 +1521,10 @@
   .store[data-family="gallery"] .campaign h1 {
     font-size: clamp(36px, 7.5cqw, 56px);
     max-width: 16ch;
+    margin-inline: auto;
   }
   .store[data-family="gallery"] .campaignImages {
-    grid-row: 3;
+    grid-row: 2;
     grid-column: 1;
   }
   .store[data-family="gallery"] .campaignTile:first-child > button {
@@ -1634,13 +1653,6 @@
   .gallery[data-presentation="stage"] > .caption {
     grid-column: 1;
   }
-  .footer {
-    align-items: start;
-  }
-  .footer > p {
-    width: 100%;
-    margin: 0;
-  }
 }
 @container storefront (max-width: 450px) {
   .header nav {
@@ -1720,9 +1732,16 @@
 }
 .logo {
   display: block;
-  width: min(180px, 100%);
+  width: min(220px, 100%);
   height: 42px;
   object-fit: contain;
+  object-position: left center;
+}
+@container storefront (max-width: 700px) {
+  .wordmark:has(.logo) {
+    flex: 0 1 auto;
+    max-width: calc(100% - 56px);
+  }
 }
 
 /* Small marketing frames use the same compositions, with reduced type and spacing. */
@@ -1762,7 +1781,6 @@
   gap: 8px;
 }
 .store[data-illustration="compact"] .campaignMeta,
-.store[data-illustration="compact"] .campaign .eyebrow,
 .store[data-illustration="compact"] .campaign .primary,
 .store[data-illustration="compact"] .categoryBar,
 .store[data-illustration="compact"] .featured,

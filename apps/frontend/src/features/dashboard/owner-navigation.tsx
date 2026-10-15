@@ -40,6 +40,11 @@ export function OwnerNavigation({
   const design = state.acceptedDesign,
     typography = TYPOGRAPHIES[design.typography],
     logoUrl = controller.logoUrl(design.logoId);
+  const closeMobileNavigation = (mobile: boolean) => {
+    if (!mobile) return;
+    dialog.current?.close();
+    onClose();
+  };
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -103,10 +108,7 @@ export function OwnerNavigation({
           title={item.label}
           aria-current={state.ownerView === item.id ? "page" : undefined}
           onClick={() => {
-            if (mobile) {
-              dialog.current?.close();
-              onClose();
-            }
+            closeMobileNavigation(mobile);
             controller.ownerNavigate(item.id);
           }}
         >
@@ -114,6 +116,37 @@ export function OwnerNavigation({
           <span className={styles.label}>{item.label}</span>
         </button>
       ))}
+    </nav>
+  );
+  const utilities = (mobile: boolean) => (
+    <nav
+      className={`${styles.links} ${styles.utilities}`}
+      aria-label="Store controls"
+    >
+      <button
+        type="button"
+        aria-label="View storefront"
+        title="View storefront"
+        onClick={() => {
+          closeMobileNavigation(mobile);
+          controller.go("storefront");
+        }}
+      >
+        <Icon name="bag" size={22} />
+        <span className={styles.label}>View storefront</span>
+      </button>
+      <button
+        type="button"
+        aria-label="Reset demo"
+        title="Reset demo"
+        onClick={() => {
+          closeMobileNavigation(mobile);
+          controller.askReset();
+        }}
+      >
+        <Icon name="reset" size={22} />
+        <span className={styles.label}>Reset demo</span>
+      </button>
     </nav>
   );
   return (
@@ -127,6 +160,7 @@ export function OwnerNavigation({
         <div id={`${drawerId}-desktop`} className={styles.navigation}>
           {links(false)}
         </div>
+        {utilities(false)}
         <button
           type="button"
           className={styles.collapse}
@@ -172,6 +206,7 @@ export function OwnerNavigation({
           <Icon name="close" />
         </button>
         <div className={styles.navigation}>{links(true)}</div>
+        {utilities(true)}
       </dialog>
     </>
   );

@@ -1,9 +1,11 @@
+import { PendingCheckoutSchema } from "@retailor/contracts/checkout";
 import {
   CurrencyPreferenceSchema,
   INITIAL_CURRENCY,
   OrderDisplaySchema,
 } from "@retailor/contracts/currency";
 import { validateSnapshot } from "@retailor/commerce/currency";
+import { completeDemoReviews } from "@retailor/commerce/scenarios";
 import { OwnerViewSchema } from "../operations/state";
 import { DashboardStateSchema, INITIAL_DASHBOARD } from "../dashboard/state";
 import { ScenarioInfoSchema } from "@retailor/contracts/scenarios";
@@ -68,10 +70,18 @@ export const ProjectionSchema = z.strictObject({
   browse: BrowseSchema.default(INITIAL_BROWSE),
   setup: SetupSchema.default(INITIAL_SETUP),
   hasAcceptedLook: z.boolean().default(false),
+  tourSeen: z
+    .strictObject({ preview: z.boolean(), storefront: z.boolean() })
+    .default({ preview: false, storefront: false }),
   designEditing: z.boolean().default(false),
   currency: CurrencyPreferenceSchema.default(INITIAL_CURRENCY),
   orderDisplays: z.array(OrderDisplaySchema).max(30).default([]),
   shopping: ShoppingSchema.default(INITIAL_SHOPPING),
+  stripeCheckout: PendingCheckoutSchema.nullable().default(null),
+  checkoutOrders: z
+    .array(z.strictObject({ attemptId: IdSchema, orderId: IdSchema }))
+    .max(30)
+    .default([]),
   scenario: ScenarioInfoSchema.nullable().default(null),
   ownerView: OwnerViewSchema.default("overview"),
   ownerSearch: z.string().max(100).default(""),
@@ -194,6 +204,25 @@ export function restoreProjection(
   )
     throw new Error("Saved confirmation currency does not match orders");
   if (
+    new Set(state.checkoutOrders.map((item) => item.attemptId)).size !==
+      state.checkoutOrders.length ||
+    new Set(state.checkoutOrders.map((item) => item.orderId)).size !==
+      state.checkoutOrders.length ||
+    state.checkoutOrders.some(
+      (item) =>
+        !graph.orders.some(
+          (order) =>
+            order.id === item.orderId &&
+            order.actor === "shopper" &&
+            order.origin === "guest_action",
+        ) ||
+        !state.orderDisplays.some(
+          (display) => display.orderId === item.orderId,
+        ),
+    )
+  )
+    throw new Error("Saved checkout confirmations do not match orders.");
+  if (
     (state.shopping.lastActivityAt &&
       (Date.parse(state.shopping.lastActivityAt) > now ||
         Date.parse(state.shopping.lastActivityAt) <
@@ -223,7 +252,10 @@ export function restoreProjection(
     throw new Error("Saved shopping references need repair");
   return {
     ...state,
-    graph,
+    graph:
+      state.scenario && !state.stripeCheckout
+        ? completeDemoReviews(graph, state.scenario.preset)
+        : graph,
     conversation: state.conversation.map((message) => ({
       ...message,
       restored: true,
@@ -254,10 +286,13 @@ export function serializeProjection(state: Projection, now: number) {
     browse: state.browse,
     setup: state.setup,
     hasAcceptedLook: state.hasAcceptedLook,
+    tourSeen: state.tourSeen,
     designEditing: state.designEditing,
     currency: state.currency,
     orderDisplays: state.orderDisplays,
     shopping: state.shopping,
+    stripeCheckout: state.stripeCheckout,
+    checkoutOrders: state.checkoutOrders,
     scenario: state.scenario,
     ownerView: state.ownerView,
     ownerSearch: state.ownerSearch,

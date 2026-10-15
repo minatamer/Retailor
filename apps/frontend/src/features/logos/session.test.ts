@@ -9,19 +9,27 @@ import { ApiRequestError } from "../../http/api-error";
 const environments: ReturnType<typeof environment>[] = [];
 afterEach(() => environments.splice(0).forEach((env) => env.dispose()));
 
-it("blocks paid retry after operator attention while preserving wordmark/local entry and inert reload", async () => {
+it("keeps local logo generation independent of AI operator attention and restores without dispatch", async () => {
   const env = environment();
   environments.push(env);
-  const logoRequest = vi.fn<LogoRequester>(
-    async (_input, _signal, dispatch) => {
+  const logoRequest = vi
+    .fn<LogoRequester>(async (input, _signal, dispatch) => {
       dispatch();
-      throw new ApiRequestError("OPERATOR_REQUIRED");
-    },
-  );
+      return result(input, new Date(env.clock()).toISOString());
+    })
+    .mockImplementationOnce(async (_input, _signal, dispatch) => {
+      dispatch();
+      throw new ApiRequestError("UNAVAILABLE");
+    });
   const assistantRequest = vi.fn(async () => {
-    throw new Error("Must stay undispatched");
+    throw new ApiRequestError("OPERATOR_REQUIRED");
   });
-  const controller = await env.open({ logoRequest, assistantRequest });
+  const logoVerify = vi.fn(async (row: StoredLogo) => row);
+  const controller = await env.open({
+    logoRequest,
+    assistantRequest,
+    logoVerify,
+  });
   await controller.photos.add([file("one")]);
   await controller.draftCatalogue();
   controller.publish();
@@ -31,11 +39,11 @@ it("blocks paid retry after operator attention while preserving wordmark/local e
   );
   controller.prepareLogo();
   await controller.generateLogos();
-  expect(controller.canAttemptAi()).toBe(false);
-  expect(controller.getSnapshot().preparedLogo).toBeNull();
-  expect(controller.getSnapshot().logoNotice).toContain("demo owner");
-  controller.prepareLogo();
-  await controller.generateLogos();
+  expect(controller.canAttemptAi()).toBe(true);
+  expect(controller.getSnapshot().preparedLogo).not.toBeNull();
+  expect(controller.getSnapshot().logoNotice).toContain(
+    "wordmark remains ready",
+  );
   expect(logoRequest).toHaveBeenCalledOnce();
   controller.keepWordmark();
   controller.acceptDesign();
@@ -45,12 +53,24 @@ it("blocks paid retry after operator attention while preserving wordmark/local e
   );
   controller.assistantInput("Show me the jeans");
   await controller.sendAssistant();
-  expect(assistantRequest).not.toHaveBeenCalled();
+  expect(assistantRequest).toHaveBeenCalledOnce();
+  expect(controller.canAttemptAi()).toBe(false);
+  controller.go("style");
+  controller.useCurrentLook();
+  expect(controller.prepareNamedLogo()).toBe(true);
+  await controller.generateLogos();
+  expect(logoRequest).toHaveBeenCalledTimes(2);
+  expect(controller.getSnapshot().state.logos.candidates).toHaveLength(3);
+  expect(controller.canAttemptAi()).toBe(false);
   controller.dispose();
-  const restored = await env.open({ logoRequest, assistantRequest });
+  const restored = await env.open({
+    logoRequest,
+    assistantRequest,
+    logoVerify,
+  });
   expect(restored.canAttemptAi()).toBe(true);
-  expect(logoRequest).toHaveBeenCalledOnce();
-  expect(assistantRequest).not.toHaveBeenCalled();
+  expect(logoRequest).toHaveBeenCalledTimes(2);
+  expect(assistantRequest).toHaveBeenCalledOnce();
 });
 
 it("does not apply a late operator failure to a replacement workspace", async () => {

@@ -11,6 +11,8 @@ import { SessionController } from "./controller";
 import type { CatalogueProcessor } from "./controller";
 import type { AssistantRequester } from "../assistants/request";
 import type { LogoRequester } from "../logos/request";
+import { Brand } from "../../components/ui/brand";
+import styles from "./context.module.css";
 const SessionContext = createContext<SessionController | null>(null);
 export function SessionProvider({
   children,
@@ -54,6 +56,23 @@ export function SessionProvider({
         }
         owned = value;
         setController(value);
+        const checkoutReturn = new URL(window.location.href);
+        const outcome = checkoutReturn.searchParams.get("checkout");
+        const attempt = checkoutReturn.searchParams.get("attempt");
+        if (attempt && (outcome === "success" || outcome === "cancel")) {
+          void value
+            .resumeStripeCheckout(attempt, outcome === "cancel")
+            .finally(() => {
+              if (disposed || current !== generation) return;
+              checkoutReturn.searchParams.delete("checkout");
+              checkoutReturn.searchParams.delete("attempt");
+              window.history.replaceState(
+                window.history.state,
+                "",
+                `${checkoutReturn.pathname}${checkoutReturn.search}${checkoutReturn.hash}`,
+              );
+            });
+        }
       });
     };
     initialize();
@@ -85,8 +104,14 @@ export function SessionProvider({
   }, [fixtureAllowed, processor, assistantRequest, logoRequest]);
   if (!controller)
     return (
-      <main className="foundation">
-        <p role="status">Opening your temporary collection…</p>
+      <main className={styles.loading}>
+        <div className={styles.content} role="status">
+          <div className={styles.brand}>
+            <Brand />
+          </div>
+          <span className={styles.spinner} aria-hidden="true" />
+          <span className={styles.status}>Opening your store…</span>
+        </div>
       </main>
     );
   return <SessionContext value={controller}>{children}</SessionContext>;

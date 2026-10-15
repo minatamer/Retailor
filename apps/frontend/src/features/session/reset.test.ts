@@ -22,25 +22,38 @@ function sampleFiles(): NamedPhoto[] {
 }
 
 describe("reset and deliberate sample selection", () => {
-  it("finishes default links after a partial sample is accepted and restored, while preserving later deliberate unlinking", async () => {
+  it("previews partial/restored samples without grouping or processing and keeps later draft-review choices", async () => {
     vi.spyOn(sampleModule, "loadSample").mockResolvedValue(sampleFiles());
     const env = setup(),
       first = await env.open();
+    const interpret = vi.spyOn(env.processor, "interpret");
     await first.photos.add(sampleFiles().slice(0, 16));
     expect(first.getSnapshot().state.photoLinksInitialized).toBe(false);
     first.dispose();
     const restored = await env.open();
     await restored.sample();
     expect(restored.photos.getSnapshot().items).toHaveLength(19);
-    expect(restored.getSnapshot().state.photoLinks).toHaveLength(3);
-    expect(restored.getSnapshot().state.photoLinksInitialized).toBe(true);
-    for (const group of restored.getSnapshot().state.photoLinks)
-      restored.photos.unlink(group[1]!);
+    expect(restored.getSnapshot().state.photoLinks).toEqual([]);
+    expect(restored.getSnapshot().state.photoLinksInitialized).toBe(false);
+    expect(restored.getSnapshot().state.draft).toBeNull();
+    expect(interpret).not.toHaveBeenCalled();
+    await restored.draftCatalogue();
+    expect(interpret).toHaveBeenCalledTimes(1);
+    expect(restored.getSnapshot().state.draft!.items).toHaveLength(15);
+    const grouped = restored
+      .getSnapshot()
+      .state.draft!.items.find((item) => item.product.imageIds.length > 1)!;
+    expect(
+      restored.split(grouped.product.id, grouped.product.imageIds[1]!),
+    ).toBe(true);
+    const reviewedLinks = restored.getSnapshot().state.photoLinks;
+    restored.go("choose");
     restored.dispose();
     const chosen = await env.open();
     await chosen.sample();
-    expect(chosen.getSnapshot().state.photoLinks).toEqual([]);
+    expect(chosen.getSnapshot().state.photoLinks).toEqual(reviewedLinks);
     expect(chosen.getSnapshot().state.photoLinksInitialized).toBe(true);
+    expect(interpret).toHaveBeenCalledTimes(1);
     await chosen.reset();
     expect(chosen.getSnapshot().state.photoLinksInitialized).toBe(false);
   });
@@ -86,10 +99,7 @@ describe("reset and deliberate sample selection", () => {
       controller = await env.open();
     await controller.sample();
     const ids = controller.getSnapshot().state.selectedIds;
-    expect(controller.photos.getSnapshot().links).toHaveLength(3);
-    const originalLinks = controller.getSnapshot().state.photoLinks;
-    controller.photos.unlink(originalLinks[0]![1]!);
-    controller.photos.cover(originalLinks[1]![1]!);
+    expect(controller.photos.getSnapshot().links).toEqual([]);
     const chosenLinks = controller.getSnapshot().state.photoLinks;
     await controller.sample();
     expect(controller.getSnapshot().state.selectedIds).toEqual(ids);
@@ -142,9 +152,10 @@ describe("reset and deliberate sample selection", () => {
       await controller.sample();
       expect(controller.photos.getSnapshot().items).toHaveLength(19);
       expect(controller.photos.getSnapshot().issues).toEqual([]);
-      expect(controller.getSnapshot().state.photoLinks).toHaveLength(3);
+      expect(controller.getSnapshot().state.photoLinks).toEqual([]);
       await controller.draftCatalogue();
       expect(controller.getSnapshot().state.draft?.items).toHaveLength(15);
+      expect(controller.getSnapshot().state.photoLinks).toHaveLength(3);
       controller.publish();
       expect(controller.getSnapshot().state.graph.products).toHaveLength(15);
       await controller.reset();

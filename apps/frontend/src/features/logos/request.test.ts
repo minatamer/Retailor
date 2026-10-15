@@ -95,7 +95,7 @@ it("sends finite fake context once and rejects partial, foreign and oversized en
     expect(transport).toHaveBeenCalledTimes(2);
   }
 });
-it("paid-off rejects before challenge or dispatch; enabled admission binds the exact design policy", async () => {
+it("unavailable logos reject before challenge; paid-off native admission binds the exact design policy", async () => {
   const live = { ...input, mode: "live" as const },
     proof = vi.fn(async () => "proof"),
     dispatch = vi.fn();
@@ -117,7 +117,7 @@ it("paid-off rejects before challenge or dispatch; enabled admission binds the e
       return Response.json({
         ...config,
         mode: "live",
-        paidEnabled: true,
+        paidEnabled: false,
         admissionSiteKey: "public-test",
         logos: { available: true, reason: "ready" },
       });
@@ -128,9 +128,8 @@ it("paid-off rejects before challenge or dispatch; enabled admission binds the e
       theme: live.context.theme,
       typography: live.context.typography,
       designRevision: 7,
-      promptPolicy: "clothing-brand-v1",
+      generatorPolicy: "local-fonts-v1",
       outputPolicy: "transparent-png-v1",
-      disclosureVersion: "brand-context-v1",
     });
     if (String(url).endsWith("admission"))
       return Response.json({

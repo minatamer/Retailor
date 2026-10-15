@@ -103,6 +103,38 @@ async function storeWithPlacedOrder(advance = 0, rateDate = "2026-10-05") {
   return { env, controller };
 }
 describe("one accepted currency display snapshot", () => {
+  it("uses the dashboard preference in the returned storefront and restores it without changing USD records", async () => {
+    const { env, controller, getter } = await openStore();
+    controller.go("dashboard");
+    controller.ownerNavigate("design");
+    const graph = controller.getSnapshot().state.graph;
+    expect(controller.getSnapshot().state.stage).toBe("dashboard");
+    await controller.selectCurrency("EUR");
+    expect(controller.getSnapshot().currencyNotice).toBe("");
+    controller.go("storefront");
+    expect(
+      formatDisplay(
+        6800,
+        selectedScope(controller.getSnapshot().state.currency),
+      ),
+    ).toBe("€34.00");
+    expect(controller.getSnapshot().state.graph).toBe(graph);
+    controller.dispose();
+    const restored = await env.open({ currencyQuote: getter });
+    expect(restored.getSnapshot().state.stage).toBe("storefront");
+    expect(
+      formatDisplay(6800, selectedScope(restored.getSnapshot().state.currency)),
+    ).toBe("€34.00");
+    restored.go("dashboard");
+    restored.ownerNavigate("design");
+    await restored.selectCurrency("USD");
+    restored.go("storefront");
+    expect(
+      formatDisplay(6800, selectedScope(restored.getSnapshot().state.currency)),
+    ).toBe("$68.00");
+    expect(restored.getSnapshot().state.graph).toEqual(graph);
+    expect(getter).toHaveBeenCalledTimes(1);
+  });
   it("switches both ways without claiming nonexistent price bounds were cleared or changing other filters and records", async () => {
     const { controller, getter } = await openStore();
     controller.browse({
@@ -115,21 +147,15 @@ describe("one accepted currency display snapshot", () => {
     const { browse, graph } = controller.getSnapshot().state;
     await controller.selectCurrency("EUR");
     expect(controller.getSnapshot().state.currency.selected).toBe("EUR");
-    expect(controller.getSnapshot().currencyNotice).toBe(
-      "Prices are shown in EUR.",
-    );
+    expect(controller.getSnapshot().currencyNotice).toBe("");
     await controller.selectCurrency("USD");
     expect(controller.getSnapshot().state.currency.selected).toBe("USD");
-    expect(controller.getSnapshot().currencyNotice).toBe(
-      "Prices are shown in USD.",
-    );
+    expect(controller.getSnapshot().currencyNotice).toBe("");
     expect(controller.getSnapshot().state.browse).toEqual(browse);
     expect(controller.getSnapshot().state.graph).toBe(graph);
     await controller.selectCurrency("EUR");
     expect(getter).toHaveBeenCalledTimes(1);
-    expect(controller.getSnapshot().currencyNotice).toBe(
-      "Prices are shown in EUR.",
-    );
+    expect(controller.getSnapshot().currencyNotice).toBe("");
   });
   it("clears an actual lower or upper price bound on currency change with a truthful notice", async () => {
     for (const bound of ["minPrice", "maxPrice"] as const) {
@@ -149,7 +175,7 @@ describe("one accepted currency display snapshot", () => {
         category: "jeans",
       });
       expect(controller.getSnapshot().currencyNotice).toBe(
-        "Prices are shown in EUR. Price bounds were cleared for this currency.",
+        "Price bounds were cleared for this currency.",
       );
       expect(controller.getSnapshot().state.graph).toBe(graph);
     }

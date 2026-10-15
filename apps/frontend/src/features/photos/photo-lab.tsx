@@ -12,7 +12,7 @@ import { BrowserPhotoCache } from "./cache";
 import { PhotoController } from "./controller";
 import { PhotoPicker } from "./photo-picker";
 import { MandatoryPhotoField } from "./mandatory-photo-field";
-import { loadSample, SAMPLE, linkSampleViews } from "./sample";
+import { loadSample, SAMPLE } from "./sample";
 import styles from "./photos.module.css";
 export function PhotoLab() {
   const [controller] = useState(() => {
@@ -48,8 +48,7 @@ export function PhotoLab() {
     try {
       const files = await loadSample(request.signal);
       if (!request.signal.aborted) {
-        const accepted = await controller.add(files, undefined, true, "reuse");
-        if (!request.signal.aborted) linkSampleViews(controller, accepted);
+        await controller.add(files, undefined, true, "reuse");
       }
     } catch {
       if (!request.signal.aborted)
@@ -90,7 +89,7 @@ export function PhotoLab() {
           controller={controller}
           onProcess={() =>
             setNotice(
-              "Photos are ready. Live recognition and the workspace review connect in RTL-005/006; this reference makes no model calls.",
+              "Photos are ready. Open the demo to create a product draft; this design reference only checks and previews files.",
             )
           }
         />

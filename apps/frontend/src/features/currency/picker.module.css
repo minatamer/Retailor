@@ -1,22 +1,42 @@
 .currency {
   min-width: 0;
-  max-width: 100%;
+  margin-bottom: 24px;
+  padding: clamp(18px, 3vw, 26px);
+  border: 1px solid var(--platform-line);
+  border-radius: 18px;
+  background: var(--platform-surface);
+  color: var(--platform-text);
 }
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: max-content;
-  max-width: 100%;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px 26px;
+}
+.copy {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.copy h3 {
+  margin: 0 0 7px;
+  font-size: 17px;
+}
+.copy p {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--platform-muted);
+  font-size: 13px;
+  line-height: 1.65;
 }
 .choices {
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, 64px);
-  border: 1px solid var(--store-control-border);
+  border: 1px solid var(--platform-line);
   border-radius: 13px;
   padding: 3px;
-  background: var(--store-surface);
+  background: var(--platform-surface);
   isolation: isolate;
 }
 .choices::before {
@@ -25,7 +45,7 @@
   inset: 3px auto 3px 3px;
   width: calc((100% - 6px) / 2);
   border-radius: 9px;
-  background: var(--store-action);
+  background: var(--platform-lime);
   pointer-events: none;
   transition:
     transform 0.25s var(--ease-out),
@@ -46,54 +66,25 @@
   border: 0;
   border-radius: 9px;
   background: transparent;
-  color: var(--store-text);
-  font: 600 12px/1 var(--store-body);
+  color: var(--platform-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
-  transition:
-    color 0.2s,
-    opacity 0.2s;
-}
-.currency .choice[aria-pressed="true"] {
-  color: var(--store-action-text);
+  transition: opacity 0.2s;
 }
 .currency .choice:hover:not([aria-pressed="true"]):not(:disabled) {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
 .currency .choice:focus-visible {
-  outline: 2px solid var(--store-focus);
+  outline: 2px solid var(--platform-focus);
   outline-offset: -3px;
-}
-.currency .choice[aria-pressed="true"]:focus-visible {
-  outline-color: var(--store-action-text);
 }
 .currency .choice:disabled {
   cursor: wait;
   opacity: 0.7;
-}
-.currency .info {
-  display: grid;
-  place-items: center;
-  min-height: 44px;
-  min-width: 44px;
-  padding: 0;
-  border: 1px solid var(--store-border);
-  border-radius: 50%;
-  background: var(--store-surface);
-  color: var(--store-text);
-  font-size: 18px;
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    border-color 0.2s;
-}
-.currency .info:hover {
-  background: var(--store-selected);
-  border-color: var(--store-control-border);
-}
-.currency .info:focus-visible {
-  outline: 2px solid var(--store-focus);
-  outline-offset: 2px;
 }
 .spinner {
   width: 10px;
@@ -108,76 +99,11 @@
     transform: rotate(360deg);
   }
 }
-.status {
-  display: block;
-  max-width: 260px;
-  font-size: 10px;
-  color: var(--store-muted);
-  line-height: 1.5;
-}
-.status:not(:empty) {
-  margin-top: 7px;
-}
-.dialog {
-  width: min(420px, calc(100% - 28px));
-  max-height: calc(100dvh - 28px);
-  overflow-y: auto;
-  padding: 30px;
-  border: 1px solid var(--store-control-border);
-  border-radius: 18px;
-  background: var(--store-surface);
-  color: var(--store-text);
-  font-family: var(--store-body);
-}
-.dialog::backdrop {
-  background: #242b6065;
-  backdrop-filter: blur(5px);
-}
-.close {
-  float: right;
-  font-size: 25px;
-  min-width: 44px;
-}
-.eyebrow {
-  display: block;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-top: 10px;
-}
-.dialog h2 {
-  font-family: var(--store-heading);
-  font-weight: var(--store-heading-weight);
-  font-size: 35px;
-  line-height: 1.1;
-  letter-spacing: var(--store-tracking);
-  margin: 15px 0;
-}
-.dialog p {
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--store-muted);
-}
-.dialog dl {
-  margin: 20px 0;
-}
-.dialog dl > div {
-  display: grid;
-  gap: 5px;
-  padding: 13px 0;
-  border-bottom: 1px solid var(--store-border);
-}
-.dialog dt {
-  font-size: 11px;
-  color: var(--store-muted);
-}
-.dialog dd {
-  margin: 0;
-  font-size: 13px;
+.status,
+.reference {
+  margin: 12px 0 0;
+  color: var(--platform-muted);
+  font-size: 12px;
+  line-height: 1.6;
   overflow-wrap: anywhere;
-}
-@media (max-width: 390px) {
-  .dialog {
-    padding: 22px;
-  }
 }

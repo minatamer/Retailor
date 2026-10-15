@@ -756,3 +756,80 @@
     font-size: 27px;
   }
 }
+.checkoutAction {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.header h2:focus {
+  outline: none;
+}
+.checkoutInfo {
+  position: static;
+  display: inline-flex;
+}
+.infoButton {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--platform-line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--platform-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.checkoutTip {
+  position: absolute;
+  z-index: 2;
+  bottom: calc(100% + 10px);
+  right: 0;
+  width: min(300px, calc(100vw - 72px));
+  padding: 14px 16px;
+  border: 1px solid var(--platform-line);
+  border-radius: 12px;
+  background: var(--platform-surface);
+  color: var(--platform-text);
+  box-shadow: 0 8px 24px #242b6024;
+  font-size: 12px;
+  line-height: 1.65;
+  animation: stepIn 0.18s var(--ease-out) both;
+}
+.checkoutSpinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: checkoutSpin 0.7s linear infinite;
+  will-change: transform;
+}
+.checkoutButton[aria-busy="true"] {
+  opacity: 1;
+  cursor: progress;
+}
+.checkoutError {
+  padding: 10px 26px;
+  margin: 0;
+  color: var(--feedback-error);
+  font-size: 12px;
+  line-height: 1.6;
+}
+@keyframes checkoutSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 600px) {
+  .checkoutAction {
+    flex: 1;
+  }
+  .checkoutAction > button {
+    flex: 1;
+  }
+}

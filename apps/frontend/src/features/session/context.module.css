@@ -1,0 +1,54 @@
+.loading {
+  min-height: 100svh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 32px 24px;
+  background: var(--platform-surface);
+  color: var(--platform-text);
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  animation: arrive 0.3s var(--ease-out) both;
+}
+.brand {
+  font-size: clamp(52px, 9vw, 84px);
+}
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--platform-line);
+  border-top-color: var(--platform-text);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  will-change: transform;
+}
+.status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

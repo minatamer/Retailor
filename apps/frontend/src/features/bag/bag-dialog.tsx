@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { formatDisplay, formatMinor } from "@retailor/commerce/currency";
 import { exactSum } from "@retailor/commerce/allocation";
 import { stockOf } from "@retailor/commerce/selectors";
@@ -22,6 +22,72 @@ import {
 import styles from "./bag-dialog.module.css";
 
 type DisplayedTotal = ReturnType<typeof displayedOrder>;
+function CheckoutInfo({ sandbox }: { sandbox: boolean }) {
+  const id = useId(),
+    wrapper = useRef<HTMLSpanElement>(null);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const outside = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !wrapper.current?.contains(event.target)
+      )
+        setOpen(false);
+    };
+    document.addEventListener("pointerdown", outside);
+    return () => document.removeEventListener("pointerdown", outside);
+  }, [open]);
+  return (
+    <span
+      ref={wrapper}
+      className={styles.checkoutInfo}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => {
+        if (!wrapper.current?.contains(document.activeElement)) setOpen(false);
+      }}
+      onFocus={() => setOpen(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen(false);
+        }
+      }}
+    >
+      <button
+        type="button"
+        className={styles.infoButton}
+        aria-label="About this checkout"
+        aria-describedby={open ? id : undefined}
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
+      >
+        !
+      </button>
+      {open && (
+        <span id={id} role="tooltip" className={styles.checkoutTip}>
+          {sandbox ? (
+            <>
+              Your selected clothing photos and store details are shared with
+              Stripe’s sandbox checkout. Use test card{" "}
+              <strong>4242 4242 4242 4242</strong>, a future expiry and any
+              three-digit CVC. No real charge or shipment.
+            </>
+          ) : (
+            <>
+              This demo checkout places a local order and updates demo stock. No
+              real charge or shipment.
+            </>
+          )}
+        </span>
+      )}
+    </span>
+  );
+}
 function OrderTotals({
   totals,
   scope,
@@ -88,6 +154,9 @@ export function BagDialog() {
     bagNotice,
     checkoutReview,
     currencyBusy,
+    checkoutBusy,
+    checkoutAvailable,
+    checkoutNotice,
   } = useSession();
   const dialog = useRef<HTMLDialogElement>(null),
     heading = useRef<HTMLHeadingElement>(null),
@@ -97,7 +166,11 @@ export function BagDialog() {
     scope: string;
     code: string;
     status: "idle" | "invalid" | "applied";
-  }>({ scope: promoScope, code: "", status: "idle" });
+  }>({
+    scope: promoScope,
+    code: state.stripeCheckout?.promoApplied ? BAG_PROMO_CODE : "",
+    status: state.stripeCheckout?.promoApplied ? "applied" : "idle",
+  });
   const promo =
     promotion.scope === promoScope
       ? promotion
@@ -312,6 +385,11 @@ export function BagDialog() {
           <Icon name="close" />
         </button>
       </header>
+      {checkoutNotice && (
+        <p className={styles.checkoutError} role="alert">
+          {checkoutNotice}
+        </p>
+      )}
       <div className={styles.screen} key={mode}>
         {order ? (
           <div className={styles.receipt}>
@@ -361,7 +439,7 @@ export function BagDialog() {
               </Button>
             </div>
             <p className={styles.demoNote}>
-              Simulated order. No payment or shipment.
+              Demo order. No real charge or shipment.
             </p>
           </div>
         ) : checkoutReview ? (
@@ -406,8 +484,16 @@ export function BagDialog() {
                 <span className={styles.sectionNumber}>03</span>
                 <div>
                   <h4>Payment</h4>
-                  <strong>Demo payment</strong>
-                  <p>Nothing will be charged.</p>
+                  <strong>
+                    {checkoutAvailable !== false || state.stripeCheckout
+                      ? "Card payment"
+                      : "Demo payment"}
+                  </strong>
+                  <p>
+                    {checkoutAvailable !== false || state.stripeCheckout
+                      ? "Continue securely in Stripe. No real charge."
+                      : "Nothing will be charged."}
+                  </p>
                 </div>
                 <Icon name="check" />
               </section>
@@ -443,18 +529,35 @@ export function BagDialog() {
                 <Button variant="quiet" onClick={() => controller.editBag()}>
                   Back to bag
                 </Button>
-                <Button
-                  disabled={
-                    !quote.ok || entries.some((row) => !!row.unavailable)
-                  }
-                  onClick={() => controller.placeReviewed(checkoutReview)}
-                >
-                  Place demo order <Icon name="arrow" />
-                </Button>
+                <span className={styles.checkoutAction}>
+                  <CheckoutInfo
+                    sandbox={
+                      checkoutAvailable !== false || !!state.stripeCheckout
+                    }
+                  />
+                  <Button
+                    className={styles.checkoutButton}
+                    aria-busy={checkoutBusy}
+                    disabled={
+                      checkoutBusy ||
+                      !quote.ok ||
+                      entries.some((row) => !!row.unavailable)
+                    }
+                    onClick={() => void controller.checkout(deduction)}
+                  >
+                    Checkout{" "}
+                    {checkoutBusy ? (
+                      <span
+                        className={styles.checkoutSpinner}
+                        role="status"
+                        aria-label="Opening checkout"
+                      />
+                    ) : (
+                      <Icon name="arrow" />
+                    )}
+                  </Button>
+                </span>
               </div>
-              <p className={styles.demoNote}>
-                No payment or shipment. This updates demo stock.
-              </p>
             </section>
           </div>
         ) : entries.length ? (
@@ -541,14 +644,25 @@ export function BagDialog() {
                 )}
                 <Button
                   className={styles.checkoutButton}
+                  aria-busy={checkoutBusy}
                   disabled={
+                    checkoutBusy ||
                     !quote.ok ||
                     currencyBusy ||
                     entries.some((row) => !!row.unavailable)
                   }
                   onClick={() => controller.reviewBag(deduction)}
                 >
-                  Checkout <Icon name="arrow" />
+                  Checkout{" "}
+                  {checkoutBusy ? (
+                    <span
+                      className={styles.checkoutSpinner}
+                      role="status"
+                      aria-label="Opening checkout"
+                    />
+                  ) : (
+                    <Icon name="arrow" />
+                  )}
                 </Button>
               </div>
               <div className={styles.bagFootnote}>

@@ -7,7 +7,6 @@ import type { PhotoController } from "./controller";
 import { namedFiles } from "./named-files";
 import { PhotoStack } from "./photo-stack";
 import { PhotoEditor } from "./photo-editor";
-import { photoGroups } from "./links";
 export { namedFiles } from "./named-files";
 import styles from "./photos.module.css";
 export function PhotoPicker({
@@ -30,21 +29,7 @@ export function PhotoPicker({
     controller.getSnapshot,
   );
   const id = useId();
-  const [linking, setLinking] = useState(false),
-    [chosen, setChosen] = useState<string[]>([]),
-    [editing, setEditing] = useState<string | null>(null);
-  const groups = photoGroups(
-    state.items.map((item) => item.photo.id),
-    state.links,
-  );
-  const selected = chosen.filter((value) =>
-    state.items.some((item) => item.photo.id === value),
-  );
-  const selectedPhotos = new Set(
-    selected.flatMap(
-      (value) => groups.find((group) => group.includes(value)) ?? [],
-    ),
-  );
+  const [editing, setEditing] = useState<string | null>(null);
   return (
     <section aria-labelledby={`${id}-heading`} className={styles.picker}>
       <div className={styles.selectionHeading}>
@@ -89,15 +74,6 @@ export function PhotoPicker({
         </div>
         {alternative}
       </div>
-      <label className={styles.reviewCheck}>
-        <input
-          type="checkbox"
-          checked={state.autoLink}
-          disabled={state.busy}
-          onChange={(event) => controller.setAutoLink(event.target.checked)}
-        />
-        <span>Auto-link matching angles and colours when processing</span>
-      </label>
       {state.busy && (
         <div className={styles.progress} role="status">
           <span className={styles.spinner} />
@@ -114,109 +90,34 @@ export function PhotoPicker({
         <>
           <div className={styles.linkHeading}>
             <div>
-              <h2>
-                {groups.length} product {groups.length === 1 ? "card" : "cards"}
-              </h2>
+              <h2>Your photos</h2>
               <p>
-                Different angles of the same product? Link their photos into one
-                card.
+                Check your selection. Open a photo for a closer look, or replace
+                or remove it.
               </p>
             </div>
-            <Button
-              variant="secondary"
-              disabled={state.busy}
-              onClick={() => {
-                setLinking(!linking);
-                setChosen([]);
-              }}
-            >
-              {linking ? "Cancel linking" : "Link photos"}
-            </Button>
           </div>
-          {linking && (
-            <div className={styles.linkBar}>
-              <p>
-                {selectedPhotos.size
-                  ? `${selectedPhotos.size} photos selected`
-                  : "Select the cards showing the same product."}
-                {selectedPhotos.size > 8
-                  ? " Keep up to 8 photos in one product."
-                  : ""}
-              </p>
-              <Button
-                disabled={
-                  state.busy || selected.length < 2 || selectedPhotos.size > 8
-                }
-                onClick={() => {
-                  if (controller.link(selected)) {
-                    setChosen([]);
-                    setLinking(false);
-                  }
-                }}
-              >
-                Link {selectedPhotos.size || "selected"} photos
-              </Button>
-            </div>
-          )}
-          <ol className={styles.selectedGallery}>
-            {groups.map((group, index) => {
-              const photos = group.flatMap(
-                (value) =>
-                  state.items.find((item) => item.photo.id === value) ?? [],
-              );
-              const cover = photos[0]!;
-              const checked = selected.some((value) => group.includes(value));
-              return (
-                <li
-                  className={styles.photoCard}
-                  key={
-                    state.items.find((item) => group.includes(item.photo.id))!
-                      .photo.id
-                  }
+          <ol className={styles.selectedGallery} aria-label="Selected photos">
+            {state.items.map((item, index) => (
+              <li className={styles.photoCard} key={item.photo.id}>
+                <button
+                  type="button"
+                  className={styles.openPhoto}
+                  onClick={() => setEditing(item.photo.id)}
+                  aria-label={`Preview photo ${index + 1}: ${item.name}`}
                 >
-                  <button
-                    type="button"
-                    className={styles.openPhoto}
-                    onClick={() => setEditing(cover.photo.id)}
-                    aria-label={`Edit photos for product ${index + 1}`}
-                  >
-                    <PhotoStack
-                      photos={photos}
-                      label={`Product ${index + 1} cover photo`}
-                    />
-                    <span className={styles.photoMeta}>
-                      <strong>
-                        Product {String(index + 1).padStart(2, "0")}
-                      </strong>
-                      <small>
-                        {cover.name} · Click to edit
-                        {group.length > 1 ? " all linked photos" : ""}
-                      </small>
-                    </span>
-                  </button>
-                  {linking && (
-                    <label className={styles.linkCheck}>
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        disabled={state.busy}
-                        aria-label={`Select product ${index + 1} photos to link`}
-                        onChange={() =>
-                          setChosen(
-                            checked
-                              ? selected.filter(
-                                  (value) => !group.includes(value),
-                                )
-                              : [...selected, cover.photo.id],
-                          )
-                        }
-                      />
-                      <span>{checked ? "Selected" : "Select photos"}</span>
-                    </label>
-                  )}
-                </li>
-              );
-            })}
+                  <PhotoStack
+                    photos={[item]}
+                    label={`Photo ${index + 1}`}
+                    showCount={false}
+                  />
+                  <span className={styles.photoMeta}>
+                    <strong>Photo {String(index + 1).padStart(2, "0")}</strong>
+                    <small>{item.name} · Preview</small>
+                  </span>
+                </button>
+              </li>
+            ))}
           </ol>
         </>
       )}
@@ -232,13 +133,15 @@ export function PhotoPicker({
       )}
       {(!alternative || state.items.length > 0) && (
         <div className={styles.processing}>
+          <p className={styles.note}>
+            We’ll identify garments and suggest matching views and colours. You
+            can change the groups and product details in the draft review.
+          </p>
           <Button
             disabled={state.busy || !state.items.length || !canProcess}
             onClick={onProcess}
           >
-            Review & process {state.items.length || "your"}{" "}
-            {state.items.length === 1 ? "photo" : "photos"}{" "}
-            <Icon name="arrow" />
+            Create product draft <Icon name="arrow" />
           </Button>
         </div>
       )}
@@ -247,11 +150,6 @@ export function PhotoPicker({
           controller={controller}
           photoId={editing}
           onClose={() => setEditing(null)}
-          onLink={(value) => {
-            setEditing(null);
-            setLinking(true);
-            setChosen([value]);
-          }}
         />
       )}
     </section>

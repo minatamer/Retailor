@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
 import { USD_SCOPE } from "@retailor/contracts/currency";
 import type { CurrencyScope } from "@retailor/contracts/currency";
 import {
@@ -43,9 +42,9 @@ export interface StorefrontInput {
   photos: ReadonlyMap<string, StorePhoto>;
   preview: boolean;
   currency?: CurrencyScope;
-  currencyControl?: ReactNode;
   bagCount?: number;
   logoUrl?: string;
+  logoSize?: { width: number; height: number };
   feedback?: readonly ProductFeedback[];
 }
 export interface StorefrontActions {
@@ -126,8 +125,8 @@ export function Storefront({
             {input.logoUrl && design.logoId ? (
               <Image
                 unoptimized
-                width={180}
-                height={42}
+                width={input.logoSize?.width ?? 180}
+                height={input.logoSize?.height ?? 42}
                 className={styles.logo}
                 src={input.logoUrl}
                 alt=""
@@ -137,7 +136,7 @@ export function Storefront({
               design.name
             )}
           </button>
-          <nav aria-label="Store pages">
+          <nav aria-label="Store pages" data-tailor-target="store-pages">
             {(["home", "collection", "product"] as const).map((page) => (
               <button
                 key={page}
@@ -156,7 +155,6 @@ export function Storefront({
               </button>
             ))}
           </nav>
-          {input.currencyControl}
           {!preview && (
             <button
               className={styles.bag}
@@ -176,13 +174,6 @@ export function Storefront({
           key={browse.page}
           ref={body}
           tabIndex={-1}
-          data-tailor-target={
-            browse.page === "home"
-              ? "store-home"
-              : browse.page === "collection"
-                ? "store-collection"
-                : "store-product"
-          }
         >
           {browse.page === "home" && (
             <>
@@ -222,10 +213,10 @@ export function Storefront({
                 <section className={styles.featured}>
                   <div className={styles.sectionHeading}>
                     <div>
+                      <h2>A few to begin with.</h2>
                       <span className={styles.eyebrow}>
                         The collection, up close
                       </span>
-                      <h2>A few to begin with.</h2>
                     </div>
                     <button
                       className={styles.textButton}
@@ -255,12 +246,12 @@ export function Storefront({
           {browse.page === "collection" && (
             <div className={styles.collectionLayout}>
               <div className={styles.collectionHeading}>
-                <span className={styles.eyebrow}>{design.name} / Clothing</span>
                 <h1>
                   {browse.filters.category
                     ? categoryLabel(browse.filters.category)
                     : "The collection."}
                 </h1>
+                <span className={styles.eyebrow}>{design.name} / Clothing</span>
                 <p>
                   {design.template === "gallery"
                     ? "A closer look, one garment at a time."
@@ -295,7 +286,10 @@ export function Storefront({
                 ))}
               </nav>
               <div className={styles.collectionResults}>
-                <div className={styles.collectionTools}>
+                <div
+                  className={styles.collectionTools}
+                  data-tailor-target="store-collection"
+                >
                   <label className={styles.search}>
                     <Icon name="search" />
                     <span className={styles.srOnly}>Search garments</span>
@@ -407,14 +401,24 @@ export function Storefront({
             ))}
         </div>
         <footer className={styles.footer}>
-          <div>
+          {input.logoUrl && design.logoId ? (
+            <Image
+              unoptimized
+              width={input.logoSize?.width ?? 240}
+              height={input.logoSize?.height ?? 56}
+              className={styles.footerLogo}
+              src={input.logoUrl}
+              alt={design.name}
+              onError={() => actions.logoFailed?.(design.logoId!)}
+            />
+          ) : (
             <strong>{design.name}</strong>
-            <span>Clothing, considered.</span>
-          </div>
-          <p>Temporary demo store · Illustrative prices and inventory</p>
-          <button onClick={actions.owner}>
-            {preview ? "Back to garment review" : "Owner workspace"} ↗
-          </button>
+          )}
+          {!(input.fullPage && !preview) && (
+            <button onClick={actions.owner} data-tailor-target="store-owner">
+              {preview ? "Back to garment review" : "Owner workspace"} ↗
+            </button>
+          )}
         </footer>
       </div>
     </section>
@@ -576,10 +580,10 @@ function ProductDetail({
     !!actions.addToBag;
   const heading = (
     <div className={styles.productHeading}>
+      <h1>{item.product.title}</h1>
       <span className={styles.eyebrow}>
         {categoryLabel(item.product.category)}
       </span>
-      <h1>{item.product.title}</h1>
       <p className={styles.detailPrice}>
         {selected
           ? price(selected.variant.price)
@@ -633,7 +637,11 @@ function ProductDetail({
           {item.product.description && (
             <p className={styles.description}>{item.product.description}</p>
           )}
-          <fieldset className={styles.options} disabled={item.product.archived}>
+          <fieldset
+            className={styles.options}
+            disabled={item.product.archived}
+            data-tailor-target="store-product"
+          >
             <legend>
               Colour{" "}
               {activeColour && knownColour(activeColour)

@@ -32,6 +32,57 @@ async function setup() {
   return { env, controller };
 }
 describe("automatic grouping within the existing session and commerce authority", () => {
+  it("keeps personal uploads as photos until explicit drafting, then links/separates locally without another recognition call", async () => {
+    const env = environment();
+    environments.push(env);
+    const interpret = vi.spyOn(env.processor, "interpret");
+    const controller = await env.open();
+    await controller.photos.add(
+      sourceFiles().map((source, index) => ({
+        ...source,
+        name: `my-clothing-${index}.webp`,
+      })),
+    );
+    expect(interpret).not.toHaveBeenCalled();
+    expect(controller.getSnapshot().state.stage).toBe("choose");
+    expect(controller.getSnapshot().state.draft).toBeNull();
+    expect(controller.photos.getSnapshot().items).toHaveLength(3);
+    expect(controller.photos.getSnapshot().links).toEqual([]);
+    await controller.draftCatalogue();
+    expect(interpret).toHaveBeenCalledTimes(1);
+    const original = controller.getSnapshot().state.draft!.items[0]!;
+    expect(original.product.imageIds).toHaveLength(3);
+    expect(
+      controller.split(original.product.id, original.product.imageIds[2]!),
+    ).toBe(true);
+    const separated = controller
+      .getSnapshot()
+      .state.draft!.items.find(
+        (item) => item.product.id !== original.product.id,
+      )!;
+    expect(separated.included).toBe(false);
+    expect(separated.confirmedClothing).toBe(false);
+    expect(
+      controller.linkProducts([original.product.id, separated.product.id]),
+    ).toBe(false);
+    controller.include(separated.product.id, true);
+    expect(
+      controller.linkProducts([original.product.id, separated.product.id]),
+    ).toBe(true);
+    expect(controller.getSnapshot().state.draft!.items).toHaveLength(1);
+    expect(
+      controller.getSnapshot().state.draft!.items[0]!.product.variants,
+    ).toHaveLength(6);
+    expect(interpret).toHaveBeenCalledTimes(1);
+    controller.go("choose");
+    expect(controller.photos.getSnapshot().items).toHaveLength(3);
+    controller.dispose();
+    const restored = await env.open();
+    expect(restored.getSnapshot().state.stage).toBe("choose");
+    expect(restored.photos.getSnapshot().items).toHaveLength(3);
+    expect(restored.getSnapshot().state.draft!.items).toHaveLength(1);
+    expect(interpret).toHaveBeenCalledTimes(1);
+  });
   it("restores default-on automatic groups and retains manual separation across a deliberate rebuild", async () => {
     const { env, controller } = await setup();
     expect(controller.getSnapshot().state.autoLinkPhotos).toBe(true);

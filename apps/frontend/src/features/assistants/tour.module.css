@@ -1,57 +1,112 @@
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  color: var(--platform-text);
+}
+.presentation > .scrim,
+.presentation > .highlight,
+.presentation > .card {
+  animation: enter 0.22s var(--ease-out) both;
+}
+.presentation[data-leaving="true"] > .scrim,
+.presentation[data-leaving="true"] > .highlight,
+.presentation[data-leaving="true"] > .card {
+  animation: leave 0.18s ease both;
+}
+.scrim {
+  position: fixed;
+  background: #14193670;
+  backdrop-filter: blur(5px);
+  pointer-events: auto;
+}
 .highlight {
   position: fixed;
   pointer-events: none;
   border: 2px solid var(--platform-action);
-  border-radius: 16px;
-  box-shadow: 0 0 0 7px #242b6021;
-  z-index: 41;
-  transition:
-    top 0.24s var(--ease-out),
-    left 0.24s var(--ease-out),
-    width 0.24s var(--ease-out),
-    height 0.24s var(--ease-out);
+  border-radius: 10px;
+  box-shadow: 0 0 0 4px #d5f87966;
 }
 .card {
   position: fixed;
-  z-index: 42;
-  padding: 18px;
+  pointer-events: auto;
+  padding: 22px;
   border: 1px solid var(--platform-line);
   border-radius: 20px;
   background: var(--platform-surface);
-  box-shadow: 0 14px 50px #242b602a;
-  max-height: calc(100dvh - 32px);
+  box-shadow: 0 14px 50px #14193645;
   overflow: auto;
-  animation: enter 0.3s var(--ease-out) both;
   color: var(--platform-text);
+}
+.measuring {
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.welcome {
+  transform: translate(-50%, -50%);
+}
+.welcomeActions {
+  margin-top: 24px;
 }
 .card small {
   color: var(--platform-muted);
-  font-size: 11px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
 .card h2 {
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1.2;
-  margin: 10px 0;
+  margin: 16px 0 12px;
 }
 .card p {
   font-size: 13px;
-  line-height: 1.5;
-  margin: 0 0 16px;
+  line-height: 1.6;
+  margin: 0;
 }
-.card > div {
+.progress {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+}
+.progress span {
+  height: 3px;
+  flex: 1;
+  border-radius: 3px;
+  background: var(--platform-line);
+}
+.progress span[data-current="true"] {
+  background: var(--platform-action);
+}
+.status {
+  display: block;
+  min-height: 18px;
+  margin-block: 10px;
+  font-size: 11px;
+  color: var(--platform-muted);
+}
+.actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 6px;
 }
 .card button {
   min-height: 44px;
   min-width: 44px;
-  padding: 9px 14px;
+  padding: 9px 12px;
   background: var(--platform-selected);
   color: var(--platform-text);
   border: 1px solid var(--platform-line);
   border-radius: 12px;
   cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+.card .skip {
+  background: transparent;
+  border-color: transparent;
 }
 .card button:last-child {
   margin-left: auto;
@@ -67,10 +122,24 @@
 @keyframes enter {
   from {
     opacity: 0;
-    transform: translateY(8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+  }
+}
+@keyframes leave {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (max-width: 480px) {
+  .card {
+    padding: 18px;
+  }
+  .card h2 {
+    font-size: 20px;
   }
 }

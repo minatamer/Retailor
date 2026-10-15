@@ -1,5 +1,8 @@
 const paths = {
   arrow: "M5 12h14m-5-5 5 5-5 5",
+  down: "M12 5v14m-5-5 5 5 5-5",
+  expand: "M14 3h7v7 M21 3l-7 7 M10 21H3v-7 M3 21l7-7",
+  restore: "M21 3l-7 7 M14 3v7h7 M3 21l7-7 M3 14h7v7",
   sparkle: "m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z",
   bag: "M5 7h14l1 14H4L5 7Zm3 0V5a4 4 0 0 1 8 0v2",
   close: "m6 6 12 12M6 18 18 6",
@@ -10,6 +13,7 @@ const paths = {
   garment: "m8 3-5 3-2 5 4 2 1-3v11h12V10l1 3 4-2-2-5-5-3a4 4 0 0 1-8 0Z",
   receipt: "M6 3h12v18l-3-2-3 2-3-2-3 2V3Z M9 7h6 M9 11h6 M9 15h3",
   returns: "M8 7H3l5-5 M3 7h11a7 7 0 0 1 0 14h-3",
+  reset: "M3 10a9 9 0 1 1 2.6 8.4 M3 4v6h6",
   inventory: "m3 7 9-4 9 4v10l-9 4-9-4V7Z m0 0 9 4 9-4 M12 11v10 M7 5l9 4",
   expense: "M3 6h17v14H3V6Z M3 6V4h14v2 M15 11h6v5h-6v-5Z M17 13.5h1",
   customers:
