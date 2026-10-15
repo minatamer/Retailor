@@ -1,5 +1,7 @@
 # Retailor hero film — discussion draft 01
 
+**Current status, 16 October 2026:** [RTL-105](../tickets/RTL-105-cinematic-landing-hero.md) subsequently shipped an original16-second local clothing-photo motion loop, dark full-viewport hero, centered copy/lime CTA and transparent-to-white navbar. [Actual evidence and limitations](../validation/RTL-105.md) distinguish playback/responsive checks from pending owner/hosted acceptance. The larger campaign narrative below remains a historical proposal; its sequence and proposed production are not claimed complete by that smaller asset.
+
 14 October 2026. **Planning only. Production deferred by the owner while frontend visual feedback continues.**
 
 Confirmed direction: **fashion campaign with punchy product reveals**. Script, duration, detailed framing and transitions below remain proposals. This document replaces no current hero code, creates no video/composition and freezes no frontend imagery.

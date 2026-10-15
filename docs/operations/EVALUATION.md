@@ -1,6 +1,6 @@
 # Retailor controlled evaluation
 
-RTL-020 prepares local evaluation; it does **not** authorize provider spend or public release. Default development, tests and these preparation commands remain paid-off. Live catalogue/text/logo acceptance, account access and provider retention/budget evidence are pending. Fixed public FX verification is separate and sends no visitor data.
+RTL-020 prepares local evaluation; it does **not** authorize provider spend or public release. Default development, tests and these preparation commands remain paid-off. Live catalogue/text acceptance, account access and provider retention/budget evidence are pending. RTL-102 removes AI-logo cases/model/transport and their output-cost approval from the current plan: local logos are verified separately with no model usage. Fixed public FX verification is separate and sends no visitor data. Earlier logo/account/24-request descriptions below are historical and superseded by the current nine-case,23-request-maximum plan.
 
 ## Commands and candidate freeze
 

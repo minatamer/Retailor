@@ -1,0 +1,16 @@
+# RTL-097 — single checkout with order placement on verified return
+
+Status: **Locally implemented and validated, including an actual Stripe test payment, order/stock/receipt/dashboard return and duplicate-return check.** [Evidence](../validation/RTL-097.md):39 focused tests pass; formatting, lint, types, boundaries and production build pass. Full suite615/616 retains only the existing strict Linux source-proof mismatch. Current Linux/image/scanner/external release and physical-device acceptance remain pending. No staging/commits.
+
+Latest owner feedback explicitly supersedes RTL-092's verify-only completion. Checkout should open Stripe, then a verified successful test payment should actually place the local demo order and return to Order placed. Remove Test payment complete, the separate Stripe checkout card, Connecting to Stripe sandbox and the exact unverified-payment sentence. Rename Place demo order to Checkout; provide photo/store sharing, sandbox disclosure and4242/future-expiry/three-digit-CVC instructions in a small hover/focus/touch info control. Show a continuously spinning indicator until Stripe opens. Hide Link's save-information offer that exposes the sandbox account label if supported.
+
+Acceptance:
+
+1. One review Checkout action uses the configured Stripe sandbox; default-off local demo ordering remains available under the same action with honest disclosure. Failed configured checkout never silently places a local order. No unwanted Stripe card/banner or quoted copy remains.
+2. Server-verified completed/paid status and exact captured amount/currency/current state precede atomic local order/stock placement and existing receipt. Persist receipt mapping to prevent duplicate URL/reload/back/late-return fulfilment. No URL-only trust, paid AI, real payment, extra data owner or monetary authority.
+3. Preserve photo/stock/price/scope/revision/workspace/reset/expiry/cancellation and finite I/O/timer/concurrency fences, including old pending data. Cancellation/open/unknown/stale return never places an order; concise actionable retry failures remain without the unwanted wording. Receipt values and dashboard refer to that actual order.
+4. Continuous visible spinner during preparation/navigation with owned cleanup/deadline; accessible nonintrusive info, responsive/native modal/keyboard/touch and designed motion.
+5. Verify current Stripe Link controls; disable per-session saving/Link where supported, without changing global account settings. Distinguish a hosted page's account-level title/metadata from the removable save-information offer; report any remaining limitation honestly.
+6. Meaningful regressions, actual laptop/phone and authorized hosted sandbox evidence, clean settled read-only review, six required gates. Preserve earlier unstaged work; no staging/commits/push/deployment/delegation.
+
+Precision: [allocation](../commit-plans/RTL-097.md), [RTL-092](RTL-092-stripe-sandbox-checkout.md), [shopping](../engineering/SHOPPING.md), [storage/ADC](../operations/CHECKOUT-STORAGE.md), RTL-023 quality/security dispositions and current checkout/controller/pure commerce. The owner authorizes this sandbox/local fulfilment change and existing synthetic-photo test flow, not production payments or release.

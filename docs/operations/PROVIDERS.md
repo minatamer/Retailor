@@ -1,5 +1,7 @@
 # Provider setup and spend policy
 
+**RTL-102 update,15 October2026:** runtime logos now use only the local bundled font/mark generator in every app mode. No logo image model, Image API call, provider moderation or paid-logo approval/cost case remains. The image pricing/account paragraphs below are historical13October preparation, superseded for this removed branch. Only catalogue/Tailor remain paid AI; production native logos retain existing Turnstile/signing prerequisites and signed/rate/count/concurrency protections independently of paid enablement/OpenAI credentials. Native usage is zero model tokens. See [current logo policy](../engineering/LOGOS.md).
+
 Checked 13 October 2026 against official OpenAI documentation. No Retailor key/account was read, no paid request was made and no budget or hosted configuration was approved. Normal app-local secrets remain ignored; `.env.example` contains fake/paid-off defaults and blank credentials.
 
 ## Prepared policies and checked prices
