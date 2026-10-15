@@ -6,7 +6,7 @@ import { createApp } from "./app.js";
 import { PaidAdmission } from "../security/admission.js";
 import { action } from "../../../../test/fixtures/recognition.js";
 import { fixtureAssistant } from "../assistants/fake.js";
-import { fixtureLogos } from "../brand/fake.js";
+import { localLogos } from "../brand/local.js";
 import { HealthSchema } from "@retailor/contracts/api";
 function app(env: Record<string, string | undefined> = {}) {
   return createApp(composeRuntime(parseEnvironment(env), () => "req_test"));
@@ -20,7 +20,33 @@ const liveEnvironment = {
   GRANT_SIGNING_SECRET: "s".repeat(32),
 };
 describe("safe runtime composition", () => {
-  it("enables all live AI including logos from the master and keys, without a money gate or health dispatch", async () => {
+  it("classifies an issued logo cookie even when another injected admission authority has a different boot", async () => {
+    const runtime = composeRuntime(parseEnvironment({}), () => "req_native");
+    const token = runtime.logos!.admission!.safety(undefined).cookie!;
+    const other = new PaidAdmission({
+      secret: "other".repeat(8),
+      challenge: { verify: async () => false },
+    });
+    const application = createApp(
+      {
+        ...runtime,
+        recognition: {
+          admission: other,
+          provider: { interpret: async () => ({}) },
+        },
+      },
+      () => {},
+    );
+    for (let index = 0; index < 20; index++) {
+      const response = await request(application)
+        .post("/v1/brand/logos")
+        .set("Origin", "http://127.0.0.1:4310")
+        .set("Cookie", `retailor_safety=${token}`)
+        .send({});
+      expect(response.status).toBe(400);
+    }
+  });
+  it("enables paid AI from the master and keys alongside the local logo generator without health dispatch", async () => {
     const verify = vi.fn(async () => true),
       interpret = vi.fn(async () => ({}));
     const gate = new PaidAdmission({
@@ -32,7 +58,7 @@ describe("safe runtime composition", () => {
       provider: { interpret },
     }));
     const assistant = vi.fn(() => fixtureAssistant()),
-      logos = vi.fn(() => fixtureLogos());
+      logos = vi.fn(() => localLogos());
     const runtime = composeRuntime(
       parseEnvironment(liveEnvironment),
       () => "req_test",
@@ -86,7 +112,7 @@ describe("safe runtime composition", () => {
     "TURNSTILE_SITE_KEY",
     "GRANT_SIGNING_SECRET",
   ])(
-    "keeps every live port inert when %s is off/missing, even with all other credentials",
+    "keeps paid AI inert and local logos available when %s is off/missing",
     (key) => {
       const recognition = vi.fn(() => {
         throw new Error("Unexpected live factory");
@@ -94,9 +120,7 @@ describe("safe runtime composition", () => {
       const assistant = vi.fn(() => {
         throw new Error("Unexpected live factory");
       });
-      const logos = vi.fn(() => {
-        throw new Error("Unexpected live factory");
-      });
+      const logos = vi.fn(() => localLogos());
       const runtime = composeRuntime(
         parseEnvironment({
           ...liveEnvironment,
@@ -111,17 +135,19 @@ describe("safe runtime composition", () => {
       expect(runtime.ready).toBe(false);
       expect(runtime.recognition).toBeUndefined();
       expect(runtime.assistant).toBeUndefined();
-      expect(runtime.logos).toBeUndefined();
+      const nativeReady =
+        key === "PAID_DEMO_ENABLED" || key === "OPENAI_API_KEY";
+      expect(!!runtime.logos).toBe(nativeReady);
       expect(runtime.capabilities).toMatchObject({
         mode: "live",
         paidEnabled: false,
         vision: { available: false },
         tailor: { available: false },
-        logos: { available: false },
+        logos: { available: nativeReady },
       });
       expect(recognition).not.toHaveBeenCalled();
       expect(assistant).not.toHaveBeenCalled();
-      expect(logos).not.toHaveBeenCalled();
+      expect(logos).toHaveBeenCalledTimes(nativeReady ? 1 : 0);
     },
   );
   it("does not contact providers for liveness/readiness/config", async () => {

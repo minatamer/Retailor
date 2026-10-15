@@ -9,8 +9,8 @@ import {
   parseAssistantAction,
   ASSISTANT_LIMITS,
 } from "@retailor/contracts/assistant";
-import { parsePaidAction } from "./paid-action.js";
-import type { PaidAction } from "./paid-action.js";
+import { parseGuardedAction } from "./guarded-action.js";
+import type { GuardedAction } from "./guarded-action.js";
 import { parseLogoAction, LOGO_LIMITS } from "@retailor/contracts/brand";
 import { deny } from "./errors.js";
 
@@ -145,9 +145,9 @@ export class PaidAdmission {
     }
   }
   private action(input: unknown) {
-    let value: PaidAction;
+    let value: GuardedAction;
     try {
-      value = parsePaidAction(input);
+      value = parseGuardedAction(input);
     } catch {
       return deny("INVALID_INPUT", 400);
     }
@@ -157,7 +157,7 @@ export class PaidAdmission {
     // Key order is established by the shared strict parser. No raw content/hash is logged.
     return { value, digest: this.mac(JSON.stringify(value)) };
   }
-  private workspace(action: PaidAction) {
+  private workspace(action: GuardedAction) {
     let state = this.workspaces.get(action.workspaceId);
     if (!state) {
       if (this.workspaces.size >= 256) return deny("BUSY", 429);
@@ -179,7 +179,7 @@ export class PaidAdmission {
       return deny("FORBIDDEN", 403);
     return state;
   }
-  private rate(identity: string, action: PaidAction["action"]) {
+  private rate(identity: string, action: GuardedAction["action"]) {
     const now = this.clock(),
       key = `${action}:${identity}`,
       local = (this.rates.get(key) ?? []).filter(
@@ -291,7 +291,7 @@ export class PaidAdmission {
     }
     return { ...this.beginAction(action, grant, safety), action };
   }
-  private beginAction(input: PaidAction, grant: string, safety: string) {
+  private beginAction(input: GuardedAction, grant: string, safety: string) {
     this.sweep();
     const { value, digest } = this.action(input),
       parsed = ClaimsSchema.safeParse(this.unseal(grant));
@@ -330,7 +330,7 @@ export class PaidAdmission {
     attempt.status = "consumed";
     let dispatched = false,
       released = false,
-      observedUsage = false;
+      observedUsage = value.action === "logos";
     return {
       action: value,
       dispatch: () => {
@@ -357,10 +357,7 @@ export class PaidAdmission {
           usage.input < 0 ||
           usage.input > 1_050_000 ||
           usage.output < 0 ||
-          usage.output >
-            (value.action === "logos"
-              ? 100000
-              : RECOGNITION_LIMITS.outputTokens)
+          usage.output > RECOGNITION_LIMITS.outputTokens
         )
           return;
         observedUsage = true;

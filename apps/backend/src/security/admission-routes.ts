@@ -22,6 +22,7 @@ export function admissionRoutes(
   app: express.Express,
   admission: PaidAdmission | undefined,
   frontendOrigin: string,
+  paidAvailable = true,
 ) {
   const enabled: express.RequestHandler = (_req, _res, next) =>
     admission ? next() : next(new OperationFailure("UNAVAILABLE", 503));
@@ -57,6 +58,8 @@ export function admissionRoutes(
     async (req, res) => {
       const parsed = RequestSchema.safeParse(req.body);
       if (!parsed.success) return deny("INVALID_INPUT", 400);
+      if (parsed.data.action.action !== "logos" && !paidAvailable)
+        return deny("UNAVAILABLE", 503);
       const signal = res.locals.admissionSignal as AbortSignal,
         safety = admission!.safety(safetyCookie(req.headers.cookie));
       const result = await admission!.admit(

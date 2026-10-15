@@ -4,8 +4,8 @@ import { parseAssistantAction } from "@retailor/contracts/assistant";
 import type { AssistantAction } from "@retailor/contracts/assistant";
 import { parseLogoAction } from "@retailor/contracts/brand";
 import type { LogoAction } from "@retailor/contracts/brand";
-export type PaidAction = CatalogueAction | AssistantAction | LogoAction;
-export function parsePaidAction(input: unknown): PaidAction {
+export type GuardedAction = CatalogueAction | AssistantAction | LogoAction;
+export function parseGuardedAction(input: unknown): GuardedAction {
   if (
     input &&
     typeof input === "object" &&

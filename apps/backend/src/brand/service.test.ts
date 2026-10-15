@@ -3,9 +3,9 @@ import sharp from "sharp";
 import { createHash } from "node:crypto";
 import { LOGO_LIMITS } from "@retailor/contracts/brand";
 import type { LogoRequest } from "@retailor/contracts/brand";
-import { fixtureLogos } from "./fake.js";
+import { localLogos } from "./local.js";
 import { generateLogos, validateLogo } from "./service.js";
-import { prepareLogoContext, logoPrompt, BRAND_PALETTE } from "./context.js";
+import { prepareLogoContext, BRAND_PALETTE } from "./context.js";
 import { ThemeSchema, DEFAULT_THEME } from "@retailor/contracts/design";
 const now = "2026-10-12T18:00:00.000Z";
 const request: LogoRequest = {
@@ -32,13 +32,10 @@ describe("bounded separate transparent logo batches", () => {
     for (const theme of ThemeSchema.options) {
       const context = { ...request.context, theme };
       const palette = BRAND_PALETTE[theme];
-      expect(logoPrompt(context)).toContain(
-        `Ink ${palette.ink}; accent ${palette.accent}; it will appear on ${palette.background}`,
-      );
       let sequence = 0;
       const result = await generateLogos(
         { ...request, context },
-        fixtureLogos(),
+        localLogos(),
         new AbortController().signal,
         accounting(),
         () => `theme_${++sequence}`,
@@ -76,7 +73,7 @@ describe("bounded separate transparent logo batches", () => {
     });
   });
   it("makes all three actual monograms responsive to the name initial, palette and type, escaping literal name text", async () => {
-    const provider = fixtureLogos();
+    const provider = localLogos();
     const make = (patch: Partial<LogoRequest["context"]>) =>
       provider.generate(
         { ...request.context, ...patch },
@@ -117,7 +114,7 @@ describe("bounded separate transparent logo batches", () => {
     let sequence = 0;
     const result = await generateLogos(
       request,
-      fixtureLogos(),
+      localLogos(),
       new AbortController().signal,
       account,
       () => `logo_${++sequence}`,
@@ -146,7 +143,7 @@ describe("bounded separate transparent logo batches", () => {
     }
   });
   it("rejects partial, duplicate, opaque, blank and non-raster output with no repair request", async () => {
-    const source = await fixtureLogos().generate(
+    const source = await localLogos().generate(
       request.context,
       new AbortController().signal,
       accounting(),
@@ -201,7 +198,7 @@ describe("bounded separate transparent logo batches", () => {
       ).rejects.toThrow();
     }
   });
-  it("binds live name/style/identity and permits only literal finite name data in the prompt", () => {
+  it("binds the exact native logo name, style and signed operation context", () => {
     const action = {
       schemaVersion: 1,
       action: "logos",
@@ -215,9 +212,8 @@ describe("bounded separate transparent logo batches", () => {
       designRevision: 1,
       nameDigest: createHash("sha256").update("FORME").digest("hex"),
       count: 3,
-      promptPolicy: "clothing-brand-v1",
+      generatorPolicy: "local-fonts-v1",
       outputPolicy: "transparent-png-v1",
-      disclosureVersion: "brand-context-v1",
     };
     expect(
       prepareLogoContext(
@@ -249,8 +245,6 @@ describe("bounded separate transparent logo batches", () => {
         now,
       ),
     ).toThrow("INVALID_INPUT");
-    expect(logoPrompt(request.context)).toContain("#222421");
-    expect(logoPrompt(request.context)).toContain('{"storeName":"FORME"}');
   });
   it("does not enter an aborted provider or accept repeated dispatch from an injected port", async () => {
     const abort = new AbortController();

@@ -3,7 +3,6 @@ import { APIError, APIConnectionTimeoutError } from "openai";
 import { providerFailure } from "./failure.js";
 import { publicError } from "@retailor/contracts/api";
 import { openAiCatalogue } from "../catalogue/provider.js";
-import { openAiLogos } from "./logos.js";
 import { openAiAssistant } from "./assistant.js";
 import { prepareAssistantContext } from "../assistants/context.js";
 import {
@@ -49,7 +48,7 @@ it("distinguishes operator quota/auth/configuration from temporary rate and dead
   ).toBe("DEADLINE");
 });
 
-it("normalizes real SDK-shaped failures at all three injected provider ports without retrying", async () => {
+it("normalizes real SDK-shaped failures at both remaining AI ports without retrying", async () => {
   for (const status of [401, 429]) {
     const fetcher = vi.fn<typeof fetch>(async () =>
       Response.json(
@@ -71,19 +70,6 @@ it("normalizes real SDK-shaped failures at all three injected provider ports wit
           action(),
           new Map([["source", new Uint8Array([1])]]),
           signal,
-        ),
-      () =>
-        openAiLogos("injected-key", fetcher).generate(
-          {
-            name: "FORME",
-            theme: "ink",
-            typography: "inter",
-            designRevision: 0,
-            themeConfirmed: true,
-            typographyConfirmed: true,
-          },
-          signal,
-          { dispatch() {}, recordUsage() {} },
         ),
       () =>
         openAiAssistant("injected-key", fetcher)

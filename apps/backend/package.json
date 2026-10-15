@@ -9,10 +9,11 @@
   "scripts": {
     "dev": "node ../../scripts/backend.mjs",
     "start": "node dist/server.js",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-logo-fonts.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@google-cloud/storage": "8.4.0",
     "@retailor/commerce": "workspace:*",
     "@retailor/contracts": "workspace:*",
     "busboy": "1.6.0",

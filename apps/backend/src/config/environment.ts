@@ -22,11 +22,22 @@ const EnvironmentSchema = z
     FAKE_MODE: bool.default(true),
     PAID_DEMO_ENABLED: bool.default(false),
     OPENAI_API_KEY: z.string().default(""),
+    STRIPE_API_KEY: z.string().default(""),
     TURNSTILE_SECRET_KEY: z.string().default(""),
     TURNSTILE_SITE_KEY: z.string().max(256).default(""),
     GRANT_SIGNING_SECRET: z.string().default(""),
   })
   .superRefine((env, ctx) => {
+    if (
+      env.STRIPE_API_KEY &&
+      !/^(?:sk|rk)_test_[A-Za-z0-9]+$/u.test(env.STRIPE_API_KEY)
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["STRIPE_API_KEY"],
+        message:
+          "Checkout requires a Stripe sandbox secret or restricted test key",
+      });
     if (env.APP_ENV === "production" && env.FAKE_MODE)
       ctx.addIssue({
         code: "custom",

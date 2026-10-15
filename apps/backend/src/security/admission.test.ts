@@ -106,9 +106,8 @@ describe("action-bound one-use paid admission", () => {
       typography: "editorial",
       designRevision: 1,
       count: 3,
-      promptPolicy: "clothing-brand-v1",
+      generatorPolicy: "local-fonts-v1",
       outputPolicy: "transparent-png-v1",
-      disclosureVersion: "brand-context-v1",
     });
     const first = logo("logo_1"),
       grant = await gate.admit(
@@ -170,9 +169,9 @@ describe("action-bound one-use paid admission", () => {
     second.finish();
     expect(gate.counters()).toEqual({ active: 0 });
     expect(gate.usageCounters()).toEqual({
-      inputTokens: 100,
-      outputTokens: 20000,
-      unknownDispatches: 1,
+      inputTokens: 0,
+      outputTokens: 0,
+      unknownDispatches: 0,
     });
     await expect(
       gate.admit(logo("logo_3"), "proof", safety, new AbortController().signal),

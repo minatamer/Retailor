@@ -1,3 +1,4 @@
+import { checkoutRoutes } from "../checkout/routes.js";
 import express from "express";
 import type { ErrorRequestHandler, Express } from "express";
 import { publicError } from "@retailor/contracts/api";
@@ -34,8 +35,12 @@ export function createApp(
     next();
   });
   app.use(
-    ingress(Date.now, (cookie) =>
-      runtime.recognition?.admission.verifiedSafety(cookie),
+    ingress(
+      Date.now,
+      (cookie) =>
+        runtime.recognition?.admission.verifiedSafety(cookie) ??
+        runtime.logos?.admission?.verifiedSafety(cookie) ??
+        runtime.checkout?.admission.verifiedSafety(cookie),
     ),
   );
   app.get("/v1/health", (_req, res) => {
@@ -55,11 +60,18 @@ export function createApp(
   app.get("/v1/config", (_req, res) => {
     res.json(runtime.capabilities);
   });
-  admissionRoutes(app, runtime.recognition?.admission, runtime.frontendOrigin);
+  admissionRoutes(
+    app,
+    runtime.recognition?.admission ??
+      (runtime.logos?.mode === "live" ? runtime.logos.admission : undefined),
+    runtime.frontendOrigin,
+    !!runtime.recognition,
+  );
   recognitionRoutes(app, runtime.recognition);
   assistantRoutes(app, runtime.assistant);
   logoRoutes(app, runtime.logos);
   currencyRoutes(app, runtime.currency);
+  checkoutRoutes(app, runtime.checkout, runtime.frontendOrigin);
   app.use((_req, res) => {
     res.status(404).json(publicError("NOT_FOUND", res.locals.requestId));
   });

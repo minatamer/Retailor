@@ -5,6 +5,7 @@ import net from "node:net";
 process.env.APP_ENV = "test";
 process.env.FAKE_MODE = "true";
 process.env.PAID_DEMO_ENABLED = "false";
+process.env.STRIPE_API_KEY = "";
 process.env.OPENAI_API_KEY = "";
 process.env.TURNSTILE_SECRET_KEY = "";
 process.env.GRANT_SIGNING_SECRET = "";
