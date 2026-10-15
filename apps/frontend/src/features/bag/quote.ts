@@ -2,7 +2,11 @@ import { ZodError } from "zod";
 import { MinorAmountSchema, MAX_MINOR_AMOUNT } from "@retailor/contracts/core";
 import type { Order, CommerceGraph } from "@retailor/contracts/commerce";
 import type { CurrencyScope } from "@retailor/contracts/currency";
-import { exactSum, exactProduct } from "@retailor/commerce/allocation";
+import {
+  exactSum,
+  exactProduct,
+  roundRatio,
+} from "@retailor/commerce/allocation";
 import { stockOf } from "@retailor/commerce/selectors";
 import { projectComponents } from "@retailor/commerce/currency";
 import { colourImageIds } from "@retailor/contracts/product";
@@ -19,6 +23,17 @@ export interface BagEntry {
   unitCost: number;
   stock: number;
   unavailable: string | null;
+}
+export const BAG_PROMO_CODE = "THREAD10";
+export function bagPromoDiscount(
+  entries: readonly Pick<BagEntry, "unitPrice" | "quantity">[],
+  code: string,
+) {
+  if (code.trim().toUpperCase() !== BAG_PROMO_CODE) return 0;
+  return roundRatio(
+    exactSum(entries.map((row) => exactProduct(row.unitPrice, row.quantity))),
+    10,
+  );
 }
 export function bagEntries(
   graph: CommerceGraph,

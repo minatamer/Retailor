@@ -50,6 +50,12 @@
   line-height: 1.1;
   outline-offset: 4px;
 }
+.dialog[data-mode="bag"] .header {
+  padding-block: 14px;
+}
+.dialog[data-mode="bag"] .header h2 {
+  font-size: 30px;
+}
 .header button {
   width: 44px;
   height: 44px;
@@ -96,16 +102,6 @@
   min-height: 100px;
   overflow: auto;
   overscroll-behavior: contain;
-}
-.currency {
-  margin-bottom: 12px;
-}
-.currency p {
-  font-size: 10px;
-  margin-block: 6px;
-}
-.currency [aria-label="Store display currency"] {
-  width: max-content;
 }
 .lines,
 .receiptLines {
@@ -214,24 +210,74 @@
 }
 .bagSummary {
   flex-shrink: 0;
-  padding: 18px 26px 8px;
+  padding: 12px 26px 6px;
   border-top: 1px solid var(--platform-line);
   background: white;
 }
 .promo {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+  display: grid;
+  gap: 6px;
   font-size: 12px;
   line-height: 1.5;
-  min-height: 44px;
-  cursor: pointer;
+}
+.promo label {
+  font-weight: 600;
+}
+.promoLabel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.promoLabel span {
+  font-size: 11px;
+  color: var(--platform-muted);
+}
+.promoEntry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
 }
 .promo input {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  accent-color: var(--platform-text);
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--platform-line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: white;
+  color: var(--platform-text);
+  font: inherit;
+}
+.promo input::placeholder {
+  color: #727680;
+  opacity: 1;
+}
+.promoEntry button {
+  min-height: 44px;
+  min-width: 72px;
+  padding: 10px 14px;
+  border: 1px solid var(--platform-text);
+  border-radius: 8px;
+  background: var(--platform-text);
+  color: white;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.18s var(--ease-out);
+}
+.promoEntry button:active {
+  transform: scale(0.96);
+}
+.promo p {
+  margin: 0;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.promo p:not(.problem) {
+  color: var(--platform-muted);
+}
+.promo p:empty {
+  display: none;
 }
 .totals {
   margin: 14px 0 18px;
@@ -264,14 +310,55 @@
   animation: valueIn 0.18s ease both;
 }
 .checkoutButton {
-  width: 100%;
+  flex: 1 0 145px;
+  min-height: 48px;
+  padding: 12px 16px;
   justify-content: space-between;
 }
-.continue {
+.bagSummary .totals {
+  gap: 5px;
+  margin: 10px 0;
+}
+.bagCheckout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding-top: 10px;
+  border-top: 1px solid var(--platform-line);
+}
+.bagTotal {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.bagTotal span {
   display: block;
-  width: 100%;
-  margin-top: 3px;
-  text-align: center;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.bagTotal strong {
+  display: block;
+  font-size: 23px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  animation: valueIn 0.18s ease both;
+}
+.bagFootnote {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-top: 2px;
+}
+.continue {
+  flex-shrink: 0;
+  padding-inline: 0;
+  text-align: left;
+}
+.bagFootnote .demoNote {
+  max-width: 230px;
+  margin: 0;
+  text-align: right;
 }
 .demoNote {
   font-size: 10px;
@@ -506,10 +593,13 @@
   font-size: 13px;
   margin-bottom: 26px;
 }
-.dialog button:focus-visible,
+.dialog button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--platform-text);
+  outline-offset: var(--focus-ring-offset);
+}
 .promo input:focus-visible {
-  outline: 2px solid var(--platform-text);
-  outline-offset: 3px;
+  outline: var(--focus-ring-width) solid var(--platform-text);
+  outline-offset: var(--focus-field-offset);
 }
 @keyframes drawerIn {
   from {

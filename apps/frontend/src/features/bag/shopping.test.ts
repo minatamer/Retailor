@@ -9,6 +9,7 @@ import {
   displayedBag,
   displayedOrder,
   tryDisplayedBag,
+  bagPromoDiscount,
 } from "./quote";
 const environments: ReturnType<typeof environment>[] = [];
 afterEach(() => environments.splice(0).forEach((env) => env.dispose()));
@@ -89,6 +90,55 @@ function ownerCommand(
   };
 }
 describe("owned shopping, exact review and once-only placement", () => {
+  it("carries a rounded 10% promotion through real review, placement and restored receipt", async () => {
+    const { env, controller, product } = await setup(1);
+    const variant = product.variants[0]!;
+    controller.go("dashboard");
+    expect(
+      controller.applyCommerce(
+        ownerCommand(env, controller, {
+          type: "updateProduct",
+          payload: ProductInputSchema.parse({
+            ...product,
+            variants: product.variants.map(({ openedAt: _openedAt, ...v }) => ({
+              ...v,
+              price: 1005,
+            })),
+          }),
+        }),
+      ).ok,
+    ).toBe(true);
+    controller.go("storefront");
+    const stock = stockOf(controller.getSnapshot().state.graph, variant.id);
+    controller.addToBag(product.id, variant.id, 3);
+    const entries = bagEntries(
+      controller.getSnapshot().state.graph,
+      controller.photos.availableIds(),
+    );
+    const discount = bagPromoDiscount(entries, "thread10");
+    expect(discount).toBe(302);
+    controller.reviewBag(discount);
+    const review = controller.getSnapshot().checkoutReview!;
+    expect(review.discount).toBe(302);
+    expect(stockOf(controller.getSnapshot().state.graph, variant.id)).toBe(
+      stock,
+    );
+    controller.placeReviewed(review);
+    const order = controller.getSnapshot().state.graph.orders[0]!;
+    expect(order).toMatchObject({
+      gross: 3015,
+      discount: 302,
+      merchandise: 2713,
+      delivery: 600,
+      total: 3313,
+    });
+    expect(order.lines[0]!.unitNet).toEqual([905, 904, 904]);
+    expect(stockOf(controller.getSnapshot().state.graph, variant.id)).toBe(
+      stock - 3,
+    );
+    const restored = await env.open();
+    expect(restored.getSnapshot().state.graph.orders[0]).toEqual(order);
+  });
   it("keeps an over-limit bag recoverable after an actual owner price change", async () => {
     const { env, controller, product } = await setup();
     const variant = product.variants[0]!;

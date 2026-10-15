@@ -7,22 +7,29 @@ import type { CurrencyScope } from "@retailor/contracts/currency";
 import { useSession } from "../session/context";
 import { merchantStyle } from "../store-design/presets";
 import { selectedScope } from "../currency/display";
-import { CurrencyPicker } from "../currency/picker";
 import { GarmentImage } from "../storefront/gallery";
 import { knownColour } from "../storefront/browse";
 import { Button } from "../../components/ui/button";
 import { Brand } from "../../components/ui/brand";
 import { Icon } from "../../components/ui/icon";
-import { bagEntries, tryDisplayedBag, displayedOrder } from "./quote";
+import {
+  bagEntries,
+  tryDisplayedBag,
+  displayedOrder,
+  BAG_PROMO_CODE,
+  bagPromoDiscount,
+} from "./quote";
 import styles from "./bag-dialog.module.css";
 
 type DisplayedTotal = ReturnType<typeof displayedOrder>;
 function OrderTotals({
   totals,
   scope,
+  compact = false,
 }: {
   totals: DisplayedTotal;
   scope: CurrencyScope;
+  compact?: boolean;
 }) {
   const subtotal = exactSum(
     totals.rows
@@ -39,13 +46,14 @@ function OrderTotals({
         .filter(
           (row) =>
             !row.id.startsWith("line_") &&
-            (row.id !== "discount" || row.amount !== 0),
+            (row.id !== "discount" || row.amount !== 0) &&
+            (!compact || row.id !== "tax" || row.amount !== 0),
         )
         .map((row) => (
           <div key={row.id}>
             <dt>
               {row.id === "discount"
-                ? "Demo discount"
+                ? "Discount"
                 : row.id === "delivery"
                   ? "Sample delivery"
                   : "Simulated tax"}
@@ -59,12 +67,14 @@ function OrderTotals({
           <dd>{formatMinor(totals.roundingAdjustment, scope.currency)}</dd>
         </div>
       )}
-      <div className={styles.total}>
-        <dt>Total</dt>
-        <dd key={`${scope.currency}:${totals.total}`}>
-          {formatMinor(totals.total, scope.currency)}
-        </dd>
-      </div>
+      {!compact && (
+        <div className={styles.total}>
+          <dt>Total</dt>
+          <dd key={`${scope.currency}:${totals.total}`}>
+            {formatMinor(totals.total, scope.currency)}
+          </dd>
+        </div>
+      )}
     </dl>
   );
 }
@@ -82,7 +92,16 @@ export function BagDialog() {
   const dialog = useRef<HTMLDialogElement>(null),
     heading = useRef<HTMLHeadingElement>(null),
     opener = useRef<HTMLElement | null>(null);
-  const [discount, setDiscount] = useState(false);
+  const promoScope = `${state.graph.workspaceId}:${state.graph.scenarioId}:${state.shopping.lastOrderId ?? ""}`;
+  const [promotion, setPromotion] = useState<{
+    scope: string;
+    code: string;
+    status: "idle" | "invalid" | "applied";
+  }>({ scope: promoScope, code: "", status: "idle" });
+  const promo =
+    promotion.scope === promoScope
+      ? promotion
+      : { scope: promoScope, code: "", status: "idle" as const };
   const entries = bagEntries(state.graph, controller.photos.availableIds());
   const order = !entries.length
     ? state.graph.orders.find((item) => item.id === bagReceiptId)
@@ -94,12 +113,7 @@ export function BagDialog() {
     historicalScope ?? checkoutReview?.scope ?? selectedScope(state.currency);
   const deduction =
     checkoutReview?.discount ??
-    (discount
-      ? Math.min(
-          500,
-          entries.reduce((sum, row) => sum + row.unitPrice * row.quantity, 0),
-        )
-      : 0);
+    bagPromoDiscount(entries, promo.status === "applied" ? promo.code : "");
   const quote = tryDisplayedBag(entries, scope, deduction);
   const totals = order
     ? displayedOrder(order, scope)
@@ -445,47 +459,109 @@ export function BagDialog() {
           </div>
         ) : entries.length ? (
           <div className={styles.bag}>
-            <div className={styles.bagItems}>
-              <div className={styles.currency}>
-                <CurrencyPicker inline />
-              </div>
-              {itemLines}
-            </div>
+            <div className={styles.bagItems}>{itemLines}</div>
             <div className={styles.bagSummary}>
-              <label className={styles.promo}>
-                <input
-                  type="checkbox"
-                  checked={discount}
-                  onChange={(event) => setDiscount(event.target.checked)}
-                />
-                <span>Try a {formatDisplay(500, scope)} demo discount</span>
-              </label>
+              <form
+                className={styles.promo}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (promo.status === "applied") {
+                    setPromotion({
+                      scope: promoScope,
+                      code: "",
+                      status: "idle",
+                    });
+                    return;
+                  }
+                  const code = promo.code.trim().toUpperCase();
+                  setPromotion({
+                    scope: promoScope,
+                    code,
+                    status: code === BAG_PROMO_CODE ? "applied" : "invalid",
+                  });
+                }}
+              >
+                <div className={styles.promoLabel}>
+                  <label htmlFor="bag-promo-code">Promo code</label>
+                  <span id="bag-promo-hint">10% off items</span>
+                </div>
+                <div className={styles.promoEntry}>
+                  <input
+                    id="bag-promo-code"
+                    name="promoCode"
+                    autoComplete="off"
+                    autoCapitalize="characters"
+                    spellCheck={false}
+                    maxLength={24}
+                    placeholder={`Try ${BAG_PROMO_CODE}`}
+                    value={promo.code}
+                    readOnly={promo.status === "applied"}
+                    aria-invalid={promo.status === "invalid"}
+                    aria-describedby="bag-promo-hint bag-promo-status"
+                    onChange={(event) =>
+                      setPromotion({
+                        scope: promoScope,
+                        code: event.target.value,
+                        status: "idle",
+                      })
+                    }
+                  />
+                  <button type="submit">
+                    {promo.status === "applied" ? "Remove" : "Apply"}
+                  </button>
+                </div>
+                <p
+                  id="bag-promo-status"
+                  role="status"
+                  className={
+                    promo.status === "invalid" ? styles.problem : undefined
+                  }
+                >
+                  {promo.status === "applied"
+                    ? `${BAG_PROMO_CODE} applied · 10% off`
+                    : promo.status === "invalid"
+                      ? `That code isn’t valid. Try ${BAG_PROMO_CODE}.`
+                      : ""}
+                </p>
+              </form>
               {!quote.ok && (
                 <p className={styles.problem} role="alert">
                   {quote.message}
                 </p>
               )}
-              {totals && <OrderTotals totals={totals} scope={scope} />}
-              <Button
-                className={styles.checkoutButton}
-                disabled={
-                  !quote.ok ||
-                  currencyBusy ||
-                  entries.some((row) => !!row.unavailable)
-                }
-                onClick={() => controller.reviewBag(deduction)}
-              >
-                Checkout <Icon name="arrow" />
-              </Button>
-              <button
-                className={styles.continue}
-                onClick={() => controller.closeBag()}
-              >
-                Continue shopping
-              </button>
-              <p className={styles.demoNote}>
-                No payment or shipment. Your bag reserves no stock.
-              </p>
+              {totals && <OrderTotals totals={totals} scope={scope} compact />}
+              <div className={styles.bagCheckout}>
+                {totals && (
+                  <div className={styles.bagTotal}>
+                    <span>Total</span>
+                    <strong key={`${scope.currency}:${totals.total}`}>
+                      {formatMinor(totals.total, scope.currency)}
+                    </strong>
+                  </div>
+                )}
+                <Button
+                  className={styles.checkoutButton}
+                  disabled={
+                    !quote.ok ||
+                    currencyBusy ||
+                    entries.some((row) => !!row.unavailable)
+                  }
+                  onClick={() => controller.reviewBag(deduction)}
+                >
+                  Checkout <Icon name="arrow" />
+                </Button>
+              </div>
+              <div className={styles.bagFootnote}>
+                <button
+                  className={styles.continue}
+                  onClick={() => controller.closeBag()}
+                >
+                  Continue shopping
+                </button>
+                <p className={styles.demoNote}>
+                  No payment or shipment. Your bag reserves no stock.
+                </p>
+              </div>
             </div>
           </div>
         ) : (
