@@ -10,6 +10,8 @@ Primary reference: [Shopify templates](https://shopify.dev/docs/storefronts/them
 
 ## Experience and semantics
 
+RTL-078, 15 October 2026: the navbar is shared across all page families. The owner prefers the former Gallery/Product alignment; wordmark stays left and the page links/currency/details/bag stay together on the right. Changing page composition no longer changes navbar geometry. Existing responsive wrapping and active-page underline remain. [Actual evidence](../validation/RTL-078.md).
+
 Main Studio/Pulse/Gallery cards remain the fast path: choose one complete look for Home, Collection and Product. Beneath them, an optional **Mix layouts by page** disclosure contains three rows. Each row shows its current family, three finite choices and Preview Home/Collection/Product. Changing one row updates that page's actual preview immediately; other page assignments stay intact. Name, colour, typography, photos, filters, cart and business data stay shared. A return-to-one-look action clears page overrides. If all three page choices become identical, normalize to that one family.
 
 Tailor briefly mentions the option during layout selection. It can answer a supported fake request such as “Studio home, Pulse collection, Gallery product” or “Use Gallery for the product page.” Reply cards list proposed assignments and remain inert until Preview; final acceptance remains the current creator/owner action. Live tools carry the same strict mapping and current design context, without adding a request to the manual path. A family-only AI proposal applies everywhere; a colour/type-only proposal preserves page choices. Unsupported/ambiguous fake prompts explain the supported controls rather than pretending to understand an unrestricted model request.

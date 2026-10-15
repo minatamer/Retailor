@@ -1,0 +1,9 @@
+# RTL-077 — give clothes more room in the laptop cart
+
+15 October 2026 owner screenshot/request: the laptop cart gives clothes too little room while the checkout section is too large. Make the summary smaller and remove USD/EUR controls from the bag.
+
+Acceptance: visibly enlarge the usable garment area at laptop heights, compact the summary and header without shrinking accessible controls, and remove the in-bag currency picker. Keep actual selected currency amounts, external currency controls, current promo-code field/10% calculation, actionable notices, quantities/removal/photos, exact totals, review/receipt and native keyboard/focus/motion behavior. Bag-only breakdown may omit zero tax; nonzero fees/discounts/rounding remain visible and the full review/receipt stays complete. Retain clear total, Checkout and Continue shopping. Verify real before/after measurements and responsive/short-height/multiple-row/promo/EUR/checkout flow, existing meaningful regressions, six settled gates and complete read-only review. No staging/commit or external action.
+
+References: exact owner screenshot, [allocation](../commit-plans/RTL-077.md), [shopping behavior](../engineering/SHOPPING.md), RTL-048/075/076 and root/frontend rules. The historical screenshot's removed checkbox/success sentence must not be restored.
+
+Status: implemented and locally reviewed. [Actual validation](../validation/RTL-077.md): same laptop item pane 225.7→409px, summary 411.5→253px; zero in-bag currency pickers while EUR prices persist. Native multiple-row/scrolling/promo/quantity/removal/keyboard/checkout and five viewport sizes verified. Focused 14/14 and five root code/build gates pass; 511/512 units retain only the existing source-proof failure. Physical/live/owner/external acceptance pending; nothing staged or committed.

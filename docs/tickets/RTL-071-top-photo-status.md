@@ -1,0 +1,7 @@
+# RTL-071 — photo status at the top of catalogue review
+
+15 October 2026 owner screenshot/request: remove “Every photo has a place.” from the bottom; retain photo status and place it at the top.
+
+Acceptance: the removed heading is absent; one linked/excluded/to-review summary appears beneath the review introduction, before product cards. Counts continue deriving from actual dispositions and update through existing actions. Keep unresolved-source reasons and exclusion actions accessible at the top, and preserve the Personalize guard. No empty coverage footer, unrelated state/processing/domain change or loss of earlier edits. Verify actual desktop/tablet/phone layout, native count transitions/review action, existing meaningful coverage regressions, six settled gates and complete read-only source review. No staging/commit or external action.
+
+References: owner request/screenshot, [allocation](../commit-plans/RTL-071.md), [photo behavior](../design/PHOTO-LINKING.md), RTL-051 grouping and RTL-070 current editor behavior, root/frontend repository instructions. Status: implemented and locally reviewed. [Actual validation](../validation/RTL-071.md): fresh/include/exclude/unlink/review-action/restore checks and four responsive widths verified; five root code/build gates pass, with 496/497 units retaining only the existing historical source-proof failure. Current external/live/physical/owner acceptance remains pending. Nothing staged or committed.

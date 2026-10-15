@@ -2,6 +2,18 @@
 
 RTL-013 extends the existing Tailor panel across creator, shopper and owner views. Local visual styling remains the main creation flow. Natural language is a deliberate, bounded foreground turn; mounting or showing a card never calls a provider. Live acceptance remains owned by RTL-020.
 
+## Sending and simulated chat
+
+RTL-081, 15 October 2026: Ask Tailor has one visible **Send** button in fake and live mode. The old Try development example label was the submit action; it is removed. Enter submits the existing form/controller once; Shift+Enter inserts a newline. IME composition/key229 and held-key repeat do not send. Empty input, pending assistant/logo work and operator-required state disable Send; the controller retains independent guards. The prompt stays editable during a pending turn, preserving a next draft. Sending and Cancel request retain existing lifecycle behavior. A described hint explains the keyboard controls; fake mode says Demo chat · Simulated replies. Live disclosure remains before deliberate dispatch.
+
+The existing explicit fake backend provider answers exact greetings with role-specific guidance and supports its bounded current-evidence grammar. A greeting plus a request still follows the real filter/tool path. Unsupported shopper input explains simulation scope without inventing actions. No local parallel chatbot, extra graph, hidden retry, new endpoint or paid call is introduced. Live unavailability still cannot select fake mode. Existing role/fence, photo, proposal-review, cancellation, history, time/turn/body and financial grounding rules remain. [Actual validation and limits](../validation/RTL-081.md).
+
+## Welcome text arrival
+
+RTL-072, 15 October 2026: the owner requests a chat-like text entrance on opening personalization so the Tailor panel draws attention. Authored setup/welcome headings reveal word by word after a short lead; their paragraph follows, completing in roughly two seconds. Creator steps and shopper/owner welcome entries share one local presentation helper. Existing step keys and a companion-role key replay the new message on entry or reopening, while palette/layout/composer/viewport updates retain the same mounted words.
+
+Finite CSS opacity animations retain the full text's layout space. Controls remain usable immediately; there is no completion gate, artificial provider wait or scroll per word. A single complete accessible copy preserves heading/text semantics, with the visual word spans hidden from assistive technology and no per-word live announcements. Native unmount removes the animated spans; there are no new timers, listeners, persistence fields, inference calls or dependencies. Existing panel/message/tour motion and focus behavior remain. Conversation history and finalized provider replies keep their existing rendering and authority. [Actual local validation](../validation/RTL-072.md) records observed frames, stable geometry, native progression/rerenders/reopen/role/restore/reset and responsive checks; physical assistive-technology/owner/live acceptance remains pending.
+
 ## Capabilities and entry points
 
 | Role    | Local actions                                                        | Deliberate conversation capabilities                                                                                                                     |
@@ -12,7 +24,7 @@ RTL-013 extends the existing Tailor panel across creator, shopper and owner view
 
 These roles are anonymous UI capabilities in a temporary simulation, not authenticated merchant identities. Shopper tools cannot inspect owner costs or prepare product/expense mutations. Model output has finite IDs and inert intents, with no command, callback, HTML, selector, remote URL or arbitrary HTTP operation.
 
-The development provider supports a small declared grammar: categories/displayed-price budgets, unknown material/fit questions, owner summaries/negative-day explanations, product creation intents, creator guidance and tours. Replies say “Development example.” It reads the current graph with no parallel product database. Examples prove choreography/contracts, not arbitrary language quality. Live failure never selects this provider.
+The development provider supports a small declared grammar: role-aware greetings, categories/displayed-price budgets, unknown material/fit questions, owner summaries/negative-day explanations, product creation intents, creator guidance and tours. The composer identifies simulated replies; some existing finite tool replies retain their Development example prefix. It reads the current graph with no parallel product database. Examples prove choreography/contracts, not arbitrary language quality. Live failure never selects this provider.
 
 ## Ownership and evidence
 

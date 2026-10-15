@@ -1,0 +1,13 @@
+# RTL-074 — hero choices match the Home preview
+
+15 October 2026 owner screenshots/request: the hero preview shows three photos but the form selects only one. Let the user choose every shown hero photo, with controls appropriate to the selected template.
+
+Acceptance:
+
+- Studio exposes two ordered photo positions; Pulse and Gallery expose three, with labels matching left/centre/right or featured/upper/lower composition. Resolve the Home assignment in mixed designs. Show actual current automatic/selected images, with a chooser and optional existing bounded upload for each position. No fabricated photograph or mandatory upload.
+- Explicit choices appear in the corresponding order in the real preview and accepted storefront. Automatic positions fill from available distinct garments/categories around explicit choices. Selecting a photo already pinned elsewhere moves it, without duplicate image output. Scarce/missing photos remain honest and repairable.
+- Template changes preserve choices and safely retain the temporarily hidden third position. Legacy singular-photo sessions retain their first image. Creator confirmation, owner Apply/Cancel, refresh, dirty-field protection and reset retain one existing session owner. No automatic provider calls or commerce/history/recognition-selection mutation.
+- Uploaded photos follow original decode/cache/count/byte/deadline/cleanup rules, target their chosen position and cannot overwrite a later design/choice/role/reset. Protect every accepted/preview hero reference, include every slot in design-sensitive fences and retain complete bounded metadata in the report allow-list.
+- Meaningful bounds/legacy/order/default/duplicate/small/missing/restore/Apply/Cancel/upload/fence/export tests; actual creator/owner/template/mixed-layout/upload/reopen/phone previews. Six settled gates and complete read-only source review, with current external/source-proof limitations. No staging/commit or external action.
+
+References: exact owner request/screenshots, [allocation](../commit-plans/RTL-074.md), [hero behavior](../design/HERO-PHOTOS.md), current RTL-008 setup/photo ownership, RTL-043 campaign geometry, RTL-049 page assignments, RTL-023 quality/security dispositions and root/frontend rules. Status: implemented and locally reviewed. [Actual validation](../validation/RTL-074.md): native ordered choice/upload/Studio/Pulse/Gallery/mixed Home/restore/owner Apply/Cancel and responsive checks; verified and repaired owner scrolling. Focused 38/38 and five root code/build gates pass; 506/507 full units retain only the existing source-proof failure. Current physical/live/owner/external acceptance remains pending. Nothing staged or committed.

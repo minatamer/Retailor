@@ -6,6 +6,8 @@ Owner request, 14 October 2026: propose a completely different hero with a motio
 
 The owner explicitly requires substantial script/motion discussion and a documented proposal before executing, and notes production may remain deferred because dashboard/storefront visual feedback is still ongoing. No video, new hero or project setup is authorized by this planning request. Tone subsequently chosen by the owner: **Fashion campaign with punchy product reveals.** That choice is not script or production approval.
 
+Latest owner clarification, 15 October 2026: record a future attempt at a full-width, full-height dynamic background video filling the hero directly beneath the navbar, with the existing headline, supporting text and CTA layered above it. This supersedes the earlier behind-header placement proposal. The owner explicitly defers making the motion-graphics video; this follow-up is documentation only.
+
 ## Planning deliverable
 
 - Present one cohesive proposed concept, a timed script and scene-by-scene motion description, keeping unapproved details visibly provisional.
@@ -27,4 +29,4 @@ The owner explicitly requires substantial script/motion discussion and a documen
 
 After discussion, obtain an explicit instruction to start the agreed next phase and identify the frontend surfaces ready for capture. A script agreement does not silently authorize installs, final asset capture, video export, hero replacement, paid/cloud use or publication. A rough motion test can be scoped separately if requested before final visuals are ready.
 
-Current status: first proposal documented and presented for discussion; the confirmed tone is incorporated. No script/duration/composition approval or execution is claimed. Production remains explicitly deferred. [Planning evidence](../validation/RTL-031.md).
+Current status: first proposal documented and presented for discussion; the confirmed tone and 15 October beneath-navbar placement reminder are incorporated. Script, duration and detailed compositions remain proposals; production and integration remain explicitly deferred. [Planning evidence](../validation/RTL-031.md).

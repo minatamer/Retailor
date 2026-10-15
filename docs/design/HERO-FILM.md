@@ -2,7 +2,9 @@
 
 14 October 2026. **Planning only. Production deferred by the owner while frontend visual feedback continues.**
 
-Confirmed direction: **fashion campaign with punchy product reveals**. Script, duration, framing and transitions below are proposals, not approvals. This document replaces no current hero code, creates no video/composition and freezes no frontend imagery.
+Confirmed direction: **fashion campaign with punchy product reveals**. Script, duration, detailed framing and transitions below remain proposals. This document replaces no current hero code, creates no video/composition and freezes no frontend imagery.
+
+**Latest owner reminder, 15 October 2026:** attempt a full-width, full-height dynamic background video across the hero directly **beneath the navbar**, with the headline, supporting text and CTA layered above it. The video should fill that hero area. Motion-graphics production and hero integration remain deferred; this request records the future direction only.
 
 ## The idea
 
@@ -12,7 +14,7 @@ Sell the feeling that good clothes can become a convincing brand without a long 
 
 The owner's requested sequence anchors it: clothes drop in → a storefront appears → two quick Tailor-led layout changes → “Perfect!” The film leaves out the detailed upload/review/setup/dashboard tour. V1 concentrates on clothes, the store and making its look yours. No dashboard shot is proposed yet; its ongoing visual review remains relevant if a later script adds one.
 
-The whole first screen becomes the film's canvas. The Retailor headline, supporting text and CTA remain real HTML in front, available from first paint and throughout the loop. The film can pass behind them; its composition accounts for those foreground areas rather than expecting every object to remain unobstructed.
+The hero area beneath the navbar becomes the film's full canvas. The Retailor headline, supporting text and CTA remain real HTML in front, available from first paint and throughout the loop. The film can pass behind them; its composition accounts for those foreground areas rather than expecting every object to remain unobstructed.
 
 ## Script and motion proposal
 
@@ -71,7 +73,7 @@ Propose **one shared timeline with three separately composed versions**, using t
 
 Landscape phones and short laptops use the wide staging with tighter vertical bounds. Intermediate ratios get individually checked framing and object positioning. The final implementation must select/reframe based on the hero container's aspect ratio and dimensions, then fill the canvas edge to edge. Test the motion focal points after the cover crop; filling a rectangle alone is not proof that the story fits.
 
-Initial hero proposal: the film fills the first viewport behind both the header and hero, with navigation over a quiet band. Foreground content sits below the header and respects device safe areas. A scene-aware paper scrim/gradient protects text contrast while the moving imagery remains visible across the background. Exact placement and scrim strength need approval on stills with the actual foreground text laid over them.
+Latest owner placement, 15 October 2026: the film fills the hero's width and height directly beneath the navbar, with the foreground text and CTA layered above it. This supersedes the earlier proposal to extend the video behind the header. Foreground content respects device safe areas. A scene-aware scrim/gradient can protect text contrast while the moving imagery remains visible across the background. Detailed text placement and scrim strength remain proposals to review on stills with the actual foreground text laid over them.
 
 Safe areas come from measuring the real HTML headline, supporting text, CTA and navigation at each test size. They are not a single fixed empty box in a master video. In very short or zoomed views, allow accessible content to flow rather than clipping text/buttons to force a one-screen fit.
 
@@ -117,4 +119,4 @@ No push, deployment, paid provider, cloud job, purchase, new chat or delegation 
 - Should the film's marketing words feel like full sentences, or shorter poster-like statements?
 - Should the final “Perfect!” moment hold longer than the two transformations? If so, retime the current 24-second proposal together.
 
-Only the overall fashion-campaign/punchy-reveal tone is confirmed. All other choices remain open. [RTL-031](../tickets/RTL-031-plan-marketing-film-hero.md) owns this planning packet; the currently implemented hero remains described in [LANDING.md](LANDING.md).
+The overall fashion-campaign/punchy-reveal tone and the full-hero background-video placement beneath the navbar with foreground text are confirmed directions. Script, timing and detailed compositions remain open; production remains deferred. [RTL-031](../tickets/RTL-031-plan-marketing-film-hero.md) owns this planning packet; the currently implemented hero remains described in [LANDING.md](LANDING.md).

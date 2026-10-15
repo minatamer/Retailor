@@ -1,0 +1,15 @@
+# RTL-089 — commit the accumulated visual revisions
+
+15 October 2026 owner requests a new file-level commit plan and explicitly approves staging and committing the accumulated unstaged work. This supersedes earlier no-commit observations for RTL-062–088 and the related deferred RTL-031 documentation correction; no push, deployment, paid/cloud or delegation authorization.
+
+Acceptance:
+
+- Inventory all current source-owned changes after `2492eac7be78cc2a0b5a4a658ea88c64b57438a3`. Before staging, allocate every final path once across meaningful ticket-prefixed commits in dependency order. Preserve shared final-file history honestly, without manufacturing earlier ticket snapshots or intermediate-release validation.
+- Keep ignored local secrets, logs/builds/caches/raw media/scanner output out of Git. Check LF text, production icon provenance and obvious accidentally added credentials. Verify current app bytes equal the settled RTL-088 fingerprint and its six-gate result; keep the sole existing source-proof failure and external/owner limitations explicit. Do not weaken a test/guard or change app behavior for this packaging task.
+- Complete a clean read-only packaging/allocation review. Stage explicit frozen groups, inspect each staged diff, verify exact path/blob identity and whitespace, commit with normal existing identity/hooks, then verify committed trees and an empty index after every group. No blanket staging, history rewrite, global configuration change or push.
+- Record actual commit IDs, scope, validation and final Git state. Existing per-ticket native/responsive evidence stays attributed to the source actually checked. Retain the deferred hero-video note as documentation only and current visual checklist as the owner handoff.
+- Verify all208 allocated paths are in final HEAD, no unexpected paths were committed, raw-byte app fingerprint is unchanged and tracked/untracked/index status is clean. Leave normal ignored secrets/artifacts in place.
+
+References: [exhaustive file plan](../commit-plans/RTL-089.md), [settled RTL-088 evidence](../validation/RTL-088.md#required-settled-gates), [current visual checklist](../design/VISUAL-REVIEW-CHECKLIST.md), RTL-062–088 ticket/index and actual validation records, [deferred hero film](../design/HERO-FILM.md). Root/frontend instructions and latest owner approval apply. No new app/server/security boundary is changed.
+
+Status: approved exact-file packaging and read-only review complete. Seven implementation/asset groups contain104 committed files with recorded IDs and exact path/blob checks. The eighth group is this104-file documentation handoff; its identity and immediate final208-file clean-tree/fingerprint verification are recorded by Git and the local final ledger after creation. Current app checks are reused only for the identical settled RTL-088 bytes. The stale owner checklist finding was independently verified and corrected in documentation. Owner/external acceptance remains pending; no push or repeated browser/provider/Linux acceptance.

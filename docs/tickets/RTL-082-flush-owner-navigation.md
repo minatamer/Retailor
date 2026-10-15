@@ -1,0 +1,9 @@
+# RTL-082 — flush full-height owner navigation
+
+15 October 2026 owner screenshot: owner sidebar appearance is good, but height is capped and links scroll inside it. Make it full-height, aligned flush left with no exterior gaps; inspect and mimic Retrosum's layout.
+
+Acceptance: full viewport-height desktop rail at the left/top edge, header/content offset alongside it, no detached rounded card or nested desktop navigation scroll. All nine links and collapse action fit a normal laptop; very short viewports retain accessible whole-rail overflow rather than clipping controls. Preserve smooth expand/collapse, accepted store identity, platform colors, focus/44px controls, canonical owner views/forms/commerce, mobile native drawer and all other app stages. Read-only Retrosum source comparison, actual responsive/keyboard/navigation checks, meaningful existing regressions, six settled gates and complete scoped read-only review. No sibling changes, commits or external actions.
+
+References: [allocation](../commit-plans/RTL-082.md), [original sidebar](RTL-060-owner-sidebar.md), [owner operations](../engineering/OWNER-OPERATIONS.md), exact screenshot and root/frontend rules. Current geometry supersedes RTL-060's detached card, viewport-minus-header cap and independently scrolling desktop link area.
+
+Status: independent local implementation and complete read-only validation finished with no new actionable finding. Full-height flush rail, matching header/content offset and all nine naturally sized links verified across laptop/wide/short/breakpoint/phone/tablet views, collapse, scroll, reload, drawer and form controls. [Actual evidence](../validation/RTL-082.md): focused35/35 and five root code/build gates pass;517/518 units retain only the existing historical source-proof failure. Current physical/live/owner/external acceptance remains pending; nothing staged or committed.

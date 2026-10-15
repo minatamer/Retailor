@@ -1,0 +1,9 @@
+# RTL-080 — remove oversized focus rectangles
+
+15 October 2026 owner screenshot/request: search and dropdowns show an unwanted detached black rectangle. Fix it and check other controls for the same artifact.
+
+Acceptance: remove the oversized offset frame, make search focus follow the whole field instead of the inner text area, and keep dropdown/text-field focus within their actual bounds. Audit shared/platform/merchant and local focus overrides so other controls do not recreate the oversized geometry. Keep clearly visible keyboard focus, existing color/contrast roles, selected/error states, native interactions, semantic labels, responsive geometry and motion. Actions may retain a compact keyboard ring for contrast; do not indiscriminately remove indicators. Validate actual representative controls before/after, laptop/phone, keyboard, filters and shopping, existing meaningful contrast/behavior tests, six settled gates and read-only review. No staging/commit or external action.
+
+References: exact owner screenshot, [allocation](../commit-plans/RTL-080.md), [design baseline/contrast](../design/RTL-002-DESIGN.md), [storefront library](../design/STOREFRONT-LIBRARY.md), root/frontend rules.
+
+Status: independent local implementation and read-only validation complete; no new actionable finding. Search highlights its whole wrapper; fields/selects use contained 2px focus, and keyboard actions keep a compact visible ring. Source-wide audit covers 26 stylesheets/31 custom focus rules; actual desktop/phone and representative merchant/platform/owner controls verified. Focused 27/27 and five root code/build gates pass; full units 511/512 retain only the existing historical source-proof mismatch. [Actual evidence and limits](../validation/RTL-080.md). Current physical/live/owner/external acceptance remains pending; nothing staged or committed.
