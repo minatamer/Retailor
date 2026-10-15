@@ -1,4 +1,5 @@
 import type { Design } from "@retailor/contracts/design";
+import { heroPhotoCount, heroPhotoIds } from "@retailor/contracts/design";
 import { Icon } from "../../components/ui/icon";
 import type { StoreItem } from "./browse";
 import { GarmentImage } from "./gallery";
@@ -23,12 +24,11 @@ export function HomeCampaign({
   explore(): void;
   onFailure(id: string): void;
 }) {
-  const hero = design.heroPhotoId ? photos.get(design.heroPhotoId) : undefined;
   const tiles = campaignPhotos(
     items,
     photos,
-    hero,
-    design.template === "studio" ? 2 : 3,
+    heroPhotoIds(design).map((id) => (id ? photos.get(id) : undefined)),
+    heroPhotoCount(design),
   );
   return (
     <section className={styles.campaign} data-tiles={tiles.length}>
@@ -56,7 +56,7 @@ export function HomeCampaign({
       </div>
       {tiles.length ? (
         <div className={styles.campaignImages}>
-          {tiles.map(({ photo, item }, index) => (
+          {tiles.map(({ photo, item, slot }) => (
             <figure key={photo.id} className={styles.campaignTile}>
               <button
                 onClick={() => (item ? select(item.product.id) : explore())}
@@ -85,7 +85,7 @@ export function HomeCampaign({
                   eager
                   onFailure={onFailure}
                 />
-                <span className={styles.campaignNumber}>0{index + 1}</span>
+                <span className={styles.campaignNumber}>0{slot + 1}</span>
               </button>
               <figcaption>
                 <span>

@@ -30,10 +30,13 @@ import { PhotoStack } from "../photos/photo-stack";
 import { HomeCampaign } from "./home";
 import { FilterSheet } from "./filter-sheet";
 import type { StorePhoto } from "./gallery";
+import type { ProductFeedback } from "./review-model";
+import { ProductReviews } from "./reviews";
 import styles from "./storefront.module.css";
 
 export interface StorefrontInput {
   illustration?: "compact" | "full";
+  fullPage?: boolean;
   design: Design;
   items: readonly StoreItem[];
   browse: BrowseState;
@@ -43,6 +46,7 @@ export interface StorefrontInput {
   currencyControl?: ReactNode;
   bagCount?: number;
   logoUrl?: string;
+  feedback?: readonly ProductFeedback[];
 }
 export interface StorefrontActions {
   browse(patch: Partial<BrowseState>, expectedCurrency?: CurrencyScope): void;
@@ -109,6 +113,7 @@ export function Storefront({
       style={merchantStyle(design)}
       data-family={design.template}
       data-illustration={input.illustration}
+      data-full-page={input.fullPage ? "true" : undefined}
       aria-label={`${design.name} storefront`}
     >
       <div className={styles.storeFrame} ref={frame}>
@@ -800,6 +805,10 @@ function ProductDetail({
           </details>
         </section>
       </div>
+      <ProductReviews
+        productId={item.product.id}
+        feedback={input.feedback ?? []}
+      />
     </>
   );
 }

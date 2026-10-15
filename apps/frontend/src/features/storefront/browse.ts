@@ -1,7 +1,7 @@
 import { DisplayMinorSchema } from "@retailor/contracts/currency";
 import { z } from "zod";
 import { IdSchema } from "@retailor/contracts/core";
-import { CategorySchema } from "@retailor/contracts/product";
+import { CATEGORY_LABELS, CategorySchema } from "@retailor/contracts/product";
 import type { Product, Variant } from "@retailor/contracts/product";
 import { namedColour } from "@retailor/contracts/product";
 import type { CommerceGraph } from "@retailor/contracts/commerce";
@@ -92,7 +92,7 @@ export function collection(
     ({ product, variants, available }) =>
       !product.archived &&
       (!query ||
-        `${product.title} ${product.category} ${product.description}`
+        `${product.title} ${product.category} ${CATEGORY_LABELS[product.category]} ${product.description}`
           .toLocaleLowerCase("en-US")
           .includes(query)) &&
       (!f.category || product.category === f.category) &&
@@ -165,6 +165,8 @@ export const SIZING_LABELS: Record<Product["sizingSystemId"], string> = {
   "pending-demo": "Options awaiting confirmation",
 };
 export function categoryLabel(value: string) {
+  const category = CategorySchema.safeParse(value);
+  if (category.success) return CATEGORY_LABELS[category.data];
   return value
     .replaceAll("-", " ")
     .replace(/^./u, (letter) => letter.toUpperCase());

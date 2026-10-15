@@ -15,6 +15,18 @@
   overflow: clip;
   border-radius: inherit;
 }
+.store[data-full-page="true"] {
+  border: 0;
+  border-radius: 0;
+}
+.store[data-full-page="true"] .storeFrame {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+.store[data-full-page="true"] .page {
+  flex: 1;
+}
 .store button {
   color: inherit;
   cursor: pointer;
@@ -30,8 +42,16 @@
   min-height: 44px;
 }
 .store :is(button, input, select, summary):focus-visible {
-  outline: 3px solid var(--store-focus);
-  outline-offset: 4px;
+  outline: var(--focus-ring-width) solid var(--store-focus);
+  outline-offset: var(--focus-ring-offset);
+}
+.store
+  :is(
+    input:not([type="checkbox"], [type="radio"]),
+    select,
+    textarea
+  ):focus-visible {
+  outline-offset: var(--focus-field-offset);
 }
 .store button:disabled {
   cursor: not-allowed;
@@ -40,13 +60,14 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 14px 24px;
   padding: 18px clamp(18px, 4cqw, 64px);
   border-bottom: 1px solid var(--store-border);
 }
 .wordmark {
+  margin-right: auto;
   font-family: var(--store-heading) !important;
   font-weight: var(--store-heading-weight);
   font-size: clamp(21px, 2.6cqw, 36px);
@@ -393,6 +414,13 @@
 }
 .search svg {
   flex: none;
+}
+.search:focus-within {
+  outline: var(--focus-ring-width) solid var(--store-focus);
+  outline-offset: var(--focus-field-offset);
+}
+.store .search input:focus-visible {
+  outline: none;
 }
 .store input::placeholder {
   color: var(--store-muted);
@@ -1183,8 +1211,8 @@
   margin: 0;
 }
 .store[data-family="pulse"] .detail {
-  grid-template-columns: 1fr;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+  gap: clamp(24px, 3cqw, 42px);
 }
 .gallery[data-presentation="stage"] {
   display: grid;
@@ -1216,40 +1244,16 @@
   grid-column: 1;
 }
 .store[data-family="pulse"] .purchase {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  column-gap: 42px;
-  padding: 25px 0 0;
-  border-top: 1px solid var(--store-border);
+  padding: 0;
 }
 .store[data-family="pulse"] .purchase .description {
-  grid-column: 1;
-  grid-row: 1 / 3;
   max-width: 48ch;
   margin-top: 0;
 }
 .store[data-family="pulse"] .purchase .options {
-  grid-column: 2;
   margin: 0 0 22px;
 }
-.store[data-family="pulse"] .purchase .availability,
-.store[data-family="pulse"] .purchase .buyRow,
-.store[data-family="pulse"] .purchase > .caption {
-  grid-column: 2;
-}
-.store[data-family="pulse"] .purchase .facts {
-  grid-column: 1;
-}
-.store[data-family="pulse"] .purchase .problem {
-  grid-column: 1 / -1;
-}
 
-.store[data-family="gallery"] .header {
-  justify-content: center;
-}
-.store[data-family="gallery"] .wordmark {
-  margin-right: auto;
-}
 .store[data-family="gallery"] .campaign {
   display: grid;
   grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr);
@@ -1582,6 +1586,7 @@
   }
   .detail,
   .store[data-family="studio"] .detail,
+  .store[data-family="pulse"] .detail,
   .store[data-family="gallery"] .detail {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -1611,7 +1616,8 @@
     font-size: 9px;
   }
   .store[data-family="pulse"] .purchase {
-    column-gap: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--store-border);
   }
   .gallery[data-presentation="stage"] {
     grid-template-columns: 1fr;
@@ -1677,9 +1683,6 @@
   }
   .store[data-family="pulse"] .campaignCaption {
     padding: 22px 18px;
-  }
-  .store[data-family="pulse"] .purchase {
-    display: block;
   }
   .store[data-family="pulse"] .purchase .options {
     margin-top: 26px;

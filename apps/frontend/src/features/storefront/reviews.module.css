@@ -1,0 +1,126 @@
+.reviews {
+  border-top: 1px solid var(--store-border);
+  margin-top: clamp(32px, 5cqw, 72px);
+  padding-block: clamp(28px, 4cqw, 52px) 12px;
+}
+.reviews h2 {
+  font-family: var(--store-heading);
+  font-weight: var(--store-heading-weight);
+  font-size: clamp(26px, 3cqw, 40px);
+  letter-spacing: var(--store-tracking);
+  line-height: 1.15;
+  margin: 0 0 10px;
+}
+.disclosure {
+  color: var(--store-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.7fr);
+  gap: clamp(24px, 4cqw, 64px);
+  margin-top: 28px;
+}
+.summary {
+  align-self: start;
+}
+.score {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.score strong {
+  font-size: clamp(44px, 5cqw, 64px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.score > span,
+.summary > p {
+  color: var(--store-muted);
+  font-size: 13px;
+}
+.summary > p {
+  margin: 12px 0 0;
+}
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--store-text);
+  flex-shrink: 0;
+}
+.star {
+  position: relative;
+  display: block;
+  width: 21px;
+  height: 21px;
+}
+.star svg {
+  display: block;
+  width: 21px;
+  height: 21px;
+  max-width: none;
+}
+.filled {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+}
+.list,
+.review {
+  min-width: 0;
+}
+.list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+.review {
+  border: 1px solid var(--store-border);
+  border-radius: 12px;
+  padding: clamp(18px, 2.5cqw, 28px);
+  background: var(--store-surface);
+}
+.review header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.review time {
+  color: var(--store-muted);
+  font-size: 11px;
+}
+.review > p {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 16px 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.list .more {
+  margin-top: 16px;
+  padding: 10px 0;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-size: 13px;
+}
+.empty {
+  margin-top: 24px;
+}
+.empty p {
+  color: var(--store-muted);
+  font-size: 14px;
+}
+@container storefront (max-width: 700px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

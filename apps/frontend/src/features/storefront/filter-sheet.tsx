@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
+import type { MouseEvent } from "react";
 import { USD_SCOPE } from "@retailor/contracts/currency";
 import { displayMinor, formatMinor } from "@retailor/commerce/currency";
 import { Icon } from "../../components/ui/icon";
@@ -53,7 +54,8 @@ export function FilterSheet({
   actions: StorefrontActions;
 }) {
   const ref = useRef<HTMLDialogElement>(null),
-    opener = useRef<HTMLButtonElement>(null);
+    opener = useRef<HTMLButtonElement>(null),
+    backdropPress = useRef(false);
   const [draft, setDraft] = useState(input.browse.filters),
     [scope, setScope] = useState(input.currency ?? USD_SCOPE);
   const [minimum, setMinimum] = useState(""),
@@ -71,6 +73,16 @@ export function FilterSheet({
       ).length
     : null;
   const close = () => ref.current?.close();
+  const outside = (event: MouseEvent<HTMLDialogElement>) => {
+    if (event.target !== event.currentTarget) return false;
+    const rect = event.currentTarget.getBoundingClientRect();
+    return (
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+    );
+  };
   const priceText = (value: number | null) =>
     value === null
       ? ""
@@ -106,7 +118,22 @@ export function FilterSheet({
         ref={ref}
         className={styles.filterDialog}
         aria-labelledby="store-filters-heading"
-        onClose={() => opener.current?.focus({ preventScroll: true })}
+        onClose={() => {
+          backdropPress.current = false;
+          opener.current?.focus({ preventScroll: true });
+        }}
+        onPointerDown={(event) => {
+          backdropPress.current =
+            event.isPrimary && event.button === 0 && outside(event);
+        }}
+        onPointerCancel={() => {
+          backdropPress.current = false;
+        }}
+        onClick={(event) => {
+          const dismiss = backdropPress.current && outside(event);
+          backdropPress.current = false;
+          if (dismiss) close();
+        }}
       >
         <header className={styles.sheetHeading}>
           <div>

@@ -21,6 +21,25 @@ async function catalogue() {
   return { env, controller, graph: controller.getSnapshot().state.graph };
 }
 describe("one current catalogue across every storefront family", () => {
+  it("finds the same actual jeans by retail label or internal type without changing filter identity", async () => {
+    const { env, controller, graph } = await catalogue();
+    try {
+      const items = storeItems(graph, controller.photos.availableIds());
+      const find = (search: string) =>
+        collection(items, {
+          ...INITIAL_BROWSE,
+          filters: { ...EMPTY_FILTERS, search },
+        }).map(({ product }) => product.id);
+      expect(find("Denim")).toEqual(find("jeans"));
+      expect(find("Denim")).toHaveLength(2);
+      expect(
+        graph.products.filter((product) => product.category === "jeans"),
+      ).toHaveLength(2);
+      expect(find("Shirts")).not.toEqual(find("Denim"));
+    } finally {
+      env.dispose();
+    }
+  });
   it("uses inclusive rounded displayed EUR unit prices rather than inverse USD bounds", async () => {
     const { env, controller, graph } = await catalogue();
     try {
