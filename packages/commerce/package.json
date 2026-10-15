@@ -50,6 +50,14 @@
     "./dashboard": {
       "types": "./dist/dashboard.d.ts",
       "import": "./dist/dashboard.js"
+    },
+    "./shopping": {
+      "types": "./dist/shopping.d.ts",
+      "import": "./dist/shopping.js"
+    },
+    "./checkout": {
+      "types": "./dist/checkout.d.ts",
+      "import": "./dist/checkout.js"
     }
   },
   "scripts": {

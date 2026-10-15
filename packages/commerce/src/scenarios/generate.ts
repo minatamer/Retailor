@@ -11,6 +11,8 @@ import { emptyGraph, parseGraph, freeze, serializedBytes } from "../graph.js";
 import { applyCommand } from "../commands.js";
 import { facts, allActivityScope } from "../facts.js";
 import { stockOf } from "../selectors.js";
+import { completeDemoReviews } from "./reviews.js";
+export { completeDemoReviews } from "./reviews.js";
 const DAY = 86_400_000;
 export const SCENARIO_LABELS: Record<ScenarioPreset, string> = {
   healthy: "Healthy profit",
@@ -419,6 +421,11 @@ export function generateScenario(
   };
   for (const entry of events.sort((a, b) => a.at - b.at))
     apply(entry.type, entry.payload(graph), new Date(entry.at).toISOString());
+  graph = completeDemoReviews(
+    parseGraph(graph),
+    preset,
+    new Set(available.map((product) => product.id)),
+  );
   // Preserve only still sellable selections at their current price, within actual reconstructed stock.
   for (const selected of source.bag) {
     const product = graph.products.find((p) =>

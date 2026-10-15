@@ -44,9 +44,8 @@ export const LogoActionSchema = z.strictObject({
   typography: TypographySchema,
   designRevision: RevisionSchema,
   count: z.literal(3),
-  promptPolicy: z.literal("clothing-brand-v1"),
+  generatorPolicy: z.literal("local-fonts-v1"),
   outputPolicy: z.literal("transparent-png-v1"),
-  disclosureVersion: z.literal("brand-context-v1"),
 });
 export type LogoAction = z.infer<typeof LogoActionSchema>;
 export function parseLogoAction(input: unknown): LogoAction {

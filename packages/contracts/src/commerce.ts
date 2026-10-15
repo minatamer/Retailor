@@ -223,6 +223,7 @@ export const FeedbackSchema = z.strictObject({
   at: TimestampSchema,
   rating: z.number().int().min(1).max(5),
   comment: z.string().max(160),
+  reviewerName: z.string().trim().min(1).max(60).optional(),
   synthetic: z.literal(true),
 });
 export const ProductCopySchema = z.strictObject({

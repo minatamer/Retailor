@@ -42,6 +42,10 @@ export const CapabilitiesSchema = z.strictObject({
   tailor: CapabilitySchema,
   logos: CapabilitySchema,
   eur: CapabilitySchema,
+  checkout: CapabilitySchema.default({
+    available: false,
+    reason: "not-implemented",
+  }),
 });
 export type Capabilities = z.infer<typeof CapabilitiesSchema>;
 export const HealthSchema = z.strictObject({
@@ -55,6 +59,30 @@ export const ReadinessSchema = z.strictObject({
   mode: ModeSchema,
 });
 export const API_ROUTES = {
+  "checkout/identity": {
+    method: "POST",
+    bodyLimit: 1024,
+    responseLimit: 8192,
+    timeoutMs: 5000,
+  },
+  "checkout/start": {
+    method: "POST",
+    bodyLimit: 10 * 1024 * 1024,
+    responseLimit: 8192,
+    timeoutMs: 125000,
+  },
+  "checkout/status": {
+    method: "POST",
+    bodyLimit: 1024,
+    responseLimit: 8192,
+    timeoutMs: 30000,
+  },
+  "checkout/cancel": {
+    method: "POST",
+    bodyLimit: 1024,
+    responseLimit: 8192,
+    timeoutMs: 30000,
+  },
   health: { method: "GET", bodyLimit: 0, responseLimit: 8192, timeoutMs: 5000 },
   ready: { method: "GET", bodyLimit: 0, responseLimit: 8192, timeoutMs: 5000 },
   config: { method: "GET", bodyLimit: 0, responseLimit: 8192, timeoutMs: 5000 },
