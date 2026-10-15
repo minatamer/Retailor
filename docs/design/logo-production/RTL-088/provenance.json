@@ -1,0 +1,38 @@
+{
+  "direction": "RTL-088 owner instruction, 15 October 2026",
+  "colors": {
+    "background": "#242b60",
+    "cart": "#ffffff",
+    "letter": "#242b60"
+  },
+  "geometry": "Exact RTL-039 outlined cart and Inter800 R; only five foreground color attributes reversed. Same 128px canvas and rounded tile.",
+  "websiteUnchanged": [
+    {
+      "path": "apps/frontend/public/brand/retailor-cart.svg",
+      "sha256": "282197fe5c86160b94055cbea72fac54a9d558e2e1130c56ce042f3bb9e0a2e7"
+    },
+    {
+      "path": "apps/frontend/public/brand/retailor-lockup.svg",
+      "sha256": "aa130b420a91d1fcc9b65cfdc2f01e5480af9a1b0ea098cdffad969792859b89"
+    }
+  ],
+  "svgSha256": "737bdb9456811f72ab26b526ea0185f1f4ea19dedf6219f617b45574dfb0f9b2",
+  "sharp": "0.35.5",
+  "assets": [
+    {
+      "path": "apps/frontend/public/favicon.ico",
+      "bytes": 2725,
+      "sha256": "63e566fbff3ad0d8ad6b142df0dab485b730c604fc38fd6968d0b4c2b7403103"
+    },
+    {
+      "path": "apps/frontend/public/favicon-96.png",
+      "bytes": 2272,
+      "sha256": "02010e50592659a29cf10e2f99c1914c76c59ed48bf984902462c1aacd3d56bf"
+    },
+    {
+      "path": "apps/frontend/public/apple-touch-icon.png",
+      "bytes": 4569,
+      "sha256": "b4e8d165c7d56457061e404569009317793f8f03b9cc0e2827ea2784d6d50c94"
+    }
+  ]
+}
