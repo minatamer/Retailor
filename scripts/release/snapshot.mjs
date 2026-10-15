@@ -22,10 +22,20 @@ const identityAssets = new Set([
   "apps/frontend/public/favicon-96.png",
   "apps/frontend/public/apple-touch-icon.png",
 ]);
+const logoAssets = new Set([
+  "apps/backend/scripts/copy-logo-fonts.mjs",
+  "apps/backend/src/brand/fonts/inter.ttf",
+  "apps/backend/src/brand/fonts/editorial.ttf",
+  "apps/backend/src/brand/fonts/modern.ttf",
+  "apps/backend/src/brand/fonts/inter-OFL.txt",
+  "apps/backend/src/brand/fonts/dm-serif-display-OFL.txt",
+  "apps/backend/src/brand/fonts/manrope-OFL.txt",
+]);
 /** Positive build-input inventory. Never open env, visitor or local output files. */
 export function isBuildInput(path) {
   if (fixed.has(path)) return true;
   if (identityAssets.has(path)) return true;
+  if (logoAssets.has(path)) return true;
   if (
     path
       .split("/")
@@ -48,7 +58,7 @@ export function isBuildInput(path) {
     )
   )
     return true;
-  return /^apps\/frontend\/public\/(?:sample\/forme\/(?:F(?:0[1-9]|1[0-9])\.webp|manifest\.json)|fonts\/(?:[a-z0-9-]+\.woff2|[a-z0-9-]+-OFL\.txt|provenance\.json)|landing\/jeans-(?:indigo|black|light)\.webp)$/u.test(
+  return /^apps\/frontend\/public\/(?:sample\/forme\/(?:F(?:0[1-9]|1[0-9])\.webp|manifest\.json)|fonts\/(?:[a-z0-9-]+\.woff2|[a-z0-9-]+-OFL\.txt|provenance\.json)|landing\/(?:jeans-(?:indigo|black|light)\.webp|hero-film\.mp4|hero-poster\.webp|hero-provenance\.json))$/u.test(
     path,
   );
 }

@@ -9,4 +9,6 @@
 *.gif -text
 *.woff -text
 *.woff2 -text
+*.ttf -text
 *.ico -text
+*.mp4 -text
