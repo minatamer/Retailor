@@ -48,8 +48,8 @@
   font-size: 1rem;
 }
 .nameField input:focus-visible {
-  outline: 2px solid var(--platform-focus);
-  outline-offset: 3px;
+  outline: var(--focus-ring-width) solid var(--platform-focus);
+  outline-offset: var(--focus-field-offset);
 }
 .nameField input[aria-invalid="true"] {
   border-color: var(--feedback-error);

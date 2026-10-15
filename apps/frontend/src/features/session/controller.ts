@@ -20,11 +20,14 @@ import {
   DashboardSeriesSchema,
   DashboardTargetSchema,
   dashboardRecord,
+  ExpenseFiltersSchema,
+  INITIAL_EXPENSE_FILTERS,
 } from "../dashboard/state";
 import type {
   DashboardPeriod,
   DashboardSeries,
   DashboardTarget,
+  ExpenseFilters,
 } from "../dashboard/state";
 import { previewCommand } from "@retailor/commerce/effects";
 import { animatePrefill, prefillFields } from "../assistants/operation-prefill";
@@ -44,15 +47,29 @@ import type {
   OwnerView,
 } from "../operations/state";
 import { INITIAL_SHOPPING, SHOPPER_INACTIVITY_MS } from "../bag/state";
+import {
+  ownerInputIssues,
+  ownerFieldIssue,
+  remainingOwnerIssues,
+} from "../operations/validation";
+import type { OwnerFieldIssue } from "../operations/validation";
+import { SUCCESS_LABELS } from "../operations/presentation";
 import type { CheckoutReview } from "../bag/state";
 import { bagEntries, bagWitness, bagTotals } from "../bag/quote";
-import { DesignSchema, withPageTemplates } from "@retailor/contracts/design";
-import type { Design } from "@retailor/contracts/design";
+import {
+  DesignSchema,
+  withPageTemplates,
+  heroPhotoIds,
+  heroPhotoCount,
+} from "@retailor/contracts/design";
+import type { Design, HeroSlot } from "@retailor/contracts/design";
 import type { CommerceGraph } from "@retailor/contracts/commerce";
 import type { Photo } from "@retailor/contracts/photos";
 import { CommandSchema } from "@retailor/contracts/commands";
 import type { CommerceCommand } from "@retailor/contracts/commands";
 import type { ProductInput } from "@retailor/contracts/product";
+import { ProductInputSchema } from "@retailor/contracts/product";
+import { suggestSizeOption } from "../catalogue/size-options";
 import { applyCommand } from "@retailor/commerce/commands";
 import { emptyGraph, freeze } from "@retailor/commerce/graph";
 import { BrowserPhotoCache, CacheConflict } from "../photos/cache";
@@ -200,7 +217,10 @@ export interface SessionSnapshot {
   } | null;
   ownerReview: OwnerReview | null;
   ownerNotice: string;
+  ownerNoticeTone: "info" | "error" | "success";
+  ownerIssues: readonly OwnerFieldIssue[];
   ownerPhotoBusy: boolean;
+  ownerExpenseFilters: ExpenseFilters;
   scenarioReview: ScenarioReview | null;
   bagOpen: boolean;
   bagReceiptId: string | null;
@@ -270,7 +290,10 @@ export class SessionController {
       ownerResult: null,
       ownerReview: null,
       ownerNotice: "",
+      ownerNoticeTone: "info",
+      ownerIssues: [],
       ownerPhotoBusy: false,
+      ownerExpenseFilters: { ...INITIAL_EXPENSE_FILTERS },
       scenarioReview: null,
       bagOpen: false,
       bagReceiptId: null,
@@ -450,6 +473,8 @@ export class SessionController {
             raw.stage === "process");
         this.snapshot.state = {
           ...restored,
+          ownerView:
+            restored.ownerView === "traffic" ? "overview" : restored.ownerView,
           pendingProvider: null,
           ...(restored.designEditing ? { ownerView: "design" as const } : {}),
         };
@@ -798,9 +823,12 @@ export class SessionController {
     if (!this.ownerAllowed() || !OwnerViewSchema.safeParse(view).success)
       return;
     this.stopOwnerPrefill();
-    this.update({ ownerReview: null }, false);
+    this.update(
+      { ownerReview: null, ownerNotice: "", ownerNoticeTone: "info" },
+      false,
+    );
     this.state({
-      ownerView: view,
+      ownerView: view === "traffic" ? "overview" : view,
       ownerSearch: "",
       ownerPage: 0,
       presentationRevision: this.snapshot.state.presentationRevision + 1,
@@ -888,6 +916,18 @@ export class SessionController {
       return;
     this.state({ dashboard: { ...this.snapshot.state.dashboard, page } });
   }
+  setOwnerExpenseFilters(patch: Partial<ExpenseFilters>) {
+    if (!this.ownerAllowed()) return;
+    const parsed = ExpenseFiltersSchema.safeParse({
+      ...this.snapshot.ownerExpenseFilters,
+      ...patch,
+    });
+    if (parsed.success)
+      this.update({ ownerExpenseFilters: parsed.data }, false);
+  }
+  dismissOwnerNotice() {
+    if (this.ownerAllowed()) this.update({ ownerNotice: "" }, false);
+  }
   ownerSearch(value: string) {
     if (!this.ownerAllowed() || value.length > 100) return;
     this.state({ ownerSearch: value, ownerPage: 0 });
@@ -930,6 +970,8 @@ export class SessionController {
           ownerResult: null,
           ownerPhotoBusy: false,
           ownerNotice: "",
+          ownerNoticeTone: "info",
+          ownerIssues: [],
           scenarioReview: null,
         },
         false,
@@ -937,7 +979,11 @@ export class SessionController {
       this.protectDesignPhotos();
     } catch {
       this.update(
-        { ownerNotice: "That form is unavailable. Choose a current record." },
+        {
+          ownerNotice: "That form is unavailable. Choose a current record.",
+          ownerNoticeTone: "error",
+          ownerIssues: [],
+        },
         false,
       );
     }
@@ -946,7 +992,14 @@ export class SessionController {
     this.stopOwnerPrefill();
     this.photos.cancel();
     this.update(
-      { ownerForm: null, ownerReview: null, ownerPhotoBusy: false },
+      {
+        ownerForm: null,
+        ownerReview: null,
+        ownerPhotoBusy: false,
+        ownerIssues: [],
+        ownerNotice: "",
+        ownerNoticeTone: "info",
+      },
       false,
     );
     this.protectDesignPhotos();
@@ -983,12 +1036,28 @@ export class SessionController {
       );
       if (form !== this.snapshot.ownerForm)
         this.update(
-          { ownerForm: form, ownerReview: null, ownerNotice: "" },
+          {
+            ownerForm: form,
+            ownerReview: null,
+            ownerNotice: "",
+            ownerNoticeTone: "info",
+            ownerIssues: this.snapshot.ownerIssues.filter(
+              (issue) => issue.field !== field,
+            ),
+          },
           false,
         );
     } catch {
       this.update(
-        { ownerNotice: "Keep this field within the demo’s supported values." },
+        {
+          ownerNotice: "Keep this field within the demo’s supported values.",
+          ownerNoticeTone: "error",
+          ownerIssues: this.snapshot.ownerForm
+            ? [
+                ownerFieldIssue(this.snapshot.ownerForm, field, "range")!,
+              ].filter(Boolean)
+            : [],
+        },
         false,
       );
     }
@@ -1000,20 +1069,21 @@ export class SessionController {
       this.snapshot.ownerForm.variants.length >= 24
     )
       return;
-    const id = this.id();
-    this.editOwnerRows("variants", [
-      ...this.snapshot.ownerForm.variants,
-      {
-        id,
-        size: "New option",
-        colour: "Unconfirmed",
-        sku: `DEMO-${id.slice(0, 16)}`,
-        price: "60.00",
-        cost: "24.00",
-        stock: "10",
-        archived: false,
-      },
-    ]);
+    const form = this.snapshot.ownerForm;
+    const sizing = ProductInputSchema.shape.sizingSystemId.safeParse(
+      form.fields.sizingSystemId,
+    );
+    const next = suggestSizeOption(
+      form.variants,
+      undefined,
+      sizing.success ? sizing.data : "pending-demo",
+      this.id(),
+    );
+    if (!next) return;
+    this.editOwnerRows("variants", [...form.variants, next]);
+    return this.snapshot.ownerForm?.variants.some((row) => row.id === next.id)
+      ? next.id
+      : undefined;
   }
   editOwnerRows<
     K extends "variants" | "photoIds" | "lines" | "unitsSelection" | "refunds",
@@ -1047,7 +1117,10 @@ export class SessionController {
     });
     if (!parsed.success) {
       this.update(
-        { ownerNotice: "That selection exceeds the supported form limits." },
+        {
+          ownerNotice: "That selection exceeds the supported form limits.",
+          ownerNoticeTone: "error",
+        },
         false,
       );
       return;
@@ -1057,13 +1130,27 @@ export class SessionController {
       parsed.data.photoIds.some((id) => !this.photos.availableIds().has(id))
     ) {
       this.update(
-        { ownerNotice: "Choose a validated available photo." },
+        {
+          ownerNotice: "Choose a validated available photo.",
+          ownerNoticeTone: "error",
+        },
         false,
       );
       return;
     }
     this.update(
-      { ownerForm: parsed.data, ownerReview: null, ownerNotice: "" },
+      {
+        ownerForm: parsed.data,
+        ownerReview: null,
+        ownerNotice: "",
+        ownerNoticeTone: "info",
+        ownerIssues: remainingOwnerIssues(
+          before,
+          parsed.data,
+          key,
+          this.snapshot.ownerIssues,
+        ),
+      },
       false,
     );
     this.protectDesignPhotos();
@@ -1100,6 +1187,7 @@ export class SessionController {
               photos.getSnapshot().issues[0]?.message ??
               photos.getSnapshot().notice ??
               "Choose a valid clothing photo.",
+            ownerNoticeTone: "error",
           },
           false,
         );
@@ -1119,7 +1207,10 @@ export class SessionController {
         },
       );
       if (!next.ok) {
-        this.update({ ownerNotice: next.message }, false);
+        this.update(
+          { ownerNotice: next.message, ownerNoticeTone: "error" },
+          false,
+        );
         return;
       }
       const retained = new Map(state.photos.map((p) => [p.id, p]));
@@ -1133,6 +1224,7 @@ export class SessionController {
         ownerReview: null,
         ownerNotice:
           "Photo checked and available. Review the garment before creating it.",
+        ownerNoticeTone: "success",
       });
       this.editOwnerRows("photoIds", [
         ...new Set([...this.snapshot.ownerForm.photoIds, id]),
@@ -1143,6 +1235,7 @@ export class SessionController {
           {
             ownerNotice:
               "That photo could not be added. Keep or choose another available photo.",
+            ownerNoticeTone: "error",
           },
           false,
         );
@@ -1177,7 +1270,15 @@ export class SessionController {
         availablePhotoIds: this.photos.availableIds(),
       });
       if (!result.ok) {
-        this.update({ ownerReview: null, ownerNotice: result.message }, false);
+        this.update(
+          {
+            ownerReview: null,
+            ownerNotice: result.message,
+            ownerNoticeTone: "error",
+            ownerIssues: [],
+          },
+          false,
+        );
         return;
       }
       if (intent.type === "saveOrderDraft") {
@@ -1203,15 +1304,23 @@ export class SessionController {
           }),
           ownerNotice:
             "Review the exact effects. Nothing has been applied yet.",
+          ownerNoticeTone: "info",
+          ownerIssues: [],
         },
         false,
       );
-    } catch {
+    } catch (error) {
+      const issues = this.snapshot.ownerForm
+        ? ownerInputIssues(this.snapshot.ownerForm, error)
+        : [];
       this.update(
         {
           ownerReview: null,
-          ownerNotice:
-            "Review the required fields, whole quantities, USD amounts and available photo.",
+          ownerIssues: issues,
+          ownerNoticeTone: "error",
+          ownerNotice: issues.length
+            ? ""
+            : "We couldn’t review this change. Your form is kept; try again.",
         },
         false,
       );
@@ -1227,7 +1336,15 @@ export class SessionController {
     const type = this.snapshot.ownerForm.type;
     const result = this.applyCommerce(review.command);
     if (!result.ok) {
-      this.update({ ownerReview: null, ownerNotice: result.message }, false);
+      this.update(
+        {
+          ownerReview: null,
+          ownerNotice: result.message,
+          ownerNoticeTone: "error",
+          ownerIssues: [],
+        },
+        false,
+      );
       return;
     }
     this.closeOwnerOperation();
@@ -1238,8 +1355,8 @@ export class SessionController {
           type,
           effect: review.effect,
         },
-        ownerNotice:
-          "Applied once to this demo. Current records and storefront now reflect the reviewed effect.",
+        ownerNotice: SUCCESS_LABELS[type],
+        ownerNoticeTone: "success",
       },
       false,
     );
@@ -1272,6 +1389,8 @@ export class SessionController {
             ),
           }),
           ownerNotice: "",
+          ownerNoticeTone: "info",
+          ownerIssues: [],
         },
         false,
       );
@@ -1281,6 +1400,7 @@ export class SessionController {
           scenarioReview: null,
           ownerNotice:
             "This story cannot be rebuilt from the current catalogue. Keep your existing records and review availability.",
+          ownerNoticeTone: "error",
         },
         false,
       );
@@ -1304,6 +1424,7 @@ export class SessionController {
           scenarioReview: null,
           ownerNotice:
             "The catalogue, availability or records changed. Review this scenario again.",
+          ownerNoticeTone: "error",
         },
         false,
       );
@@ -1338,6 +1459,9 @@ export class SessionController {
       ownerNotice: review.bagChanged
         ? "Business activity replaced. Bag selections were revalidated against the rebuilt stock/prices."
         : "Business activity replaced. Your catalogue, photos and accepted look are preserved.",
+      ownerNoticeTone: "success",
+      ownerIssues: [],
+      ownerExpenseFilters: { ...INITIAL_EXPENSE_FILTERS },
     });
     this.protectDesignPhotos();
   }
@@ -1568,7 +1692,7 @@ export class SessionController {
         {
           bagOpen: true,
           bagReceiptId: null,
-          bagNotice: "Added to your bag.",
+          bagNotice: "",
         },
         false,
       );
@@ -2360,8 +2484,9 @@ export class SessionController {
         revision: this.snapshot.state.previewDesign.revision + 1,
       });
       if (
-        previewDesign.heroPhotoId &&
-        !this.photos.availableIds().has(previewDesign.heroPhotoId)
+        heroPhotoIds(previewDesign).some(
+          (id) => id !== null && !this.photos.availableIds().has(id),
+        )
       )
         throw new Error("Unavailable hero image");
       this.state({
@@ -2451,8 +2576,8 @@ export class SessionController {
         ),
         ...(this.snapshot.ownerForm?.photoIds ?? []),
         ...[
-          state.acceptedDesign.heroPhotoId,
-          state.previewDesign.heroPhotoId,
+          ...heroPhotoIds(state.acceptedDesign),
+          ...heroPhotoIds(state.previewDesign),
         ].filter((id): id is string => id !== null),
       ]),
     ]);
@@ -2880,8 +3005,9 @@ export class SessionController {
         draft = setup.brandDraft ?? brandValues(state.previewDesign);
       if (setup === state.setup) return;
       if (
-        draft.heroPhotoId &&
-        !this.photos.availableIds().has(draft.heroPhotoId)
+        heroPhotoIds(draft).some(
+          (id) => id !== null && !this.photos.availableIds().has(id),
+        )
       )
         return;
       this.state({ setup: reconcileSetup(setup, state.previewDesign) });
@@ -2890,6 +3016,7 @@ export class SessionController {
         name: draft.name.trim() || state.previewDesign.name,
         headline: draft.headline,
         heroPhotoId: draft.heroPhotoId,
+        additionalHeroPhotoIds: draft.additionalHeroPhotoIds,
       };
       if (
         JSON.stringify(brandValues(preview)) !==
@@ -3380,10 +3507,33 @@ export class SessionController {
     this.protectDesignPhotos();
     this.update({ preparedLogo: null, heroBusy: false }, false);
   }
-  async uploadHero(file: NamedPhoto) {
+  heroInput(slot: HeroSlot, photoId: string | null) {
+    const state = this.snapshot.state;
+    if (
+      !Number.isInteger(slot) ||
+      slot < 0 ||
+      slot >= heroPhotoCount(state.previewDesign) ||
+      (photoId !== null && !this.photos.availableIds().has(photoId))
+    )
+      return;
+    const ids = heroPhotoIds(
+      state.setup.brandDraft ?? brandValues(state.previewDesign),
+    );
+    for (const index of [0, 1, 2] as const)
+      if (index === slot) ids[index] = photoId;
+      else if (photoId !== null && ids[index] === photoId) ids[index] = null;
+    this.brandInput({
+      heroPhotoId: ids[0],
+      additionalHeroPhotoIds: [ids[1], ids[2]],
+    });
+  }
+  async uploadHero(file: NamedPhoto, slot: HeroSlot = 0) {
     const state = this.snapshot.state;
     if (
       !this.valid() ||
+      !Number.isInteger(slot) ||
+      slot < 0 ||
+      slot >= heroPhotoCount(state.previewDesign) ||
       !["style", "dashboard"].includes(state.stage) ||
       this.snapshot.heroBusy ||
       (state.stage === "dashboard" && !state.designEditing)
@@ -3418,7 +3568,7 @@ export class SessionController {
       );
       for (const photo of photos.descriptors()) retained.set(photo.id, photo);
       this.state({ photos: [...retained.values()] });
-      this.brandInput({ heroPhotoId: id });
+      this.heroInput(slot, id);
     } catch {
       if (this.active && generation === this.generation)
         this.update({
@@ -3520,7 +3670,10 @@ export class SessionController {
       ownerResult: null,
       ownerReview: null,
       ownerNotice: "",
+      ownerNoticeTone: "info",
+      ownerIssues: [],
       ownerPhotoBusy: false,
+      ownerExpenseFilters: { ...INITIAL_EXPENSE_FILTERS },
       scenarioReview: null,
       bagOpen: false,
       bagReceiptId: null,

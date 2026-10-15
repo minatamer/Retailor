@@ -38,12 +38,13 @@ export function OwnerDesign({ preview }: { preview: ReactNode }) {
     <section className={styles.panel} aria-labelledby="owner-design-title">
       <header>
         <div>
-          <span>Design</span>
+          <span>Personalize</span>
           <h2 id="owner-design-title" ref={headingRef} tabIndex={-1}>
             A look that feels like you.
           </h2>
           <p>
-            One complete storefront. Your products and records stay connected.
+            Personalize page layouts, colours, type and branding. Your products
+            and records stay connected.
           </p>
         </div>
         {!state.designEditing && (
@@ -52,7 +53,7 @@ export function OwnerDesign({ preview }: { preview: ReactNode }) {
             variant="secondary"
             onClick={() => controller.beginOwnerDesign()}
           >
-            Edit store design
+            Personalize store
           </Button>
         )}
       </header>
@@ -71,7 +72,7 @@ export function OwnerDesign({ preview }: { preview: ReactNode }) {
           </p>
           <div className={styles.layout}>
             <div ref={controlsRef} className={styles.controls}>
-              <nav className={styles.tabs} aria-label="Owner design fields">
+              <nav className={styles.tabs} aria-label="Personalization options">
                 {(Object.keys(FIELDS) as (keyof typeof FIELDS)[]).map((key) => (
                   <Choice
                     key={key}

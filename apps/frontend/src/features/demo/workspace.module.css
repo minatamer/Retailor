@@ -1,6 +1,52 @@
 .workspace {
+  --owner-sidebar-width: 0px;
   min-height: 100svh;
   background: var(--platform-canvas);
+  padding-left: var(--owner-sidebar-width);
+  transition: padding-left 420ms var(--ease-out);
+}
+.workspace[data-full-page="true"] {
+  display: flex;
+  flex-direction: column;
+}
+.workspace[data-full-page="true"] .main {
+  flex: 1;
+}
+.workspace[data-storefront-workspace="true"] .main {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+.workspace[data-owner-workspace="true"] .main {
+  width: 100%;
+  margin: 0;
+  padding: 30px clamp(16px, 3vw, 48px) 120px;
+}
+.workspace[data-full-page="true"] .stage {
+  animation-name: owner-arrive;
+}
+.workspace[data-full-page="true"] .notice:empty {
+  display: none;
+}
+.workspace[data-storefront-workspace="true"] :is(.notice, .recovery, .repair) {
+  margin-inline: clamp(16px, 4vw, 64px);
+  margin-bottom: 24px;
+}
+@media (min-width: 901px) {
+  .workspace[data-owner-workspace="true"] {
+    --owner-sidebar-width: 248px;
+  }
+  .workspace[data-owner-workspace="true"]:has([data-owner-collapsed="true"]) {
+    --owner-sidebar-width: 76px;
+  }
+}
+@keyframes owner-arrive {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .header {
   padding: 18px clamp(16px, 4vw, 64px);
@@ -162,6 +208,43 @@
   border-top: 1px solid var(--platform-line);
   padding: 20px clamp(16px, 4vw, 64px) max(20px, env(safe-area-inset-bottom));
   color: var(--platform-text);
+}
+.footer[data-full-page="true"] {
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-block: 12px max(20px, env(safe-area-inset-bottom));
+}
+.attribution {
+  margin: 0;
+  color: var(--platform-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.attribution a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--platform-text);
+  font-weight: 650;
+}
+.footerActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 20px;
+}
+.footerActions button {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--platform-muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .processing {
   text-align: center;
@@ -451,11 +534,8 @@
   line-height: 1.5;
 }
 .coverage {
-  margin-top: 35px;
-  border-top: 1px solid var(--platform-line);
-  padding: 24px 0;
+  margin-top: 8px;
 }
-.coverage h2,
 .repair h2 {
   font-size: 17px;
   font-weight: 550;
@@ -606,6 +686,9 @@
   }
 }
 @media (max-width: 620px) {
+  .footer[data-full-page="true"] {
+    padding-bottom: max(88px, env(safe-area-inset-bottom));
+  }
   .main {
     width: calc(100% - 28px);
     padding-top: 24px;
@@ -658,23 +741,6 @@
   .header button {
     padding-inline: 10px;
     font-size: 12px;
-  }
-  .header[data-store-actions="true"] {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 12px;
-  }
-  .header[data-store-actions="true"] .headerActions {
-    display: contents;
-  }
-  .header[data-store-actions="true"] .headerActions > button:first-child {
-    justify-self: end;
-  }
-  .header[data-store-actions="true"] .headerActions > button:not(:first-child) {
-    align-self: stretch;
-    width: 100%;
-    gap: 6px;
-    padding-inline: 8px;
   }
   .wordmark {
     font-size: 25px;

@@ -5,6 +5,7 @@ import {
   TypographySchema,
   PageTemplatesSchema,
   resolvedTemplates,
+  AdditionalHeroPhotosSchema,
 } from "@retailor/contracts/design";
 import type { Design } from "@retailor/contracts/design";
 import { IdSchema } from "@retailor/contracts/core";
@@ -13,9 +14,15 @@ export const BrandDraftSchema = z.strictObject({
   name: z.string().max(40),
   headline: z.string().max(100),
   heroPhotoId: IdSchema.nullable(),
+  additionalHeroPhotoIds: AdditionalHeroPhotosSchema.default([null, null]),
 });
 export type BrandDraft = z.infer<typeof BrandDraftSchema>;
-export const CLEAN_BRAND = { name: false, headline: false, heroPhotoId: false };
+export const CLEAN_BRAND = {
+  name: false,
+  headline: false,
+  heroPhotoId: false,
+  additionalHeroPhotoIds: false,
+};
 export const SetupStepSchema = z.enum([
   "introduction",
   "template",
@@ -40,6 +47,7 @@ export const SetupSchema = z.strictObject({
       name: z.boolean(),
       headline: z.boolean(),
       heroPhotoId: z.boolean(),
+      additionalHeroPhotoIds: z.boolean().default(false),
     })
     .default(CLEAN_BRAND),
 });
@@ -62,6 +70,7 @@ export function brandValues(design: Design): BrandDraft {
     name: design.name,
     headline: design.headline,
     heroPhotoId: design.heroPhotoId,
+    additionalHeroPhotoIds: design.additionalHeroPhotoIds ?? [null, null],
   };
 }
 export function updateBrand(
@@ -85,6 +94,15 @@ export function updateBrand(
         draft[key] = value;
       if (origin === "human") dirty[key] = true;
     }
+  }
+  if (
+    "additionalHeroPhotoIds" in patch &&
+    (origin === "human" || !dirty.additionalHeroPhotoIds)
+  ) {
+    draft.additionalHeroPhotoIds = AdditionalHeroPhotosSchema.parse(
+      patch.additionalHeroPhotoIds,
+    );
+    if (origin === "human") dirty.additionalHeroPhotoIds = true;
   }
   const parsed = BrandDraftSchema.parse(draft);
   const changed = JSON.stringify(parsed) !== JSON.stringify(previous);

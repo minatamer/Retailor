@@ -12,7 +12,7 @@ export function ExpenseForm() {
           name="expenseCategory"
           label="Demo operating expense category"
           choices={["marketing", "packaging", "platform", "operations"].map(
-            (id) => ({ id, label: id }),
+            (id) => ({ id, label: id.charAt(0).toUpperCase() + id.slice(1) }),
           )}
         />
       )}{" "}

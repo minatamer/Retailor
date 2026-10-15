@@ -2,7 +2,11 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Design, StorePage } from "@retailor/contracts/design";
-import { resolvedTemplates, DEFAULT_THEME } from "@retailor/contracts/design";
+import {
+  resolvedTemplates,
+  DEFAULT_THEME,
+  heroPhotoIds,
+} from "@retailor/contracts/design";
 import { Button, Choice } from "../../components/ui/button";
 import { formatDisplay, formatMinor } from "@retailor/commerce/currency";
 import { selectedScope } from "../currency/display";
@@ -15,7 +19,7 @@ import {
   layoutLabel,
 } from "../store-design/presets";
 import { PageLayouts } from "../store-design/page-layouts";
-import { namedFiles } from "../photos/photo-picker";
+import { HeroPhotos } from "../store-design/hero-photos";
 import { GarmentImage } from "../storefront/gallery";
 import { logoEligible, brandValues } from "./setup";
 import type { SetupStep } from "./setup";
@@ -26,8 +30,8 @@ import { Tour } from "./tour";
 import { roleOf } from "./context";
 const PROMPTS: Record<SetupStep, { title: string; text: string }> = {
   introduction: {
-    title: "Hello, possibility.",
-    text: "I’m Tailor. Your clothes already have a home. Let’s give it a look that feels like you.",
+    title: "Let’s personalize your store.",
+    text: "I’m Tailor. Start with a look, then personalize page layouts, colours, type and branding around your clothes.",
   },
   template: {
     title: "A home for your collection.",
@@ -43,7 +47,7 @@ const PROMPTS: Record<SetupStep, { title: string; text: string }> = {
   },
   brand: {
     title: "Make it yours.",
-    text: "Give your collection a name, a line and, if you like, a hero photo. The suggested details are ready to use.",
+    text: "Give your collection a name, a line and hero photos that match your Home layout. The suggested details are ready to use.",
   },
   logo: {
     title: "Your name, beautifully set.",
@@ -188,7 +192,7 @@ export function Tailor() {
           </span>
           <span>
             <strong>
-              {creator ? "Continue styling with Tailor" : "Meet Tailor"}
+              {creator ? "Personalize with Tailor" : "Meet Tailor"}
             </strong>
             <small>
               {creator
@@ -210,7 +214,7 @@ export function Tailor() {
               <strong>Tailor</strong>
               <small>
                 {creator
-                  ? "Your creative companion"
+                  ? "Your personalization guide"
                   : state.stage === "dashboard"
                     ? "Owner companion"
                     : "Store companion"}
@@ -229,12 +233,14 @@ export function Tailor() {
                 <Recap />
                 <article className={styles.message} key={state.setup.step}>
                   <span className={styles.kicker}>
-                    {LABELS[state.setup.step]} · Make it yours
+                    {LABELS[state.setup.step]} · Personalize
                   </span>
                   <h2 id="tailor-title" ref={heading} tabIndex={-1}>
-                    {prompt.title}
+                    <PromptText text={prompt.title} />
                   </h2>
-                  <p>{prompt.text}</p>
+                  <p>
+                    <PromptText text={prompt.text} delay={620} />
+                  </p>
                   {state.setup.step === "introduction" && (
                     <>
                       <div className={styles.welcomeArt} aria-hidden="true">
@@ -245,7 +251,7 @@ export function Tailor() {
                       <Button
                         onClick={() => controller.stylingStep("template")}
                       >
-                        Let’s style it <Icon name="arrow" />
+                        Let’s personalize <Icon name="arrow" />
                       </Button>
                     </>
                   )}
@@ -303,8 +309,8 @@ export function Tailor() {
                           {TYPOGRAPHIES[state.previewDesign.typography].label}
                         </span>
                         <small>
-                          {state.previewDesign.heroPhotoId
-                            ? "Supplied hero photo"
+                          {heroPhotoIds(state.previewDesign).some(Boolean)
+                            ? "Selected hero photos"
                             : "Your actual clothes in the hero"}{" "}
                           ·{" "}
                           {state.previewDesign.logoId
@@ -340,17 +346,26 @@ export function Tailor() {
                 )}
               </>
             ) : (
-              <article className={styles.message}>
+              <article className={styles.message} key={state.stage}>
                 <span className={styles.kicker}>Welcome back</span>
                 <h2 id="tailor-title" ref={heading} tabIndex={-1}>
-                  {state.stage === "dashboard"
-                    ? "A clearer picture."
-                    : "Find your kind of clothing."}
+                  <PromptText
+                    text={
+                      state.stage === "dashboard"
+                        ? "A clearer picture."
+                        : "Find your kind of clothing."
+                    }
+                  />
                 </h2>
                 <p>
-                  {state.stage === "dashboard"
-                    ? "Your products and these figures share one collection. Start with the overview, or refine your store’s look."
-                    : "Explore the clothes, open their details and find a fit. Your store remembers where you were."}
+                  <PromptText
+                    text={
+                      state.stage === "dashboard"
+                        ? "Your products and these figures share one collection. Start with the overview, or personalize your store."
+                        : "Explore the clothes, open their details and find a fit. Your store remembers where you were."
+                    }
+                    delay={620}
+                  />
                 </p>
                 <div className={styles.actions}>
                   {state.stage === "dashboard" ? (
@@ -361,7 +376,7 @@ export function Tailor() {
                           controller.toggleTailor(false);
                         }}
                       >
-                        Open Design controls
+                        Personalize store
                       </Button>
                       <Button
                         variant="secondary"
@@ -397,7 +412,7 @@ export function Tailor() {
                         variant="secondary"
                         onClick={() => controller.go("style")}
                       >
-                        Revisit my look
+                        Personalize store
                       </Button>
                     </>
                   )}
@@ -424,6 +439,30 @@ export function Tailor() {
       )}
       <Tour />
     </aside>
+  );
+}
+function PromptText({ text, delay = 180 }: { text: string; delay?: number }) {
+  return (
+    <>
+      <span className={styles.srOnly}>{text}</span>
+      <span aria-hidden="true">
+        {text.split(/(\s+)/).map((part, index) =>
+          part.trim() ? (
+            <span
+              key={index}
+              className={styles.promptWord}
+              style={
+                { "--word-delay": `${delay + index * 22}ms` } as CSSProperties
+              }
+            >
+              {part}
+            </span>
+          ) : (
+            part
+          ),
+        )}
+      </span>
+    </>
   );
 }
 function Recap() {
@@ -634,11 +673,8 @@ export function DesignChoices({
   );
 }
 export function BrandFields() {
-  const { controller, state, heroBusy } = useSession(),
+  const { controller, state } = useSession(),
     draft = state.setup.brandDraft ?? brandValues(state.previewDesign);
-  const photos = state.photos.filter((p) =>
-    controller.photos.availableIds().has(p.id),
-  );
   return (
     <div className={styles.brandFields}>
       <label>
@@ -663,41 +699,7 @@ export function BrandFields() {
           }
         />
       </label>
-      <label>
-        Hero photo
-        <select
-          value={draft.heroPhotoId ?? ""}
-          onChange={(event) =>
-            controller.brandInput({ heroPhotoId: event.target.value || null })
-          }
-        >
-          <option value="">Use the collection’s first available photo</option>
-          {photos.map((photo, i) => (
-            <option key={photo.id} value={photo.id}>
-              {state.graph.products.find((p) => p.imageIds.includes(photo.id))
-                ?.title ?? `Supplied photo ${i + 1}`}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className={styles.upload}>
-        {" "}
-        {heroBusy ? "Checking your hero photo…" : "Upload a hero photo"}
-        <input
-          type="file"
-          disabled={heroBusy}
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(event) => {
-            const file = namedFiles(event.target.files)[0];
-            event.target.value = "";
-            if (file) void controller.uploadHero(file);
-          }}
-        />
-      </label>
-      <p className={styles.note}>
-        Optional JPEG, PNG or WebP, up to 4 MiB. A hero photo is separate from
-        product recognition.
-      </p>
+      <HeroPhotos />
     </div>
   );
 }

@@ -59,8 +59,8 @@ it("preserves explicit coverage, prior copy and grouping provenance through spli
     ...first.product,
     title: "My title",
   });
-  expect(edited.corrections[0]!.before.title).toBe("Straight-leg jeans");
-  expect(original.items[0]!.product.title).toBe("Straight-leg jeans");
+  expect(edited.corrections[0]!.before.title).toBe("Straight-leg Jeans");
+  expect(original.items[0]!.product.title).toBe("Straight-leg Jeans");
   const merged = mergeDraft(edited, [
     edited.items[0]!.product.id,
     edited.items[1]!.product.id,

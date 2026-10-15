@@ -126,8 +126,8 @@
   border-color: var(--platform-action);
 }
 .upload:focus-within {
-  outline: 3px solid var(--platform-focus);
-  outline-offset: 3px;
+  outline: var(--focus-ring-width) solid var(--platform-focus);
+  outline-offset: var(--focus-field-offset);
 }
 .upload svg {
   color: var(--platform-action);
@@ -204,8 +204,8 @@
   box-shadow: 0 0 0 2px var(--platform-control-line);
 }
 .openPhoto:focus-visible {
-  outline: 3px solid var(--platform-text);
-  outline-offset: 4px;
+  outline: var(--focus-ring-width) solid var(--platform-text);
+  outline-offset: var(--focus-ring-offset);
 }
 .linkHeading {
   display: flex;
@@ -336,8 +336,8 @@
   background: var(--platform-soft);
 }
 .replace:focus-within {
-  outline: 3px solid var(--platform-focus);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--platform-focus);
+  outline-offset: var(--focus-field-offset);
 }
 .issues {
   padding: 0;

@@ -1,4 +1,5 @@
 "use client";
+import { CATEGORY_LABELS } from "@retailor/contracts/product";
 import { useMemo } from "react";
 import { useSession } from "../session/context";
 import { dashboardModel, PERIOD_LABELS, factDisplay, labelOf } from "./model";
@@ -205,7 +206,7 @@ export function DashboardOverview() {
           note="Current catalogue categories group exact historical product contributions. Signed contributions use bars around zero; a category rename does not rewrite old order snapshots."
           marks={model.categories.map((r) => ({
             key: r.category,
-            label: r.category.replaceAll("-", " "),
+            label: CATEGORY_LABELS[r.category],
             fact: r.fact,
             target: { kind: "category", category: r.category },
           }))}

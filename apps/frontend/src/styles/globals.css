@@ -26,8 +26,13 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 summary:focus-visible {
-  outline: 3px solid var(--platform-focus);
-  outline-offset: 5px;
+  outline: var(--focus-ring-width) solid var(--platform-focus);
+  outline-offset: var(--focus-ring-offset);
+}
+input:not([type="checkbox"], [type="radio"]):focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline-offset: var(--focus-field-offset);
 }
 button {
   -webkit-tap-highlight-color: transparent;

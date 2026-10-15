@@ -25,6 +25,9 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --radius: 16px;
   --radius-small: 8px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-field-offset: -2px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;

@@ -10,10 +10,23 @@
   overflow: hidden;
 }
 .desktop {
-  position: sticky;
-  top: 20px;
-  height: calc(100dvh - 120px);
-  min-height: 280px;
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 20;
+  width: var(--owner-sidebar-width);
+  border-radius: 0;
+  overflow-y: auto;
+  transition: width 420ms var(--ease-out);
+}
+.desktop .brand {
+  flex-shrink: 0;
+}
+.desktop .navigation {
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.desktop .collapse {
+  margin-top: auto;
 }
 .brand {
   display: flex;

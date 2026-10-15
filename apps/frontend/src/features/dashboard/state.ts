@@ -42,6 +42,17 @@ export type DashboardPeriod = z.infer<typeof DashboardPeriodSchema>;
 export type DashboardSeries = z.infer<typeof DashboardSeriesSchema>;
 export type DashboardTarget = z.infer<typeof DashboardTargetSchema>;
 export const INITIAL_DASHBOARD = DashboardStateSchema.parse({});
+export const ExpenseFiltersSchema = z.strictObject({
+  month: z.union([z.literal(""), z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/u)]),
+  category: z.union([z.literal("all"), ExpenseCategorySchema]),
+  sort: z.enum(["newest", "oldest"]),
+});
+export type ExpenseFilters = z.infer<typeof ExpenseFiltersSchema>;
+export const INITIAL_EXPENSE_FILTERS: ExpenseFilters = {
+  month: "",
+  category: "all",
+  sort: "newest",
+};
 export function dashboardRecord(graph: CommerceGraph, reference: string) {
   const separator = reference.indexOf(":"),
     kind = reference.slice(0, separator),

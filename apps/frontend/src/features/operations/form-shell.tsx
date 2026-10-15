@@ -1,11 +1,13 @@
 "use client";
-import { useEffect, useId, useRef } from "react";
+import { useCallback, useEffect, useId, useRef } from "react";
 import { formatUsd } from "@retailor/commerce/money";
 import { productReferenced } from "@retailor/commerce/selectors";
 import { Button } from "../../components/ui/button";
+import { Icon } from "../../components/ui/icon";
+import { CONFIRM_LABELS } from "./presentation";
 import { useSession } from "../session/context";
 import type { OwnerOperationType } from "./state";
-import { ownerIntent } from "./state";
+import { requiredProductIssues, visibleOwnerIssues } from "./validation";
 import { ReviewSummary } from "./review-summary";
 import { ProductForm } from "./product-form";
 import { OrderForm } from "./order-form";
@@ -43,14 +45,35 @@ export function FormShell({ inline = false }: { inline?: boolean }) {
     ownerForm,
     ownerReview,
     ownerNotice,
+    ownerNoticeTone,
+    ownerIssues,
     ownerPhotoBusy,
     ownerFilling,
     state,
   } = useSession();
   const heading = useRef<HTMLHeadingElement>(null),
+    formElement = useRef<HTMLFormElement>(null),
     opener = useRef<HTMLElement | null>(null),
     dialog = useRef<HTMLDialogElement>(null),
     titleId = useId();
+  const focusField = useCallback((field: string) => {
+    const control = Array.from(
+      formElement.current?.querySelectorAll<HTMLElement>(
+        "[data-owner-field]",
+      ) ?? [],
+    ).find(
+      (node) =>
+        node.dataset.ownerField === field &&
+        !node.matches(":disabled") &&
+        node.getClientRects().length,
+    );
+    control?.focus({ preventScroll: true });
+    control?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, []);
+  useEffect(() => {
+    if (ownerNoticeTone === "error" && ownerIssues[0])
+      focusField(ownerIssues[0].field);
+  }, [ownerIssues, ownerNoticeTone, focusField]);
   useEffect(() => {
     const node = dialog.current;
     opener.current =
@@ -72,7 +95,7 @@ export function FormShell({ inline = false }: { inline?: boolean }) {
     heading.current?.focus({ preventScroll: true });
     if (inline)
       heading.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    else dialog.current?.scrollTo({ top: 0, behavior: "smooth" });
+    else formElement.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [inline, ownerForm?.id, ownerReview?.command.id]);
   if (!ownerForm) return null;
   const type = ownerForm.type,
@@ -83,26 +106,15 @@ export function FormShell({ inline = false }: { inline?: boolean }) {
       state.graph.orderDrafts.some((d) =>
         d.lines.some((l) => product.variants.some((v) => v.id === l.variantId)),
       ));
-  let missing = "";
-  if (type === "createProduct" || type === "updateProduct") {
-    if (
-      !ownerForm.photoIds.length ||
-      !ownerForm.photoIds.every((id) =>
-        controller.photos.availableIds().has(id),
-      )
-    )
-      missing = "Choose at least one available clothing photograph.";
-    else if (!ownerForm.fields.title?.trim())
-      missing = "Give this garment a title.";
-    else {
-      try {
-        ownerIntent(ownerForm, state.graph);
-      } catch {
-        missing =
-          "Review the category, option labels, USD prices and whole stock quantities.";
-      }
-    }
-  }
+  const missing = requiredProductIssues(
+    ownerForm,
+    controller.photos.availableIds(),
+  );
+  const issues = visibleOwnerIssues(
+    ownerForm,
+    ownerIssues,
+    controller.photos.availableIds(),
+  );
   const Panel = inline ? "section" : "dialog";
   return (
     <Panel
@@ -123,33 +135,52 @@ export function FormShell({ inline = false }: { inline?: boolean }) {
         </h2>
         <Button
           variant="quiet"
+          aria-label="Cancel form"
           onClick={() => controller.closeOwnerOperation()}
         >
-          Cancel form
+          <Icon name="close" />
         </Button>
       </div>
-      <p>Current records · Owner amounts in USD · Temporary local demo</p>
-      <div className={styles.actions}>
-        <Button
-          type="button"
-          variant="quiet"
-          onClick={() =>
-            controller.moveOwnerForm(inline ? "dashboard" : "tailor")
-          }
-        >
-          {inline ? "Open full form" : "Continue in Tailor"}
-        </Button>
-        {ownerFilling && (
-          <Button
-            type="button"
-            variant="quiet"
-            onClick={() => controller.stopOwnerPrefill()}
-          >
-            Stop suggested fill
-          </Button>
-        )}
+      <div className={styles.workflow}>
+        <ol aria-label="Operation progress">
+          <li aria-current={!ownerReview ? "step" : undefined}>
+            <span>1</span>Details
+          </li>
+          <li aria-current={ownerReview ? "step" : undefined}>
+            <span>2</span>Review
+          </li>
+        </ol>
+        <p role="status">
+          {ownerReview
+            ? "Check your changes before applying."
+            : "Make your changes, then review."}
+        </p>
       </div>
+      {(inline || ownerFilling) && (
+        <div className={styles.actions}>
+          {inline && (
+            <Button
+              type="button"
+              variant="quiet"
+              onClick={() => controller.moveOwnerForm("dashboard")}
+            >
+              Open full form
+            </Button>
+          )}
+          {ownerFilling && (
+            <Button
+              type="button"
+              variant="quiet"
+              onClick={() => controller.stopOwnerPrefill()}
+            >
+              Stop suggested fill
+            </Button>
+          )}
+        </div>
+      )}
       <form
+        className={styles.form}
+        ref={formElement}
         onSubmit={(event) => {
           event.preventDefault();
           controller.reviewOwnerOperation();
@@ -189,81 +220,138 @@ export function FormShell({ inline = false }: { inline?: boolean }) {
             ) : (
               <OrderForm />
             )}
-            <div className={styles.actions}>
-              <Button type="submit" disabled={ownerPhotoBusy || !!missing}>
-                Review exact effects
+            {issues.length > 0 && (
+              <div
+                className={styles.errorSummary}
+                role={ownerIssues.length ? "alert" : "status"}
+              >
+                <strong>Check the highlighted fields</strong>
+                <ul>
+                  {issues.map((issue) => (
+                    <li key={issue.field}>
+                      <button
+                        type="button"
+                        onClick={() => focusField(issue.field)}
+                      >
+                        {issue.message}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className={styles.submitBar}>
+              <span>Next: check the changes.</span>
+              <Button
+                type="submit"
+                disabled={ownerPhotoBusy || missing.length > 0}
+              >
+                Review changes <Icon name="arrow" size={16} />
               </Button>
             </div>
-            {missing && <p role="status">{missing}</p>}
           </>
         ) : (
           <>
             <ReviewSummary />
-            <div className={styles.effect}>
-              <h3>Exactly what changes</h3>
-              <dl>
-                {[
-                  ["Net merchandise", ownerReview.effect.netSales],
-                  ["Sold cost", ownerReview.effect.soldCost],
-                  ["Operating expenses", ownerReview.effect.expenses],
-                  ["Inventory loss", ownerReview.effect.inventoryLoss],
-                  ["Demo result", ownerReview.effect.operatingResult],
-                ].map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd>{formatUsd(Number(value))}</dd>
-                  </div>
-                ))}
-              </dl>
-              {ownerReview.effect.stock.map((change) => {
-                const p = state.graph.products.find((p) =>
-                    p.variants.some((v) => v.id === change.variantId),
-                  ),
-                  v = p?.variants.find((v) => v.id === change.variantId);
-                return (
-                  <p key={change.variantId}>
-                    {p?.title ?? ownerForm.fields.title ?? "New garment"} ·{" "}
-                    {v?.size ??
-                      ownerForm.variants.find((v) => v.id === change.variantId)
-                        ?.size}{" "}
-                    · Stock {change.before} → {change.after}
-                  </p>
-                );
-              })}
-              <details>
-                <summary>Affected record references</summary>
-                <ul>
-                  {ownerReview.effect.refs.map((ref) => (
-                    <li key={ref}>{ref}</li>
-                  ))}
-                </ul>
-              </details>
-            </div>
-            <p>
-              No payment or shipment occurs. Confirmation applies this exact
-              current review once.
-            </p>
-            <div className={styles.actions}>
-              <Button
-                type="button"
-                onClick={() => controller.confirmOwnerOperation(ownerReview)}
-              >
-                {OPERATION_LABELS[type]}
-              </Button>
+            <EffectReview />
+            <div className={styles.submitBar}>
               <Button
                 type="button"
                 variant="secondary"
                 onClick={() => controller.editOwnerReview()}
               >
-                Back to editable fields
+                Back to details
+              </Button>
+              <Button
+                type="button"
+                onClick={() => controller.confirmOwnerOperation(ownerReview)}
+              >
+                {CONFIRM_LABELS[type]} <Icon name="check" size={16} />
               </Button>
             </div>
           </>
         )}
       </form>
-      <p className={styles.notice} role="status">
-        {ownerNotice}
-      </p>
+      {ownerNotice && (!ownerReview || ownerNoticeTone === "error") && (
+        <p
+          className={styles.notice}
+          data-tone={ownerNoticeTone}
+          role={ownerNoticeTone === "error" ? "alert" : "status"}
+        >
+          {ownerNoticeTone === "error" && <strong>Unable to continue. </strong>}
+          {ownerNotice}
+        </p>
+      )}
     </Panel>
+  );
+}
+
+function EffectReview() {
+  const { ownerReview, ownerForm, state } = useSession();
+  if (!ownerReview || !ownerForm) return null;
+  const amounts = [
+    { label: "Net merchandise", value: ownerReview.effect.netSales },
+    { label: "Sold cost", value: ownerReview.effect.soldCost },
+    { label: "Operating expenses", value: ownerReview.effect.expenses },
+    { label: "Inventory loss", value: ownerReview.effect.inventoryLoss },
+    { label: "Demo result", value: ownerReview.effect.operatingResult },
+  ];
+  const changed = amounts.filter((amount) => amount.value !== 0);
+  return (
+    <>
+      {changed.length > 0 && (
+        <section className={styles.effect}>
+          <h3>Impact of this change</h3>
+          <dl>
+            {changed.map((amount) => (
+              <div key={amount.label}>
+                <dt>{amount.label}</dt>
+                <dd>{formatUsd(amount.value)}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+      {ownerReview.effect.stock.map((change) => {
+        const product = state.graph.products.find((p) =>
+            p.variants.some((v) => v.id === change.variantId),
+          ),
+          variant = product?.variants.find((v) => v.id === change.variantId);
+        return (
+          <div className={styles.stockImpact} key={change.variantId}>
+            <span>
+              {product?.title ?? ownerForm.fields.title ?? "New garment"} ·{" "}
+              {variant?.size ??
+                ownerForm.variants.find((v) => v.id === change.variantId)?.size}
+            </span>
+            <strong>
+              {change.before}
+              <Icon name="arrow" />
+              {change.after}
+              <small>available units</small>
+            </strong>
+          </div>
+        );
+      })}
+      <details className={styles.accounting}>
+        <summary>Accounting & record details</summary>
+        <dl>
+          {amounts.map((amount) => (
+            <div key={amount.label}>
+              <dt>{amount.label}</dt>
+              <dd>{formatUsd(amount.value)}</dd>
+            </div>
+          ))}
+        </dl>
+        <ul>
+          {ownerReview.effect.refs.map((ref) => (
+            <li key={ref}>{ref}</li>
+          ))}
+        </ul>
+      </details>
+      <p className={styles.demoNote}>
+        Demo changes only. No payment or shipment.
+      </p>
+    </>
   );
 }

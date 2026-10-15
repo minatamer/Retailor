@@ -60,8 +60,8 @@
 .referenceList button:focus-visible,
 .proposal button:focus-visible,
 .composerActions button:focus-visible {
-  outline: 2px solid var(--platform-action);
-  outline-offset: 3px;
+  outline: var(--focus-ring-width) solid var(--platform-action);
+  outline-offset: var(--focus-ring-offset);
 }
 .history {
   display: grid;
@@ -149,23 +149,31 @@
   background: var(--platform-surface);
   color: var(--platform-text);
   font: inherit;
-  font-size: 14px;
+  font-size: 16px;
   min-height: 80px;
   max-height: 200px;
   resize: vertical;
 }
 .composer textarea:focus {
-  outline: 2px solid var(--platform-action);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--platform-action);
+  outline-offset: var(--focus-field-offset);
 }
 .composerActions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  justify-content: flex-end;
 }
 .composerActions button:first-child {
+  min-width: 96px;
   background: var(--platform-action);
   color: white;
+}
+.composerHint {
+  margin: 0;
+  color: var(--platform-muted);
+  font-size: 11px;
+  line-height: 1.5;
 }
 .composerActions button:disabled {
   opacity: 0.55;
@@ -251,6 +259,17 @@
 }
 .message {
   animation: message 0.32s var(--ease-out) both;
+}
+.promptWord {
+  animation: promptWord 180ms ease-out var(--word-delay) both;
+}
+@keyframes promptWord {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .message h2 {
   font-family: var(--font-editorial);
@@ -434,17 +453,15 @@
   border: 0;
 }
 .miniature[data-template="pulse"] .miniProduct {
-  flex-direction: column;
   gap: 2px;
 }
 .miniature[data-template="pulse"] .miniProduct i {
-  width: 100%;
-  height: 70%;
+  width: 66%;
 }
 .miniature[data-template="pulse"] .miniProduct em {
-  width: 100%;
+  width: 28%;
   height: 3px;
-  margin: 0;
+  margin: 6px 0 0;
 }
 .miniature[data-template="pulse"] .miniProduct b {
   display: none;
@@ -757,8 +774,11 @@
 }
 .shell button:focus-visible,
 .brandFields :focus-visible {
-  outline: 3px solid var(--platform-action);
-  outline-offset: 3px;
+  outline: var(--focus-ring-width) solid var(--platform-action);
+  outline-offset: var(--focus-ring-offset);
+}
+.brandFields :is(input, select, textarea):focus-visible {
+  outline-offset: var(--focus-field-offset);
 }
 .srOnly {
   position: absolute;

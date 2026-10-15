@@ -45,7 +45,8 @@
   position: sticky;
   top: 14px;
 }
-.controls:has(details[open]) {
+.controls:has(details[open]),
+.controls:has([data-hero-photos]) {
   position: static;
 }
 .tabs {

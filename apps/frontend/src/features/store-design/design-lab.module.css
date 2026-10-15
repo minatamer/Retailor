@@ -134,8 +134,8 @@
   box-shadow: 0 12px 40px #242b6008;
 }
 .preview:focus-visible {
-  outline: 3px solid var(--platform-focus);
-  outline-offset: 5px;
+  outline: var(--focus-ring-width) solid var(--platform-focus);
+  outline-offset: var(--focus-ring-offset);
 }
 .referenceNotes {
   display: flex;

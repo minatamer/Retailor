@@ -4,6 +4,7 @@ import { generateScenario } from "@retailor/commerce/scenarios";
 import { facts, allActivityScope } from "@retailor/commerce/facts";
 import { storeItems } from "../storefront/browse";
 import { stockOf } from "@retailor/commerce/selectors";
+import { SESSION_KEY } from "../session/projection";
 const environments: ReturnType<typeof environment>[] = [];
 afterEach(() => environments.splice(0).forEach((env) => env.dispose()));
 async function setup(realScenario = false) {
@@ -29,6 +30,213 @@ function apply(controller: Awaited<ReturnType<typeof setup>>["controller"]) {
   return review;
 }
 describe("reviewed owner forms and atomic scenario identity", () => {
+  it("keeps expense filters bounded and ephemeral, and gracefully retires saved visits navigation without losing records", async () => {
+    const { env, controller } = await setup(true);
+    const graph = controller.getSnapshot().state.graph;
+    controller.setOwnerExpenseFilters({
+      month: "2026-10",
+      category: "marketing",
+      sort: "oldest",
+    });
+    const filters = controller.getSnapshot().ownerExpenseFilters;
+    controller.setOwnerExpenseFilters({ month: "2026-99" });
+    expect(controller.getSnapshot().ownerExpenseFilters).toBe(filters);
+    controller.ownerNavigate("traffic");
+    expect(controller.getSnapshot().state.ownerView).toBe("overview");
+    expect(controller.getSnapshot().state.graph).toBe(graph);
+    const raw = JSON.parse(env.storage.getItem(SESSION_KEY)!);
+    raw.ownerView = "traffic";
+    env.storage.setItem(SESSION_KEY, JSON.stringify(raw));
+    controller.dispose();
+    const restored = await env.open();
+    expect(restored.getSnapshot().state.ownerView).toBe("overview");
+    expect(restored.getSnapshot().state.graph.traffic).toEqual(graph.traffic);
+    expect(restored.getSnapshot().state.graph.buyers).toEqual(graph.buyers);
+    expect(restored.getSnapshot().ownerExpenseFilters).toEqual({
+      month: "",
+      category: "all",
+      sort: "newest",
+    });
+    restored.setOwnerExpenseFilters({ month: "2026-09" });
+    await restored.reset();
+    expect(restored.getSnapshot().ownerExpenseFilters.month).toBe("");
+  });
+  it("saves an expense only after explicit review, reports the operation and retains immutable posted history", async () => {
+    const { controller } = await setup();
+    const before = controller.getSnapshot().state.graph;
+    controller.openOwnerOperation("saveExpenseDraft");
+    controller.editOwnerField("amount", "12.34");
+    controller.editOwnerField("note", "Packaging supplies");
+    controller.reviewOwnerOperation();
+    expect(controller.getSnapshot().state.graph).toBe(before);
+    expect(controller.getSnapshot().ownerReview?.command.payload).toMatchObject(
+      { amount: 1234, note: "Packaging supplies" },
+    );
+    controller.closeOwnerOperation();
+    expect(controller.getSnapshot().state.graph).toBe(before);
+    controller.openOwnerOperation("saveExpenseDraft");
+    controller.editOwnerField("amount", "12.34");
+    const review = apply(controller)!;
+    expect(controller.getSnapshot()).toMatchObject({
+      ownerForm: null,
+      ownerNotice: "Expense draft saved.",
+      ownerNoticeTone: "success",
+    });
+    const saved = controller.getSnapshot().state.graph;
+    controller.confirmOwnerOperation(review);
+    expect(controller.getSnapshot().state.graph).toBe(saved);
+    controller.ownerNavigate("expenses");
+    expect(controller.getSnapshot().ownerNotice).toBe("");
+    expect(controller.getSnapshot().state.graph).toBe(saved);
+    controller.dismissOwnerNotice();
+    expect(controller.getSnapshot().ownerNotice).toBe("");
+  });
+  it("identifies the missing stock reason, preserves unrelated edits and reviews only after correction", async () => {
+    const { controller } = await setup();
+    const graph = controller.getSnapshot().state.graph;
+    const variant = graph.products[0]!.variants[0]!;
+    controller.openOwnerOperation("adjustStock", variant.id);
+    controller.reviewOwnerOperation();
+    expect(controller.getSnapshot()).toMatchObject({
+      ownerReview: null,
+      ownerNoticeTone: "error",
+      ownerIssues: [
+        {
+          field: "reason",
+          label: "Explain this change",
+          message: "Explain this change: this field is required.",
+        },
+      ],
+    });
+    expect(controller.getSnapshot().state.graph).toBe(graph);
+    controller.editOwnerField("units", "2");
+    expect(controller.getSnapshot().ownerIssues[0]?.field).toBe("reason");
+    expect(controller.getSnapshot().ownerNoticeTone).toBe("info");
+    controller.moveOwnerForm("tailor");
+    expect(controller.getSnapshot().ownerIssues[0]?.field).toBe("reason");
+    controller.editOwnerField("reason", "Counted remaining stock");
+    expect(controller.getSnapshot().ownerIssues).toEqual([]);
+    controller.reviewOwnerOperation();
+    expect(controller.getSnapshot().ownerReview?.command).toMatchObject({
+      type: "adjustStock",
+      payload: { units: 2, reason: "Counted remaining stock" },
+    });
+    expect(controller.getSnapshot().ownerNoticeTone).toBe("info");
+    expect(controller.getSnapshot().state.graph).toBe(graph);
+    controller.closeOwnerOperation();
+    expect(controller.getSnapshot().ownerIssues).toEqual([]);
+  });
+  it("identifies a malformed variant price without changing the product and clears validation on reset", async () => {
+    const { controller } = await setup();
+    const graph = controller.getSnapshot().state.graph;
+    controller.openOwnerOperation("updateProduct", graph.products[0]!.id);
+    const rows = controller.getSnapshot().ownerForm!.variants;
+    controller.editOwnerRows(
+      "variants",
+      rows.map((row, i) => (i ? row : { ...row, price: "12.345" })),
+    );
+    controller.reviewOwnerOperation();
+    expect(controller.getSnapshot().ownerIssues).toMatchObject([
+      {
+        field: "variants.0.price",
+        message: expect.stringContaining("two decimal places"),
+      },
+    ]);
+    expect(controller.getSnapshot().ownerReview).toBeNull();
+    expect(controller.getSnapshot().state.graph).toBe(graph);
+    await controller.reset();
+    expect(controller.getSnapshot().ownerIssues).toEqual([]);
+    expect(controller.getSnapshot().ownerNoticeTone).toBe("info");
+  });
+  it("keeps the other row error when only one invalid variant field is corrected", async () => {
+    const { controller } = await setup();
+    controller.openOwnerOperation(
+      "updateProduct",
+      controller.getSnapshot().state.graph.products[0]!.id,
+    );
+    controller.editOwnerRows(
+      "variants",
+      controller
+        .getSnapshot()
+        .ownerForm!.variants.map((row, i) =>
+          i ? row : { ...row, size: "", colour: "" },
+        ),
+    );
+    controller.reviewOwnerOperation();
+    expect(
+      controller.getSnapshot().ownerIssues.map((issue) => issue.field),
+    ).toEqual(expect.arrayContaining(["variants.0.size", "variants.0.colour"]));
+    controller.editOwnerRows(
+      "variants",
+      controller
+        .getSnapshot()
+        .ownerForm!.variants.map((row, i) => (i ? row : { ...row, size: "M" })),
+    );
+    expect(
+      controller.getSnapshot().ownerIssues.map((issue) => issue.field),
+    ).toEqual(["variants.0.colour"]);
+  });
+  it("adds the next owner size from current edits, applies new stock once and preserves original identities", async () => {
+    const { controller } = await setup();
+    const product = controller.getSnapshot().state.graph.products[0]!;
+    controller.openOwnerOperation("updateProduct", product.id);
+    const form = controller.getSnapshot().ownerForm!;
+    controller.editOwnerRows(
+      "variants",
+      form.variants.map((row, i) =>
+        i === form.variants.length - 1
+          ? { ...row, price: "71.05", cost: "31.61", stock: row.stock }
+          : row,
+      ),
+    );
+    const before = controller.getSnapshot().state.graph;
+    const id = controller.addOwnerVariant()!;
+    const next = controller.getSnapshot().ownerForm!.variants.at(-1)!;
+    expect(next).toMatchObject({
+      id,
+      size: "34/32",
+      colour: form.variants.at(-1)!.colour,
+      price: "71.05",
+      cost: "31.61",
+      stock: form.variants.at(-1)!.stock,
+    });
+    expect(controller.getSnapshot().state.graph).toBe(before);
+    const review = apply(controller)!;
+    const graph = controller.getSnapshot().state.graph;
+    const changed = graph.products.find((row) => row.id === product.id)!;
+    expect(
+      changed.variants.slice(0, product.variants.length).map((row) => row.id),
+    ).toEqual(product.variants.map((row) => row.id));
+    expect(changed.variants.at(-1)).toMatchObject({
+      id,
+      price: 7105,
+      unitCost: 3161,
+      openingStock: Number(next.stock),
+    });
+    expect(stockOf(graph, id)).toBe(Number(next.stock));
+    controller.confirmOwnerOperation(review);
+    expect(controller.getSnapshot().state.graph).toBe(graph);
+  });
+  it("keeps unknown sizes editable, does not overwrite original stock and stops at 24 owner options", async () => {
+    const { controller } = await setup();
+    const product = controller.getSnapshot().state.graph.products[0]!;
+    controller.openOwnerOperation("updateProduct", product.id);
+    controller.editOwnerField("sizingSystemId", "one-size-demo");
+    controller.addOwnerVariant();
+    expect(controller.getSnapshot().ownerForm!.variants.at(-1)!.size).toBe("");
+    controller.reviewOwnerOperation();
+    expect(controller.getSnapshot().ownerReview).toBeNull();
+    expect(controller.getSnapshot().state.graph.products[0]).toEqual(product);
+    for (let i = 0; i < 30; i++) controller.addOwnerVariant();
+    expect(controller.getSnapshot().ownerForm!.variants).toHaveLength(24);
+    expect(controller.addOwnerVariant()).toBeUndefined();
+    expect(
+      controller
+        .getSnapshot()
+        .ownerForm!.variants.slice(0, product.variants.length)
+        .map((row) => row.id),
+    ).toEqual(product.variants.map((row) => row.id));
+  });
   it("requires a validated real photo, preserves dirty human fields and publishes the same new garment", async () => {
     const { controller } = await setup();
     controller.openOwnerOperation("createProduct");

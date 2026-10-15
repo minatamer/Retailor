@@ -1,3 +1,4 @@
+import { CATEGORY_LABELS } from "@retailor/contracts/product";
 import type { CommerceGraph } from "@retailor/contracts/commerce";
 import type { FactScope, MetricFact } from "@retailor/contracts/facts";
 import { facts, allActivityScope } from "@retailor/commerce/facts";
@@ -162,7 +163,7 @@ export function resolveDashboardTarget(
       const row = model.categories.find((r) => r.category === target.category);
       return row
         ? {
-            label: `${target.category.replaceAll("-", " ")} · Current category contribution`,
+            label: `${CATEGORY_LABELS[target.category]} · Current category contribution`,
             fact: row.fact,
           }
         : null;

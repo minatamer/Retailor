@@ -1,4 +1,5 @@
 "use client";
+import { CATEGORY_LABELS } from "@retailor/contracts/product";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { formatUsd } from "@retailor/commerce/money";
@@ -7,6 +8,7 @@ import {
   refundable,
   orderFinancialState,
 } from "@retailor/commerce/selectors";
+import { exactSum } from "@retailor/commerce/allocation";
 import { SCENARIO_LABELS } from "@retailor/commerce/scenarios";
 import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
@@ -16,6 +18,11 @@ import { DashboardOverview } from "./overview";
 import type { OwnerOperationType } from "../operations/state";
 import { GarmentImage } from "../storefront/gallery";
 import { OwnerNavigation, OWNER_VIEWS } from "./owner-navigation";
+import { InventoryRegister } from "./inventory-register";
+import { ExpenseRegister } from "./expense-register";
+import { RecordPhoto, MetricStrip } from "./record-photo";
+import { inventorySummary } from "./register-model";
+import { StarRating } from "../storefront/reviews";
 import styles from "./owner-workspace.module.css";
 export const utc = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
@@ -37,8 +44,14 @@ function Source({ origin, at }: { origin: string; at?: string }) {
   );
 }
 export function OwnerWorkspace({ design }: { design: ReactNode }) {
-  const { controller, state, ownerForm, ownerNotice, ownerSurface } =
-    useSession();
+  const {
+    controller,
+    state,
+    ownerForm,
+    ownerNotice,
+    ownerNoticeTone,
+    ownerSurface,
+  } = useSession();
   const heading = useRef<HTMLHeadingElement>(null);
   const [collapsed, setCollapsed] = useState(false),
     [navigationOpen, setNavigationOpen] = useState(false);
@@ -71,7 +84,6 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
     inventory = graph.products
       .flatMap((p) => p.variants.map((v) => ({ p, v })))
       .filter(({ p, v }) => matches(p.title, v.size, v.colour, v.sku)),
-    traffic = graph.traffic.filter((t) => matches(t.id, t.actor, t.origin)),
     feedback = graph.feedback.filter((f) =>
       matches(
         f.id,
@@ -85,15 +97,13 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
         ? orders.length
         : view === "inventory"
           ? inventory.length
-          : view === "traffic"
-            ? traffic.length
-            : view === "feedback"
-              ? feedback.length
-              : 0;
+          : view === "feedback"
+            ? feedback.length
+            : 0;
   return (
     <section
       className={styles.owner}
-      data-collapsed={collapsed}
+      data-owner-collapsed={collapsed}
       aria-label="Owner workspace"
     >
       <OwnerNavigation
@@ -117,23 +127,155 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
             <Icon name="menu" />
             <span>Navigation</span>
           </button>
-          <div className={styles.headerActions}>
-            <Button
-              onClick={() => {
-                controller.ownerNavigate("products");
-                open("createProduct");
-              }}
-            >
-              Create a garment
-            </Button>
-          </div>
         </header>
         <ScenarioReviewDialog />
         <div className={styles.layout}>
-          <div className={styles.records} data-tailor-target="owner-records">
-            <h2 id="owner-register-heading" ref={heading} tabIndex={-1}>
-              {OWNER_VIEWS.find((v) => v.id === view)?.label}
-            </h2>
+          <div
+            className={styles.records}
+            data-view={view}
+            data-tailor-target="owner-records"
+          >
+            <div className={styles.titleRow}>
+              <div>
+                <span className={styles.eyebrow}>Your store</span>
+                <h2 id="owner-register-heading" ref={heading} tabIndex={-1}>
+                  {OWNER_VIEWS.find((v) => v.id === view)?.label}
+                </h2>
+              </div>
+              {view === "products" ? (
+                <Button onClick={() => open("createProduct")}>
+                  Create a garment
+                </Button>
+              ) : view === "expenses" ? (
+                <Button onClick={() => open("saveExpenseDraft")}>
+                  Add expense
+                </Button>
+              ) : view === "orders" ? (
+                <Button onClick={() => open("saveOrderDraft")}>
+                  New order draft
+                </Button>
+              ) : null}
+            </div>
+            {!["overview", "design"].includes(view) && (
+              <p className={styles.intro}>
+                {
+                  (
+                    {
+                      products: "Your collection, ready for its next chapter.",
+                      orders: "Follow every order from draft to delivery.",
+                      returns:
+                        "Manage returns, refunds and the units coming back.",
+                      inventory:
+                        "See what is on hand. Keep every option ready to shop.",
+                      expenses: "Keep your spending in view, month by month.",
+                      feedback:
+                        "What shoppers are saying about your collection.",
+                    } as Record<string, string>
+                  )[view]
+                }
+              </p>
+            )}
+            {!ownerForm && ownerNotice && (
+              <div
+                className={styles.resultBanner}
+                data-tone={ownerNoticeTone}
+                role={ownerNoticeTone === "error" ? "alert" : "status"}
+              >
+                <Icon
+                  name={ownerNoticeTone === "success" ? "check" : "feedback"}
+                />
+                <span>{ownerNotice}</span>
+                <button
+                  aria-label="Dismiss message"
+                  onClick={() => controller.dismissOwnerNotice()}
+                >
+                  <Icon name="close" size={16} />
+                </button>
+              </div>
+            )}
+            {view === "products" && (
+              <MetricStrip
+                items={[
+                  {
+                    label: "Active garments",
+                    value: graph.products.filter((p) => !p.archived).length,
+                  },
+                  {
+                    label: "Garment options",
+                    value: graph.products.flatMap((p) => p.variants).length,
+                  },
+                  {
+                    label: "Units on hand",
+                    value: inventorySummary(graph).units,
+                  },
+                ]}
+              />
+            )}
+            {view === "orders" && (
+              <MetricStrip
+                items={[
+                  {
+                    label: "To fulfil",
+                    value: graph.orders.filter(
+                      (o) => o.state === "placed" || o.state === "shipped",
+                    ).length,
+                  },
+                  {
+                    label: "Completed orders",
+                    value: graph.orders.filter((o) => o.state === "fulfilled")
+                      .length,
+                  },
+                  { label: "Unplaced drafts", value: graph.orderDrafts.length },
+                ]}
+              />
+            )}
+            {view === "returns" && (
+              <MetricStrip
+                items={[
+                  {
+                    label: "Open returns",
+                    value: graph.returns.filter((r) => r.state !== "closed")
+                      .length,
+                  },
+                  {
+                    label: "Ready to inspect",
+                    value: graph.returns.filter((r) => r.state === "approved")
+                      .length,
+                  },
+                  {
+                    label: "Refunds issued",
+                    value: formatUsd(
+                      exactSum(
+                        graph.refunds.map((r) =>
+                          exactSum([
+                            ...r.lines.map((l) => l.amount),
+                            r.delivery,
+                            r.tax,
+                          ]),
+                        ),
+                      ),
+                    ),
+                  },
+                ]}
+              />
+            )}
+            {view === "feedback" && (
+              <MetricStrip
+                items={[
+                  {
+                    label: "Average rating",
+                    value: feedback.length
+                      ? `${(feedback.reduce((sum, f) => sum + f.rating, 0) / feedback.length).toFixed(1)} / 5`
+                      : "—",
+                  },
+                  { label: "Reviews", value: feedback.length },
+                  {
+                    label: "Reviewed garments",
+                    value: new Set(feedback.map((f) => f.productId)).size,
+                  },
+                ]}
+              />
+            )}
             {view === "overview" ? <DashboardOverview /> : null}
             {!["overview", "design", "returns", "expenses"].includes(view) && (
               <label className={styles.search}>
@@ -152,8 +294,7 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
             {view === "products" ? (
               <>
                 <p className={styles.note}>
-                  Photos back every garment. Sizing, prices, future costs and
-                  opening inventory are disclosed demo inputs.
+                  Manage photos, garment details and options in one place.
                 </p>
                 <div className={styles.productGrid}>
                   {products.slice(start, start + 20).map((p) => {
@@ -179,7 +320,7 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
                           </div>
                         )}
                         <span className={styles.source}>
-                          {p.category.replaceAll("-", " ")}
+                          {CATEGORY_LABELS[p.category]}
                           {p.archived ? " · Archived" : " · Current garment"}
                         </span>
                         <h3>{p.title}</h3>
@@ -248,9 +389,7 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
                           Create a clothing garment with its photograph. This
                           same item will appear throughout your store.
                         </p>
-                        <Button onClick={() => open("createProduct")}>
-                          Create a garment
-                        </Button>
+                        <p>Choose Create a garment above to begin.</p>
                       </>
                     )}
                   </div>
@@ -259,15 +398,9 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
             ) : null}
             {view === "orders" ? (
               <>
-                <div className={styles.actions}>
-                  <Button onClick={() => open("saveOrderDraft")}>
-                    Create an order draft
-                  </Button>
-                </div>
                 <p className={styles.note}>
-                  Drafts reserve no stock. Placed snapshots preserve original
-                  titles, options, prices and costs. Shipment states are
-                  simulated.
+                  Drafts stay editable. Placed orders keep their original prices
+                  and costs.
                 </p>
                 {graph.orderDrafts.map((d) => (
                   <article className={styles.record} key={d.id}>
@@ -300,11 +433,31 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
                   const remaining = refundable(graph, o.id);
                   return (
                     <article className={styles.record} key={o.id}>
-                      <span className={styles.badge}>
-                        {o.state} · {o.actor}
-                      </span>
-                      <h3>{o.id}</h3>
-                      <Source origin={o.origin} at={o.placedAt} />
+                      <div className={styles.recordHeading}>
+                        <RecordPhoto
+                          product={graph.products.find(
+                            (p) => p.id === o.lines[0]?.productId,
+                          )}
+                          colour={o.lines[0]?.colour}
+                        />
+                        <div>
+                          <span className={styles.badge}>
+                            {o.state} · {o.actor}
+                          </span>
+                          <h3>
+                            {o.lines[0]?.title ?? "Order"}
+                            {o.lines.length > 1
+                              ? ` + ${o.lines.length - 1} more`
+                              : ""}
+                          </h3>
+                          <small>{o.id}</small>
+                          <Source origin={o.origin} at={o.placedAt} />
+                        </div>
+                        <strong className={styles.recordAmount}>
+                          {formatUsd(o.total)}
+                          <small>Order total</small>
+                        </strong>
+                      </div>
                       <dl>
                         <div>
                           <dt>Financial state</dt>
@@ -433,22 +586,45 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
             {view === "returns" ? (
               <>
                 <p className={styles.note}>
-                  Physical receipts and financial refunds have independent dates
-                  and effects. Refunds do not restore stock; inspected restock
-                  does not issue payment.
+                  Inspect returned items and manage refunds separately.
+                  Refunding does not automatically restock a garment.
                 </p>
                 {graph.returns.map((r) => {
                   const order = graph.orders.find((o) => o.id === r.orderId)!;
+                  const returnedLine = order.lines.find(
+                    (line) => line.id === r.lines[0]?.lineId,
+                  );
                   return (
                     <article className={styles.record} key={r.id}>
-                      <span className={styles.badge}>
-                        {r.state} · {r.reason}
-                      </span>
-                      <h3>{r.id}</h3>
-                      <Source
-                        origin={r.origin}
-                        at={r.receivedAt ?? r.requestedAt}
-                      />
+                      <div className={styles.recordHeading}>
+                        <RecordPhoto
+                          product={graph.products.find(
+                            (p) => p.id === returnedLine?.productId,
+                          )}
+                          colour={returnedLine?.colour}
+                        />
+                        <div>
+                          <span className={styles.badge}>
+                            {r.state} · {r.reason}
+                          </span>
+                          <h3>{returnedLine?.title ?? "Returned garments"}</h3>
+                          <Source
+                            origin={r.origin}
+                            at={r.receivedAt ?? r.requestedAt}
+                          />
+                        </div>
+                        <strong className={styles.recordAmount}>
+                          {r.lines.reduce(
+                            (sum, line) => sum + line.units.length,
+                            0,
+                          )}
+                          <small>Returning units</small>
+                        </strong>
+                      </div>
+                      <details>
+                        <summary>Return reference</summary>
+                        <p>{r.id}</p>
+                      </details>
                       <p>Order {r.orderId}</p>
                       {r.lines.map((l) => (
                         <p key={l.lineId}>
@@ -495,7 +671,25 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
                 })}
                 {graph.refunds.map((r) => (
                   <article className={styles.record} key={r.id}>
-                    <h3>Issued refund · {r.id}</h3>
+                    <div className={styles.recordHeading}>
+                      <span className={styles.recordIcon}>
+                        <Icon name="returns" />
+                      </span>
+                      <div>
+                        <h3>Refund issued</h3>
+                        <small>{r.id}</small>
+                      </div>
+                      <strong className={styles.recordAmount}>
+                        {formatUsd(
+                          exactSum([
+                            ...r.lines.map((l) => l.amount),
+                            r.delivery,
+                            r.tax,
+                          ]),
+                        )}
+                        <small>Recorded refund</small>
+                      </strong>
+                    </div>
                     <Source origin={r.origin} at={r.at} />
                     <p>
                       Order {r.orderId} · Merchandise{" "}
@@ -516,195 +710,44 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
                 )}
               </>
             ) : null}
-            {view === "inventory" ? (
-              <>
-                <p className={styles.note}>
-                  Available units equal opening inventory plus signed movements.
-                  Low stock means two units or fewer. Future costs do not
-                  rewrite placed snapshots.
-                </p>
-                {inventory.slice(start, start + 20).map(({ p, v }) => (
-                  <article className={styles.record} key={v.id}>
-                    <h3>
-                      {p.title} · {v.size} · {v.colour}
-                    </h3>
-                    <p>
-                      {v.sku}
-                      {v.archived || p.archived ? " · Archived" : ""}
-                    </p>
-                    <dl>
-                      <div>
-                        <dt>Currently available</dt>
-                        <dd>{stockOf(graph, v.id)} units</dd>
-                      </div>
-                      <div>
-                        <dt>Current future cost / estimated value</dt>
-                        <dd>
-                          {formatUsd(v.unitCost)} /{" "}
-                          {formatUsd(v.unitCost * stockOf(graph, v.id))}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>Disclosed opening inventory</dt>
-                        <dd>{v.openingStock} units</dd>
-                      </div>
-                    </dl>
-                    <details>
-                      <summary>Movement history</summary>
-                      {graph.movements
-                        .filter((m) => m.variantId === v.id)
-                        .map((m) => (
-                          <div key={m.id}>
-                            <p>
-                              {m.kind} · {m.units} units · {m.reason}
-                            </p>
-                            <Source origin={m.origin} at={m.at} />
-                            <p>
-                              {m.id} · Source {m.sourceId}
-                            </p>
-                          </div>
-                        ))}
-                    </details>
-                    <div className={styles.actions}>
-                      <Button
-                        variant="secondary"
-                        onClick={() => open("adjustStock", v.id)}
-                      >
-                        Adjust stock
-                      </Button>
-                      <Button
-                        variant="quiet"
-                        onClick={() => open("setUnitCost", v.id)}
-                      >
-                        Change future cost
-                      </Button>
-                      <Button
-                        variant="quiet"
-                        onClick={() => open("writeoffStock", v.id)}
-                      >
-                        Review available damage
-                      </Button>
-                    </div>
-                  </article>
-                ))}
-              </>
-            ) : null}
-            {view === "expenses" ? (
-              <>
-                <Button onClick={() => open("saveExpenseDraft")}>
-                  Create an expense draft
-                </Button>
-                <p className={styles.note}>
-                  Unposted drafts have no result effect. Posted entries are
-                  immutable; correction/void adds a linked record.
-                </p>
-                {graph.expenseDrafts.map((e) => (
-                  <article className={styles.record} key={e.id}>
-                    <h3>
-                      Unposted · {e.category} · {formatUsd(e.amount)}
-                    </h3>
-                    <p>
-                      {e.note} · {e.id}
-                    </p>
-                    <div className={styles.actions}>
-                      <Button
-                        variant="secondary"
-                        onClick={() => open("saveExpenseDraft", e.id)}
-                      >
-                        Edit expense draft
-                      </Button>
-                      <Button onClick={() => open("postExpense", e.id)}>
-                        Review posting
-                      </Button>
-                      <Button
-                        variant="quiet"
-                        onClick={() => open("deleteExpenseDraft", e.id)}
-                      >
-                        Delete expense draft
-                      </Button>
-                    </div>
-                  </article>
-                ))}
-                {graph.expenses.map((e) => (
-                  <article className={styles.record} key={e.id}>
-                    <h3>
-                      {e.category} · {formatUsd(e.amount)}
-                    </h3>
-                    <Source origin={e.origin} at={e.at} />
-                    <p>
-                      {e.kind} · {e.id}
-                      {e.parentId ? ` · Linked to ${e.parentId}` : ""}
-                    </p>
-                    <p>{e.note}</p>
-                    {e.kind === "posting" &&
-                      !graph.expenses.some(
-                        (v) => v.parentId === e.id && v.kind === "void",
-                      ) && (
-                        <div className={styles.actions}>
-                          <Button
-                            variant="secondary"
-                            onClick={() => open("correctExpense", e.id)}
-                          >
-                            Review correction
-                          </Button>
-                          <Button
-                            variant="quiet"
-                            onClick={() => open("voidExpense", e.id)}
-                          >
-                            Review void
-                          </Button>
-                        </div>
-                      )}
-                  </article>
-                ))}
-              </>
-            ) : null}
-            {view === "traffic" ? (
-              <>
-                <p className={styles.note}>
-                  {graph.buyers.length} fictional buyer identities · No real
-                  customer PII or external analytics. Visit stages are nested;
-                  owner/designer activity is excluded from the funnel.
-                </p>
-                {traffic.slice(start, start + 20).map((t) => (
-                  <article className={styles.record} key={t.id}>
-                    <h3>
-                      {t.id} · {t.actor}
-                    </h3>
-                    <Source origin={t.origin} at={t.startedAt} />
-                    <p>
-                      Engaged {t.engagedAt ? "yes" : "no"} · Bag{" "}
-                      {t.bagAt ? "yes" : "no"} · Checkout{" "}
-                      {t.checkoutAt ? "yes" : "no"} · {t.orderIds.length} linked
-                      orders (at most one conversion)
-                    </p>
-                    <details>
-                      <summary>Known linked records</summary>
-                      <p>Products: {t.productIds.join(", ") || "None"}</p>
-                      <p>Orders: {t.orderIds.join(", ") || "None"}</p>
-                    </details>
-                  </article>
-                ))}
-              </>
-            ) : null}
+            {view === "inventory" && (
+              <InventoryRegister rows={inventory.slice(start, start + 20)} />
+            )}
+            {view === "expenses" && <ExpenseRegister />}
             {view === "feedback" ? (
               <>
                 <p className={styles.note}>
-                  Authored fictional feedback, tied to actual product/order IDs.
-                  Small sample observations do not prove real demand or fit.
+                  Demo reviews, connected to the garments in your store.
                 </p>
                 {feedback.slice(start, start + 20).map((f) => (
                   <article className={styles.record} key={f.id}>
-                    <h3>
-                      {graph.products.find((p) => p.id === f.productId)
-                        ?.title ?? "Historical garment"}{" "}
-                      · {f.rating} / 5
-                    </h3>
-                    <Source origin={f.origin} at={f.at} />
-                    <p>{f.comment}</p>
-                    <p>
-                      {f.id} · Order {f.orderId ?? "No linked order"}
-                    </p>
+                    <div className={styles.recordHeading}>
+                      <RecordPhoto
+                        product={graph.products.find(
+                          (p) => p.id === f.productId,
+                        )}
+                      />
+                      <div>
+                        <h3>
+                          {graph.products.find((p) => p.id === f.productId)
+                            ?.title ?? "Historical garment"}
+                        </h3>
+                        <div className={styles.rating}>
+                          <StarRating rating={f.rating} />
+                          <span>{f.rating} / 5</span>
+                        </div>
+                      </div>
+                    </div>
+                    <blockquote className={styles.reviewQuote}>
+                      {f.comment}
+                    </blockquote>
+                    <details>
+                      <summary>Review details</summary>
+                      <Source origin={f.origin} at={f.at} />
+                      <p>
+                        {f.id} · Order {f.orderId ?? "No linked order"}
+                      </p>
+                    </details>
                     <Button
                       variant="quiet"
                       onClick={() => visitProduct(f.productId)}
@@ -718,7 +761,7 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
             {view === "design" ? (
               ownerForm ? (
                 <p>
-                  Finish or cancel the current form to edit your store design.
+                  Finish or cancel the current form to personalize your store.
                 </p>
               ) : (
                 design
@@ -752,11 +795,6 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
               >
                 Review latest unposted Undo
               </Button>
-            )}
-            {!ownerForm && (
-              <p className={styles.notice} role="status">
-                {ownerNotice}
-              </p>
             )}
           </div>
           {ownerForm && ownerSurface === "dashboard" && (

@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { CATEGORY_LABELS } from "@retailor/contracts/product";
+import { useRef } from "react";
 import { CategorySchema } from "@retailor/contracts/product";
 import { Button } from "../../components/ui/button";
 import { useSession } from "../session/context";
@@ -8,13 +9,20 @@ import { GarmentImage } from "../storefront/gallery";
 import { Field, SelectField } from "./fields";
 import type { OwnerForm } from "./state";
 import styles from "./operations.module.css";
+import { FieldFeedback, ownerFieldProps } from "./field-feedback";
+import { visibleOwnerIssues } from "./validation";
 export function ProductForm() {
-  const [clothingConfirmed, setClothingConfirmed] = useState(false);
-  const { controller, ownerForm, ownerPhotoBusy, ownerNotice, state } =
+  const focusNewSize = useRef<string | null>(null);
+  const { controller, ownerForm, ownerPhotoBusy, ownerIssues, state } =
     useSession();
   if (!ownerForm) return null;
   const form = ownerForm,
     current = state.graph.products.find((p) => p.id === form.targetId);
+  const issues = visibleOwnerIssues(
+    form,
+    ownerIssues,
+    controller.photos.availableIds(),
+  );
   const patch = (
     id: string,
     key: keyof OwnerForm["variants"][number],
@@ -28,15 +36,17 @@ export function ProductForm() {
     <>
       <label className={styles.upload}>
         <strong>Clothing photograph · required</strong>
-        <span>
-          Choose a photo you own or have permission to use. It is checked for
-          valid raster bytes locally. Fabric and fit remain unconfirmed.
+        <span id="owner-photo-guidance">
+          JPEG, PNG or static WebP · 4 MiB per original. Upload adds a view;
+          remove an old view to replace it. A missing photograph cannot unlock
+          the review.
         </span>
         <input
+          {...ownerFieldProps(form, issues, "photoIds", "owner-photo-guidance")}
+          aria-label="Clothing photograph · required"
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          disabled={ownerPhotoBusy || !clothingConfirmed}
-          aria-describedby="owner-photo-guidance"
+          disabled={ownerPhotoBusy}
           onChange={(event) => {
             const file = namedFiles(event.target.files)[0];
             event.target.value = "";
@@ -44,29 +54,8 @@ export function ProductForm() {
           }}
         />
         {ownerPhotoBusy && <span role="status">Checking your photograph…</span>}
+        <FieldFeedback form={form} issues={issues} field="photoIds" />
       </label>
-      <label className={styles.check}>
-        <input
-          type="checkbox"
-          checked={clothingConfirmed}
-          onChange={(event) => setClothingConfirmed(event.target.checked)}
-        />
-        This upload shows clothing, rather than a logo or illustration.
-      </label>
-      <p id="owner-photo-guidance">
-        JPEG, PNG or static WebP · 4 MiB per original. Upload adds a view;
-        remove an old view to replace it. A missing photograph cannot unlock the
-        review.
-      </p>
-      {!form.photoIds.length && (
-        <p role="status">
-          A clothing photograph is required before this garment can be reviewed.
-        </p>
-      )}
-      {ownerNotice &&
-        /photo|image|webp|jpeg|png|decode|format/i.test(ownerNotice) && (
-          <p role="status">{ownerNotice}</p>
-        )}
       <div className={styles.photos}>
         {form.photoIds.map((id) => {
           const photo = controller.photos.view(id);
@@ -154,7 +143,7 @@ export function ProductForm() {
         label="Clothing category"
         choices={CategorySchema.options.map((id) => ({
           id,
-          label: id.replaceAll("-", " "),
+          label: CATEGORY_LABELS[id],
         }))}
       />
       <Field
@@ -205,7 +194,23 @@ export function ProductForm() {
                 <label className={styles.field} key={key}>
                   <span>{label}</span>
                   <input
+                    {...ownerFieldProps(
+                      form,
+                      issues,
+                      `variants.${index}.${key}`,
+                    )}
+                    aria-label={label}
                     value={variant[key]}
+                    ref={(element) => {
+                      if (
+                        element &&
+                        key === "size" &&
+                        focusNewSize.current === variant.id
+                      ) {
+                        element.focus();
+                        focusNewSize.current = null;
+                      }
+                    }}
                     maxLength={
                       key === "size"
                         ? 16
@@ -229,6 +234,11 @@ export function ProductForm() {
                     onChange={(event) =>
                       patch(variant.id, key, event.target.value)
                     }
+                  />
+                  <FieldFeedback
+                    form={form}
+                    issues={issues}
+                    field={`variants.${index}.${key}`}
                   />
                 </label>
               ))}
@@ -267,13 +277,21 @@ export function ProductForm() {
         ))}
       </div>
       <Button
+        {...ownerFieldProps(form, issues, "variants")}
         type="button"
         variant="secondary"
         disabled={form.variants.length >= 24}
-        onClick={() => controller.addOwnerVariant()}
+        onClick={() => {
+          focusNewSize.current = controller.addOwnerVariant() ?? null;
+        }}
       >
-        Add another option
+        Add size
       </Button>
+      <FieldFeedback form={form} issues={issues} field="variants" />
+      <p>
+        New sizes copy the previous colour, price, cost and opening units. Check
+        them before review.
+      </p>
     </>
   );
 }

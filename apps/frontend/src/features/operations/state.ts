@@ -15,6 +15,7 @@ import type { CommerceCommand } from "@retailor/contracts/commands";
 import { parseUsd } from "@retailor/commerce/money";
 import { refundable } from "@retailor/commerce/selectors";
 import type { previewCommand } from "@retailor/commerce/effects";
+import { ownerValue } from "./validation";
 export const OwnerViewSchema = z.enum([
   "overview",
   "products",
@@ -264,38 +265,78 @@ export function ownerIntent(
   const f = form.fields,
     get = (key: OwnerField) => f[key] ?? "",
     target = form.targetId;
+  const money = (field: string, value: string) =>
+    ownerValue(form, field, () => amount(value), "money");
+  const whole = (field: string, value: string, signed = false) =>
+    ownerValue(form, field, () => integer(value, signed), "integer");
+  const required = (field: OwnerField) =>
+    ownerValue(
+      form,
+      field,
+      () => {
+        if (!get(field).trim()) throw new Error("A value is required.");
+        return get(field);
+      },
+      "required",
+    );
   switch (form.type) {
     case "createProduct":
     case "updateProduct": {
       const current = graph.products.find((p) => p.id === target);
-      const variants = form.variants.map((v) => ({
+      const variants = form.variants.map((v, index) => ({
         id: v.id,
         size: v.size,
         colour: v.colour,
         sku: v.sku,
-        price: amount(v.price),
-        unitCost: amount(v.cost),
-        openingStock: integer(v.stock),
+        price: money(`variants.${index}.price`, v.price),
+        unitCost: money(`variants.${index}.cost`, v.cost),
+        openingStock: whole(`variants.${index}.stock`, v.stock),
         archived: v.archived,
       }));
+      const input = ProductInputSchema.parse({
+        id: target,
+        title: get("title"),
+        description: get("description"),
+        category: ownerValue(form, "category", () =>
+          CategorySchema.parse(get("category")),
+        ),
+        imageIds: form.photoIds,
+        sizingSystemId: get("sizingSystemId"),
+        attributes: current?.attributes ?? [],
+        archived:
+          ownerValue(form, "productState", () =>
+            z.enum(["active", "archived"]).parse(get("productState")),
+          ) === "archived",
+        variants,
+      });
+      // Validate editable fields before linked-photo consistency can reject a rename.
+      const colourPhotos = current?.colourPhotos?.flatMap((row) => {
+        const members = current.variants.filter(
+          (variant) =>
+            variant.colour.toLowerCase() === row.colour.toLowerCase(),
+        );
+        const changed = input.variants.findIndex((variant) =>
+          members.some(
+            (old) => old.id === variant.id && old.colour !== variant.colour,
+          ),
+        );
+        return ownerValue(
+          form,
+          `variants.${Math.max(changed, 0)}.colour`,
+          () =>
+            relabelColourPhotos(
+              { ...current, colourPhotos: [row] },
+              input.variants,
+              form.photoIds,
+            )!,
+          "colour",
+        );
+      });
       return {
         type: form.type,
-        payload: ProductInputSchema.parse({
-          id: target,
-          title: get("title"),
-          description: get("description"),
-          category: CategorySchema.parse(get("category")),
-          imageIds: form.photoIds,
-          colourPhotos: current
-            ? relabelColourPhotos(current, variants, form.photoIds)
-            : undefined,
-          sizingSystemId: get("sizingSystemId"),
-          attributes: current?.attributes ?? [],
-          archived:
-            z.enum(["active", "archived"]).parse(get("productState")) ===
-            "archived",
-          variants,
-        }),
+        payload: colourPhotos
+          ? ProductInputSchema.parse({ ...input, colourPhotos })
+          : input,
       };
     }
     case "removeProduct":
@@ -307,13 +348,13 @@ export function ownerIntent(
           id: target,
           actor: "owner",
           ...(get("buyerId") ? { buyerId: get("buyerId") } : {}),
-          lines: form.lines.map((l) => ({
+          lines: form.lines.map((l, index) => ({
             variantId: l.variantId,
-            quantity: integer(l.quantity),
+            quantity: whole(`lines.${index}.quantity`, l.quantity),
           })),
-          discount: amount(get("discount")),
-          delivery: amount(get("delivery")),
-          tax: amount(get("tax")),
+          discount: money("discount", get("discount")),
+          delivery: money("delivery", get("delivery")),
+          tax: money("tax", get("tax")),
         }),
       };
     case "deleteOrderDraft":
@@ -328,7 +369,9 @@ export function ownerIntent(
         type: form.type,
         payload: {
           orderId: target,
-          state: z.enum(["shipped", "fulfilled"]).parse(get("state")),
+          state: ownerValue(form, "state", () =>
+            z.enum(["shipped", "fulfilled"]).parse(get("state")),
+          ),
         },
       };
     case "requestReturn":
@@ -337,9 +380,11 @@ export function ownerIntent(
         payload: {
           id: form.id,
           orderId: target,
-          reason: z
-            .enum(["sizing", "changed-mind", "damaged", "other"])
-            .parse(get("reason")),
+          reason: ownerValue(form, "reason", () =>
+            z
+              .enum(["sizing", "changed-mind", "damaged", "other"])
+              .parse(get("reason")),
+          ),
           lines: form.unitsSelection,
         },
       };
@@ -348,7 +393,9 @@ export function ownerIntent(
         type: form.type,
         payload: {
           returnId: target,
-          state: z.enum(["approved", "closed"]).parse(get("state")),
+          state: ownerValue(form, "state", () =>
+            z.enum(["approved", "closed"]).parse(get("state")),
+          ),
         },
       };
     case "receiveReturn":
@@ -365,10 +412,13 @@ export function ownerIntent(
           id: form.id,
           orderId: target,
           lines: form.refunds
-            .map((l) => ({ lineId: l.lineId, amount: amount(l.amount) }))
+            .map((l, index) => ({
+              lineId: l.lineId,
+              amount: money(`refunds.${index}.amount`, l.amount),
+            }))
             .filter((l) => l.amount > 0),
-          delivery: amount(get("refundDelivery")),
-          tax: amount(get("refundTax")),
+          delivery: money("refundDelivery", get("refundDelivery")),
+          tax: money("refundTax", get("refundTax")),
         },
       };
     case "adjustStock":
@@ -376,9 +426,11 @@ export function ownerIntent(
         type: form.type,
         payload: {
           variantId: get("variantId"),
-          units: integer(get("units"), true),
-          kind: z.enum(["inbound", "correction"]).parse(get("kind")),
-          reason: get("reason"),
+          units: whole("units", get("units"), true),
+          kind: ownerValue(form, "kind", () =>
+            z.enum(["inbound", "correction"]).parse(get("kind")),
+          ),
+          reason: required("reason"),
         },
       };
     case "writeoffStock":
@@ -387,14 +439,17 @@ export function ownerIntent(
         payload: {
           id: form.id,
           variantId: get("variantId"),
-          quantity: integer(get("quantity")),
-          reason: get("reason"),
+          quantity: whole("quantity", get("quantity")),
+          reason: required("reason"),
         },
       };
     case "setUnitCost":
       return {
         type: form.type,
-        payload: { variantId: get("variantId"), cost: amount(get("cost")) },
+        payload: {
+          variantId: get("variantId"),
+          cost: money("cost", get("cost")),
+        },
       };
     case "saveExpenseDraft":
       return {
@@ -402,7 +457,7 @@ export function ownerIntent(
         payload: ExpenseDraftSchema.parse({
           id: target,
           category: get("expenseCategory"),
-          amount: amount(get("amount")),
+          amount: money("amount", get("amount")),
           note: get("note"),
         }),
       };
@@ -416,8 +471,8 @@ export function ownerIntent(
           id: form.id,
           expenseId: target,
           amount: get("amount").startsWith("-")
-            ? -amount(get("amount").slice(1))
-            : amount(get("amount")),
+            ? -money("amount", get("amount").slice(1))
+            : money("amount", get("amount")),
           note: get("note"),
         },
       };

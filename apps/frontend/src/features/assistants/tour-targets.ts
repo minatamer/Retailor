@@ -9,7 +9,7 @@ export const TOUR_STEPS: Record<
     {
       target: "store-home",
       title: "Your clothes, in their new home",
-      text: "This preview uses your actual catalogue. Your choices update all three page layouts together.",
+      text: "Preview your actual catalogue while you personalize page layouts, colours, type and branding.",
     },
     {
       target: "store-collection",
@@ -23,8 +23,8 @@ export const TOUR_STEPS: Record<
     },
     {
       target: "tailor-choices",
-      title: "Make the look yours",
-      text: "Try a template, palette and typography here. Confirm a look when it feels right.",
+      title: "Personalize your store",
+      text: "Choose layouts, colours and type here. Preview each change, then confirm the look you want to keep.",
     },
   ],
   shopper: [

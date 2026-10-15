@@ -76,8 +76,8 @@
   overflow: hidden;
 }
 .viewer:focus-visible {
-  outline: 3px solid var(--platform-text);
-  outline-offset: 3px;
+  outline: var(--focus-ring-width) solid var(--platform-text);
+  outline-offset: var(--focus-ring-offset);
 }
 .slide {
   margin: 0;
@@ -247,6 +247,12 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+.optionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
 }
 .colourRow {
   display: grid;

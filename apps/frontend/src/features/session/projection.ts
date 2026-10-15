@@ -20,6 +20,7 @@ import {
 } from "@retailor/contracts/photos";
 import {
   DesignSchema,
+  heroPhotoIds,
   DEFAULT_THEME,
   TemplateSchema,
   ThemeSchema,
@@ -143,6 +144,13 @@ export function restoreProjection(
     photos.size !== state.photos.length ||
     new Set(state.selectedIds).size !== state.selectedIds.length ||
     state.selectedIds.some((id) => !photos.has(id)) ||
+    [
+      state.acceptedDesign,
+      state.previewDesign,
+      ...(state.setup.brandDraft ? [state.setup.brandDraft] : []),
+    ].some((design) =>
+      heroPhotoIds(design).some((id) => id !== null && !photos.has(id)),
+    ) ||
     state.photoLinks.some((group) =>
       group.some((id) => !state.selectedIds.includes(id)),
     ) ||

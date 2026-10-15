@@ -14,9 +14,8 @@ export const OWNER_VIEWS = [
   { id: "returns", label: "Returns & refunds", icon: "returns" },
   { id: "inventory", label: "Inventory & costs", icon: "inventory" },
   { id: "expenses", label: "Expenses", icon: "expense" },
-  { id: "traffic", label: "Visits & customers", icon: "customers" },
   { id: "feedback", label: "Feedback", icon: "feedback" },
-  { id: "design", label: "Design", icon: "design" },
+  { id: "design", label: "Personalize", icon: "design" },
 ] as const satisfies ReadonlyArray<{
   id: OwnerView;
   label: string;

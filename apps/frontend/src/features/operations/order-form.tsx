@@ -5,9 +5,16 @@ import { formatUsd } from "@retailor/commerce/money";
 import { stockOf } from "@retailor/commerce/selectors";
 import { Field, SelectField } from "./fields";
 import styles from "./operations.module.css";
+import { FieldFeedback, ownerFieldProps } from "./field-feedback";
+import { visibleOwnerIssues } from "./validation";
 export function OrderForm() {
-  const { controller, ownerForm, state } = useSession();
+  const { controller, ownerForm, state, ownerIssues } = useSession();
   if (!ownerForm) return null;
+  const issues = visibleOwnerIssues(
+    ownerForm,
+    ownerIssues,
+    controller.photos.availableIds(),
+  );
   const variants = state.graph.products
     .filter((p) => !p.archived)
     .flatMap((p) =>
@@ -56,7 +63,7 @@ export function OrderForm() {
         }))}
       />
       <div className={styles.lines}>
-        {ownerForm.lines.map((line) => (
+        {ownerForm.lines.map((line, index) => (
           <article key={line.variantId}>
             <strong>
               {variants.find((v) => v.id === line.variantId)?.label ??
@@ -65,6 +72,11 @@ export function OrderForm() {
             <label className={styles.field}>
               <span>Quantity</span>
               <select
+                {...ownerFieldProps(
+                  ownerForm,
+                  issues,
+                  `lines.${index}.quantity`,
+                )}
                 value={line.quantity}
                 aria-label={`Quantity for ${variants.find((v) => v.id === line.variantId)?.label ?? line.variantId}`}
                 onChange={(event) =>
@@ -82,6 +94,11 @@ export function OrderForm() {
                   <option key={n}>{n}</option>
                 ))}
               </select>
+              <FieldFeedback
+                form={ownerForm}
+                issues={issues}
+                field={`lines.${index}.quantity`}
+              />
             </label>
             <Button
               type="button"
@@ -101,6 +118,8 @@ export function OrderForm() {
       <label className={styles.field}>
         <span>Add a known garment option</span>
         <select
+          {...ownerFieldProps(ownerForm, issues, "lines")}
+          aria-label="Add a known garment option"
           value=""
           disabled={ownerForm.lines.length >= 8}
           onChange={(event) => {
@@ -118,6 +137,7 @@ export function OrderForm() {
             </option>
           ))}
         </select>
+        <FieldFeedback form={ownerForm} issues={issues} field="lines" />
       </label>
       <div className={styles.group}>
         <Field name="discount" label="Merchandise discount" money />

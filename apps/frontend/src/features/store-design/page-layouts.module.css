@@ -38,8 +38,8 @@
   transform: rotate(-90deg);
 }
 .mixing summary:focus-visible {
-  outline: 2px solid var(--platform-text);
-  outline-offset: 3px;
+  outline: var(--focus-ring-width) solid var(--platform-text);
+  outline-offset: var(--focus-ring-offset);
   border-radius: 14px;
 }
 .content {

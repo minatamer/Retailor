@@ -9,19 +9,226 @@
   scroll-margin-top: 20px;
 }
 .dialog {
-  width: min(760px, calc(100% - 32px));
-  max-width: calc(100% - 32px);
-  max-height: calc(100dvh - 32px);
-  margin: auto;
+  width: min(660px, 100%);
+  max-width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border-radius: 22px 0 0 22px;
   color: var(--platform-text);
   box-shadow: 0 32px 100px #242b6033;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  animation: drawerEnter 0.32s var(--ease-out) both;
+}
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.dialog::backdrop {
+  background: #242b6026;
+}
+.dialog .top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  padding: 24px 24px 12px;
+  flex-shrink: 0;
+  align-items: start;
+}
+.dialog .top > button {
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+}
+.dialog .top h2 {
+  margin: 0;
+  font-size: 30px;
+  max-width: none;
+}
+.form {
+  min-height: 0;
+}
+.dialog .form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 24px;
   overflow: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
-.dialog::backdrop {
-  background: #242b6066;
-  backdrop-filter: blur(5px);
+.dialog .form > * {
+  flex-shrink: 0;
+}
+.workflow {
+  padding: 8px 0 20px;
+}
+.dialog .workflow {
+  padding: 8px 24px 16px;
+  border-bottom: 1px solid var(--platform-line);
+  flex-shrink: 0;
+}
+.workflow ol {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+.workflow li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--platform-muted);
+}
+.workflow li > span {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--platform-soft);
+}
+.workflow li[aria-current] {
+  color: var(--platform-text);
+  font-weight: 600;
+}
+.workflow li[aria-current] > span {
+  background: var(--platform-text);
+  color: white;
+}
+.workflow p {
+  margin: 0;
+  font-size: 11px;
+}
+.submitBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 18px 0;
+  margin-top: 24px;
+  border-top: 1px solid var(--platform-line);
+  background: var(--platform-surface);
+  z-index: 2;
+}
+.submitBar > span {
+  color: var(--platform-muted);
+  font-size: 11px;
+}
+.submitBar button {
+  display: inline-flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.dialog .submitBar {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  margin-inline: -24px;
+  padding-inline: 24px;
+  box-shadow: 0 -10px 20px #242b6006;
+}
+.dialog > .notice {
+  margin: 10px 24px;
+  flex-shrink: 0;
+}
+.stockImpact {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0;
+  border: 1px solid var(--platform-line);
+  border-radius: 14px;
+  padding: 20px;
+}
+.stockImpact > span {
+  font-size: 12px;
+}
+.stockImpact strong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 30px;
+  font-weight: 500;
+}
+.stockImpact small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--platform-muted);
+}
+.accounting {
+  margin: 24px 0;
+  font-size: 11px;
+  color: var(--platform-muted);
+  overflow-wrap: anywhere;
+}
+.accounting summary {
+  min-height: 44px;
+  cursor: pointer;
+  padding: 12px 0;
+}
+.accounting dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-block: 10px;
+}
+.accounting dd {
+  margin: 0;
+}
+.panel .demoNote {
+  font-size: 10px;
+}
+.reviewAmount {
+  font-size: 42px;
+  line-height: 1.1;
+  margin: 28px 0 12px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.reviewCategory {
+  text-transform: capitalize;
+  font-size: 12px;
+  color: var(--platform-muted);
+}
+@keyframes drawerEnter {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (max-width: 600px) {
+  .dialog {
+    border-radius: 0;
+  }
+  .dialog .top {
+    padding: 18px 18px 12px;
+  }
+  .dialog .workflow {
+    padding-inline: 18px;
+  }
+  .dialog .form {
+    padding-inline: 18px;
+  }
+  .dialog .submitBar {
+    margin-inline: -18px;
+    padding-inline: 18px;
+  }
+  .submitBar > span {
+    flex-basis: 100%;
+  }
+  .submitBar button {
+    flex: 1 1 100%;
+  }
 }
 .inline {
   padding: 16px;
@@ -242,8 +449,47 @@
   font-variant-numeric: tabular-nums;
 }
 .notice {
-  color: var(--feedback-success) !important;
   overflow-wrap: anywhere;
+}
+.panel .notice[data-tone="success"] {
+  color: var(--feedback-success);
+}
+.panel .notice[data-tone="error"],
+.panel .fieldError {
+  color: var(--feedback-error);
+}
+.panel .fieldError {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+.panel [aria-invalid="true"] {
+  border-color: var(--feedback-error);
+}
+.errorSummary,
+.panel .notice[data-tone="error"] {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--feedback-error);
+  border-radius: 12px;
+  background: var(--feedback-error-surface);
+  color: var(--feedback-error);
+  font-size: 13px;
+}
+.errorSummary ul {
+  padding-left: 18px;
+  margin: 6px 0 0;
+}
+.errorSummary button {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  padding: 6px 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
 }
 @keyframes rise {
   from {

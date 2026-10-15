@@ -4,9 +4,16 @@ import { Field, SelectField } from "./fields";
 import { formatUsd } from "@retailor/commerce/money";
 import { refundable } from "@retailor/commerce/selectors";
 import styles from "./operations.module.css";
+import { FieldFeedback, ownerFieldProps } from "./field-feedback";
+import { visibleOwnerIssues } from "./validation";
 export function ReturnForm() {
-  const { controller, ownerForm, state } = useSession();
+  const { controller, ownerForm, state, ownerIssues } = useSession();
   if (!ownerForm) return null;
+  const issues = visibleOwnerIssues(
+    ownerForm,
+    ownerIssues,
+    controller.photos.availableIds(),
+  );
   const form = ownerForm,
     returned = state.graph.returns.find((r) => r.id === form.targetId),
     order = state.graph.orders.find(
@@ -21,7 +28,7 @@ export function ReturnForm() {
           Financial refunds do not restore stock or reverse sold cost. Amounts
           below are the remaining discounted components.
         </p>
-        {form.refunds.map((row) => (
+        {form.refunds.map((row, index) => (
           <label className={styles.field} key={row.lineId}>
             <span>
               {order.lines.find((l) => l.id === row.lineId)?.title} · refundable{" "}
@@ -32,6 +39,8 @@ export function ReturnForm() {
               · USD
             </span>
             <input
+              {...ownerFieldProps(form, issues, `refunds.${index}.amount`)}
+              aria-label={`Refund line ${index + 1} amount · USD`}
               inputMode="decimal"
               maxLength={16}
               value={row.amount}
@@ -45,6 +54,11 @@ export function ReturnForm() {
                   ),
                 )
               }
+            />
+            <FieldFeedback
+              form={form}
+              issues={issues}
+              field={`refunds.${index}.amount`}
             />
           </label>
         ))}
@@ -124,6 +138,7 @@ export function ReturnForm() {
               return (
                 <label className={styles.check} key={unit}>
                   <input
+                    {...ownerFieldProps(form, issues, "unitsSelection")}
                     type="checkbox"
                     checked={chosen.includes(unit)}
                     onChange={(event) => {
@@ -147,6 +162,7 @@ export function ReturnForm() {
           </fieldset>
         );
       })}
+      <FieldFeedback form={form} issues={issues} field="unitsSelection" />
     </>
   );
 }

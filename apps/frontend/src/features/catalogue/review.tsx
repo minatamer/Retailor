@@ -1,4 +1,5 @@
 "use client";
+import { CATEGORY_LABELS } from "@retailor/contracts/product";
 import { useState } from "react";
 import { formatUsd } from "@retailor/commerce/money";
 import { Button } from "../../components/ui/button";
@@ -41,6 +42,38 @@ export function CatalogueReview() {
             {included} garments included. Click a card to edit its photos and
             details.
           </p>
+          <div className={styles.coverage}>
+            <p role="status" aria-label="Photo status">
+              {
+                draft.dispositions.filter((item) => item.kind === "linked")
+                  .length
+              }{" "}
+              linked ·{" "}
+              {
+                draft.dispositions.filter((item) => item.kind === "rejected")
+                  .length
+              }{" "}
+              excluded ·{" "}
+              {
+                draft.dispositions.filter((item) => item.kind === "review")
+                  .length
+              }{" "}
+              to review
+            </p>
+            {draft.dispositions
+              .filter((item) => item.kind === "review")
+              .map((item) => (
+                <div key={item.photoId}>
+                  <span>{item.reason}</span>
+                  <Button
+                    variant="secondary"
+                    onClick={() => controller.excludeSource(item.photoId)}
+                  >
+                    Exclude this source
+                  </Button>
+                </div>
+              ))}
+          </div>
         </div>
         <span className={styles.count}>
           {String(included).padStart(2, "0")}
@@ -59,7 +92,7 @@ export function CatalogueReview() {
           }
           onClick={() => controller.publish()}
         >
-          Make it my own <Icon name="arrow" />
+          Personalize store <Icon name="arrow" />
         </Button>
       </div>
       <div className={photoStyles.linkHeading}>
@@ -131,7 +164,7 @@ export function CatalogueReview() {
                 />
                 <span className={styles.cardBody}>
                   <small>
-                    {product.category.replaceAll("-", " ")} ·{" "}
+                    {CATEGORY_LABELS[product.category]} ·{" "}
                     {item.copyOrigin === "user_supplied"
                       ? "edited by you"
                       : "draft"}
@@ -197,30 +230,6 @@ export function CatalogueReview() {
             </article>
           );
         })}
-      </div>
-      <div className={styles.coverage}>
-        <h2>Every photo has a place.</h2>
-        <p>
-          {draft.dispositions.filter((item) => item.kind === "linked").length}{" "}
-          linked ·{" "}
-          {draft.dispositions.filter((item) => item.kind === "rejected").length}{" "}
-          excluded ·{" "}
-          {draft.dispositions.filter((item) => item.kind === "review").length}{" "}
-          to review
-        </p>
-        {draft.dispositions
-          .filter((item) => item.kind === "review")
-          .map((item) => (
-            <div key={item.photoId}>
-              <span>{item.reason}</span>
-              <Button
-                variant="secondary"
-                onClick={() => controller.excludeSource(item.photoId)}
-              >
-                Exclude this source
-              </Button>
-            </div>
-          ))}
       </div>
       {edited && (
         <ProductEditor

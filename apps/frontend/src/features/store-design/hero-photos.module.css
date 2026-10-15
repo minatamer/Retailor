@@ -1,0 +1,70 @@
+.heroes {
+  min-width: 0;
+}
+.heroes h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.heroes p {
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--platform-muted);
+}
+.slot {
+  min-width: 0;
+  margin: 16px 0;
+  padding: 12px;
+  border: 1px solid var(--platform-line);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 12px;
+}
+.slot legend {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 5px;
+}
+.thumbnail {
+  grid-row: span 2;
+  height: 86px;
+  border: 1px solid var(--platform-line);
+  border-radius: 6px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  text-align: center;
+}
+.thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.slot label {
+  min-width: 0;
+  font-size: 12px;
+}
+.slot select {
+  max-width: 100%;
+}
+.upload input {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  font-size: 11px;
+}
+.slot .caption {
+  grid-column: 1 / -1;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 359px) {
+  .slot {
+    grid-template-columns: 1fr;
+  }
+  .thumbnail {
+    grid-row: auto;
+    width: 62px;
+  }
+}

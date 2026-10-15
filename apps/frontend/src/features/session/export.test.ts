@@ -4,6 +4,7 @@ import { generateScenario } from "@retailor/commerce/scenarios";
 import { environment, file } from "../../../test/workspace";
 import { buildExport } from "./export";
 import { ReportDownload } from "./download";
+import { heroPhotoIds } from "@retailor/contracts/design";
 
 const environments: ReturnType<typeof environment>[] = [];
 afterEach(() => {
@@ -22,6 +23,32 @@ async function collection() {
   controller.acceptDesign();
   return { env, controller };
 }
+it("exports all accepted hero metadata with the legacy first photo and no preview or image bytes", async () => {
+  const { env, controller } = await collection();
+  controller.go("dashboard");
+  controller.beginOwnerDesign();
+  const state = controller.getSnapshot().state;
+  controller.design({ ...state.previewDesign, template: "pulse" });
+  controller.heroInput(0, state.photos[0]!.id);
+  controller.heroInput(1, state.photos[1]!.id);
+  await controller.uploadHero(file("third-hero"), 2);
+  controller.applyOwnerDesign();
+  const accepted = controller.getSnapshot().state.acceptedDesign;
+  const result = buildExport(controller.getSnapshot().state, env.clock(), true);
+  const report = DemoExportSchema.parse(JSON.parse(result.json));
+  expect(report.heroPhotos.map((photo) => photo.id)).toEqual(
+    heroPhotoIds(accepted),
+  );
+  expect(report.heroPhoto?.id).toBe(accepted.heroPhotoId);
+  expect(result.bytes).toBeLessThan(EXPORT_LIMITS.bytes);
+  expect(result.json).not.toMatch(/blob:|data:image/u);
+  expect(() =>
+    DemoExportSchema.parse({
+      ...report,
+      heroPhotos: [...report.heroPhotos, report.heroPhotos[0]],
+    }),
+  ).toThrow();
+});
 it("exports finalized exact records and scoped facts while excluding chat, drafts, replay and preview design", async () => {
   const { env, controller } = await collection();
   controller.go("dashboard");

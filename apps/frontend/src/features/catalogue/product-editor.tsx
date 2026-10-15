@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { CATEGORY_LABELS } from "@retailor/contracts/product";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { CategorySchema } from "@retailor/contracts/product";
 import type { ProductInput } from "@retailor/contracts/product";
@@ -12,6 +13,7 @@ import { Button } from "../../components/ui/button";
 import { useSession } from "../session/context";
 import type { DraftItem } from "./draft";
 import { readCatalogueEdit, catalogueEditNotice } from "./edit-input";
+import { sizeOptionFields, suggestSizeOption } from "./size-options";
 import styles from "../../components/ui/photo-dialog.module.css";
 
 function fieldsFor(product: ProductInput) {
@@ -20,13 +22,6 @@ function fieldsFor(product: ProductInput) {
     category: product.category,
     description: product.description,
   };
-  product.variants.forEach((variant, index) => {
-    fields[`size_${index}`] = variant.size;
-    fields[`colour_${index}`] = variant.colour;
-    fields[`price_${index}`] = (variant.price / 100).toFixed(2);
-    fields[`cost_${index}`] = (variant.unitCost / 100).toFixed(2);
-    fields[`stock_${index}`] = String(variant.openingStock);
-  });
   product.colourPhotos?.forEach((row, index) => {
     fields[`colourway_${index}`] = row.colour;
   });
@@ -44,7 +39,40 @@ export function ProductEditor({
 }) {
   const { controller, state } = useSession(),
     product = item.product;
+  const reviewReason =
+    item.linkOrigin === "development-fixture" &&
+    item.reviewReason ===
+      "Automatic linking simulation; review the matching views and colour options."
+      ? ""
+      : item.reviewReason;
   const [fields, setFields] = useState(() => fieldsFor(product));
+  const [optionRows, setOptions] = useState(() =>
+    product.variants.map((variant) => ({
+      original: variant,
+      fields: sizeOptionFields(variant),
+    })),
+  );
+  const [originalOptionIds] = useState(
+    () => new Set(product.variants.map((row) => row.id)),
+  );
+  const options = optionRows.filter(
+    (row) =>
+      product.variants.some((variant) => variant.id === row.original.id) ||
+      (!originalOptionIds.has(row.original.id) &&
+        product.variants.some(
+          (variant) =>
+            variant.colour.toLowerCase() === row.original.colour.toLowerCase(),
+        )),
+  );
+  const focusOption = useRef<string | null>(null);
+  const [optionNotice, setOptionNotice] = useState("");
+  const optionLimit = Math.min(
+    24,
+    288 -
+      (state.draft?.items
+        .filter((row) => row.product.id !== product.id)
+        .reduce((total, row) => total + row.product.variants.length, 0) ?? 0),
+  );
   const [order, setOrder] = useState(product.imageIds),
     [error, setError] = useState("");
   const [selected, setSelected] = useState(product.imageIds[0]);
@@ -73,6 +101,44 @@ export function ProductEditor({
     onChange: (event: { target: { value: string } }) =>
       setFields((current) => ({ ...current, [name]: event.target.value })),
   });
+  const optionInput = (
+    index: number,
+    name: "size" | "colour" | "price" | "cost" | "stock",
+  ) => ({
+    name: `${name}_${index}`,
+    value: options[index]!.fields[name],
+    onChange: (event: { target: { value: string } }) =>
+      setOptions((current) =>
+        current.map((row) =>
+          row.original.id === options[index]!.original.id
+            ? { ...row, fields: { ...row.fields, [name]: event.target.value } }
+            : row,
+        ),
+      ),
+  });
+  function addSize(afterId: string) {
+    if (options.length >= optionLimit) return;
+    const next = suggestSizeOption(
+      options.map((row) => row.fields),
+      afterId,
+      product.sizingSystemId,
+      crypto.randomUUID(),
+    );
+    const index = options.findIndex((row) => row.original.id === afterId);
+    if (!next || index < 0) return;
+    const source = options[index]!.original;
+    focusOption.current = next.id;
+    setOptions([
+      ...options.slice(0, index + 1),
+      { original: { ...source, id: next.id, sku: next.sku }, fields: next },
+      ...options.slice(index + 1),
+    ]);
+    setOptionNotice(
+      next.size
+        ? "Next size suggested. Price, unit cost and opening units copied; review before saving."
+        : "Enter the new size. Price, unit cost and opening units copied; review before saving.",
+    );
+  }
   function move(id: string, direction: -1 | 1) {
     const next = [...images],
       index = next.indexOf(id),
@@ -86,7 +152,11 @@ export function ProductEditor({
     if (!form.reportValidity()) return;
     try {
       const edited = readCatalogueEdit(
-        { ...product, imageIds: images },
+        {
+          ...product,
+          imageIds: images,
+          variants: options.map((row) => row.original),
+        },
         new FormData(form),
       );
       if (
@@ -235,15 +305,21 @@ export function ProductEditor({
                             setFields((current) => ({
                               ...current,
                               [`colourway_${colourIndex}`]: value,
-                              ...Object.fromEntries(
-                                product.variants.flatMap((variant, index) =>
-                                  variant.colour.toLowerCase() ===
-                                  row.colour.toLowerCase()
-                                    ? [[`colour_${index}`, value]]
-                                    : [],
-                                ),
-                              ),
                             }));
+                            setOptions((current) =>
+                              current.map((option) =>
+                                option.original.colour.toLowerCase() ===
+                                row.colour.toLowerCase()
+                                  ? {
+                                      ...option,
+                                      fields: {
+                                        ...option.fields,
+                                        colour: value,
+                                      },
+                                    }
+                                  : option,
+                              ),
+                            );
                           }}
                         />
                       </label>
@@ -261,7 +337,7 @@ export function ProductEditor({
               <select {...input("category")}>
                 {CategorySchema.options.map((category) => (
                   <option key={category} value={category}>
-                    {category.replaceAll("-", " ")}
+                    {CATEGORY_LABELS[category]}
                   </option>
                 ))}
               </select>
@@ -274,62 +350,119 @@ export function ProductEditor({
               One product, one set of options. Price, cost and opening stock
               below are editable demo defaults.
             </p>
-            {product.variants.map((variant, option) => (
-              <fieldset key={variant.id}>
-                <legend>
-                  {fields[`colour_${option}`]} · {fields[`size_${option}`]}
-                </legend>
-                <div className={styles.optionFields}>
-                  <label>
-                    Size
-                    <input
-                      {...input(`size_${option}`)}
-                      required
-                      maxLength={16}
-                    />
-                  </label>
-                  {product.colourPhotos?.some(
-                    (row) =>
-                      row.colour.toLowerCase() === variant.colour.toLowerCase(),
-                  ) ? (
-                    <input type="hidden" {...input(`colour_${option}`)} />
-                  ) : (
+            {options.map(
+              ({ original: variant, fields: optionFields }, option) => (
+                <fieldset key={variant.id}>
+                  <legend>
+                    {optionFields.colour} · {optionFields.size || "New size"}
+                  </legend>
+                  <div className={styles.optionFields}>
                     <label>
-                      Colour
+                      Size
                       <input
-                        {...input(`colour_${option}`)}
+                        {...optionInput(option, "size")}
+                        ref={(element) => {
+                          if (element && focusOption.current === variant.id) {
+                            element.focus();
+                            focusOption.current = null;
+                          }
+                        }}
                         required
-                        maxLength={32}
+                        maxLength={16}
                       />
                     </label>
-                  )}
-                  <label>
-                    Price · USD
-                    <input
-                      {...input(`price_${option}`)}
-                      inputMode="decimal"
-                      required
-                    />
-                  </label>
-                  <label>
-                    Unit cost · USD
-                    <input
-                      {...input(`cost_${option}`)}
-                      inputMode="decimal"
-                      required
-                    />
-                  </label>
-                  <label>
-                    Opening units
-                    <input
-                      {...input(`stock_${option}`)}
-                      inputMode="numeric"
-                      required
-                    />
-                  </label>
-                </div>
-              </fieldset>
-            ))}
+                    {product.colourPhotos?.some(
+                      (row) =>
+                        row.colour.toLowerCase() ===
+                        variant.colour.toLowerCase(),
+                    ) ? (
+                      <input type="hidden" {...optionInput(option, "colour")} />
+                    ) : (
+                      <label>
+                        Colour
+                        <input
+                          {...optionInput(option, "colour")}
+                          required
+                          maxLength={32}
+                        />
+                      </label>
+                    )}
+                    <label>
+                      Price · USD
+                      <input
+                        {...optionInput(option, "price")}
+                        inputMode="decimal"
+                        required
+                      />
+                    </label>
+                    <label>
+                      Unit cost · USD
+                      <input
+                        {...optionInput(option, "cost")}
+                        inputMode="decimal"
+                        required
+                      />
+                    </label>
+                    <label>
+                      Opening units
+                      <input
+                        {...optionInput(option, "stock")}
+                        inputMode="numeric"
+                        required
+                      />
+                    </label>
+                  </div>
+                  <div className={styles.optionActions}>
+                    {!optionFields.archived &&
+                      !options
+                        .slice(option + 1)
+                        .some(
+                          (row) =>
+                            !row.fields.archived &&
+                            row.fields.colour.trim().toLowerCase() ===
+                              optionFields.colour.trim().toLowerCase(),
+                        ) && (
+                        <Button
+                          variant="secondary"
+                          disabled={options.length >= optionLimit}
+                          aria-label={`Add size for ${optionFields.colour}`}
+                          onClick={() => addSize(variant.id)}
+                        >
+                          Add size
+                        </Button>
+                      )}
+                    {!product.variants.some((row) => row.id === variant.id) && (
+                      <Button
+                        variant="quiet"
+                        aria-label={`Remove added size ${optionFields.size || "option"} for ${optionFields.colour}`}
+                        onClick={(event) => {
+                          focusPhotoDialog(event.currentTarget);
+                          setOptions((current) =>
+                            current.filter(
+                              (row) => row.original.id !== variant.id,
+                            ),
+                          );
+                          setOptionNotice(
+                            "Added size removed. Other edits are kept.",
+                          );
+                        }}
+                      >
+                        Remove size
+                      </Button>
+                    )}
+                  </div>
+                </fieldset>
+              ),
+            )}
+            {(options.length >= optionLimit || optionNotice) && (
+              <p role="status" className={styles.intro}>
+                {options.length >= optionLimit
+                  ? optionLimit === 24
+                    ? "This garment has the maximum of 24 size and colour options."
+                    : "This draft has reached its size and colour option limit."
+                  : optionNotice}
+              </p>
+            )}
             {product.attributes.some(
               (attribute) => !attribute.sourceIds.length,
             ) && (
@@ -346,9 +479,7 @@ export function ProductEditor({
               </ul>
             )}
           </div>
-          {item.reviewReason && (
-            <p className={styles.intro}>{item.reviewReason}</p>
-          )}
+          {reviewReason && <p className={styles.intro}>{reviewReason}</p>}
           {error && (
             <p role="alert" className={styles.error}>
               {error}

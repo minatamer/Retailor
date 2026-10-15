@@ -56,6 +56,31 @@ async function prepared(
   return c;
 }
 describe("one session owns scoped Tailor conversation", () => {
+  it("ignores blank and duplicate pending sends while preserving a new multiline draft", async () => {
+    let resolve!: (result: AssistantResult) => void, input!: AssistantPayload;
+    const request = vi.fn((payload: AssistantPayload) => {
+        input = payload;
+        return new Promise<AssistantResult>((done) => {
+          resolve = done;
+        });
+      }),
+      c = await prepared(env(), request);
+    c.assistantInput(" \n ");
+    await c.sendAssistant();
+    expect(request).not.toHaveBeenCalled();
+    c.assistantInput("hello\nhelp me choose a look");
+    const first = c.sendAssistant();
+    c.assistantInput("Keep this next draft");
+    await c.sendAssistant();
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(input.prompt).toBe("hello\nhelp me choose a look");
+    expect(c.getSnapshot().state.conversation).toHaveLength(1);
+    resolve(reply(input));
+    await first;
+    expect(c.getSnapshot().assistantBusy).toBe(false);
+    expect(c.getSnapshot().assistantDraft).toBe("Keep this next draft");
+    expect(c.getSnapshot().state.conversation).toHaveLength(2);
+  });
   it("applies current shopping filters immediately, keeps local shortcuts free and restores finalized text inertly", async () => {
     const e = env(),
       request = vi.fn(async (p: AssistantPayload) =>

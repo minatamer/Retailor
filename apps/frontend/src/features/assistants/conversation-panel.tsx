@@ -13,12 +13,18 @@ export function ConversationPanel() {
       state,
       assistantDraft,
       assistantBusy,
+      logoBusy,
       assistantNotice,
       ownerForm,
       ownerSurface,
       ownerResult,
     } = useSession(),
     role = roleOf(state);
+  const canSend =
+    !assistantBusy &&
+    !logoBusy &&
+    Boolean(assistantDraft.trim()) &&
+    controller.canAttemptAi();
   const messages = state.conversation.filter((m) => m.role === role);
   const context = controller.assistantContext();
   const model = useMemo(
@@ -95,8 +101,21 @@ export function ConversationPanel() {
           id="tailor-prompt"
           rows={3}
           maxLength={2000}
+          aria-describedby="tailor-prompt-hint"
           value={assistantDraft}
           onChange={(event) => controller.assistantInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (
+              event.key !== "Enter" ||
+              event.shiftKey ||
+              event.nativeEvent.isComposing ||
+              event.keyCode === 229
+            )
+              return;
+            event.preventDefault();
+            if (!event.repeat && canSend)
+              event.currentTarget.form?.requestSubmit();
+          }}
           placeholder={
             role === "owner"
               ? "Explain this chart day’s operating result…"
@@ -105,6 +124,10 @@ export function ConversationPanel() {
                 : "Show me the jeans under €80…"
           }
         />
+        <p id="tailor-prompt-hint" className={styles.composerHint}>
+          {state.fixture && "Demo chat · Simulated replies. "}
+          Enter to send · Shift+Enter for a new line
+        </p>
         {!state.fixture && (
           <p className={styles.note}>
             Send shares this demo’s records, prompt and recent role messages
@@ -113,20 +136,9 @@ export function ConversationPanel() {
           </p>
         )}
         <div className={styles.composerActions}>
-          <button
-            type="submit"
-            disabled={
-              assistantBusy ||
-              !assistantDraft.trim() ||
-              !controller.canAttemptAi()
-            }
-          >
-            {assistantBusy
-              ? "Investigating…"
-              : state.fixture
-                ? "Try development example"
-                : "Send to Tailor"}{" "}
-            →
+          <button type="submit" disabled={!canSend}>
+            {assistantBusy ? "Sending…" : "Send"}{" "}
+            <span aria-hidden="true">→</span>
           </button>
           {assistantBusy && (
             <button type="button" onClick={() => controller.cancelAssistant()}>

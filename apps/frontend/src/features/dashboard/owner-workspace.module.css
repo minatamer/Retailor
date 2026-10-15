@@ -1,20 +1,11 @@
 .owner {
-  --owner-sidebar-width: 248px;
-  display: grid;
-  grid-template-columns: var(--owner-sidebar-width) minmax(0, 1fr);
-  gap: 28px;
-  align-items: start;
   min-width: 0;
-  transition: grid-template-columns 420ms var(--ease-out);
-}
-.owner[data-collapsed="true"] {
-  --owner-sidebar-width: 76px;
 }
 .content {
   min-width: 0;
 }
 .header {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
@@ -60,10 +51,8 @@
   min-width: 0;
 }
 @media (max-width: 900px) {
-  .owner,
-  .owner[data-collapsed="true"] {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
+  .header {
+    display: flex;
   }
   .menu {
     display: flex;
@@ -74,12 +63,140 @@
     display: none;
   }
 }
-.records > h2 {
+.titleRow h2 {
   font-family: var(--font-editorial);
   font-weight: 400;
   font-size: 32px;
-  margin: 12px 0 20px;
+  margin: 5px 0 0;
   outline-offset: 5px;
+}
+.titleRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--platform-muted);
+}
+.intro {
+  color: var(--platform-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+.resultBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid var(--platform-line);
+  border-radius: 12px;
+  background: var(--platform-selected);
+  font-size: 13px;
+  margin: 20px 0;
+}
+.resultBanner[data-tone="error"] {
+  background: var(--feedback-error-surface);
+  color: var(--feedback-error);
+  border-color: var(--feedback-error);
+}
+.resultBanner button {
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+}
+.recordHeading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.recordHeading > div:nth-child(2) {
+  min-width: 140px;
+  flex: 1;
+}
+.recordHeading h3 {
+  margin: 8px 0 5px;
+  font-weight: 600;
+}
+.recordHeading small {
+  color: var(--platform-muted);
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.recordHeading .source {
+  margin: 6px 0 0;
+}
+.recordAmount {
+  margin-left: auto;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.recordAmount small {
+  display: block;
+  font-size: 10px;
+  text-align: right;
+  margin-top: 5px;
+  letter-spacing: 0;
+}
+.recordIcon {
+  background: var(--platform-soft);
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+}
+.records[data-view="orders"] .record dl {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 18px;
+  background: var(--platform-canvas);
+  border-radius: 12px;
+}
+.records[data-view="orders"] .record dl div {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+.records[data-view="orders"] .record dd {
+  font-size: 16px;
+}
+.rating {
+  --store-text: var(--platform-text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.reviewQuote {
+  font-family: var(--font-editorial);
+  font-size: 23px;
+  line-height: 1.5;
+  margin: 24px 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .records[data-view="orders"] .record dl {
+    grid-template-columns: 1fr;
+  }
+  .recordAmount {
+    font-size: 24px;
+  }
 }
 .metrics {
   display: grid;

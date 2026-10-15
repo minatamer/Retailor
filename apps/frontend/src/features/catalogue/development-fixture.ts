@@ -1,5 +1,6 @@
 import type { Photo } from "@retailor/contracts/photos";
 import type { ProductInput } from "@retailor/contracts/product";
+import { formatGarmentTitle } from "@retailor/contracts/product";
 import { parseDraft, mergeDraft } from "./draft";
 import { SAMPLE } from "../photos/sample";
 import type { CatalogueDraft } from "./draft";
@@ -72,7 +73,7 @@ export function developmentDraft(
     return {
       product: {
         id: productId,
-        title: TITLES[originalIndex] ?? "Clothing draft",
+        title: formatGarmentTitle(TITLES[originalIndex] ?? "Clothing draft"),
         description: "",
         category,
         imageIds: [photo.id],

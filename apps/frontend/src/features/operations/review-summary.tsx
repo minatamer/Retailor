@@ -1,4 +1,5 @@
 "use client";
+import { CATEGORY_LABELS } from "@retailor/contracts/product";
 import { useSession } from "../session/context";
 import { productReferenced } from "@retailor/commerce/selectors";
 import { formatUsd } from "@retailor/commerce/money";
@@ -20,7 +21,7 @@ export function ReviewSummary() {
       return (
         <div className={styles.effect}>
           <strong>
-            {p.title} · {p.category.replaceAll("-", " ")}
+            {p.title} · {CATEGORY_LABELS[p.category]}
             {p.archived ? " · Archived from shopping" : " · Offered in store"}
           </strong>
           <div className={styles.photos}>
@@ -157,17 +158,28 @@ export function ReviewSummary() {
       );
     case "adjustStock":
       return (
-        <p>
-          {variant(c.payload.variantId)?.sku} · {c.payload.units} signed units ·{" "}
-          {c.payload.kind} · {c.payload.reason}
-        </p>
+        <section>
+          <h3>
+            {c.payload.units > 0 ? "Add" : "Remove"} {Math.abs(c.payload.units)}{" "}
+            {Math.abs(c.payload.units) === 1 ? "unit" : "units"}
+          </h3>
+          <p>
+            {c.payload.kind === "inbound"
+              ? "New stock received"
+              : "Stock count correction"}
+          </p>
+          <p>{c.payload.reason}</p>
+        </section>
       );
     case "writeoffStock":
       return (
-        <p>
-          {variant(c.payload.variantId)?.sku} · {c.payload.quantity} available
-          units · {c.payload.reason}
-        </p>
+        <section>
+          <h3>
+            Write off {c.payload.quantity}{" "}
+            {c.payload.quantity === 1 ? "unit" : "units"}
+          </h3>
+          <p>{c.payload.reason}</p>
+        </section>
       );
     case "issueRefund":
       return (
@@ -207,33 +219,52 @@ export function ReviewSummary() {
       );
     case "saveExpenseDraft":
       return (
-        <p>
-          {c.payload.category} · Unposted {formatUsd(c.payload.amount)} ·{" "}
-          {c.payload.note}
-        </p>
+        <section aria-label="Expense draft review">
+          <div className={styles.reviewAmount}>
+            {formatUsd(c.payload.amount)}
+          </div>
+          <span className={styles.reviewCategory}>
+            {c.payload.category} · Draft
+          </span>
+          <p>{c.payload.note || "No note added."}</p>
+          <p>This saves a draft. Post it later to include it in expenses.</p>
+        </section>
       );
     case "postExpense":
     case "deleteExpenseDraft": {
       const e = g.expenseDrafts.find((e) => e.id === c.payload.draftId);
       return (
-        <p>
-          {e?.category} · {formatUsd(e?.amount ?? 0)} · {e?.note}
-        </p>
+        <section aria-label="Expense review">
+          <div className={styles.reviewAmount}>{formatUsd(e?.amount ?? 0)}</div>
+          <span className={styles.reviewCategory}>{e?.category}</span>
+          <p>{e?.note}</p>
+        </section>
       );
     }
     case "correctExpense":
       return (
-        <p>
-          Linked correction {formatUsd(c.payload.amount)} to{" "}
-          {c.payload.expenseId} · {c.payload.note}
-        </p>
+        <section>
+          <div className={styles.reviewAmount}>
+            {formatUsd(c.payload.amount)}
+          </div>
+          <span className={styles.reviewCategory}>
+            Linked expense adjustment
+          </span>
+          <p>{g.expenses.find((e) => e.id === c.payload.expenseId)?.note}</p>
+          <p>{c.payload.note}</p>
+        </section>
       );
     case "voidExpense":
       return (
-        <p>
-          Linked reversal of {c.payload.expenseId} and its existing corrections
-          · {c.payload.note}
-        </p>
+        <section>
+          <h3>Void this expense</h3>
+          <p>{g.expenses.find((e) => e.id === c.payload.expenseId)?.note}</p>
+          <p>{c.payload.note}</p>
+          <p>
+            Reverse this expense and its linked corrections. The original record
+            stays in history.
+          </p>
+        </section>
       );
     default:
       return (

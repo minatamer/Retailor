@@ -70,6 +70,7 @@ function WorkspaceFlow() {
         : state.stage === "catalogue"
           ? 2
           : 3;
+  const fullPage = state.stage === "storefront" || state.stage === "dashboard";
   if (!ready)
     return (
       <main className={styles.opening}>
@@ -78,41 +79,26 @@ function WorkspaceFlow() {
       </main>
     );
   return (
-    <main className={styles.workspace}>
-      <header
-        className={styles.header}
-        data-store-actions={state.stage === "storefront" ? "true" : undefined}
-      >
-        <Link href="/" className={styles.wordmark} aria-label="Retailor home">
-          <Brand />
-        </Link>
-        <div className={styles.headerActions}>
-          <Button variant="quiet" onClick={() => controller.askReset()}>
-            Reset demo
-          </Button>
-          {state.stage === "dashboard" && (
-            <Button
-              variant="secondary"
-              onClick={() => controller.go("storefront")}
-            >
-              View storefront
+    <main
+      className={styles.workspace}
+      data-owner-workspace={state.stage === "dashboard" ? "true" : undefined}
+      data-storefront-workspace={
+        state.stage === "storefront" ? "true" : undefined
+      }
+      data-full-page={fullPage ? "true" : undefined}
+    >
+      {!fullPage && (
+        <header className={styles.header}>
+          <Link href="/" className={styles.wordmark} aria-label="Retailor home">
+            <Brand />
+          </Link>
+          <div className={styles.headerActions}>
+            <Button variant="quiet" onClick={() => controller.askReset()}>
+              Reset demo
             </Button>
-          )}
-          {state.stage === "storefront" && (
-            <>
-              <Button
-                variant="secondary"
-                onClick={() => controller.go("style")}
-              >
-                Revisit the look
-              </Button>
-              <Button onClick={() => controller.go("dashboard")}>
-                Owner dashboard <Icon name="arrow" />
-              </Button>
-            </>
-          )}
-        </div>
-      </header>
+          </div>
+        </header>
+      )}
       <div
         className={styles.main}
         data-tailor-preview={
@@ -121,7 +107,7 @@ function WorkspaceFlow() {
       >
         {!["storefront", "dashboard"].includes(state.stage) && (
           <ol className={styles.steps} aria-label="Store creation progress">
-            {["Photos", "Draft", "Review", "Make it yours"].map(
+            {["Photos", "Draft", "Review", "Personalize"].map(
               (label, index) => (
                 <li
                   key={label}
@@ -252,10 +238,33 @@ function WorkspaceFlow() {
           </p>
         )}
       </div>
-      <footer className={styles.footer}>
-        <Link href="/" className={styles.wordmark} aria-label="Retailor home">
-          <Brand />
-        </Link>
+      <footer
+        className={styles.footer}
+        data-full-page={fullPage ? "true" : undefined}
+      >
+        {fullPage ? (
+          <>
+            <p className={styles.attribution}>
+              Powered by <Link href="/">Retailor</Link>
+            </p>
+            <nav className={styles.footerActions} aria-label="Demo controls">
+              {state.stage === "dashboard" ? (
+                <button onClick={() => controller.go("storefront")}>
+                  View storefront
+                </button>
+              ) : (
+                <button onClick={() => controller.go("style")}>
+                  Personalize
+                </button>
+              )}
+              <button onClick={() => controller.askReset()}>Reset demo</button>
+            </nav>
+          </>
+        ) : (
+          <Link href="/" className={styles.wordmark} aria-label="Retailor home">
+            <Brand />
+          </Link>
+        )}
       </footer>
       <Tailor />
       <BagDialog />
@@ -339,8 +348,10 @@ function CollectionCanvas() {
             : {}),
           items,
           photos,
+          feedback: state.graph.feedback,
           browse: state.browse,
           preview,
+          fullPage: state.stage === "storefront",
           currency: selectedScope(state.currency),
           bagCount: state.graph.bag.reduce(
             (sum, line) => sum + line.quantity,

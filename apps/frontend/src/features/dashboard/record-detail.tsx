@@ -1,4 +1,5 @@
 "use client";
+import { CATEGORY_LABELS } from "@retailor/contracts/product";
 import { formatUsd } from "@retailor/commerce/money";
 import { exactProduct } from "@retailor/commerce/allocation";
 import { stockOf, orderFinancialState } from "@retailor/commerce/selectors";
@@ -42,7 +43,7 @@ export function RecordDetail({ reference }: { reference: string }) {
         )}
         <h4>{p.title}</h4>
         <p>
-          Current garment · {p.category} ·{" "}
+          Current garment · {CATEGORY_LABELS[p.category]} ·{" "}
           {p.archived ? "Archived from shopping" : "Offered in storefront"}
         </p>
         {p.variants.map((v) => (

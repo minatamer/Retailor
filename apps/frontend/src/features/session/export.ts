@@ -5,6 +5,7 @@ import { validateSnapshot } from "@retailor/commerce/currency";
 import { dashboardScope } from "../dashboard/model";
 import type { Projection } from "./projection";
 import { ProjectionSchema } from "./projection";
+import { heroPhotoIds } from "@retailor/contracts/design";
 
 /** Explicit report allow-list; never serializes controllers or the runtime snapshot. */
 export function buildExport(
@@ -68,6 +69,11 @@ export function buildExport(
           (photo) => photo.id === state.acceptedDesign.heroPhotoId,
         ) ?? null)
       : null,
+    heroPhotos: state.hasAcceptedLook
+      ? [...new Set(heroPhotoIds(state.acceptedDesign))].flatMap(
+          (id) => state.photos.find((photo) => photo.id === id) ?? [],
+        )
+      : [],
     currency: state.currency,
     orderDisplays: state.orderDisplays,
     report: {
