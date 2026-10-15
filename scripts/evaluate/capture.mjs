@@ -21,7 +21,6 @@ const AuthorizationSchema = z.strictObject({
   ownerApproved: z.literal(true),
   accountAndRetentionVerified: z.literal(true),
   expiresAt: z.iso.datetime({ precision: 3 }),
-  logoOutputEnvelopeVerified: z.boolean(),
   caseIds: z
     .array(z.enum(LIVE_CASES.map((c) => c.id)))
     .min(1)
@@ -43,14 +42,6 @@ export function validateAuthorization(input, plan) {
     new Set(authorization.caseIds).size !== authorization.caseIds.length
   )
     throw new Error("Authorization does not match candidate/plan");
-  const cases = authorization.caseIds.map((id) =>
-    LIVE_CASES.find((c) => c.id === id),
-  );
-  if (
-    cases.some((c) => c.capability === "logos") &&
-    !authorization.logoOutputEnvelopeVerified
-  )
-    throw new Error("Authorized logo envelope unavailable");
   return Object.freeze({
     ...authorization,
     caseIds: Object.freeze([...authorization.caseIds]),
@@ -153,10 +144,7 @@ export function createCaptureSession(
       return async (input, init) => {
         const context = storage.getStore(),
           target = input instanceof Request ? input.url : String(input);
-        const allowed =
-          context?.case?.capability === "logos"
-            ? "https://api.openai.com/v1/images/generations"
-            : "https://api.openai.com/v1/responses";
+        const allowed = "https://api.openai.com/v1/responses";
         if (
           !context?.case ||
           state.stopped ||
@@ -200,7 +188,6 @@ export function createCaptureSession(
             admissionSiteKey: null,
             vision: unavailable,
             tailor: unavailable,
-            logos: unavailable,
           };
         },
       };
@@ -247,19 +234,6 @@ export function createCaptureSession(
             },
           },
         };
-      if (runtime.logos)
-        decorated.logos = {
-          ...runtime.logos,
-          provider: {
-            async generate(contextValue, signal, accounting) {
-              const context = claim("logos");
-              return runtime.logos.provider.generate(contextValue, signal, {
-                dispatch: () => dispatch(context, accounting.dispatch),
-                recordUsage: usage(context, accounting.recordUsage),
-              });
-            },
-          },
-        };
       const app = express();
       app.use((req, res, next) => {
         const context = {
@@ -277,7 +251,7 @@ export function createCaptureSession(
           case: null,
         };
         const paidPath =
-          /^\/v1\/(?:catalogue\/interpret|assistant\/(?:creator|shopper|owner)|brand\/logos)$/u.test(
+          /^\/v1\/(?:catalogue\/interpret|assistant\/(?:creator|shopper|owner))$/u.test(
             req.path,
           );
         const json = res.json;
@@ -289,8 +263,6 @@ export function createCaptureSession(
               context.outputCount = body?.draft?.items?.length ?? 0;
             if (context.case?.capability === "assistant")
               context.outputCount = body?.reply ? 1 : 0;
-            if (context.case?.capability === "logos")
-              context.outputCount = body?.candidates?.length ?? 0;
           }
           return json.call(this, body);
         };

@@ -23,7 +23,6 @@ function approved(caseIds = ["shopper_category"]) {
       planDigest: authorizationDigest(plan),
       ownerApproved: true,
       accountAndRetentionVerified: true,
-      logoOutputEnvelopeVerified: false,
       expiresAt: new Date(Date.now() + 3600000).toISOString(),
       caseIds,
     },

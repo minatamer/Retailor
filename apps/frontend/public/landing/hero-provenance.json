@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "description": "Original Retailor editorial clothing motion; generated demo photographs, no visitor assets, audio or external footage.",
+  "renderer": "scripts/media/render-landing-hero.mjs",
+  "width": 1440,
+  "height": 900,
+  "fps": 24,
+  "seconds": 16,
+  "codec": "H.264 / yuv420p / faststart",
+  "videoBytes": 2576593,
+  "posterBytes": 75772,
+  "sources": [
+    {
+      "path": "apps/frontend/public/sample/forme/F04.webp",
+      "sha256": "3f53f55da75732b47f03885c9b82b83836f6f43c6bbff5705f928dba83dc4146"
+    },
+    {
+      "path": "apps/frontend/public/sample/forme/F07.webp",
+      "sha256": "55ec131ef0e5ac6d9bc4db08858a21dde7baa3e78071ae59aec22e781a556338"
+    },
+    {
+      "path": "apps/frontend/public/sample/forme/F01.webp",
+      "sha256": "1cece25a55b40ca865604049d6dfd351f2261ba0ee6b08b34d8e067b35b1e06f"
+    },
+    {
+      "path": "apps/frontend/public/sample/forme/F12.webp",
+      "sha256": "3ebc75ea35a7dfc6df6d5c5e5166021ef05998879ea4030720e8fc919a99d9aa"
+    },
+    {
+      "path": "apps/frontend/public/sample/forme/F10.webp",
+      "sha256": "19214941f6a8cecc1b4f87fc3b04913c2c2ef55fa500408a83964b03f5275f47"
+    },
+    {
+      "path": "apps/frontend/public/sample/forme/F06.webp",
+      "sha256": "b8773a56592808e8737c006c3ca43af996d3c6cad51e991a4c4b242a43cc2f00"
+    }
+  ]
+}

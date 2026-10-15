@@ -6,7 +6,6 @@ import {
   ASSISTANT_MODEL,
   ASSISTANT_PROMPT_VERSION,
 } from "../../apps/backend/src/providers/assistant.js";
-import { LOGO_MODEL } from "../../apps/backend/src/providers/logos.js";
 import { RECOGNITION_LIMITS } from "@retailor/contracts/recognition";
 import { ASSISTANT_LIMITS } from "@retailor/contracts/assistant";
 import { LOGO_LIMITS } from "@retailor/contracts/brand";
@@ -20,7 +19,6 @@ export const LIVE_CASES = Object.freeze([
   { id: "owner_loss_summary", capability: "assistant", role: "owner" },
   { id: "owner_photo_form", capability: "assistant", role: "owner" },
   { id: "shopper_unsupported_tour", capability: "assistant", role: "shopper" },
-  { id: "logos_optional", capability: "logos", optional: true, outputCount: 3 },
 ]);
 export function evaluationPlan(candidate, assets) {
   if (!/^[a-f0-9]{40}$/u.test(candidate))
@@ -41,7 +39,6 @@ export function evaluationPlan(candidate, assets) {
     models: {
       catalogue: CATALOGUE_MODEL,
       assistant: ASSISTANT_MODEL,
-      logos: LOGO_MODEL,
     },
     policies: {
       catalogue: CATALOGUE_PROMPT_VERSION,
@@ -49,15 +46,14 @@ export function evaluationPlan(candidate, assets) {
       retries: 0,
       store: false,
       tier: "default",
-      logos: "clothing-brand-v1/transparent-png-v1",
+      logos: "local-fonts-v1/transparent-png-v1",
     },
     inventory: LIVE_CASES,
     maximum: {
       catalogueBatches: catalogue,
       assistantTurns: assistant,
       logoBatches: logos,
-      providerRequests:
-        catalogue + assistant * ASSISTANT_LIMITS.modelRequests + logos,
+      providerRequests: catalogue + assistant * ASSISTANT_LIMITS.modelRequests,
       catalogueOutputTokens: catalogue * RECOGNITION_LIMITS.outputTokens,
       assistantOutputTokens:
         assistant *
@@ -73,7 +69,7 @@ export function evaluationPlan(candidate, assets) {
     cost: {
       measuredMicroUsd: null,
       actualVisionInputTokens: "pending",
-      actualLogoOutputEnvelope: "pending",
+      actualLogoOutputEnvelope: "local-only",
       optionalLogoApprovable: false,
       basis:
         "docs/operations/PROVIDERS.md — 13 October 2026 official prices; account and usage unverified",

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Icon } from "../../components/ui/icon";
 import { Brand } from "../../components/ui/brand";
-import { Runway } from "./runway";
+import { HeroVideo } from "./hero-video";
 import { StoreFamilies } from "./families";
 import { OwnerLayoutExample } from "./owner-layout-example";
 import { LandingNavigation, SectionNavigation } from "./section-navigation";
@@ -89,12 +89,13 @@ export function Landing() {
         </Link>
       </header>
       <main>
-        <section className={styles.hero} aria-labelledby="hero-title">
+        <section
+          className={styles.hero}
+          aria-labelledby="hero-title"
+          data-landing-hero
+        >
+          <HeroVideo />
           <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>
-              <span />
-              For the clothes you believe in
-            </p>
             <h1 id="hero-title" tabIndex={-1}>
               <span>Bring your products.</span>
               <em>See your store.</em>
@@ -114,13 +115,29 @@ export function Landing() {
               </Link>
             </div>
           </div>
-          <Runway />
           <a
             className={styles.heroNext}
             href="#how-it-works"
             aria-label="See how it works"
           >
-            <span aria-hidden="true">↓</span>
+            <span className={styles.heroNextArrow} aria-hidden="true">
+              ↓
+            </span>
+            <span className={styles.swipeHint} aria-hidden="true">
+              <svg
+                className={styles.swipeGesture}
+                viewBox="0 0 28 32"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9 16V6a2 2 0 0 1 4 0v7a2 2 0 0 1 4 0v2a2 2 0 0 1 4 0v2a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-2c-3 0-4.5-1.5-6-4l-4-6a2 2 0 0 1 3-2l2 2" />
+                <path d="M13 13v4m4-2v3m4-1v2" />
+              </svg>
+              <span>Swipe up to see details</span>
+            </span>
           </a>
         </section>
 

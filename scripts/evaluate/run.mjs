@@ -22,7 +22,6 @@ import { PaidAdmission } from "../../apps/backend/src/security/admission.js";
 import { turnstile } from "../../apps/backend/src/security/turnstile.js";
 import { openAiCatalogue } from "../../apps/backend/src/catalogue/provider.js";
 import { openAiAssistant } from "../../apps/backend/src/providers/assistant.js";
-import { openAiLogos } from "../../apps/backend/src/providers/logos.js";
 const root = new URL("../../", import.meta.url);
 
 export async function readBoundedJsonFile(path) {
@@ -167,7 +166,6 @@ export async function executeEvaluation(args = []) {
       }),
       undefined,
       (environment) => openAiAssistant(environment.OPENAI_API_KEY, fetcher),
-      (environment) => openAiLogos(environment.OPENAI_API_KEY, fetcher),
     );
     if (!runtime.ready || !runtime.capabilities.paidEnabled)
       throw new Error("Live prerequisites unavailable");

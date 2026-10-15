@@ -6,7 +6,6 @@ import { parseEnvironment } from "../../apps/backend/src/config/environment.js";
 import { PaidAdmission } from "../../apps/backend/src/security/admission.js";
 import { RecognitionResultSchema } from "@retailor/contracts/recognition";
 import { AssistantPayloadSchema } from "@retailor/contracts/assistant";
-import { LogoResultSchema } from "@retailor/contracts/brand";
 import { emptyGraph } from "@retailor/commerce/graph";
 import { applyCommand } from "@retailor/commerce/commands";
 import { allActivityScope, facts } from "@retailor/commerce/facts";
@@ -393,32 +392,6 @@ export async function runFixture(candidate, inputs) {
       errorCategory: "INVALID_INPUT",
     }),
   );
-  const logoBody = {
-    schemaVersion: 1,
-    mode: "fake",
-    workspaceId: "evaluation_logos",
-    operationId: "logo_batch",
-    createdAt: now,
-    expiresAt: new Date(Date.parse(now) + 7200000).toISOString(),
-    context: {
-      name: "EVAL",
-      theme: "ink",
-      typography: "editorial",
-      designRevision: 0,
-      themeConfirmed: true,
-      typographyConfirmed: true,
-    },
-    action: null,
-    grant: null,
-  };
-  const logoResponse = await record(
-    "logos_optional",
-    200,
-    () =>
-      request(app).post("/v1/brand/logos").set("Origin", origin).send(logoBody),
-    { outputCount: 3 },
-  );
-  LogoResultSchema.parse(logoResponse.body);
   return {
     schemaVersion: 1,
     candidate,

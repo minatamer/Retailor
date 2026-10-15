@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { MouseEvent, ReactNode } from "react";
 
 const SECTIONS = [
@@ -17,10 +17,43 @@ export function LandingNavigation({
   className: string | undefined;
   children: ReactNode;
 }) {
+  const root = useRef<HTMLDivElement>(null);
+  const [pastHero, setPastHero] = useState(false);
   const frame = useRef<number | null>(null);
   const cancel = useCallback(() => {
     if (frame.current !== null) cancelAnimationFrame(frame.current);
     frame.current = null;
+  }, []);
+
+  useEffect(() => {
+    const hero = root.current?.querySelector("[data-landing-hero]");
+    const header = root.current?.querySelector("header");
+    if (!hero || !header) return;
+    let measurement: number | null = null;
+    const measure = () => {
+      measurement = null;
+      setPastHero(
+        hero.getBoundingClientRect().bottom <=
+          header.getBoundingClientRect().bottom + 1,
+      );
+    };
+    const schedule = () => {
+      measurement ??= requestAnimationFrame(measure);
+    };
+    measure();
+    const observer = new ResizeObserver(schedule);
+    observer.observe(hero);
+    observer.observe(header);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    window.addEventListener("pageshow", schedule);
+    return () => {
+      if (measurement !== null) cancelAnimationFrame(measurement);
+      observer.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("pageshow", schedule);
+    };
   }, []);
 
   useEffect(() => {
@@ -76,13 +109,16 @@ export function LandingNavigation({
     const start = window.scrollY;
     const margin =
       Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
-    const end = Math.max(
-      0,
-      Math.min(
-        start + target.getBoundingClientRect().top - margin,
-        document.documentElement.scrollHeight - window.innerHeight,
-      ),
-    );
+    const end =
+      id === "hero-title"
+        ? 0
+        : Math.max(
+            0,
+            Math.min(
+              start + target.getBoundingClientRect().top - margin,
+              document.documentElement.scrollHeight - window.innerHeight,
+            ),
+          );
     const distance = end - start;
     const duration = Math.min(900, Math.max(450, Math.abs(distance) * 0.24));
     let started: number | undefined;
@@ -101,7 +137,12 @@ export function LandingNavigation({
   }
 
   return (
-    <div className={className} onClick={navigate}>
+    <div
+      ref={root}
+      className={className}
+      data-header-theme={pastHero ? "solid" : "overlay"}
+      onClick={navigate}
+    >
       {children}
     </div>
   );

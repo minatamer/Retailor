@@ -28,8 +28,8 @@ describe("bounded release evaluation preparation", () => {
       maximum: {
         catalogueBatches: 2,
         assistantTurns: 7,
-        logoBatches: 1,
-        providerRequests: 24,
+        logoBatches: 0,
+        providerRequests: 23,
       },
     });
     expect(plan.cost.measuredMicroUsd).toBeNull();
