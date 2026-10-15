@@ -3,7 +3,7 @@ import { ModelCatalogueSchema } from "@retailor/contracts/recognition";
 import type { CatalogueAction } from "@retailor/contracts/recognition";
 import { parseDraft } from "@retailor/contracts/catalogue";
 import type { DraftItem } from "@retailor/contracts/catalogue";
-import { namedColour } from "@retailor/contracts/product";
+import { namedColour, formatGarmentTitle } from "@retailor/contracts/product";
 import { deny } from "../security/errors.js";
 
 const visible = new Set(["colour", "pattern", "closure", "sleeve", "neckline"]);
@@ -120,7 +120,7 @@ export function reconcileCatalogue(
           "Confirm that this is clothing and review its photo grouping.",
       product: {
         id: productIds[index]!,
-        title: garment.title,
+        title: formatGarmentTitle(garment.title),
         description: garment.description,
         category: garment.category ?? "other-clothing",
         imageIds: garment.sourceIds,

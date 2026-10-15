@@ -83,8 +83,13 @@ export function fixtureAssistant(): AssistantProvider {
           const layout =
             c.role !== "shopper" ? fixtureLayout(prompt, c.design) : null;
           const theme = c.role !== "shopper" ? fixtureTheme(prompt) : null;
-          let text =
-            "Development example: try the contextual shortcuts, a tour, a catalogue category or a business summary. This simulation supports those examples only.";
+          const help =
+            c.role === "creator"
+              ? "I can help personalize your store. Try ‘Use Pine / Sand’, ask about layouts, or ask for a tour. Suggestions stay previews until you choose them."
+              : c.role === "owner"
+                ? "I can show a business summary, explain the selected chart day, or help prepare an editable garment draft. Changes stay yours to review."
+                : "I can help you explore this collection. Try ‘Show jeans’, ask about a garment’s reviewed details, or ask for a tour. You can include a budget in the store’s selected currency.";
+          let text = `This demo simulates a few clothing and store requests. ${help}`;
           let references: AssistantReference[] = [],
             navigation: AssistantNavigation | null = null,
             proposal: AssistantProposal | null = null;
@@ -96,7 +101,13 @@ export function fixtureAssistant(): AssistantProvider {
               ]),
             ),
           );
-          if (/tour|show me around/.test(prompt)) {
+          if (
+            /^(?:hi|hello|hey|good morning|good afternoon|good evening)[\s!.?]*$/u.test(
+              prompt.trim(),
+            )
+          ) {
+            text = `Hi, I’m Tailor. ${help}`;
+          } else if (/tour|show me around/.test(prompt)) {
             text =
               "Development example: let us walk through the controls on this page.";
             navigation = { kind: "tour", role: c.role };

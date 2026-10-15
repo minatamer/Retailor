@@ -2,6 +2,16 @@ import { describe, it, expect } from "vitest";
 import { action, observation } from "../../../../test/fixtures/recognition.js";
 import { reconcileCatalogue } from "./reconcile.js";
 describe("independent catalogue output policy", () => {
+  it("formats generated garment names without changing category, sources or evidence", () => {
+    const model = observation();
+    model.garments[0]!.title = "  straight-leg jeans  ";
+    const before = structuredClone(model);
+    const product = reconcileCatalogue(model, action()).items[0]!.product;
+    expect(product.title).toBe("Straight-leg Jeans");
+    expect(product.category).toBe(model.garments[0]!.category);
+    expect(product.imageIds).toEqual(model.garments[0]!.sourceIds);
+    expect(model).toEqual(before);
+  });
   it("assigns application IDs and disclosed defaults while preserving exact sources", () => {
     let count = 0;
     const draft = reconcileCatalogue(
