@@ -32,6 +32,7 @@ export const DemoExportSchema = z.strictObject({
   acceptedDesign: DesignSchema.nullable(),
   selectedLogo: LogoMetadataSchema.nullable(),
   heroPhoto: PhotoSchema.nullable(),
+  heroPhotos: z.array(PhotoSchema).max(3).default([]),
   currency: CurrencyPreferenceSchema,
   orderDisplays: z.array(OrderDisplaySchema).max(30),
   report: z.strictObject({

@@ -20,6 +20,43 @@ export const CategorySchema = z.enum([
   "underwear-socks",
   "other-clothing",
 ]);
+/** Retail labels only; stable category IDs still own filtering and historical records. */
+export const CATEGORY_LABELS: Readonly<
+  Record<z.infer<typeof CategorySchema>, string>
+> = {
+  jeans: "Denim",
+  hoodies: "Hoodies",
+  tees: "T-Shirts",
+  shirts: "Shirts",
+  overshirts: "Overshirts",
+  trousers: "Trousers",
+  blazers: "Blazers",
+  cardigans: "Cardigans",
+  dresses: "Dresses",
+  skirts: "Skirts",
+  shorts: "Shorts",
+  swimwear: "Swimwear",
+  jackets: "Jackets",
+  knitwear: "Knitwear",
+  activewear: "Activewear",
+  loungewear: "Loungewear",
+  "underwear-socks": "Underwear & Socks",
+  "other-clothing": "Other Clothing",
+};
+/** Generated defaults only: formatting supplies no new garment facts or owner edits. */
+export function formatGarmentTitle(value: string) {
+  return value
+    .trim()
+    .replace(/\s+/gu, " ")
+    .replace(/\S+/gu, (word) => {
+      const lower = word.toLocaleLowerCase("en");
+      if (/^t-shirts?$/u.test(lower))
+        return lower === "t-shirt" ? "T-Shirt" : "T-Shirts";
+      return lower.replace(/\p{L}/u, (letter) =>
+        letter.toLocaleUpperCase("en"),
+      );
+    });
+}
 export const VariantSchema = z.strictObject({
   id: IdSchema,
   size: z.string().trim().min(1).max(16),

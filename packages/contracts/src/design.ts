@@ -11,6 +11,11 @@ export const PageTemplatesSchema = z.strictObject({
 export const ThemeSchema = z.enum(["navy", "ink", "cobalt", "oxblood", "pine"]);
 export const DEFAULT_THEME: z.infer<typeof ThemeSchema> = "navy";
 export const TypographySchema = z.enum(["inter", "editorial", "modern"]);
+export const AdditionalHeroPhotosSchema = z.tuple([
+  IdSchema.nullable(),
+  IdSchema.nullable(),
+]);
+export type HeroSlot = 0 | 1 | 2;
 export const DesignSchema = z.strictObject({
   template: TemplateSchema,
   pageTemplates: PageTemplatesSchema.optional(),
@@ -19,10 +24,26 @@ export const DesignSchema = z.strictObject({
   name: z.string().min(1).max(40),
   headline: z.string().max(100),
   heroPhotoId: IdSchema.nullable().default(null),
+  additionalHeroPhotoIds: AdditionalHeroPhotosSchema.optional(),
   logoId: IdSchema.nullable().optional(),
   revision: z.number().int().nonnegative().max(1_000_000),
 });
 export type Design = z.infer<typeof DesignSchema>;
+/** The first field remains the sole first-slot authority for existing saved looks. */
+export function heroPhotoIds(
+  design: Pick<Design, "heroPhotoId" | "additionalHeroPhotoIds">,
+): [string | null, string | null, string | null] {
+  return [
+    design.heroPhotoId,
+    design.additionalHeroPhotoIds?.[0] ?? null,
+    design.additionalHeroPhotoIds?.[1] ?? null,
+  ];
+}
+export function heroPhotoCount(
+  design: Pick<Design, "template" | "pageTemplates">,
+): 2 | 3 {
+  return pageTemplate(design, "home") === "studio" ? 2 : 3;
+}
 export function pageTemplate(
   design: Pick<Design, "template" | "pageTemplates">,
   page: StorePage,

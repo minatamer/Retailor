@@ -297,6 +297,7 @@ export function assistantFence(c: AssistantContext) {
       c.design.name,
       c.design.headline,
       c.design.heroPhotoId,
+      c.design.additionalHeroPhotoIds ?? [null, null],
       resolvedTemplates(c.design),
     ]),
     filterKey: JSON.stringify([

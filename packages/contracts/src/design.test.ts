@@ -8,6 +8,8 @@ import {
   TemplateSchema,
   ThemeSchema,
   DEFAULT_THEME,
+  heroPhotoIds,
+  heroPhotoCount,
 } from "./design.js";
 
 const legacy = DesignSchema.parse({
@@ -19,6 +21,52 @@ const legacy = DesignSchema.parse({
   revision: 0,
 });
 describe("finite independent page layouts", () => {
+  it("retains a legacy first hero and bounds additional slots while following the Home assignment", () => {
+    expect(heroPhotoIds({ ...legacy, heroPhotoId: "first" })).toEqual([
+      "first",
+      null,
+      null,
+    ]);
+    const selected = DesignSchema.parse({
+      ...legacy,
+      heroPhotoId: "first",
+      additionalHeroPhotoIds: ["second", "third"],
+    });
+    expect(heroPhotoIds(selected)).toEqual(["first", "second", "third"]);
+    for (const additionalHeroPhotoIds of [
+      [],
+      ["one"],
+      ["one", "two", "three"],
+      ["one", 42],
+      { photo: "one" },
+    ])
+      expect(
+        DesignSchema.safeParse({ ...legacy, additionalHeroPhotoIds }).success,
+      ).toBe(false);
+    expect(heroPhotoCount(selected)).toBe(2);
+    expect(heroPhotoCount({ ...selected, template: "pulse" })).toBe(3);
+    expect(
+      heroPhotoCount({
+        ...selected,
+        template: "gallery",
+        pageTemplates: {
+          home: "studio",
+          collection: "gallery",
+          product: "pulse",
+        },
+      }),
+    ).toBe(2);
+    expect(
+      heroPhotoCount({
+        ...selected,
+        pageTemplates: {
+          home: "gallery",
+          collection: "studio",
+          product: "studio",
+        },
+      }),
+    ).toBe(3);
+  });
   it("accepts the new finite default and original saved theme IDs but rejects arbitrary colour/CSS values", () => {
     expect(DEFAULT_THEME).toBe("navy");
     for (const theme of ThemeSchema.options)
