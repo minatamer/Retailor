@@ -19,7 +19,7 @@ export function StoreFamilies() {
       <div
         className={styles.familyChoices}
         role="group"
-        aria-label="Choose a store layout"
+        aria-label="Choose a starting look"
       >
         {RUNWAY_LOOKS.map((choice, index) => (
           <button
@@ -79,8 +79,9 @@ export function StoreFamilies() {
         </div>
       </figure>
       <p className={styles.caption}>
-        Illustrative FORME collection. Choose a layout and page above, then
-        scroll to explore. Your real demo starts with your photos.
+        Illustrative FORME collection. Choose a starting look and page, then
+        scroll to explore. Personalize layouts, colours, type and branding in
+        your demo.
       </p>
     </div>
   );

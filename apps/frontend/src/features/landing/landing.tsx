@@ -5,7 +5,7 @@ import { Brand } from "../../components/ui/brand";
 import { Runway } from "./runway";
 import { StoreFamilies } from "./families";
 import { OwnerLayoutExample } from "./owner-layout-example";
-import { SectionNavigation } from "./section-navigation";
+import { LandingNavigation, SectionNavigation } from "./section-navigation";
 import styles from "./landing.module.css";
 
 const CUSTOMER_JEANS = [
@@ -27,8 +27,8 @@ const STEPS = [
   },
   {
     number: "03",
-    title: "Make it yours.",
-    copy: "Choose a complete look, colour mood and typography with Tailor beside you.",
+    title: "Personalize your store.",
+    copy: "Pick page layouts, colours and type with Tailor. Add your name and an optional logo.",
   },
   {
     number: "04",
@@ -43,9 +43,9 @@ const FAQ = [
       "Clothing photos: jeans, tees, hoodies, dresses, formalwear, beachwear and more. Static JPEG, PNG or WebP, up to 4 MiB per image and 24 photos. Every garment needs a valid photograph. You can also try nineteen original generated sample photos, with linked views of the same garment.",
   },
   {
-    question: "Is the storefront really mine to customize?",
+    question: "How can I personalize my store?",
     answer:
-      "Yes. Choose from three complete home/collection/product layouts, four colour moods and three type presets. Add a name, headline or your own hero photograph. Tailor guides the choices through visual chat cards; no typing is required. Your wordmark is ready by default, with an optional three-logo AI path after you choose colour and type.",
+      "Start with Studio, Pulse or Gallery, or mix layouts for Home, Collection and Product. Personalize colours, type, your store name, headline and hero photo with Tailor or the manual controls. Keep your wordmark or review an optional three-logo batch. You choose what to apply.",
   },
   {
     question: "What does the AI do?",
@@ -71,7 +71,7 @@ const FAQ = [
 
 export function Landing() {
   return (
-    <div className={styles.landing}>
+    <LandingNavigation className={styles.landing}>
       <a className={styles.skip} href="#hero-title">
         Skip to the store story
       </a>
@@ -101,11 +101,11 @@ export function Landing() {
             </h1>
             <p className={styles.heroLead}>
               <span className={styles.fullLead}>
-                Your clothing. A beautiful storefront. Make it yours with Tailor
-                beside you.
+                Your clothing. A beautiful storefront. Personalize it with
+                Tailor beside you.
               </span>
               <span className={styles.compactLead}>
-                Clothing photos. Your store. With Tailor.
+                Your clothes. Your store. Personalize with Tailor.
               </span>
             </p>
             <div className={styles.heroAction}>
@@ -160,16 +160,16 @@ export function Landing() {
           aria-labelledby="family-title"
         >
           <div className={styles.sectionIntro}>
-            <p className={styles.eyebrow}>Three complete points of view</p>
+            <p className={styles.eyebrow}>Personalize your store</p>
             <h2 id="family-title">
-              Different looks.
+              Your store.
               <br />
-              <em>All good choices.</em>
+              <em>Your style.</em>
             </h2>
             <p>
-              Compare three complete store layouts with the same clothes.
-              Explore each home, collection and product page to find your point
-              of view.
+              Compare three starting looks below. In your demo, personalize page
+              layouts, colours, type and your store name with Tailor, then keep
+              your wordmark or choose an optional logo.
             </p>
           </div>
           <StoreFamilies />
@@ -209,7 +209,7 @@ export function Landing() {
               </li>
             </ul>
           </div>
-          <div className={styles.faq} id="questions">
+          <div className={styles.faq} id="questions" tabIndex={-1}>
             {FAQ.map((item) => (
               <details key={item.question}>
                 <summary>
@@ -238,12 +238,12 @@ export function Landing() {
               <em>A helping hand.</em>
             </h2>
             <p>
-              Tailor is here for customers and store owners. Find the right
-              clothes, make your store yours and understand the numbers, with
-              help at every step.
+              Find the right clothes, personalize your store and understand the
+              numbers. Tailor is here for customers and store owners, with help
+              at every step.
             </p>
             <div className={styles.roles}>
-              <span>Your styling guide</span>
+              <span>Your personalization guide</span>
               <span>Your shopping helper</span>
               <span>Your business companion</span>
             </div>
@@ -293,7 +293,7 @@ export function Landing() {
                   <small>Tailor · Your styling and business companion</small>
                 </div>
               </header>
-              <p className={styles.chatUser}>Help me choose my store’s look.</p>
+              <p className={styles.chatUser}>Help me personalize my store.</p>
               <OwnerLayoutExample />
             </article>
             <small className={styles.caption}>
@@ -323,13 +323,7 @@ export function Landing() {
         >
           <Brand />
         </a>
-        <p>
-          A clothing ecommerce demo. Fictional activity, beautifully connected.
-        </p>
-        <a href="#questions">
-          About the demo <Icon name="arrow" size={14} />
-        </a>
       </footer>
-    </div>
+    </LandingNavigation>
   );
 }

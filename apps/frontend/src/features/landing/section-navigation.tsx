@@ -1,16 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import type { MouseEvent } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
 const SECTIONS = [
   ["how-it-works", "How it works"],
-  ["storefronts", "Storefronts"],
-  ["owner-view", "Owner view"],
+  ["storefronts", "Personalize"],
+  ["questions", "FAQs"],
 ] as const;
 
 /** One bounded animation: native smooth scrolling can be ignored by a browser. */
-export function SectionNavigation() {
+export function LandingNavigation({
+  className,
+  children,
+}: {
+  className: string | undefined;
+  children: ReactNode;
+}) {
   const frame = useRef<number | null>(null);
   const cancel = useCallback(() => {
     if (frame.current !== null) cancelAnimationFrame(frame.current);
@@ -33,7 +39,7 @@ export function SectionNavigation() {
     };
   }, [cancel]);
 
-  function navigate(event: MouseEvent<HTMLAnchorElement>, id: string) {
+  function navigate(event: MouseEvent<HTMLDivElement>) {
     if (
       event.defaultPrevented ||
       event.button !== 0 ||
@@ -43,12 +49,30 @@ export function SectionNavigation() {
       event.altKey
     )
       return;
+    const anchor =
+      event.target instanceof Element ? event.target.closest("a") : null;
+    if (
+      !(anchor instanceof HTMLAnchorElement) ||
+      !event.currentTarget.contains(anchor) ||
+      anchor.hasAttribute("download") ||
+      (anchor.target && anchor.target.toLowerCase() !== "_self")
+    )
+      return;
+    const href = anchor.getAttribute("href");
+    if (!href?.startsWith("#")) return;
+    const id = href.slice(1);
+    if (id !== "hero-title" && !SECTIONS.some(([section]) => section === id))
+      return;
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
     cancel();
-    const hash = `#${id}`;
-    if (window.location.hash !== hash) window.history.pushState(null, "", hash);
+    if (window.location.hash)
+      window.history.replaceState(
+        window.history.state,
+        "",
+        window.location.pathname + window.location.search,
+      );
     const start = window.scrollY;
     const margin =
       Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
@@ -77,9 +101,17 @@ export function SectionNavigation() {
   }
 
   return (
+    <div className={className} onClick={navigate}>
+      {children}
+    </div>
+  );
+}
+
+export function SectionNavigation() {
+  return (
     <nav aria-label="Retailor navigation">
       {SECTIONS.map(([id, label]) => (
-        <a key={id} href={`#${id}`} onClick={(event) => navigate(event, id)}>
+        <a key={id} href={`#${id}`}>
           {label}
         </a>
       ))}

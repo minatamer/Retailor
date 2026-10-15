@@ -11,21 +11,21 @@ import { PALETTES } from "../store-design/presets";
 export const ILLUSTRATED_CLOTHES = [
   {
     id: "F01",
-    title: "Straight-leg jeans",
+    title: "Straight-leg Jeans",
     category: "jeans",
     price: 6800,
     size: "28/30",
   },
   {
     id: "F07",
-    title: "Button-front shirt",
+    title: "Button-front Shirt",
     category: "shirts",
     price: 5400,
     size: "M",
   },
   {
     id: "F12",
-    title: "Midi dress",
+    title: "Midi Dress",
     category: "dresses",
     price: 9600,
     size: "M",

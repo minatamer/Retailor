@@ -6,7 +6,7 @@ import "../styles/tokens.css";
 import "../styles/globals.css";
 export const metadata: Metadata = {
   title: "Retailor — Bring your products. See your store.",
-  description: "A clothing storefront demo with Tailor beside you.",
+  description: "Personalize your clothing store with Tailor beside you.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" },

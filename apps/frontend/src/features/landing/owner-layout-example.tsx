@@ -158,13 +158,14 @@ export function OwnerLayoutExample() {
   return (
     <div className={styles.chatReply}>
       <p>
-        Let’s find your point of view. Every choice comes with a real preview.
+        Let’s personalize your store. Choose a starting look and see a real
+        preview.
       </p>
       <div className={styles.ownerLayouts}>
         <div
           className={styles.layoutChoices}
           role="group"
-          aria-label="Try a storefront layout"
+          aria-label="Try a starting look"
         >
           {LAYOUTS.map((template) => (
             <button
