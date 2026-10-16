@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 import { formatDisplay, formatMinor } from "@retailor/commerce/currency";
 import { exactSum } from "@retailor/commerce/allocation";
 import { stockOf } from "@retailor/commerce/selectors";
@@ -160,7 +161,18 @@ export function BagDialog() {
   } = useSession();
   const dialog = useRef<HTMLDialogElement>(null),
     heading = useRef<HTMLHeadingElement>(null),
-    opener = useRef<HTMLElement | null>(null);
+    opener = useRef<HTMLElement | null>(null),
+    backdropPress = useRef(false);
+  const outsideDialog = (event: MouseEvent<HTMLDialogElement>) => {
+    if (event.target !== event.currentTarget) return false;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    return (
+      event.clientX < bounds.left ||
+      event.clientX > bounds.right ||
+      event.clientY < bounds.top ||
+      event.clientY > bounds.bottom
+    );
+  };
   const promoScope = `${state.graph.workspaceId}:${state.graph.scenarioId}:${state.shopping.lastOrderId ?? ""}`;
   const [promotion, setPromotion] = useState<{
     scope: string;
@@ -202,6 +214,7 @@ export function BagDialog() {
   useEffect(() => {
     const node = dialog.current;
     if (!node) return;
+    backdropPress.current = false;
     if (bagOpen) {
       node.inert = false;
       if (!node.open) {
@@ -346,11 +359,24 @@ export function BagDialog() {
       data-mode={mode}
       style={merchantStyle(state.acceptedDesign)}
       aria-labelledby="bag-heading"
+      onPointerDown={(event) => {
+        backdropPress.current =
+          event.isPrimary && event.button === 0 && outsideDialog(event);
+      }}
+      onPointerCancel={() => {
+        backdropPress.current = false;
+      }}
+      onClick={(event) => {
+        const dismiss = backdropPress.current && outsideDialog(event);
+        backdropPress.current = false;
+        if (dismiss) controller.closeBag();
+      }}
       onCancel={(event) => {
         event.preventDefault();
         controller.closeBag();
       }}
       onClose={() => {
+        backdropPress.current = false;
         if (
           !dialog.current?.isConnected ||
           dialog.current.open ||
@@ -673,7 +699,7 @@ export function BagDialog() {
                   Continue shopping
                 </button>
                 <p className={styles.demoNote}>
-                  No payment or shipment. Your bag reserves no stock.
+                  No actual payment or shipment for this demo
                 </p>
               </div>
             </div>
