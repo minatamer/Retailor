@@ -148,7 +148,7 @@ describe("release metadata and verdict", () => {
     "prepared preflight rejects stale evidence and reports $state source exactly",
     async ({ matches, verdict }) => {
       const packaged = await readReleaseJson(
-        "docs/validation/RTL-025/containers.json",
+        "docs/validation/RTL-143/containers.json",
         131072,
       );
       const fingerprint = matches
@@ -189,7 +189,7 @@ describe("release metadata and verdict", () => {
     const env = vi.spyOn(process, "loadEnvFile");
     const source = await snapshot.sourceSnapshot();
     const packaged = await readReleaseJson(
-      "docs/validation/RTL-025/containers.json",
+      "docs/validation/RTL-143/containers.json",
       131072,
     );
     const result = await preparePreflight();

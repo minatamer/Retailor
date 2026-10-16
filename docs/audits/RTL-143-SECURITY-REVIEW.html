@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Retailor · Security review · 16 October 2026</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --navy: #242b60;
+        --lime: #d7f77b;
+        --paper: #f4f5fb;
+        --line: #d9ddea;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        color: var(--navy);
+        background: var(--paper);
+        font:
+          16px/1.65 system-ui,
+          sans-serif;
+      }
+      header {
+        padding: 64px max(24px, calc((100vw - 1040px) / 2));
+        background: var(--navy);
+        color: white;
+      }
+      .eyebrow {
+        margin: 0 0 20px;
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        max-width: 850px;
+        font:
+          clamp(42px, 7vw, 76px)/1.05 Georgia,
+          serif;
+      }
+      h1 em {
+        color: var(--lime);
+        font-weight: normal;
+      }
+      header p:last-child {
+        max-width: 700px;
+        margin-top: 28px;
+        color: #e0e3f1;
+      }
+      main {
+        max-width: 1088px;
+        padding: 32px 24px 64px;
+        margin: auto;
+      }
+      .facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 0 0 32px;
+      }
+      .facts span {
+        padding: 8px 16px;
+        border: 1px solid var(--navy);
+        border-radius: 40px;
+        background: white;
+      }
+      article,
+      section {
+        margin: 18px 0;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: white;
+      }
+      .status {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 20px;
+        background: var(--lime);
+        font-size: 13px;
+        font-weight: 650;
+      }
+      h2 {
+        margin: 16px 0;
+        font:
+          30px/1.2 Georgia,
+          serif;
+      }
+      h3 {
+        margin-bottom: 4px;
+        font-size: 16px;
+      }
+      p {
+        margin: 10px 0;
+      }
+      a {
+        color: inherit;
+        text-underline-offset: 4px;
+      }
+      a:focus-visible {
+        outline: 3px solid var(--navy);
+        outline-offset: 5px;
+      }
+      li {
+        margin: 8px 0;
+      }
+      .small {
+        font-size: 14px;
+        color: #535d80;
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        padding-top: 22px;
+        margin-top: 32px;
+      }
+      @media (max-width: 540px) {
+        header {
+          padding: 40px 24px;
+        }
+        article,
+        section {
+          padding: 22px;
+        }
+        main {
+          padding: 24px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">Retailor · STRIDE review · 16 October 2026</p>
+      <h1>A safer demo.<br /><em>The same experience.</em></h1>
+      <p>
+        Two focused security remedies, with the clothing, storefront, dashboard,
+        Tailor and designed motion preserved. No new login, database, queue or
+        paid service.
+      </p>
+    </header>
+    <main>
+      <div class="facts" aria-label="Review outcomes">
+        <span>Next security patch applied</span
+        ><span>Upload memory bounded</span><span>No release authorization</span>
+      </div>
+      <article>
+        <span class="status">Patched · supplier Critical/High</span>
+        <h2>Keep the framework current.</h2>
+        <h3>What was the risk?</h3>
+        <p>
+          The vendor's new security notice includes our old Next version. Its
+          described exploit conditions are absent here or already mitigated by
+          the installed Sharp version; this review did not demonstrate website
+          code execution.
+        </p>
+        <h3>What changed?</h3>
+        <p>
+          Next and its matching lint plugin move from 16.4.0 to 16.4.1. The
+          exact lockfile is updated. No framework migration or product redesign.
+        </p>
+        <p class="small">
+          The registry audit missed these new vendor notices. Zero audit
+          findings alone is not a complete security verdict.
+          <a
+            href="https://nextjs.org/blog/nextjs-security-update-october-14-2026"
+            >Official notice</a
+          >.
+        </p>
+      </article>
+      <article>
+        <span class="status">Fixed · Medium availability</span>
+        <h2>Tiny upload fragments should stay tiny.</h2>
+        <h3>What was the risk?</h3>
+        <p>
+          An admitted upload could arrive as many tiny chunks. The parser kept a
+          separate reference for every chunk, creating memory overhead beyond
+          the photo's byte count. A small offline test reproduced this safely.
+        </p>
+        <h3>What changed?</h3>
+        <p>
+          Each admitted photo gets one size-bounded buffer. The same photo
+          bytes, count limits, cancellation, verification and provider flow
+          remain. No larger uploads or longer deadlines.
+        </p>
+      </article>
+      <section>
+        <h2>What still needs attention?</h2>
+        <ul>
+          <li>
+            <strong>Upstream packages:</strong> each image reports zero Critical
+            and eight High OS-package advisories. The retained Bookworm matches
+            have no offered patch; application preconditions and package
+            presence are documented individually. These are not eight proven
+            website exploits.
+          </li>
+          <li>
+            <strong>Development tooling:</strong> one unpatched High braces
+            advisory remains in the lint dependency graph. Visitor text does not
+            become a lint pattern.
+          </li>
+          <li>
+            <strong>Node:</strong> the vendor schedules its next security
+            release for 21 October. No released fix or detailed CVE was
+            available on this review date.
+          </li>
+          <li>
+            <strong>Public hosting:</strong> actual edge/IAM/domain controls,
+            account-wide spending/retention and hosted capacity still need their
+            own evidence. This review does not publish or enable anything.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h2>What was checked?</h2>
+        <p>
+          Identity and replay, data/photo tampering, private errors and logs,
+          resource exhaustion, role/tool permissions, sandbox checkout,
+          temporary storage, dependency notices and actual isolated Linux
+          images/native execution.
+        </p>
+        <p>
+          Exact commands, test outcomes, image identities, scanner records,
+          browser observations and remaining limits are in the validation
+          record. Local injected tests do not stand in for real provider or
+          hosted acceptance.
+        </p>
+      </section>
+      <footer>
+        <a href="RTL-143-SECURITY.md">Detailed STRIDE review</a> ·
+        <a href="../validation/RTL-143.md">Actual validation</a> ·
+        <a href="../commit-plans/RTL-143.md">File-level commit plan</a>
+        <p class="small">
+          Owner-approved local fixes. No push, deployment, paid-provider
+          request, cloud mutation or blanket scanner-clean claim.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

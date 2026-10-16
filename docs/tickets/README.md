@@ -1,5 +1,7 @@
 # Retailor implementation tickets
 
+Repeat STRIDE/security review: [RTL-143](RTL-143-repeat-stride-security-audit.md) applies the verified Next16.4.1 security patch and bounds admitted multipart retention independently of fragmentation, with behavior/limits preserved. [Current validation](../validation/RTL-143.md) records Windows/actual Linux gates, native execution, exact image/source proof, fresh scans and a clean settled read-only review; unpatched upstream and actual external release conditions remain explicit. Owner authorizes the local fix/review/commit loop without another manual gate.
+
 Repeat quality audit: [RTL-142](RTL-142-repeat-code-quality-audit.md) reviews current ownership, behavior and structure after the demo revisions. Its confirmed restore-mode correction preserves the catalogue/records and public fixture rejection. [Validation](../validation/RTL-142.md) records current gates and browser recovery; the subsequent STRIDE batch owns dependency/Linux/scanner evidence.
 
 Editorial project README: [RTL-141](RTL-141-editorial-readme.md) adds the owner's selected navy/lime garment artwork and a marketing-led product story, refreshes obsolete feature wording and retains setup, architecture and evidence links. [Validation](../validation/RTL-141.md) records documentation/image checks and the approved commit scope; application bytes and external release status remain unchanged.

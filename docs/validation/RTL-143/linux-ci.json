@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-16T15:33:08.219Z",
+  "source": {
+    "fingerprint": "f7ffdfa63bed81093ab655bf271351450036b0993a633eef7d24b48bedb1e9c5",
+    "appInputFiles": 303,
+    "qualityInputFilesCompared": 372,
+    "exactHostContextBytes": true,
+    "normalization": false
+  },
+  "image": {
+    "id": "sha256:db84daf6e0865a17433e80a0f5703a2e04a3450ac840067dcd1f1c738591f7e2",
+    "os": "linux",
+    "architecture": "amd64",
+    "bytes": 1842834119
+  },
+  "observed": {
+    "platform": "linux",
+    "node": "v24.19.0",
+    "pnpm": "11.25.0",
+    "temporaryGitRevision": "c829e2474f5768acbd6a1e4d3fdd4fa66bb45a44",
+    "fingerprint": "f7ffdfa63bed81093ab655bf271351450036b0993a633eef7d24b48bedb1e9c5",
+    "matchesLocalLinuxEvidence": true,
+    "paidRequests": 0,
+    "networkRequests": 0,
+    "publicReleaseAccepted": false
+  },
+  "commands": [
+    "pnpm install --frozen-lockfile",
+    "pnpm check",
+    "node scripts/release/preflight.mjs"
+  ],
+  "gates": {
+    "format": true,
+    "lint": true,
+    "typecheck": true,
+    "boundaries": {
+      "passed": true,
+      "modules": 206
+    },
+    "unit": {
+      "passed": true,
+      "tests": 648,
+      "files": 102
+    },
+    "productionBuild": true
+  },
+  "network": {
+    "install": "Official registry during image preparation",
+    "gates": "none",
+    "verification": "none"
+  },
+  "originalGitMetadata": false,
+  "localEnvironment": false,
+  "rawBuildLogSha256": "fe029f70aa7b5e10fd646eb80ac89c21efe47564bdf8fe0b05df2c13e77eb6e0",
+  "verificationDockerfileSha256": "34ed3625a1de8c373553ad00d836abc3a83834754b34eb8fe9bfa6abe7aafb7f",
+  "limitations": [
+    "Actual local Linux run, not a GitHub job or hosted deployment",
+    "Temporary Git identity differs from owner repository; source/test/tool bytes compared independently",
+    "Docker warns about the explicitly blank OPENAI_API_KEY test ENV; no secret value is supplied",
+    "No paid AI, Stripe, cloud storage, image publication or hosted acceptance"
+  ]
+}

@@ -119,22 +119,19 @@ export function receiveCatalogue(
         return;
       }
       seen.add(name);
-      const chunks: Buffer[] = [];
+      // Bound retained storage by admitted bytes, independently of transport fragmentation.
+      const bytes = Buffer.alloc(expected.bytes);
       let count = 0;
       stream.on("limit", () => fail(new OperationFailure("TOO_LARGE", 413)));
       stream.on("data", (chunk: Buffer) => {
-        if (ended) {
-          chunks.length = 0;
-          return;
-        }
+        if (ended) return;
         count += chunk.length;
         aggregate += chunk.length;
         if (count > expected.bytes || aggregate > PHOTO_LIMITS.derivatives) {
-          chunks.length = 0;
           fail(new OperationFailure("TOO_LARGE", 413));
           return;
         }
-        chunks.push(chunk);
+        bytes.set(chunk, count - chunk.length);
       });
       stream.on("end", () => {
         if (ended) return;
@@ -142,8 +139,7 @@ export function receiveCatalogue(
           fail(new OperationFailure("INVALID_INPUT", 400));
           return;
         }
-        files.set(name, Buffer.concat(chunks, count));
-        chunks.length = 0;
+        files.set(name, bytes);
       });
     });
     parser.on("close", () => {

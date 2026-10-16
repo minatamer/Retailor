@@ -222,18 +222,92 @@ describe("bounded admission and actual multipart recognition", () => {
     incoming.destroy();
     expect(h.gate.counters()).toEqual({ active: 0 });
   });
+  it("accepts byte-fragmented photo uploads and releases a cancelled partial upload", async () => {
+    const h = harness(),
+      input = await image(),
+      value = { ...action(), photos: [input.photo] },
+      signal = new AbortController().signal,
+      safety = "local-identity",
+      approval = await h.gate.admit(value, "valid-proof", safety, signal);
+    const header = (action: CatalogueAction, grant: string) =>
+      Buffer.from(
+        `--fragment\r\nContent-Disposition: form-data; name="manifest"\r\n\r\n${JSON.stringify({ action, grant })}\r\n--fragment\r\nContent-Disposition: form-data; name="source"; filename="preview"\r\nContent-Type: image/jpeg\r\n\r\n`,
+      );
+    const prefix = header(value, approval.grant);
+    const incoming = Readable.from(
+      (function* () {
+        yield prefix;
+        for (const byte of input.bytes) yield Buffer.from([byte]);
+        yield Buffer.from("\r\n--fragment--\r\n");
+      })(),
+    );
+    Object.assign(incoming, {
+      headers: { "content-type": "multipart/form-data; boundary=fragment" },
+    });
+    const received = await receiveCatalogue(
+      incoming as unknown as Request,
+      h.gate,
+      safety,
+      signal,
+    );
+    try {
+      expect(received.files.get("source")).toEqual(input.bytes);
+      expect(h.gate.counters().active).toBe(1);
+    } finally {
+      received.lease.finish();
+      incoming.destroy();
+    }
+    expect(h.gate.counters().active).toBe(0);
+
+    const next = { ...value, operationId: "cancel-fragment" },
+      owner = new AbortController(),
+      cancelledApproval = await h.gate.admit(
+        next,
+        "valid-proof",
+        safety,
+        owner.signal,
+      ),
+      partial = new Readable({ read() {} });
+    Object.assign(partial, {
+      headers: { "content-type": "multipart/form-data; boundary=fragment" },
+    });
+    const cancelled = receiveCatalogue(
+      partial as unknown as Request,
+      h.gate,
+      safety,
+      owner.signal,
+    );
+    const rejected = expect(cancelled).rejects.toMatchObject({
+      code: "DEADLINE",
+    });
+    partial.push(header(next, cancelledApproval.grant));
+    partial.push(input.bytes.subarray(0, 5));
+    await vi.waitFor(() => expect(h.gate.counters().active).toBe(1));
+    owner.abort();
+    await rejected;
+    expect(h.gate.counters().active).toBe(0);
+    partial.destroy();
+    expect(h.provider.interpret).not.toHaveBeenCalled();
+  });
   it("caps streamed transport independently of declared length and limits each file", async () => {
     const h = harness(),
       input = await image(),
       value = { ...action(), photos: [input.photo] },
       grant = await admit(h.app, value);
-    const giant = await request(h.app)
-      .post("/v1/catalogue/interpret")
-      .set("Origin", origin)
-      .set("Cookie", grant.cookie)
-      .set("Content-Type", "multipart/form-data; boundary=bounded")
-      .send(Buffer.alloc(19 * 1024 * 1024 + 1, 120));
-    expect(giant.status).toBe(413);
+    try {
+      const giant = await request(h.app)
+        .post("/v1/catalogue/interpret")
+        .set("Origin", origin)
+        .set("Cookie", grant.cookie)
+        .set("Content-Type", "multipart/form-data; boundary=bounded")
+        .send(Buffer.alloc(19 * 1024 * 1024 + 1, 120));
+      expect(giant.status).toBe(413);
+    } catch (error) {
+      // Incomplete/excess rejected tails intentionally close after bounded draining.
+      expect(error).toMatchObject({ code: "ECONNRESET" });
+    }
+    expect(h.provider.interpret).not.toHaveBeenCalled();
+    expect(h.gate.counters().active).toBe(0);
     const declared = {
         ...action("other"),
         photos: [

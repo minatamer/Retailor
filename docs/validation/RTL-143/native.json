@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-16T15:20:13.960Z",
+  "platform": "linux",
+  "node": "v24.21.0",
+  "openssl": "3.5.8",
+  "uid": 1000,
+  "sharp": {
+    "aom": "3.15.1",
+    "archive": "3.8.9",
+    "cairo": "1.18.6",
+    "cgif": "0.5.4",
+    "exif": "0.6.26",
+    "expat": "2.8.5",
+    "ffi": "3.8.0",
+    "fontconfig": "2.18.3",
+    "freetype": "2.14.3",
+    "fribidi": "1.0.17",
+    "glib": "2.90.0",
+    "harfbuzz": "14.5.0",
+    "heif": "1.23.5",
+    "highway": "1.4.0",
+    "imagequant": "2.4.1",
+    "lcms": "2.19.1",
+    "mozjpeg": "0826579",
+    "pango": "1.58.2",
+    "pixman": "0.46.4",
+    "png": "1.6.58",
+    "proxy-libintl": "0.5",
+    "rsvg": "2.63.2",
+    "tiff": "4.7.2",
+    "uhdr": "2.0.2",
+    "vips": "8.18.7",
+    "webp": "1.6.0",
+    "xml2": "2.15.4",
+    "zlib-ng": "2.3.3",
+    "sharp": "0.35.5"
+  },
+  "logos": [
+    {
+      "typography": "inter",
+      "index": 0,
+      "bytes": 25210,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "a2c7522c1aafe5dd5d7eb5a9b9f4f94f2428b3f5cb55a60ce3468c4641f22e81"
+    },
+    {
+      "typography": "inter",
+      "index": 1,
+      "bytes": 26845,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "02a5d375034d2aa51d79e9441e73ceb46112c4f8a09ddb386e8a1019a28e5be6"
+    },
+    {
+      "typography": "inter",
+      "index": 2,
+      "bytes": 24543,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "ad8e9d7009b11f1fed7cce114fcf89bac5eeb324786e9bd2afe2a2e893c38cad"
+    },
+    {
+      "typography": "editorial",
+      "index": 0,
+      "bytes": 32324,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "66186edda760af995303db8c4d3b504ac1b132fffad92cbd692ea07b5a1d6209"
+    },
+    {
+      "typography": "editorial",
+      "index": 1,
+      "bytes": 33615,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "38db1f10d93fa57718741bed3542f9aa52127ef129ed21b8df6ec0331fc23e87"
+    },
+    {
+      "typography": "editorial",
+      "index": 2,
+      "bytes": 31446,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "e10a09affcbe7e396cefff47fca7007c3cadd799f2dd6fd79f351cf7e360edce"
+    },
+    {
+      "typography": "modern",
+      "index": 0,
+      "bytes": 24826,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "66b63984dff56cb01096caaf9eda359c1d613a13416df48bbb7897cd5c3a6006"
+    },
+    {
+      "typography": "modern",
+      "index": 1,
+      "bytes": 26411,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "ecfa4cf350be7ed0ad5006bda4c1d70bda6460f090c3de269993cb0942910c67"
+    },
+    {
+      "typography": "modern",
+      "index": 2,
+      "bytes": 24127,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "f4ce20076d013bc6008ac6d1e1d98fdb174b83076917b8bf60141eba91402c7f"
+    }
+  ],
+  "unsupportedNameDispatches": 0,
+  "sanitized": {
+    "format": "webp",
+    "width": 24,
+    "height": 32,
+    "privateMetadata": false
+  },
+  "network": "none",
+  "paidRequests": 0,
+  "limitations": [
+    "Synthetic native raster and literal-name logo checks; no AI quality, physical device, full paid-load or hosted acceptance"
+  ],
+  "candidate": {
+    "fingerprint": "f7ffdfa63bed81093ab655bf271351450036b0993a633eef7d24b48bedb1e9c5",
+    "backendImage": "sha256:7fe980c0645e5bd4f573b7bb48b827d3af3fa2769c20098d656fd1fd33b106e3"
+  },
+  "components": {
+    "frontend": {
+      "platform": "linux",
+      "node": "v24.21.0",
+      "openssl": "3.5.8",
+      "zlib": "1.3.2.1-motley-8002e91",
+      "pointerBytes": 8,
+      "uid": 1000,
+      "packages": [
+        "libblkid1:amd64\t2.38.1-5+deb12u3",
+        "libmount1:amd64\t2.38.1-5+deb12u3",
+        "perl-base\t5.36.0-7+deb12u4",
+        "zlib1g:amd64\t1:1.2.13.dfsg-1"
+      ],
+      "podTextAvailable": false,
+      "mountBinary": true,
+      "nsenterBinary": true,
+      "fstabEntries": 0,
+      "network": "none",
+      "limitations": [
+        "Package/API/presence observations are not exhaustive native/static analysis or proof against unrelated local compromise"
+      ]
+    },
+    "backend": {
+      "platform": "linux",
+      "node": "v24.21.0",
+      "openssl": "3.5.8",
+      "zlib": "1.3.2.1-motley-8002e91",
+      "pointerBytes": 8,
+      "uid": 1000,
+      "packages": [
+        "libblkid1:amd64\t2.38.1-5+deb12u3",
+        "libmount1:amd64\t2.38.1-5+deb12u3",
+        "perl-base\t5.36.0-7+deb12u4",
+        "zlib1g:amd64\t1:1.2.13.dfsg-1"
+      ],
+      "podTextAvailable": false,
+      "mountBinary": true,
+      "nsenterBinary": true,
+      "fstabEntries": 0,
+      "network": "none",
+      "limitations": [
+        "Package/API/presence observations are not exhaustive native/static analysis or proof against unrelated local compromise"
+      ]
+    }
+  },
+  "probe": "Read-only mounted local scripts; network none; no external model, storage or Stripe call"
+}

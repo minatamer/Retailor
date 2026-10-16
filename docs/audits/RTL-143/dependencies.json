@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-16T15:26:32.655Z",
+  "candidateFingerprint": "f7ffdfa63bed81093ab655bf271351450036b0993a633eef7d24b48bedb1e9c5",
+  "commands": ["pnpm audit --prod --json", "pnpm audit --json"],
+  "exits": {
+    "productionExit": 0,
+    "allExit": 1
+  },
+  "production": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 141,
+    "devDependencies": 0,
+    "optionalDependencies": 71,
+    "totalDependencies": 212
+  },
+  "all": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 1,
+      "critical": 0
+    },
+    "dependencies": 177,
+    "devDependencies": 230,
+    "optionalDependencies": 88,
+    "totalDependencies": 442
+  },
+  "advisories": [
+    {
+      "id": "GHSA-vfj7-8cjw-p6xm",
+      "module": "braces",
+      "severity": "high",
+      "affected": "<=3.0.3",
+      "patched": null,
+      "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+      "findings": [
+        {
+          "version": "3.0.3",
+          "paths": [".>@next/eslint-plugin-next>fast-glob>micromatch>braces"],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    }
+  ],
+  "vendorPatch": {
+    "before": "next16.4.0",
+    "after": "next16.4.1",
+    "matchingEslintPlugin": "16.4.1",
+    "notice": "https://nextjs.org/blog/nextjs-security-update-october-14-2026",
+    "advisories": [
+      "GHSA-673q-mjm6-r5xr",
+      "GHSA-2464-fhr4-w9xw",
+      "GHSA-p3m5-59mp-jv5r"
+    ],
+    "currentPreconditions": {
+      "cacheComponents": false,
+      "useCacheFunctions": false,
+      "serverActions": false,
+      "sharp": "0.35.5"
+    },
+    "limitation": "Registry audit returned zero production advisories even before the vendor patch; it is not exhaustive bundled-framework/native coverage"
+  },
+  "pendingNodeNotice": {
+    "url": "https://nodejs.org/en/blog/vulnerability/october-2026-security-releases",
+    "announced": "2026-10-14",
+    "scheduled": "2026-10-21",
+    "highestSeverity": "HIGH",
+    "status": "Future vendor release as of2026-10-16; no invented CVE or patched version"
+  }
+}

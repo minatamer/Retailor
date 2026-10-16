@@ -1,5 +1,32 @@
 # Retailor release status
 
+## Current local candidate — 16 October2026
+
+RTL-142 repeats the quality review and fixes restored runtime-mode authority. RTL-143 repeats STRIDE/dependency/native/image review, applies Next16.4.1 and removes multipart fragment-list memory amplification. Both preserve the demo's behavior and architecture. [Current quality evidence](../validation/RTL-142.md), [security review](../audits/RTL-143-SECURITY.md) and [actual security validation](../validation/RTL-143.md) distinguish checks from limitations.
+
+Current fingerprint **`f7ffdfa63bed81093ab655bf271351450036b0993a633eef7d24b48bedb1e9c5`**,303 exact inputs. All six gates pass on Windows and actual local Linux at workflow Node24.19.0/pnpm11.25.0:648 tests/102 files,206 boundary modules, both production builds. [Independent Linux record](../validation/RTL-143/linux-ci.json) compares372 source/test/tool/config files byte-for-byte; it is not a GitHub job. Preflight now selects the [current exact container proof](../validation/RTL-143/containers.json) and still rejects stale/mismatched evidence, with public acceptance/publication false.
+
+| Role     | Current tested local image                                                |
+| -------- | ------------------------------------------------------------------------- |
+| Frontend | `sha256:fec205daf664dc342c9182acc6d4621b146101119c65623f99a09d4729b6cbc3` |
+| Backend  | `sha256:7fe980c0645e5bd4f573b7bb48b827d3af3fa2769c20098d656fd1fd33b106e3` |
+
+Network-disabled Linux startup/assets/guard/full-upload/shutdown and [native logo/raster checks](../validation/RTL-143/native.json) pass. [Fresh scans](../validation/RTL-143/scout.json) retain50 entries per image:0 Critical/8 High/4 Medium/38 Low, with no offered Bookworm fix for the High matches. Two previously Unspecified entries were reclassified High; no IDs were added/removed. The development-only braces advisory remains unpatched. Primary14October Next notices justified the patch despite a zero-advisory production registry audit. Node schedules a further security release for21October; no future fix is invented.
+
+## Current demo and external acceptance
+
+- Normal local fake/paid-off operation: frontend4310, backend4311; `/` and `/demo`. Runtime identity/readiness/logs are recorded in the current validation file; environment secrets remain local.
+- Clothing photo intake/review; three independent page-layout families, five palettes and three typography choices; local optional logos and wordmark; connected storefront/dashboard, exact commerce/evidence, USD/EUR display, tours, reset/restore/export and contextual Tailor. Scenario selection and the old36-look wording no longer describe the public onboarding.
+- Sandbox-only checkout uses actual selected sanitized derivatives/private storage and verified test payment returns. Native logos use zero model calls. Earlier bounded paid recognition/chat/storage/Stripe observations are in RTL-091/092/097/102/138/140; they do not establish perfect recognition, current cloud policy or production acceptance.
+- Public release remains unaccepted. Actual edge header overwrite/rates/all-origin denial, private backend IAM/audience, canonical domain/TLS, hosted capacity, account-wide cutoff/overlap/outstanding usage/retention, current storage lifecycle/IAM and physical/zoom/keyboard checks remain external acceptance. Local evidence is not deployment permission.
+
+Use [manual release packet](RELEASE.md), [evaluation worksheet](EVALUATION.md) and [hosted verification worksheet](HOSTED-VERIFICATION.md). `node scripts/release/preflight.mjs` reads only bounded non-secret metadata and current bytes, never keys or networks. No push, deployment, cloud mutation, new paid request or automation occurs in this audit. Preserve owner-selected paid-master/credential/finite-limit policy; do not restore removed signoff/dollar/logo-enable flags. Retained upstream advisories and the announced Node release require supported vendor follow-up before relevant external acceptance.
+
+## Historical 13October handoff
+
+<details>
+<summary>Earlier RTL-023/024/025 identities and dated acceptance record, retained verbatim</summary>
+
 RTL-025 corrects the supplied GitHub CI checkout mismatch. Canonical LF app inputs now have fingerprint **`dc7d98dffa86fd6d72ab39c0057019c3a38b0585d4cd4cace5f028257e7930ac`**; [actual fresh Linux proof](../validation/RTL-025/containers.json) identifies frontend `sha256:c4600074e00eeeac5f382a5d585d86df25186ee9dce1d9d18a01531909ac1e82` and backend `sha256:10c8c31d19e65b1145339bd0dd99c3c4ee24d0b0a975f1bdb560b214fc79ded5`. Preflight selects this exact new proof. [New-image scans](../validation/RTL-025/scout.json) retain 50 entries/zero Critical/six unpatched High per image. [Settled validation](../validation/RTL-025.md) records all six gates and **381 tests / 72 files passing on both Windows and actual local Linux**, including the original strict preflight assertion and real 24-image stress case with unchanged RSS guard. The actual GitHub job remains unverified until a new owner push/run. No paid/cloud/publication action occurs.
 
 ## Historical RTL-024 configuration candidate
@@ -41,3 +68,5 @@ Unpaid network-disabled Linux probes observed frontend 62.13 MiB/512 MiB and bac
 Use [manual release packet](RELEASE.md), [evaluation worksheet](EVALUATION.md) and [hosted verification worksheet](HOSTED-VERIFICATION.md), in that order of prerequisites. Start with `node scripts/release/preflight.mjs`: local-only, no env/key/network. Fill only non-secret metadata in ignored `artifacts/local/release-inputs.json`; inspect the fixed read-only command arrays within approved resource scope. Preflight always keeps public acceptance/authorization false. No successful helper, fixture, budget reservation or CLI installation authorizes deployment.
 
 Keep paid off until actual prerequisites/acceptance are satisfied. Default hosted GET checks expect disabled AI; optional capabilities retain honest wordmark/USD fallbacks. All deploy/enable/public-IAM/DNS/paid actions remain explicit future owner decisions. No auto deploy, recurring monitor, third service, storage/database/queue or purchase has been added. The current execute/validate local goal ends with a committed reviewable handoff; original RTL-022 hosted acceptance stays pending.
+
+</details>

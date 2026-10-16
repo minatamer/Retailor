@@ -1,0 +1,2002 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-16T15:18:16.088Z",
+  "source": {
+    "schemaVersion": 1,
+    "gitRevision": "670d2b18e301b50763881c635497e7ec21cfbf3a",
+    "dirty": true,
+    "fingerprint": "f7ffdfa63bed81093ab655bf271351450036b0993a633eef7d24b48bedb1e9c5",
+    "scope": "Positive application build inputs; no environment, visitor, documentation or local output content",
+    "files": [
+      {
+        "path": ".dockerignore",
+        "bytes": 1499,
+        "sha256": "1f726378e335a6a2b08198f6ad2288f58db19fffa7eb588c3da69dd98c885f33"
+      },
+      {
+        "path": "apps/backend/Dockerfile",
+        "bytes": 1475,
+        "sha256": "23cab8fbe214935a552b696679a762a26154e3c31f73ff6b628c6d9e8137cb68"
+      },
+      {
+        "path": "apps/backend/package.json",
+        "bytes": 705,
+        "sha256": "2e18ad7e5dfdfe3c9f31d85e70a83508099e006deff080b1326fd09b60c48d04"
+      },
+      {
+        "path": "apps/backend/scripts/copy-logo-fonts.mjs",
+        "bytes": 973,
+        "sha256": "512590ab78fbc12d99cf7a57b59508f63d0d6a696005dd3e864bbe866099464d"
+      },
+      {
+        "path": "apps/backend/src/assistants/context.ts",
+        "bytes": 6002,
+        "sha256": "eaceff51b1de67006df44f94dbd43b7b4a28b324aaeb94a83d8ea454138bf356"
+      },
+      {
+        "path": "apps/backend/src/assistants/fake.ts",
+        "bytes": 11536,
+        "sha256": "200b86137e12c3aba8e4e9541dd252f6ede6be380347e5928736a1f0bbaf97fe"
+      },
+      {
+        "path": "apps/backend/src/assistants/grounding.ts",
+        "bytes": 7591,
+        "sha256": "9956926e73db969b68cce2acf8140e51c11d3e8835a704096445777b073a27ff"
+      },
+      {
+        "path": "apps/backend/src/assistants/operations.ts",
+        "bytes": 7985,
+        "sha256": "81859debc069368e278347aebb31ecfd76d9b5a19775a0ccfa9cb1af3ddceb6c"
+      },
+      {
+        "path": "apps/backend/src/assistants/provider.ts",
+        "bytes": 771,
+        "sha256": "a2724044a3865bd8c9488cac1a9edde3fa2e601ab339e3058c0e06152de1a038"
+      },
+      {
+        "path": "apps/backend/src/assistants/routes.ts",
+        "bytes": 5402,
+        "sha256": "a4f98208add459b7d70727d756d927b60e762ce5151d3fe78884351122dffaf9"
+      },
+      {
+        "path": "apps/backend/src/assistants/service.ts",
+        "bytes": 4519,
+        "sha256": "8c52bc497cde90944152bc2a3fd698d458772382ccb69dfb3894cfad7ed3158a"
+      },
+      {
+        "path": "apps/backend/src/assistants/tools.ts",
+        "bytes": 14535,
+        "sha256": "06b7957f2e82a8ffed59b0adbf2a90472d0f1d89e015cf79969f589755f6c535"
+      },
+      {
+        "path": "apps/backend/src/brand/context.ts",
+        "bytes": 2017,
+        "sha256": "8d8723f36631bd17cb9fe15d6814fb7d9b0585833c1243135b14e9d007d83a7b"
+      },
+      {
+        "path": "apps/backend/src/brand/fonts/dm-serif-display-OFL.txt",
+        "bytes": 4599,
+        "sha256": "e9d4ced9825bf03a6b634c37fe8ae974f6d1b80fbb0bd3ae9b089987e4dc541b"
+      },
+      {
+        "path": "apps/backend/src/brand/fonts/editorial.ttf",
+        "bytes": 54968,
+        "sha256": "a71fa7554dc69fe833ee1dafd9f13939f8cacd6f5fddf8e7473c34dcc5cec8d1"
+      },
+      {
+        "path": "apps/backend/src/brand/fonts/inter-OFL.txt",
+        "bytes": 4477,
+        "sha256": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345"
+      },
+      {
+        "path": "apps/backend/src/brand/fonts/inter.ttf",
+        "bytes": 66596,
+        "sha256": "5880d1455b543bf5128a99b2d5d64f7672369168df4e171895f7426855a36949"
+      },
+      {
+        "path": "apps/backend/src/brand/fonts/manrope-OFL.txt",
+        "bytes": 4383,
+        "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30"
+      },
+      {
+        "path": "apps/backend/src/brand/fonts/modern.ttf",
+        "bytes": 35600,
+        "sha256": "6e7f880a1b2194959dceec1b7f1226940e83e718223a6ba28fb91d1b6c1e203c"
+      },
+      {
+        "path": "apps/backend/src/brand/fonts/provenance.json",
+        "bytes": 2966,
+        "sha256": "217acfc4da97d878075f3437ccec052a354e45629a0ab12461b93c6251b1fe80"
+      },
+      {
+        "path": "apps/backend/src/brand/local.ts",
+        "bytes": 4996,
+        "sha256": "4a5c627d6351f08d52816226bb693854af5fb6ae77341a710e60b48246555c06"
+      },
+      {
+        "path": "apps/backend/src/brand/provider.ts",
+        "bytes": 428,
+        "sha256": "ead6da5c518f47919058b2f104c261b4ae183566071720a01e4fe234ba4d434a"
+      },
+      {
+        "path": "apps/backend/src/brand/routes.ts",
+        "bytes": 4629,
+        "sha256": "e7e9fb589f92632a6fda12793eca0d1b73cf82c21ac7d42bc5c295d22cfa601b"
+      },
+      {
+        "path": "apps/backend/src/brand/service.ts",
+        "bytes": 4953,
+        "sha256": "9375d573921c6468b537731d324dfb0726eb3e506d5a31cbdf584b9840ea13a0"
+      },
+      {
+        "path": "apps/backend/src/catalogue/image-capacity.ts",
+        "bytes": 2041,
+        "sha256": "7da207ce47bd8284c1644639f0e1abd4ea963d6bf6ff0267e850f9522b80ec4a"
+      },
+      {
+        "path": "apps/backend/src/catalogue/image-worker.ts",
+        "bytes": 1618,
+        "sha256": "996b22039389f6d1c20f024408bc8b494e30d1a2025370a95271e3d94dd4f12d"
+      },
+      {
+        "path": "apps/backend/src/catalogue/multipart.ts",
+        "bytes": 5391,
+        "sha256": "aca8ac95999bbc37149a87312c0a1953160ce971e0bc4169564e2ce9918775a2"
+      },
+      {
+        "path": "apps/backend/src/catalogue/provider.ts",
+        "bytes": 8108,
+        "sha256": "ab5a52002493f6f533b917174db3ef2989c49452290bbcfec129407b0037d606"
+      },
+      {
+        "path": "apps/backend/src/catalogue/reconcile.ts",
+        "bytes": 7711,
+        "sha256": "c5c86668520f42703bcb76e81988ffdb02dbade3986900545486e8f0f0a90c64"
+      },
+      {
+        "path": "apps/backend/src/catalogue/routes.ts",
+        "bytes": 4503,
+        "sha256": "0b05e6376a288595e27873d3f5852ce81f75a7c6d651dd8878f510ce0ad97887"
+      },
+      {
+        "path": "apps/backend/src/catalogue/sanitize.ts",
+        "bytes": 5627,
+        "sha256": "85f78e5e8e3bbe496b7a291cb95c30f9afa08276a4e7dea0977dd382bbf3be64"
+      },
+      {
+        "path": "apps/backend/src/catalogue/validate-images.ts",
+        "bytes": 2178,
+        "sha256": "ed03740de16bff066bf559a0fb91e033dbdea7a9fce988157250a25b111d3293"
+      },
+      {
+        "path": "apps/backend/src/checkout/provider.ts",
+        "bytes": 7214,
+        "sha256": "2913fa26263954e572f39fc31f0a0e2ab48914724270b081394392b85fb5fe8a"
+      },
+      {
+        "path": "apps/backend/src/checkout/routes.ts",
+        "bytes": 3537,
+        "sha256": "36d9e9a73f66e8f9cf11f189b0cf486b876be3445e8a2ca51807cf60d723e8af"
+      },
+      {
+        "path": "apps/backend/src/checkout/service.ts",
+        "bytes": 10125,
+        "sha256": "83290ab8dd9313edb30901d8b965b731b70798665a52306499a099a0c473e9d2"
+      },
+      {
+        "path": "apps/backend/src/checkout/storage.ts",
+        "bytes": 2168,
+        "sha256": "20a4cd91890dc4e62bdba49706a42d579233703f2177dcc90e57d5c18457369e"
+      },
+      {
+        "path": "apps/backend/src/config/checkout.ts",
+        "bytes": 238,
+        "sha256": "0eaa7aaf3ee871a8d98406db626e2b98cd9095ca4ca89b4106c2ce26aa6f588b"
+      },
+      {
+        "path": "apps/backend/src/config/environment.ts",
+        "bytes": 2146,
+        "sha256": "c9fddd1ff54df91e8ae9fe85db2f3ba9b621ea28930bb4101bf7d17dfe4e63ff"
+      },
+      {
+        "path": "apps/backend/src/currency/provider.ts",
+        "bytes": 4465,
+        "sha256": "5a1b5d0219bed38e70e92b086e7e3c710eada5e7c1bd842c64287afe205375a3"
+      },
+      {
+        "path": "apps/backend/src/currency/routes.ts",
+        "bytes": 799,
+        "sha256": "3d70d47dc8f30a579fd966bf35ebb797efacda9cbe9ba155f12e65562f7fa9ca"
+      },
+      {
+        "path": "apps/backend/src/currency/service.ts",
+        "bytes": 2695,
+        "sha256": "602cdc08ac908e4612e7eecd97f00183b220a516b69fa09a8ea9c19602c88597"
+      },
+      {
+        "path": "apps/backend/src/http/app.ts",
+        "bytes": 3611,
+        "sha256": "281ad40118ad45d6e1a3c6aeb7549ede4a23bbfaf268a3ac5bc236591ade838d"
+      },
+      {
+        "path": "apps/backend/src/http/diagnostics.ts",
+        "bytes": 2511,
+        "sha256": "01a78b6afdc4abbee4db3fba5148d6f91563d535c53073e8d6eb3fbe73367ab0"
+      },
+      {
+        "path": "apps/backend/src/http/ingress.ts",
+        "bytes": 5333,
+        "sha256": "16ad2008489f7f07aa7a3ba76168f6138279aeb4254518ff94c7ec723087ba81"
+      },
+      {
+        "path": "apps/backend/src/providers/assistant.ts",
+        "bytes": 13706,
+        "sha256": "24c9095905ad9633f830779e5bdfca31969b8430f67808fbdfa8bfef48113628"
+      },
+      {
+        "path": "apps/backend/src/providers/failure.ts",
+        "bytes": 2367,
+        "sha256": "c4e41ce3eaaca3ee0f7266023bf14601bb0a3002497e599cff752016f77b50ca"
+      },
+      {
+        "path": "apps/backend/src/providers/responses-client.ts",
+        "bytes": 1100,
+        "sha256": "074371b52786523b98e6f80972dd4fc69409fd72e18d901cc952847f9a7b6d19"
+      },
+      {
+        "path": "apps/backend/src/runtime/compose.ts",
+        "bytes": 5771,
+        "sha256": "7e0f518594e118684d20db6e81dce71381fe22e374f0b7269eefb49f64f2e28f"
+      },
+      {
+        "path": "apps/backend/src/security/admission-routes.ts",
+        "bytes": 2667,
+        "sha256": "d9c72ebf33d8e8826d89578044f840fb54e6df352ad348e4eb9dda18e20ed627"
+      },
+      {
+        "path": "apps/backend/src/security/admission.ts",
+        "bytes": 12792,
+        "sha256": "39186d0149a064433d2d7173d1d185f47cf70d319054bb9633f5ec300e1a113f"
+      },
+      {
+        "path": "apps/backend/src/security/bounded.ts",
+        "bytes": 938,
+        "sha256": "4bd79b3de7ead36085cc784a8c02bf056a664f63dc59c25dc03ec74d24011d82"
+      },
+      {
+        "path": "apps/backend/src/security/errors.ts",
+        "bytes": 316,
+        "sha256": "9e9b199d28a4c37db3fb1efa42a88d600ec944ed4ab22d5e37e1b7b6a7a0d1eb"
+      },
+      {
+        "path": "apps/backend/src/security/guarded-action.ts",
+        "bytes": 876,
+        "sha256": "226e94d36f9515908b805b7bf6fda736a59f1885c9c09fac5818ca0785f89483"
+      },
+      {
+        "path": "apps/backend/src/security/safety-cookie.ts",
+        "bytes": 501,
+        "sha256": "2cf034cd7605e95a14a04aeba46d26b0148faa080156540e623c67a17156f0e9"
+      },
+      {
+        "path": "apps/backend/src/security/turnstile.ts",
+        "bytes": 1644,
+        "sha256": "74a8b547846d578ec065dbe04eb694b814968e352d62dd82103de2587412cce1"
+      },
+      {
+        "path": "apps/backend/src/server.ts",
+        "bytes": 1606,
+        "sha256": "d554a5276a50f223c0a389d4dd0416a94f963e716b02400f3cca93c2cd480ba6"
+      },
+      {
+        "path": "apps/backend/tsconfig.build.json",
+        "bytes": 106,
+        "sha256": "fe1e2f73631f25a0cc1bb78c8829745d758e058eac26637793503879eb280890"
+      },
+      {
+        "path": "apps/backend/tsconfig.json",
+        "bytes": 159,
+        "sha256": "4cd0436da42ec26d1196e31ee0d2f9bf3c21c7eaea36b9c2f16a45e9b033bfa9"
+      },
+      {
+        "path": "apps/frontend/Dockerfile",
+        "bytes": 1713,
+        "sha256": "50fa83c05e60a215987862b598956ed905ba499d279e03c8a389db490cc2e81b"
+      },
+      {
+        "path": "apps/frontend/next.config.mjs",
+        "bytes": 1691,
+        "sha256": "668d626f3bda3fd1169fec4ceadb0035be2ebdeaebf9aad06402014391bebbaf"
+      },
+      {
+        "path": "apps/frontend/package.json",
+        "bytes": 597,
+        "sha256": "d6db35baa7c3ae383552266eb83e397ea0c3c1069e8433f53e4d97a1776ff2a5"
+      },
+      {
+        "path": "apps/frontend/public/apple-touch-icon.png",
+        "bytes": 4569,
+        "sha256": "b4e8d165c7d56457061e404569009317793f8f03b9cc0e2827ea2784d6d50c94"
+      },
+      {
+        "path": "apps/frontend/public/brand/retailor-cart.svg",
+        "bytes": 1434,
+        "sha256": "282197fe5c86160b94055cbea72fac54a9d558e2e1130c56ce042f3bb9e0a2e7"
+      },
+      {
+        "path": "apps/frontend/public/brand/retailor-lockup.svg",
+        "bytes": 11056,
+        "sha256": "aa130b420a91d1fcc9b65cfdc2f01e5480af9a1b0ea098cdffad969792859b89"
+      },
+      {
+        "path": "apps/frontend/public/favicon-96.png",
+        "bytes": 2272,
+        "sha256": "02010e50592659a29cf10e2f99c1914c76c59ed48bf984902462c1aacd3d56bf"
+      },
+      {
+        "path": "apps/frontend/public/favicon.ico",
+        "bytes": 2725,
+        "sha256": "63e566fbff3ad0d8ad6b142df0dab485b730c604fc38fd6968d0b4c2b7403103"
+      },
+      {
+        "path": "apps/frontend/public/fonts/dm-sans-OFL.txt",
+        "bytes": 4502,
+        "sha256": "6fbd040a29c2037a765dfb9f2561e9965b5c95c6dcb5dce516089d63d5f17af7"
+      },
+      {
+        "path": "apps/frontend/public/fonts/dm-sans-latin-wght-normal.woff2",
+        "bytes": 36932,
+        "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543"
+      },
+      {
+        "path": "apps/frontend/public/fonts/dm-serif-display-OFL.txt",
+        "bytes": 4599,
+        "sha256": "e9d4ced9825bf03a6b634c37fe8ae974f6d1b80fbb0bd3ae9b089987e4dc541b"
+      },
+      {
+        "path": "apps/frontend/public/fonts/dm-serif-display-latin-400-italic.woff2",
+        "bytes": 24572,
+        "sha256": "ed8b291611e32fa2d2900488dd48fc95faf0957b2ef7ddf1527e8d21dd9cf2df"
+      },
+      {
+        "path": "apps/frontend/public/fonts/dm-serif-display-latin-400-normal.woff2",
+        "bytes": 24744,
+        "sha256": "fdf61e20fd2c0108e0ea28da4daca0035205b4b7fc031a3974b865b704de160a"
+      },
+      {
+        "path": "apps/frontend/public/fonts/inter-OFL.txt",
+        "bytes": 4477,
+        "sha256": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345"
+      },
+      {
+        "path": "apps/frontend/public/fonts/inter-latin-wght-normal.woff2",
+        "bytes": 48256,
+        "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62"
+      },
+      {
+        "path": "apps/frontend/public/fonts/manrope-OFL.txt",
+        "bytes": 4383,
+        "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30"
+      },
+      {
+        "path": "apps/frontend/public/fonts/manrope-latin-wght-normal.woff2",
+        "bytes": 24836,
+        "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+      },
+      {
+        "path": "apps/frontend/public/fonts/provenance.json",
+        "bytes": 2068,
+        "sha256": "9204e11248f2f22dacbe874101181b0a10d1ed6d07a69d114ac8f94ca9bdf2e5"
+      },
+      {
+        "path": "apps/frontend/public/landing/hero-film.mp4",
+        "bytes": 2576593,
+        "sha256": "0906ff2fc1a05ec6cd8d22f845973e8fd0685e35f05e3727785dbb57c1adb452"
+      },
+      {
+        "path": "apps/frontend/public/landing/hero-poster.webp",
+        "bytes": 75772,
+        "sha256": "93a623e7a3e02faceed06bba1d3ac967b439724dbbd44afd8346f891763c28e3"
+      },
+      {
+        "path": "apps/frontend/public/landing/hero-provenance.json",
+        "bytes": 1323,
+        "sha256": "bc3a1df7aec5d013391c16082bde38a8966e87be6fba689be18a92967015ade3"
+      },
+      {
+        "path": "apps/frontend/public/landing/jeans-black.webp",
+        "bytes": 2864,
+        "sha256": "9f8c1c3852d47dfa059fce14336f3757116b939ef18e2a01748da25967c302fc"
+      },
+      {
+        "path": "apps/frontend/public/landing/jeans-indigo.webp",
+        "bytes": 5058,
+        "sha256": "6b0f534e071bf92184082f9cdb704170cbd5b6764da5598f93e397e641cdf7fb"
+      },
+      {
+        "path": "apps/frontend/public/landing/jeans-light.webp",
+        "bytes": 5822,
+        "sha256": "2fc3c8c814e2e4770e62a01da977ee66571297923b73517a4d71b8afaea46cb0"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F01.webp",
+        "bytes": 175264,
+        "sha256": "1cece25a55b40ca865604049d6dfd351f2261ba0ee6b08b34d8e067b35b1e06f"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F02.webp",
+        "bytes": 85032,
+        "sha256": "16dd4882013a3ade901a26b050c0fd2d4b0fd2b185401fa12c361c52358aeecc"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F03.webp",
+        "bytes": 70614,
+        "sha256": "bdbfa926f23b612e5c4586942e6320ac1ff886960b6f0e65ada1f8b37dcc5e9b"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F04.webp",
+        "bytes": 120532,
+        "sha256": "3f53f55da75732b47f03885c9b82b83836f6f43c6bbff5705f928dba83dc4146"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F05.webp",
+        "bytes": 26440,
+        "sha256": "780c14b5cc04ffb3ad5e27b7d74ecb2dacfb49816b480ed9323676887439ba3d"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F06.webp",
+        "bytes": 86174,
+        "sha256": "b8773a56592808e8737c006c3ca43af996d3c6cad51e991a4c4b242a43cc2f00"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F07.webp",
+        "bytes": 69360,
+        "sha256": "55ec131ef0e5ac6d9bc4db08858a21dde7baa3e78071ae59aec22e781a556338"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F08.webp",
+        "bytes": 123974,
+        "sha256": "ad5de867adb239d5c28ee338b40faa4bb82a8f212127de39e4969f732539f2e7"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F09.webp",
+        "bytes": 59234,
+        "sha256": "d99820cddcf457f415ee34eec9c06a949929b47124bd32a0c18c42ca6a425a29"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F10.webp",
+        "bytes": 92798,
+        "sha256": "19214941f6a8cecc1b4f87fc3b04913c2c2ef55fa500408a83964b03f5275f47"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F11.webp",
+        "bytes": 251246,
+        "sha256": "46ac9d2da862fb76482192115709a83baa152cbd6213053fbc1226753a7e278e"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F12.webp",
+        "bytes": 33314,
+        "sha256": "3ebc75ea35a7dfc6df6d5c5e5166021ef05998879ea4030720e8fc919a99d9aa"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F13.webp",
+        "bytes": 32898,
+        "sha256": "a76a2a46a651d73af604dd68bf92b29256d3ac5f9b54204f4035987668a98576"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F14.webp",
+        "bytes": 123148,
+        "sha256": "b19a2dd86a5a3511326931731eea8f09f70f8e0bff23f754f0a362d04207bc62"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F15.webp",
+        "bytes": 55984,
+        "sha256": "10703c61fdd98328b109066a5e7776910867e06066bad7bbcf17042834a0e8d3"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F16.webp",
+        "bytes": 163602,
+        "sha256": "9e19af76e4040f0cb00efae88ffa3b4f1adfee007032ecc0b3412a14cccc13ee"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F17.webp",
+        "bytes": 75496,
+        "sha256": "68eda8004781af7a163f8ebfb309036acb11ba47de0e9e892a90c639ed2f0173"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F18.webp",
+        "bytes": 49282,
+        "sha256": "85cd5abf6d0871ce2cdc308fe12d2443dd9f28cd7295b19edf5d508f6e9ee3e4"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/F19.webp",
+        "bytes": 130436,
+        "sha256": "e3841201cd2024e1434c4d750a5b156191c5af80efef576102a7f56638a1fe84"
+      },
+      {
+        "path": "apps/frontend/public/sample/forme/manifest.json",
+        "bytes": 7015,
+        "sha256": "17ffe3f856c5f42d59c355af24b0f9c4ce4766bd619e0494a88e25c3fee7df38"
+      },
+      {
+        "path": "apps/frontend/src/app/api/retailor/v1/[...operation]/route.ts",
+        "bytes": 420,
+        "sha256": "a631a534497c3011f5f0c9a56e99d1418d337d67c192e6131166c98664d3b78f"
+      },
+      {
+        "path": "apps/frontend/src/app/demo/page.tsx",
+        "bytes": 380,
+        "sha256": "ecc70d85b5dbaad3d3478547aa5811ba6571c0ec3512877568cc0e3ee34e8a3e"
+      },
+      {
+        "path": "apps/frontend/src/app/design/page.tsx",
+        "bytes": 344,
+        "sha256": "4ed1abc2621a886088f010dbae7b94a5f208c1bb30b2f3f96f384c4138adaa61"
+      },
+      {
+        "path": "apps/frontend/src/app/design/photos/page.tsx",
+        "bytes": 340,
+        "sha256": "aa3ffe764f8047264327831016fd6a47b04c9abf03cb51c95a3a7ad23f23642f"
+      },
+      {
+        "path": "apps/frontend/src/app/error.tsx",
+        "bytes": 283,
+        "sha256": "f9e716427c342f3fb693a8d310f180bc5dd597ff6af8140d6f7b77102b947d2e"
+      },
+      {
+        "path": "apps/frontend/src/app/global-error.tsx",
+        "bytes": 372,
+        "sha256": "6b1d44e82bcb65aef34292e135c9bfde5c5e3e57b74c9a48044fb1f4e0e6581c"
+      },
+      {
+        "path": "apps/frontend/src/app/layout.tsx",
+        "bytes": 895,
+        "sha256": "8aa201050381e908a481b570c263bb03733f68a2dd983470944b1b04122fb892"
+      },
+      {
+        "path": "apps/frontend/src/app/page.tsx",
+        "bytes": 473,
+        "sha256": "00dbfe9075dc2b90d4375e3c87284fa02b9927e00224dd3dd61ad9f1e4a61a42"
+      },
+      {
+        "path": "apps/frontend/src/components/ui/brand.module.css",
+        "bytes": 81,
+        "sha256": "f091920a547722c302cca067a38d59d7dd3a9937c8499110c5c6572d5bef36d4"
+      },
+      {
+        "path": "apps/frontend/src/components/ui/brand.tsx",
+        "bytes": 304,
+        "sha256": "42c522fa30b9f0e8c7ec9fb2448cd0aebd942c5438f7a12807566458b0c2ed16"
+      },
+      {
+        "path": "apps/frontend/src/components/ui/button.tsx",
+        "bytes": 720,
+        "sha256": "9625bfc92e2732deb3cd26f3c0af029c192ffa24f8ec8a4723b24450e2fb37bd"
+      },
+      {
+        "path": "apps/frontend/src/components/ui/controls.module.css",
+        "bytes": 1484,
+        "sha256": "54f27319c20ac98b443ef26186d099a53a144675f56847d025acc2af8c9ab6af"
+      },
+      {
+        "path": "apps/frontend/src/components/ui/icon.tsx",
+        "bytes": 1678,
+        "sha256": "3d07906f27957745fa39a657c126ac05f66feb9c3384ec60fc1264cc2fdbede0"
+      },
+      {
+        "path": "apps/frontend/src/components/ui/photo-carousel.tsx",
+        "bytes": 3629,
+        "sha256": "2f8be8f5f27a213abc3405591651167b5aaaad9cf4e4d4555c04f100063bee80"
+      },
+      {
+        "path": "apps/frontend/src/components/ui/photo-dialog.module.css",
+        "bytes": 6473,
+        "sha256": "6cf428a1e7802588b229ce6a957c5bcd438497d3fbf48b803d59b05728d4f155"
+      },
+      {
+        "path": "apps/frontend/src/components/ui/photo-dialog.tsx",
+        "bytes": 1559,
+        "sha256": "5f3c2bc01e9f4820ae5b070fe080c5d7069c07280bffaa3cdd11d4a7b5d71a12"
+      },
+      {
+        "path": "apps/frontend/src/components/ui/recovery.module.css",
+        "bytes": 1188,
+        "sha256": "786a9f5d7e014833bf64c1c26acb627d2ebc5b0190b23e9a3d9da115eca22dc2"
+      },
+      {
+        "path": "apps/frontend/src/components/ui/recovery.tsx",
+        "bytes": 920,
+        "sha256": "8019a84da11bc8e647e0013fdc44445481cf76870a2ec6af9179b941331ae7cd"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/context.ts",
+        "bytes": 2170,
+        "sha256": "2d68f6c241835947548b99c00f70d0cf6f0173c3809b58254caca82055153e75"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/conversation-panel.tsx",
+        "bytes": 5430,
+        "sha256": "da4e41d8e6ff4f73cd619ba0a3e999e8d66be7c050e7cc746800f4d7b25fcc7e"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/conversation.ts",
+        "bytes": 1612,
+        "sha256": "3ea6abe7689f61685cde575ce9ca0fa56a6a1f0de6a0c318706028005753f6a0"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/local.ts",
+        "bytes": 2764,
+        "sha256": "a53091223596417a3dcb38e009a5285b5b210aba27d8adcef71c36905a5fcce7"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/logo-panel.module.css",
+        "bytes": 3436,
+        "sha256": "9bca46aeee8ec85eeb54de869fa12ea0e067eb4d5bf8ced50713da4c7bf799a9"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/logo-panel.tsx",
+        "bytes": 7058,
+        "sha256": "ed01da55037e6c8049357a72f6c24e374345efd20bdce6ebab74e4706aa3ef59"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/operation-prefill.ts",
+        "bytes": 1862,
+        "sha256": "6c469c0e64cd650ea713d91d4b3fc1f1ea81d6069fef09d2bd81ef74b87accfc"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/operation-result.tsx",
+        "bytes": 3624,
+        "sha256": "46c62ef91b5966d62f37b1b605a09e823d08732094cb7cdd82668f1c46e03b0b"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/reply.tsx",
+        "bytes": 10905,
+        "sha256": "5a2cfc604fdf6a5149ee98e53ec792d47b860a6e18b4fd2455ac18ff673d5d0c"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/request.ts",
+        "bytes": 3989,
+        "sha256": "38ae234c2429007e4fcc21eee0c15e4f2cbd77acf1092c1705f5f12d51a30393"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/setup.ts",
+        "bytes": 6559,
+        "sha256": "a7ff03e2e9794c53a7286695c66377b714d93a6da0d367b8f737b99fdacc048b"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/tailor.module.css",
+        "bytes": 19209,
+        "sha256": "f82b919d458b4ed7b5697a6ebe5fa77d48458f263ac9ffe7549d42d4dbe329ea"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/tailor.tsx",
+        "bytes": 25598,
+        "sha256": "42a52b02e069d7e40c1b1bed6ab89919b26f72d1a1fb8653d42042d2c0cf38fc"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/tour-layout.ts",
+        "bytes": 4476,
+        "sha256": "5c999de8639e6be66f25d8e8abdf96ce11fad424c5587e2954fc48cd4109ce9c"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/tour-targets.ts",
+        "bytes": 7092,
+        "sha256": "af1729300808e07e5f301ed0ec52c19c644ef9feb7f32179d5d12cfdfe1f6248"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/tour.module.css",
+        "bytes": 2619,
+        "sha256": "bc3bb9964cc25f2d688ff9ae9cd8a2023d200f2e7751510dadff708d4c4b367b"
+      },
+      {
+        "path": "apps/frontend/src/features/assistants/tour.tsx",
+        "bytes": 16958,
+        "sha256": "a8f535f8927949f2ff36ed43d9b75663a35a977225775a592642acf678a8e3b0"
+      },
+      {
+        "path": "apps/frontend/src/features/bag/bag-dialog.module.css",
+        "bytes": 15258,
+        "sha256": "8b8b8131d0b901e1adcf9ba1d03d6a6d7baf6f5e48b01c0e0ede24855616e1ed"
+      },
+      {
+        "path": "apps/frontend/src/features/bag/bag-dialog.tsx",
+        "bytes": 25619,
+        "sha256": "d7c4ae6725d5eafd124b0045d66d40b102994946703792546ed77220fff8eb75"
+      },
+      {
+        "path": "apps/frontend/src/features/bag/quote.ts",
+        "bytes": 1025,
+        "sha256": "5aed160eb1ebe87ce425c7f42dd1cf4d0b957628dfd30b6a0876c2b2a6582817"
+      },
+      {
+        "path": "apps/frontend/src/features/bag/state.ts",
+        "bytes": 939,
+        "sha256": "dde4a1441de06e5191a39aea79daa8aae756d478d721d163217dc724dd84c33a"
+      },
+      {
+        "path": "apps/frontend/src/features/catalogue/development-fixture.ts",
+        "bytes": 4376,
+        "sha256": "b88f929fb4b0fc37749f97b0755c75c5f163e78ed3d1157b0b7b6a2b1dec6dae"
+      },
+      {
+        "path": "apps/frontend/src/features/catalogue/draft.ts",
+        "bytes": 12005,
+        "sha256": "8c2e8b9e9cd0fdc925ff049c7801e8e0ba5232863992c62a4be2421f07728d2b"
+      },
+      {
+        "path": "apps/frontend/src/features/catalogue/edit-input.ts",
+        "bytes": 2238,
+        "sha256": "8793ba1f538156e959ce12988dfe8a98b2af2593a9b1574dd214c25841015bc0"
+      },
+      {
+        "path": "apps/frontend/src/features/catalogue/live-processor.ts",
+        "bytes": 4385,
+        "sha256": "f7cefede896378fd942409614a4679ddc448ad10c9c60ae88035d2c63b56ec21"
+      },
+      {
+        "path": "apps/frontend/src/features/catalogue/product-editor.tsx",
+        "bytes": 19823,
+        "sha256": "17c2852145b004bfb02b02120b748a2f0b131dfef0c1d9162a3d2af9588e11cc"
+      },
+      {
+        "path": "apps/frontend/src/features/catalogue/review.tsx",
+        "bytes": 9433,
+        "sha256": "6ef74193cc306ced9b1492c7923912b8077bf0eb2713d918d489f549bb42879e"
+      },
+      {
+        "path": "apps/frontend/src/features/catalogue/size-options.ts",
+        "bytes": 6025,
+        "sha256": "74ff2f68bdf2fba59507d57c64e93f44048e98568cb0b5080707453271284116"
+      },
+      {
+        "path": "apps/frontend/src/features/checkout/request.ts",
+        "bytes": 2897,
+        "sha256": "e6ad38450f41478164b187548147313e2b72f0c4bd68e6576778dc2a57c7be28"
+      },
+      {
+        "path": "apps/frontend/src/features/checkout/state.ts",
+        "bytes": 898,
+        "sha256": "e040943ed2dab08acebf3f4b22f049c1d02cac645a77b6bcca5bac66dbe16ef8"
+      },
+      {
+        "path": "apps/frontend/src/features/currency/display.ts",
+        "bytes": 506,
+        "sha256": "33a0b6430b0bcc26efb821b678f95d66ae57dc0d406cf76fa00519a93b06b50a"
+      },
+      {
+        "path": "apps/frontend/src/features/currency/picker.module.css",
+        "bytes": 2211,
+        "sha256": "f62f13590b5e4c4fccb7c2c2be08e701413adba22ff63b9c8a5cc216639a99be"
+      },
+      {
+        "path": "apps/frontend/src/features/currency/picker.tsx",
+        "bytes": 2525,
+        "sha256": "e1c87da95f4dc738c010b9f44a7a99ff6718564f6638a8bf180d9f326bcf99e6"
+      },
+      {
+        "path": "apps/frontend/src/features/currency/request.ts",
+        "bytes": 813,
+        "sha256": "0e13f1f8e52ae8592888dd981d950c2655e62849519ae867b69d209d2fc0e257"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/charts.tsx",
+        "bytes": 16183,
+        "sha256": "abe8f70d10f88f74d151c78a9138c46401682cb8bd79ab67124c5c63251ffd4e"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/dashboard.module.css",
+        "bytes": 23897,
+        "sha256": "9079a0bf66a869c90af86038e0631d1cf1d745822983c927922c0d250d72d50c"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/evidence-drawer.tsx",
+        "bytes": 15675,
+        "sha256": "2e7018cdd0694d1067c0b9683df5821c59411f253fa94054ce5f2c8abccd78b0"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/evidence-presentation.ts",
+        "bytes": 7368,
+        "sha256": "d8b13eddbc1f18d3b3cd85c83ac40ba691133163877b31229081cfa90f61294a"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/evidence-ui.tsx",
+        "bytes": 2275,
+        "sha256": "4d646feb8264674bc801fbf0f743d02a97996e6d27a30cdb365621a20d45407b"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/expense-register.tsx",
+        "bytes": 7845,
+        "sha256": "2019dad6b00136556e8be96c42e90846bb94370a24b66ae2f2466f3d2d13a201"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/inventory-register.tsx",
+        "bytes": 5026,
+        "sha256": "1ab6c1da1c7be704c4751b89bdf87e6a822017bf872f7531aaa28b9046b59cb3"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/model.ts",
+        "bytes": 6510,
+        "sha256": "d15e16d8d23393c07746f28c6657918e25d217fba38deb87f726e8443b5145fb"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/overview.tsx",
+        "bytes": 11645,
+        "sha256": "73dce46ae02c9b918271ac68b739558905cabb860de8021e325c6fd07421bad3"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/owner-navigation.module.css",
+        "bytes": 5143,
+        "sha256": "e28ecb0322693c128cd38fccfcef650d367fe8a344e028a1875b2bfb0e490a7f"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/owner-navigation.tsx",
+        "bytes": 6270,
+        "sha256": "254638f51f64cb9e992bcbb13fb15158e5379e763429d2f1d0acb012ed5f1cb1"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/owner-workspace.module.css",
+        "bytes": 7629,
+        "sha256": "6c3a7aaef45135897bc2bdabf0909867ebcfb68a7d799a87631ab3d710de8c92"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/owner-workspace.tsx",
+        "bytes": 36361,
+        "sha256": "e74a19e504b6e5a1df22cd89320eaf5d2336bb9b7a4ba5cb408979df8db4fcb2"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/record-detail.tsx",
+        "bytes": 20972,
+        "sha256": "8b109acba7fa75b5cbe3b285af7f90f4518c20deb7cf50e4f8cea7238a53d29a"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/record-photo.tsx",
+        "bytes": 1515,
+        "sha256": "9436c3c0631b89f589d51a3663acbb4401fb71632012bdf456440472ddc180b9"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/register-model.ts",
+        "bytes": 2041,
+        "sha256": "296ee0dd95c0e40ee0f4920410b2935c0a47e68657012d497bbe48ba40667d67"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/registers.module.css",
+        "bytes": 6879,
+        "sha256": "6e952943b8b3075b3ed3f145a84f0d9ffbab6db064c1211914b7a739dff15304"
+      },
+      {
+        "path": "apps/frontend/src/features/dashboard/state.ts",
+        "bytes": 5193,
+        "sha256": "efdf684cc74c08ec39b7404b5820c7262e2815c5eac1bcdb331782abc5a0133a"
+      },
+      {
+        "path": "apps/frontend/src/features/demo/development-workspace.tsx",
+        "bytes": 662,
+        "sha256": "573dc86ac987d4195f83148263ca2432a181368bbd6a70881a26afd9e2be7097"
+      },
+      {
+        "path": "apps/frontend/src/features/demo/live-workspace.tsx",
+        "bytes": 4680,
+        "sha256": "e83c3ccddf02c6949264a42df2bcb3cbdfa4a7b27ed7a0d417f248677f393f26"
+      },
+      {
+        "path": "apps/frontend/src/features/demo/turnstile.ts",
+        "bytes": 1801,
+        "sha256": "a572e7465bb966576d95345c2c8afd205ca8793e9150e012cbc73859ad965653"
+      },
+      {
+        "path": "apps/frontend/src/features/demo/workspace.module.css",
+        "bytes": 18301,
+        "sha256": "963cea8b764ca870e0a945446de7929bb169297e89f33443830470405b614a67"
+      },
+      {
+        "path": "apps/frontend/src/features/demo/workspace.tsx",
+        "bytes": 15690,
+        "sha256": "9bcae97883bbe533ddd061d16d5050a00ea07348ec0976d6f742e5a8cdf9ec30"
+      },
+      {
+        "path": "apps/frontend/src/features/landing/brand-recipe.tsx",
+        "bytes": 5204,
+        "sha256": "abfe12ac988c5638e5d4988f34627a3510448a9c5fce15831d03d25221283433"
+      },
+      {
+        "path": "apps/frontend/src/features/landing/choreography.ts",
+        "bytes": 968,
+        "sha256": "bf82d49315863ff228aaca164f900b124a6343ed19574561df91f673da4583f0"
+      },
+      {
+        "path": "apps/frontend/src/features/landing/hero-video.tsx",
+        "bytes": 677,
+        "sha256": "be407760ce99757a1ca5d56ef47b86ce2aeb4496bd774154e1371fb58b393e78"
+      },
+      {
+        "path": "apps/frontend/src/features/landing/illustration.ts",
+        "bytes": 4115,
+        "sha256": "68467f6103c8b15e72b774b65e72e3fec4d240d8af15c87904b5a4e0c81d2a1d"
+      },
+      {
+        "path": "apps/frontend/src/features/landing/landing.module.css",
+        "bytes": 28235,
+        "sha256": "5c67fc147d79c96b34ac2c5bd0fadb16493ad9ad9244a1b01fbd79d0ce9eb909"
+      },
+      {
+        "path": "apps/frontend/src/features/landing/landing.tsx",
+        "bytes": 12043,
+        "sha256": "281d629fcefa394f950630ce09a690769866d3f420c542f05c6d02035baeee30"
+      },
+      {
+        "path": "apps/frontend/src/features/landing/owner-layout-example.tsx",
+        "bytes": 5131,
+        "sha256": "0fa306bb2d4cf5e534a53da98de5a2ab2d599c0dd8a179bcedd5857486ae1c1b"
+      },
+      {
+        "path": "apps/frontend/src/features/landing/runway.tsx",
+        "bytes": 6207,
+        "sha256": "d7afae47838e683fa8b5c18f633d44292d82214687228663ce31971f3630f3f9"
+      },
+      {
+        "path": "apps/frontend/src/features/landing/section-navigation.tsx",
+        "bytes": 4761,
+        "sha256": "565562bb53d13f3c99d5c9e9747a16522805983d894969146a6ed2fe2dc724bd"
+      },
+      {
+        "path": "apps/frontend/src/features/logos/controller.ts",
+        "bytes": 5202,
+        "sha256": "f43c098841469518e8d9cdc36748488dce4b196b01c2140dddf75af72ad654e7"
+      },
+      {
+        "path": "apps/frontend/src/features/logos/logo.worker.ts",
+        "bytes": 2097,
+        "sha256": "12d16d9b13c18acd69339ce05fadc355ffa5ba4674cb2f0daa177c828335a31c"
+      },
+      {
+        "path": "apps/frontend/src/features/logos/request.ts",
+        "bytes": 4078,
+        "sha256": "d3a56e8a2f3db2e9f67561ccaad30d46fb3b1f955c0641b594f1652f2a442d6b"
+      },
+      {
+        "path": "apps/frontend/src/features/logos/state.ts",
+        "bytes": 1199,
+        "sha256": "857ecbbb1546571425d1d8002a442f55b5bcf1d82c5bde5c79a3f28f10645479"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/expense-form.tsx",
+        "bytes": 1615,
+        "sha256": "0aa71df9e5f6e9a4d934d6e3bef429de21c9f6cc18fe288663bd7101c8b33424"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/field-feedback.tsx",
+        "bytes": 972,
+        "sha256": "24041382a73e16739c812ec003e841888f183f523f647cf0b3d152aa9139d8dc"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/fields.tsx",
+        "bytes": 2548,
+        "sha256": "85a48b6d679d8902433327b1935840838993b00f42305bfe7e6f8dcfdad1f389"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/form-shell.tsx",
+        "bytes": 12247,
+        "sha256": "42e58dafd0c0bd0e668b122544bd1fffb5ca526f3a62e075f44cb11371604c8a"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/inventory-form.tsx",
+        "bytes": 2062,
+        "sha256": "762dbf32b5708f7b132232adef948e7af85f2b01b604a7abe82edcf8a7af098e"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/operations.module.css",
+        "bytes": 9162,
+        "sha256": "076bf040585fdbdbb783ac542ab6ab926ff42d9afebef3c7f5daf1060897c6e5"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/order-form.tsx",
+        "bytes": 4985,
+        "sha256": "e21182a7fdd7a81119ad48f4be1bfa8c76ff1f8f3fd02b786cbd4776501081c5"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/presentation.ts",
+        "bytes": 1823,
+        "sha256": "bf04c3ca488a9648094935bfa1dd6b964d5c3069cd62cc734db2214d3241af87"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/product-form.tsx",
+        "bytes": 10878,
+        "sha256": "527766bd6536fe9e9a2f64bb0ac0dcc14d6ca256a40c230b4b712cd2f58542c6"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/return-form.tsx",
+        "bytes": 5942,
+        "sha256": "f3408392533ff0ccc7957a3ad3b0a2a605400c8f68ab90479fd52b8b27473ce6"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/review-summary.tsx",
+        "bytes": 9542,
+        "sha256": "03c8a90513d5ff1f633e39d8d7137167b3a1437af2eeac232e27053dce9ed125"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/state.ts",
+        "bytes": 14504,
+        "sha256": "5b8c82fe62e78217603933cfbf1b310cc934eec6f681a7c1683dbd252b697eec"
+      },
+      {
+        "path": "apps/frontend/src/features/operations/validation.ts",
+        "bytes": 9260,
+        "sha256": "17ebe9d2155f0e18de145e784509d13463b94e9a11953603dd4840773cb6185d"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/cache.ts",
+        "bytes": 21091,
+        "sha256": "f1ca5a38f74561f9de7637b07dfbcd5f2fc907e953d1813e2cd1a8f83d2578f1"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/controller.ts",
+        "bytes": 31092,
+        "sha256": "943ce6c93784821d8ce7d4231ff5685fa3fd6ce25056c679636fabcd602eea9f"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/decode-capacity.ts",
+        "bytes": 2309,
+        "sha256": "281d2bfedf5cc38f97add02d70c87b68e5a54017e3ee63491996818474941b44"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/decode.ts",
+        "bytes": 5230,
+        "sha256": "857e57304d31d1b6ea0436a84a35540cecbd82aa882cb79da79b51b9d491d208"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/errors.ts",
+        "bytes": 790,
+        "sha256": "834e129a3869706e4c1a6fe4ffd56956848a1ed34838dbb1b91d3ec3af6305fa"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/mandatory-photo-field.tsx",
+        "bytes": 2443,
+        "sha256": "62a538bd006894f47e7f49d9857f331be203bd11225ee26fcf61c682def26f99"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/named-files.ts",
+        "bytes": 343,
+        "sha256": "b39a46f2944cf5440b7fd8aa2d1eddf1a55b4aaff4bc68736464d722e367e481"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/ordered-processing.ts",
+        "bytes": 1757,
+        "sha256": "58e046b09dcf859a07bf9ef775aa2bd42f7e30b6d1627c256c9f3b9d2fcd1cef"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/photo-editor.tsx",
+        "bytes": 3756,
+        "sha256": "9b43da79c775873af35ab2eb6c43758b8d9c259bbf66bed056f3c4377c7bcd08"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/photo-lab.tsx",
+        "bytes": 7785,
+        "sha256": "30113698ce66671829ec90673d4abf61cb76b36756c8df5c6ef874b883f2918a"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/photo-picker.tsx",
+        "bytes": 5384,
+        "sha256": "62342eb675087a0ea7eeb51f1aa94c3dc09ebf60755161c2a663716a2bcc7fd2"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/photo-stack.module.css",
+        "bytes": 1226,
+        "sha256": "7e5d2288b99479e887eec9162a5ceef582e2ee9cb062a1c8a82d3b8bc713d12c"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/photo-stack.tsx",
+        "bytes": 1168,
+        "sha256": "c181f55aa142f16e43229386f15ca12a7c793366b4a0aedc251707d4f1c33e6f"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/photo.worker.ts",
+        "bytes": 5006,
+        "sha256": "c95f9c89344ae4e5d95eaab51e563f47452504b2bf435199bf6e75acca57a7db"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/photos.module.css",
+        "bytes": 11206,
+        "sha256": "1ae6c6ad525917b27809c9e501ac75e262d492d4b0ab72883d314e1f825f52ee"
+      },
+      {
+        "path": "apps/frontend/src/features/photos/sample.ts",
+        "bytes": 3148,
+        "sha256": "98882b1fe401ee824f0f3674544f77f19b7c14357be754c03dd85ff08bbb9e10"
+      },
+      {
+        "path": "apps/frontend/src/features/session/context.module.css",
+        "bytes": 969,
+        "sha256": "088e868c2201d2038196704478cfd30ab61136a03bd1fb4033323dfcfdee7488"
+      },
+      {
+        "path": "apps/frontend/src/features/session/context.tsx",
+        "bytes": 4282,
+        "sha256": "dc0eb64d55b8587c73e3268d673e20dd0a2f48368aa61c9f5e3e367a5c439219"
+      },
+      {
+        "path": "apps/frontend/src/features/session/controller.ts",
+        "bytes": 135911,
+        "sha256": "5b58d636a81a27b2d4dedb6b5c7aec38915be54c1afb9cf2e4468bac65c82fc4"
+      },
+      {
+        "path": "apps/frontend/src/features/session/download.ts",
+        "bytes": 1295,
+        "sha256": "d9b9e56f3671e5e5f19d0e6b64a390946b9eb9b50b53a0f294646b4b650fcd8b"
+      },
+      {
+        "path": "apps/frontend/src/features/session/export.ts",
+        "bytes": 3452,
+        "sha256": "afcca626d70dee1a53b784f5b979cf474887b6c5bc71e29d294e41122b526f62"
+      },
+      {
+        "path": "apps/frontend/src/features/session/projection.ts",
+        "bytes": 14229,
+        "sha256": "7595f09e2f532e614265cfb087460731028900bc3b13c4f0faa96f5945c02648"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/dashboard-specimen.tsx",
+        "bytes": 8034,
+        "sha256": "e363046389f5a68712d1f07ffcc6c2cff0260471e8c622b7fcf1df5586a76591"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/design-lab.module.css",
+        "bytes": 17499,
+        "sha256": "13195ebc629e0840056aaccf7fcc41e3dc57346c9035ff54b409ae297ebd7397"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/design-lab.tsx",
+        "bytes": 17725,
+        "sha256": "145135f75b70df925081ba985e44ce6e54d25a3df44ebfa46cacdd8474c5dff0"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/hero-photos.module.css",
+        "bytes": 1122,
+        "sha256": "ee0920fe8540e5bc504dbec510a4361b31ae09f7bc52d6ceb631034ef9348627"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/hero-photos.tsx",
+        "bytes": 4941,
+        "sha256": "4c3871800bf896bbd43110ceb46b0d8cce796c6c16b1d57d02026f3021e5d13a"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/owner-design.module.css",
+        "bytes": 1544,
+        "sha256": "0cf12d1826ec080d2c910489f9f3436dcf1eb7715fee00ee04e2b0b9271dfb9b"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/owner-design.tsx",
+        "bytes": 5146,
+        "sha256": "97ab6174b96b797c705326823d7139fd455fe02329b34c914189a714573bbca1"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/page-layouts.module.css",
+        "bytes": 2072,
+        "sha256": "ff0f7846bd0416b97350604879ff910f09cf1d100f6129a5c96be1ec8b92a04f"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/page-layouts.tsx",
+        "bytes": 2897,
+        "sha256": "9e2e51610a09dee7cf6b5dc166b9149292f9d9c5a46d3e80c23a5f276ebda6ee"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/presets.ts",
+        "bytes": 4927,
+        "sha256": "be229437f9aba8338e6c216ca4391ada30160c645a1453c59c384a41d35fe930"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/store-composition.module.css",
+        "bytes": 11945,
+        "sha256": "be9d0e4a07af9856349180c8cb3fa156db127f5c6ad2b9121a6ec4dea2aa2fd5"
+      },
+      {
+        "path": "apps/frontend/src/features/store-design/store-composition.tsx",
+        "bytes": 9244,
+        "sha256": "afbd7d4043f253ce17f10169167b958e0e861a30d6d3e6ccafebbcec241d989e"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/browse.ts",
+        "bytes": 5958,
+        "sha256": "74307c5d9566b1867624c2dec8a2acbc9a64158898d5a5f5572860529e574ed8"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/campaign.ts",
+        "bytes": 1961,
+        "sha256": "ac16d070cc505a5c016bd1cb6cd085af59cd317aeded4f53d0b2f9b5914674de"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/facets.ts",
+        "bytes": 2833,
+        "sha256": "252808bb5924d507ef99715ee191ab8992bef3c195612fd746c2a41ce35eaf55"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/filter-sheet.tsx",
+        "bytes": 10401,
+        "sha256": "3e22adb0e3ca3e5d2afa3906cef41dca3fb18b903b6cc4ee42ece51df6569748"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/gallery.tsx",
+        "bytes": 5692,
+        "sha256": "954d6b5044df7f0877d29b65447774d01ade7c3bac5865a33415d7824a69d409"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/home.tsx",
+        "bytes": 3465,
+        "sha256": "fad85a728666523f0689d685e253379ca80eda233131278216ef272c3ce7310e"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/photo.ts",
+        "bytes": 119,
+        "sha256": "c1a3d6cf69a85811cf7f20cb4b801c8361ac07eaa5bb52b65c82a55c76dee6d8"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/review-model.ts",
+        "bytes": 909,
+        "sha256": "6b2cdce5e9a6e64c62c45b883983b4d63b70bd83a792734a4cfd17366f73216e"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/reviews.module.css",
+        "bytes": 2359,
+        "sha256": "2d590888525e2cb743d10d624608a5bd28e41e191a896c3e6ed5ea038be9fe8d"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/reviews.tsx",
+        "bytes": 4001,
+        "sha256": "915563f641100604683ea6ddfb98bf1dbd6dd08dd99209eb696a368c8b8e89af"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/storefront.module.css",
+        "bytes": 42176,
+        "sha256": "d1afafff082df228b89af9d3aa2abc77bff1f6e614c2ec50c9d5afb683005d2b"
+      },
+      {
+        "path": "apps/frontend/src/features/storefront/storefront.tsx",
+        "bytes": 29826,
+        "sha256": "64e709aee138c50ec4daf75ec185a3fa36d60f88fa5d6af90f19633baac646fe"
+      },
+      {
+        "path": "apps/frontend/src/http/api-error.ts",
+        "bytes": 316,
+        "sha256": "2d250c4db20f9755f59ad376f5aa1449ef1b89a5eaa3a1820ebc46d75db21810"
+      },
+      {
+        "path": "apps/frontend/src/http/response.ts",
+        "bytes": 1701,
+        "sha256": "1e703c54aaa4ec5548073023895ce39f1b368c5fe23c184fc648fdc22747d0c5"
+      },
+      {
+        "path": "apps/frontend/src/proxy.ts",
+        "bytes": 502,
+        "sha256": "7f73c6805094d846ac58cf26de004b3e1cd49b638183c7415d3db14312b4b4fc"
+      },
+      {
+        "path": "apps/frontend/src/server/backend.server.ts",
+        "bytes": 1486,
+        "sha256": "f5ca39fc4d5d71981cc6e0dbbbb10d31491893c67298c66394a2fe196c34653d"
+      },
+      {
+        "path": "apps/frontend/src/server/bridge.ts",
+        "bytes": 9064,
+        "sha256": "3ef28763c9c8be2a4644936966dde715e0295db8e685432dd66df959775e5ae0"
+      },
+      {
+        "path": "apps/frontend/src/server/design-preview.server.ts",
+        "bytes": 161,
+        "sha256": "fa536e566f8f94f64e58ff6af69a3f059e67bef6ad76c8173dfb1ac831f26043"
+      },
+      {
+        "path": "apps/frontend/src/server/origin-guard.server.ts",
+        "bytes": 1876,
+        "sha256": "c6cdef59d8b6923dbdbfe3833b7548169373a476b2ced0c230a6e2ec31167ca2"
+      },
+      {
+        "path": "apps/frontend/src/styles/font-preloads.tsx",
+        "bytes": 455,
+        "sha256": "f28ffd4480037b73f13228cf636800ab9e79b54af20b0b9a8a4db0c184e6c3ba"
+      },
+      {
+        "path": "apps/frontend/src/styles/fonts.css",
+        "bytes": 947,
+        "sha256": "6953c566c672bb19cfc3ff28388022009a4aa61e282f67a204089c63af5af641"
+      },
+      {
+        "path": "apps/frontend/src/styles/globals.css",
+        "bytes": 2338,
+        "sha256": "e794c39d1225ad42beeebd270811971b6715073da335d6738967f0e9f9ced5c4"
+      },
+      {
+        "path": "apps/frontend/src/styles/tokens.css",
+        "bytes": 1108,
+        "sha256": "e373d4ee8aa1c0b09fe4ec0c869e41229cfa84a49122260538e152c8fa85dd7b"
+      },
+      {
+        "path": "apps/frontend/tsconfig.json",
+        "bytes": 543,
+        "sha256": "23a0ce952f57b7e4c3579b2fb7be7a11fee400ed50fb1807895bbb8d7dfbe82b"
+      },
+      {
+        "path": "package.json",
+        "bytes": 2167,
+        "sha256": "a221f73c5858d42b02606e7a50cac3e0eb4d00925dc5cda109ce1f57ca3e8152"
+      },
+      {
+        "path": "packages/commerce/package.json",
+        "bytes": 1641,
+        "sha256": "678f80e9295c40729fb66f169894dcbb22d5dca6d17ecd363de974c5305f8c81"
+      },
+      {
+        "path": "packages/commerce/src/allocation.ts",
+        "bytes": 3567,
+        "sha256": "64c66d8b3f032d1bcb0727b297149610d9e05a0cbc28500e592c65712834e636"
+      },
+      {
+        "path": "packages/commerce/src/checkout.ts",
+        "bytes": 2155,
+        "sha256": "45ee4a706c5c912cd4c5d1f21f9aca8c4785f4ad9a5e55acffe963abcabd3275"
+      },
+      {
+        "path": "packages/commerce/src/commands.ts",
+        "bytes": 33249,
+        "sha256": "3fb4721abbc843bbba96dae5b32a5ed2b15dcf680535f5a7d5071df2b4b7d395"
+      },
+      {
+        "path": "packages/commerce/src/currency.ts",
+        "bytes": 5294,
+        "sha256": "682e49a41cf68504bb2095452a738fd714b9d90001bb375b55b99cf023e72c7e"
+      },
+      {
+        "path": "packages/commerce/src/dashboard.ts",
+        "bytes": 4226,
+        "sha256": "72c18c6dbb620c87afbf3567befc5a016302778209c4cf9b87a49d434b1a2396"
+      },
+      {
+        "path": "packages/commerce/src/effects.ts",
+        "bytes": 1948,
+        "sha256": "35be41f0e4fe187de570f5c20384da8b9e822504a2e3705e5365c600939f7358"
+      },
+      {
+        "path": "packages/commerce/src/errors.ts",
+        "bytes": 768,
+        "sha256": "d95c4196d917859a68585cbbe7356ff70f7da1ec57f7f698c9185f9ae7956b0e"
+      },
+      {
+        "path": "packages/commerce/src/facts.ts",
+        "bytes": 23249,
+        "sha256": "1960c2711122cc2984f633809520eb29c8edaee5fcf7ef4b93c4ea4a89b94dce"
+      },
+      {
+        "path": "packages/commerce/src/graph.ts",
+        "bytes": 22659,
+        "sha256": "0ac3099079053b7aac86370ef7b473a664d978451099c0765941157980d4a312"
+      },
+      {
+        "path": "packages/commerce/src/money.ts",
+        "bytes": 904,
+        "sha256": "e5a14ebded75b01e753e213f308efbe0987b4ffd72da94f8c3a742f7d6a83701"
+      },
+      {
+        "path": "packages/commerce/src/scenarios/generate.ts",
+        "bytes": 16734,
+        "sha256": "5ce71631a5aab24de59ee43f0241ca7eb2ce9b20ca0de53ebb3e6cc5a604c015"
+      },
+      {
+        "path": "packages/commerce/src/scenarios/reviews.ts",
+        "bytes": 5245,
+        "sha256": "dacab96d989dc459687b89ed7487fbb71942e3c8869af39f82557122cd3885fe"
+      },
+      {
+        "path": "packages/commerce/src/selectors.ts",
+        "bytes": 3351,
+        "sha256": "d9db619a09f13e01b871521bf444c3205bd844044f27932cf8058cdc5f130f76"
+      },
+      {
+        "path": "packages/commerce/src/shopping.ts",
+        "bytes": 4999,
+        "sha256": "30b44ae3e82e352d510c4dfc1fe10b3bf783ceec9f38cb5e3f17418f730a4338"
+      },
+      {
+        "path": "packages/commerce/src/unit-events.ts",
+        "bytes": 1588,
+        "sha256": "0007deecba8f0b1abba8bf3c159b348bc2c1c7ce1db0f3711067e2d4892afc82"
+      },
+      {
+        "path": "packages/commerce/tsconfig.build.json",
+        "bytes": 106,
+        "sha256": "fe1e2f73631f25a0cc1bb78c8829745d758e058eac26637793503879eb280890"
+      },
+      {
+        "path": "packages/commerce/tsconfig.json",
+        "bytes": 153,
+        "sha256": "cd83c6d50fc6b79f732bf7d1e293b80acb4bee111cc573e0cf674fae77fccd37"
+      },
+      {
+        "path": "packages/contracts/package.json",
+        "bytes": 1981,
+        "sha256": "93a1537371ecefb887839737c2b356239dad0a17bc1d21bd6ea6ee4721e7532a"
+      },
+      {
+        "path": "packages/contracts/src/api.ts",
+        "bytes": 4607,
+        "sha256": "ea4fbc2c5eaba6d83d14d8196d458fad3472e520770c25a4780908d3530a780a"
+      },
+      {
+        "path": "packages/contracts/src/assistant.ts",
+        "bytes": 11695,
+        "sha256": "6c5ba9250ccd60ff14f61efc1c99122b4ff11514f6e51b9620eaaf8921ec8692"
+      },
+      {
+        "path": "packages/contracts/src/brand.ts",
+        "bytes": 3660,
+        "sha256": "c9f2586b9aad3a7805e2545583188a3d34bba6c52d303847f1fb8781d3e118ad"
+      },
+      {
+        "path": "packages/contracts/src/catalogue.ts",
+        "bytes": 4804,
+        "sha256": "2cd45b71d4a7f8ee4150763c6c9a6bb0064c555731765b927a5753054f0fdcd1"
+      },
+      {
+        "path": "packages/contracts/src/checkout.ts",
+        "bytes": 2541,
+        "sha256": "6d67460d5d15f4f40a91fcec8647ad9b4824a1020442d0e2ea47397c8e0964fc"
+      },
+      {
+        "path": "packages/contracts/src/commands.ts",
+        "bytes": 5260,
+        "sha256": "97250e7c3d3f4e9ac801171d46886a7868010f629b7d4701fc5114b72f72c1cb"
+      },
+      {
+        "path": "packages/contracts/src/commerce.ts",
+        "bytes": 9051,
+        "sha256": "6cd339c812bc1f53f1c2d5bbe6c87fe44cc6331e252d0e9275480af5dfb0b258"
+      },
+      {
+        "path": "packages/contracts/src/core.ts",
+        "bytes": 1005,
+        "sha256": "e19fb29d9c9342e40b5337f91479adede0e03ee8c3fa5a8859fbfd2efc13db59"
+      },
+      {
+        "path": "packages/contracts/src/currency.ts",
+        "bytes": 2480,
+        "sha256": "c5a36ad2e4f817902bd8a0fd3bc84a82c7c8a59a2afc22ccc796ecaef51fdf61"
+      },
+      {
+        "path": "packages/contracts/src/design.ts",
+        "bytes": 2816,
+        "sha256": "66d4d18d7b5f60eeaa5e29758c230acd36eae5c502e502ea0fe6efcc821923cd"
+      },
+      {
+        "path": "packages/contracts/src/export.ts",
+        "bytes": 1844,
+        "sha256": "8efaff324c620e7dd66ac6d3ff01a8207a7ea9306aa089d3c71881aa6c866584"
+      },
+      {
+        "path": "packages/contracts/src/facts.ts",
+        "bytes": 2189,
+        "sha256": "b75638e71ac3912487cab573eac7cfb16db69c4db490ab334eaefa8bfbf9f228"
+      },
+      {
+        "path": "packages/contracts/src/photos.ts",
+        "bytes": 3743,
+        "sha256": "32e5c756854cc1d59219d5305bd4d081bea58c4afe8b408237717f4da0adc1d3"
+      },
+      {
+        "path": "packages/contracts/src/product.ts",
+        "bytes": 6019,
+        "sha256": "1f6464ef4b1055cc2811888273ac51d81b7d0efaed966723c8a7edd603dbb6ad"
+      },
+      {
+        "path": "packages/contracts/src/raster.ts",
+        "bytes": 5923,
+        "sha256": "82d89c0b4722f0fbc8156fb43ad321cc22868fbbf8d95168e3c4a08b7c972a6f"
+      },
+      {
+        "path": "packages/contracts/src/recognition.ts",
+        "bytes": 4229,
+        "sha256": "259cde6aedf3b47646827bcbdd91ed63cf78ae77faaa8d148c1be20dcfc27bd8"
+      },
+      {
+        "path": "packages/contracts/src/scenarios.ts",
+        "bytes": 509,
+        "sha256": "ea0174b7cc6103fa9036b2cd77eb2094ff06307989b24fcc0bc3b51ef8172920"
+      },
+      {
+        "path": "packages/contracts/tsconfig.build.json",
+        "bytes": 106,
+        "sha256": "fe1e2f73631f25a0cc1bb78c8829745d758e058eac26637793503879eb280890"
+      },
+      {
+        "path": "packages/contracts/tsconfig.json",
+        "bytes": 153,
+        "sha256": "cd83c6d50fc6b79f732bf7d1e293b80acb4bee111cc573e0cf674fae77fccd37"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "bytes": 131436,
+        "sha256": "b2472c1456c7d690ceb406489a9e0d3a852d81f2cbc42c55e2bcdeedcb6877c1"
+      },
+      {
+        "path": "pnpm-workspace.yaml",
+        "bytes": 167,
+        "sha256": "003b3cb657cdf144276587706c1550611dddf9dce6e81f993784f2c548e4a9fc"
+      },
+      {
+        "path": "tsconfig.base.json",
+        "bytes": 563,
+        "sha256": "c3d085f5d1feb23a39d4e32bd4d8d6688229a8a96eed5f78ff9cf14003b6fddc"
+      }
+    ]
+  },
+  "images": {
+    "frontend": {
+      "id": "sha256:fec205daf664dc342c9182acc6d4621b146101119c65623f99a09d4729b6cbc3",
+      "repoDigests": [
+        "retailor/rtl143-frontend@sha256:fec205daf664dc342c9182acc6d4621b146101119c65623f99a09d4729b6cbc3"
+      ],
+      "os": "linux",
+      "architecture": "amd64",
+      "bytes": 409944756,
+      "user": "node",
+      "command": ["node", "apps/frontend/server.js"],
+      "environment": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "NODE_VERSION=24.21.0",
+        "YARN_VERSION=1.22.22",
+        "NODE_ENV=production",
+        "APP_ENV=production",
+        "RETAILOR_DEV=false",
+        "NEXT_TELEMETRY_DISABLED=1",
+        "HOSTNAME=0.0.0.0",
+        "PORT=4310"
+      ]
+    },
+    "backend": {
+      "id": "sha256:7fe980c0645e5bd4f573b7bb48b827d3af3fa2769c20098d656fd1fd33b106e3",
+      "repoDigests": [
+        "retailor/rtl143-backend@sha256:7fe980c0645e5bd4f573b7bb48b827d3af3fa2769c20098d656fd1fd33b106e3"
+      ],
+      "os": "linux",
+      "architecture": "amd64",
+      "bytes": 450001649,
+      "user": "node",
+      "command": ["node", "dist/server.js"],
+      "environment": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "NODE_VERSION=24.21.0",
+        "YARN_VERSION=1.22.22",
+        "NODE_ENV=production",
+        "APP_ENV=production",
+        "FAKE_MODE=false",
+        "PAID_DEMO_ENABLED=false",
+        "PORT=4311"
+      ]
+    }
+  },
+  "network": "none",
+  "publishedPorts": [],
+  "paidRequests": 0,
+  "backend": {
+    "runtime": {
+      "uid": 1000,
+      "node": "v24.21.0",
+      "pid1Node": true,
+      "bindAll": true
+    },
+    "http": [
+      {
+        "path": "/v1/health",
+        "status": 200,
+        "bytes": 65,
+        "contentType": "application/json; charset=utf-8",
+        "csp": "default-src 'none'; frame-ancestors 'none'",
+        "body": {
+          "schemaVersion": 1,
+          "service": "retailor-backend",
+          "status": "alive"
+        }
+      },
+      {
+        "path": "/v1/ready",
+        "status": 503,
+        "bytes": 47,
+        "contentType": "application/json; charset=utf-8",
+        "csp": "default-src 'none'; frame-ancestors 'none'",
+        "body": {
+          "schemaVersion": 1,
+          "ready": false,
+          "mode": "live"
+        }
+      },
+      {
+        "path": "/v1/config",
+        "status": 200,
+        "bytes": 346,
+        "contentType": "application/json; charset=utf-8",
+        "csp": "default-src 'none'; frame-ancestors 'none'",
+        "body": {
+          "schemaVersion": 1,
+          "mode": "live",
+          "paidEnabled": false,
+          "admissionSiteKey": null,
+          "vision": {
+            "available": false,
+            "reason": "paid-disabled"
+          },
+          "tailor": {
+            "available": false,
+            "reason": "paid-disabled"
+          },
+          "logos": {
+            "available": false,
+            "reason": "missing-prerequisites"
+          },
+          "eur": {
+            "available": true,
+            "reason": "ready"
+          },
+          "checkout": {
+            "available": false,
+            "reason": "not-implemented"
+          }
+        }
+      }
+    ],
+    "post": [
+      {
+        "path": "/v1/assistant/creator",
+        "status": 403,
+        "code": "FORBIDDEN"
+      },
+      {
+        "path": "/v1/assistant/creator",
+        "status": 503,
+        "code": "UNAVAILABLE"
+      },
+      {
+        "path": "/v1/admission",
+        "status": 413,
+        "code": "TOO_LARGE"
+      }
+    ],
+    "sharp": {
+      "vips": "8.18.7",
+      "bytes": 98,
+      "fakeRejected": true,
+      "originRejected": true
+    },
+    "startupRejections": [
+      {
+        "name": "backend-fake",
+        "exitCode": 1,
+        "running": false,
+        "oomKilled": false
+      },
+      {
+        "name": "backend-origin",
+        "exitCode": 1,
+        "running": false,
+        "oomKilled": false
+      }
+    ]
+  },
+  "frontend": {
+    "runtime": {
+      "uid": 1000,
+      "node": "v24.21.0",
+      "pid1Node": true,
+      "bindAll": true
+    },
+    "http": [
+      {
+        "path": "/",
+        "status": 200,
+        "bytes": 42698,
+        "contentType": "text/html; charset=utf-8",
+        "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "body": null
+      },
+      {
+        "path": "/demo",
+        "status": 200,
+        "bytes": 10263,
+        "contentType": "text/html; charset=utf-8",
+        "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "body": null
+      },
+      {
+        "path": "/design",
+        "status": 404,
+        "bytes": 8622,
+        "contentType": "text/html; charset=utf-8",
+        "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "body": null
+      },
+      {
+        "path": "/api/retailor/v1/config",
+        "status": 503,
+        "bytes": 199,
+        "contentType": "application/json",
+        "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "body": null
+      },
+      {
+        "path": "/api/retailor/v1/not-an-operation",
+        "status": 404,
+        "bytes": 167,
+        "contentType": "application/json",
+        "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "body": null
+      },
+      {
+        "path": "/api/retailor/v1/config?url=https://example.invalid",
+        "status": 503,
+        "bytes": 199,
+        "contentType": "application/json",
+        "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "body": null
+      }
+    ],
+    "assets": {
+      "photos": [
+        {
+          "id": "F01",
+          "bytes": 175264,
+          "sha256": "1cece25a55b40ca865604049d6dfd351f2261ba0ee6b08b34d8e067b35b1e06f"
+        },
+        {
+          "id": "F02",
+          "bytes": 85032,
+          "sha256": "16dd4882013a3ade901a26b050c0fd2d4b0fd2b185401fa12c361c52358aeecc"
+        },
+        {
+          "id": "F03",
+          "bytes": 70614,
+          "sha256": "bdbfa926f23b612e5c4586942e6320ac1ff886960b6f0e65ada1f8b37dcc5e9b"
+        },
+        {
+          "id": "F04",
+          "bytes": 120532,
+          "sha256": "3f53f55da75732b47f03885c9b82b83836f6f43c6bbff5705f928dba83dc4146"
+        },
+        {
+          "id": "F05",
+          "bytes": 26440,
+          "sha256": "780c14b5cc04ffb3ad5e27b7d74ecb2dacfb49816b480ed9323676887439ba3d"
+        },
+        {
+          "id": "F06",
+          "bytes": 86174,
+          "sha256": "b8773a56592808e8737c006c3ca43af996d3c6cad51e991a4c4b242a43cc2f00"
+        },
+        {
+          "id": "F07",
+          "bytes": 69360,
+          "sha256": "55ec131ef0e5ac6d9bc4db08858a21dde7baa3e78071ae59aec22e781a556338"
+        },
+        {
+          "id": "F08",
+          "bytes": 123974,
+          "sha256": "ad5de867adb239d5c28ee338b40faa4bb82a8f212127de39e4969f732539f2e7"
+        },
+        {
+          "id": "F09",
+          "bytes": 59234,
+          "sha256": "d99820cddcf457f415ee34eec9c06a949929b47124bd32a0c18c42ca6a425a29"
+        },
+        {
+          "id": "F10",
+          "bytes": 92798,
+          "sha256": "19214941f6a8cecc1b4f87fc3b04913c2c2ef55fa500408a83964b03f5275f47"
+        },
+        {
+          "id": "F11",
+          "bytes": 251246,
+          "sha256": "46ac9d2da862fb76482192115709a83baa152cbd6213053fbc1226753a7e278e"
+        },
+        {
+          "id": "F12",
+          "bytes": 33314,
+          "sha256": "3ebc75ea35a7dfc6df6d5c5e5166021ef05998879ea4030720e8fc919a99d9aa"
+        },
+        {
+          "id": "F13",
+          "bytes": 32898,
+          "sha256": "a76a2a46a651d73af604dd68bf92b29256d3ac5f9b54204f4035987668a98576"
+        },
+        {
+          "id": "F14",
+          "bytes": 123148,
+          "sha256": "b19a2dd86a5a3511326931731eea8f09f70f8e0bff23f754f0a362d04207bc62"
+        },
+        {
+          "id": "F15",
+          "bytes": 55984,
+          "sha256": "10703c61fdd98328b109066a5e7776910867e06066bad7bbcf17042834a0e8d3"
+        },
+        {
+          "id": "F16",
+          "bytes": 163602,
+          "sha256": "9e19af76e4040f0cb00efae88ffa3b4f1adfee007032ecc0b3412a14cccc13ee"
+        },
+        {
+          "id": "F17",
+          "bytes": 75496,
+          "sha256": "68eda8004781af7a163f8ebfb309036acb11ba47de0e9e892a90c639ed2f0173"
+        },
+        {
+          "id": "F18",
+          "bytes": 49282,
+          "sha256": "85cd5abf6d0871ce2cdc308fe12d2443dd9f28cd7295b19edf5d508f6e9ee3e4"
+        },
+        {
+          "id": "F19",
+          "bytes": 130436,
+          "sha256": "e3841201cd2024e1434c4d750a5b156191c5af80efef576102a7f56638a1fe84"
+        }
+      ],
+      "fonts": [
+        {
+          "name": "dm-sans-OFL.txt",
+          "bytes": 4502,
+          "sha256": "6fbd040a29c2037a765dfb9f2561e9965b5c95c6dcb5dce516089d63d5f17af7"
+        },
+        {
+          "name": "dm-sans-latin-wght-normal.woff2",
+          "bytes": 36932,
+          "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543"
+        },
+        {
+          "name": "dm-serif-display-OFL.txt",
+          "bytes": 4599,
+          "sha256": "e9d4ced9825bf03a6b634c37fe8ae974f6d1b80fbb0bd3ae9b089987e4dc541b"
+        },
+        {
+          "name": "dm-serif-display-latin-400-italic.woff2",
+          "bytes": 24572,
+          "sha256": "ed8b291611e32fa2d2900488dd48fc95faf0957b2ef7ddf1527e8d21dd9cf2df"
+        },
+        {
+          "name": "dm-serif-display-latin-400-normal.woff2",
+          "bytes": 24744,
+          "sha256": "fdf61e20fd2c0108e0ea28da4daca0035205b4b7fc031a3974b865b704de160a"
+        },
+        {
+          "name": "inter-OFL.txt",
+          "bytes": 4477,
+          "sha256": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345"
+        },
+        {
+          "name": "inter-latin-wght-normal.woff2",
+          "bytes": 48256,
+          "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62"
+        },
+        {
+          "name": "manrope-OFL.txt",
+          "bytes": 4383,
+          "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30"
+        },
+        {
+          "name": "manrope-latin-wght-normal.woff2",
+          "bytes": 24836,
+          "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+        },
+        {
+          "name": "provenance.json",
+          "bytes": 2068,
+          "sha256": "9204e11248f2f22dacbe874101181b0a10d1ed6d07a69d114ac8f94ca9bdf2e5"
+        }
+      ],
+      "staticStatus": 200
+    },
+    "originGuard": {
+      "rows": [
+        {
+          "path": "/",
+          "rejected": 403,
+          "accepted": 200
+        },
+        {
+          "path": "/demo",
+          "rejected": 403,
+          "accepted": 200
+        },
+        {
+          "path": "/demo?_rsc=probe",
+          "rejected": 403,
+          "accepted": 200
+        },
+        {
+          "path": "/sample/forme/F01.webp",
+          "rejected": 403,
+          "accepted": 200
+        },
+        {
+          "path": "/fonts/inter-latin-wght-normal.woff2",
+          "rejected": 403,
+          "accepted": 200
+        },
+        {
+          "path": "/_next/static/chunks/3a3p2m7mtp3wd.js",
+          "rejected": 403,
+          "accepted": 200
+        },
+        {
+          "path": "/api/retailor/v1/config",
+          "rejected": 403,
+          "accepted": 503
+        },
+        {
+          "path": "/api/retailor/v1/not-an-operation",
+          "rejected": 403,
+          "accepted": 404
+        }
+      ],
+      "wrong": 403,
+      "largeUploadStatus": 503,
+      "largeUploadCode": "UNAVAILABLE",
+      "largeUploadBytes": 10485761,
+      "sealForwarded": false,
+      "sealReflected": false,
+      "paidRequests": 0,
+      "environment": "test-only-local-peer"
+    },
+    "missingGuard": [
+      {
+        "path": "/",
+        "status": 503,
+        "bytes": 244,
+        "contentType": "text/html; charset=utf-8",
+        "csp": "default-src 'none'; frame-ancestors 'none'",
+        "body": null
+      },
+      {
+        "path": "/api/retailor/v1/config",
+        "status": 503,
+        "bytes": 199,
+        "contentType": "application/json",
+        "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "body": null
+      }
+    ]
+  },
+  "memory": {
+    "backend": {
+      "BlockIO": "119kB / 0B",
+      "CPUPerc": "0.00%",
+      "Container": "7bed48144ad1b6825b31519d74a88295c8322cb77fc1dbab8fe0b344f0a93e17",
+      "ID": "7bed48144ad1",
+      "MemPerc": "7.24%",
+      "MemUsage": "74.11MiB / 1GiB",
+      "Name": "retailor-release-506b040d-bd50-47b6-807e-bb0ed86bea67-backend",
+      "NetIO": "0B / 0B",
+      "PIDs": "11"
+    },
+    "frontend": {
+      "BlockIO": "3.98MB / 115kB",
+      "CPUPerc": "0.00%",
+      "Container": "1b4a1082d76df1e9ed4c39d2f91205d8fa842b13d33fbeea1e808731bf07ae97",
+      "ID": "1b4a1082d76d",
+      "MemPerc": "12.63%",
+      "MemUsage": "64.68MiB / 512MiB",
+      "Name": "retailor-release-506b040d-bd50-47b6-807e-bb0ed86bea67-frontend",
+      "NetIO": "0B / 0B",
+      "PIDs": "11"
+    }
+  },
+  "shutdown": {
+    "frontend": {
+      "milliseconds": 438,
+      "exitCode": 143,
+      "oomKilled": false,
+      "running": false
+    },
+    "backend": {
+      "milliseconds": 419,
+      "exitCode": 0,
+      "oomKilled": false,
+      "running": false
+    }
+  },
+  "limitations": [
+    "No Cloud Run IAM, metadata identity, paid AI, TLS/DNS, browser rendering or concurrent workload is proven by these isolated local containers.",
+    "Local image IDs/digests are not registry publication evidence. Memory is a point-in-time unpaid observation, not a peak or paid-load guarantee."
+  ]
+}
