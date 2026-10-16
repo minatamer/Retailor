@@ -2645,7 +2645,7 @@ export class SessionController {
       this.snapshot.state.graph.workspaceId === workspaceId &&
       inputRevision === this.snapshot.state.inputRevision &&
       this.clock() < Date.parse(this.snapshot.state.graph.expiresAt);
-    this.state({ stage: "process" });
+    this.state({ stage: "process" }, "");
     this.update({ processStep: "Checking photos" });
     try {
       this.photos.requireSelection(this.snapshot.state.selectedIds);

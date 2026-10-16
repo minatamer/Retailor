@@ -14,6 +14,7 @@ import {
 } from "./projection";
 import type { CatalogueProcessor } from "./controller";
 import { developmentDraft } from "../catalogue/development-fixture";
+import { ApiRequestError } from "../../http/api-error";
 const environments: ReturnType<typeof environment>[] = [];
 afterEach(() => environments.splice(0).forEach((env) => env.dispose()));
 const setup = () => {
@@ -22,6 +23,38 @@ const setup = () => {
   return env;
 };
 describe("single workspace ownership and safe recovery", () => {
+  it("clears an earlier catalogue failure during a deliberate retry and retains a new failure", async () => {
+    const env = setup();
+    let rejectRetry!: (error: Error) => void;
+    const interpret = vi
+      .fn<CatalogueProcessor["interpret"]>()
+      .mockRejectedValueOnce(new ApiRequestError("FORBIDDEN"))
+      .mockImplementationOnce(
+        () =>
+          new Promise((_resolve, reject) => {
+            rejectRetry = reject;
+          }),
+      );
+    const controller = await env.open({
+      processor: { mode: "development-fixture", interpret },
+    });
+    await controller.photos.add([file("one")]);
+    const selected = controller.getSnapshot().state.selectedIds;
+    await controller.draftCatalogue();
+    expect(controller.getSnapshot().state.stage).toBe("choose");
+    expect(controller.getSnapshot().notice).toContain("valid approval");
+    const pending = controller.draftCatalogue();
+    expect(controller.getSnapshot().state.stage).toBe("process");
+    expect(controller.getSnapshot().notice).toBe("");
+    expect(interpret).toHaveBeenCalledTimes(2);
+    rejectRetry(new ApiRequestError("UNAVAILABLE"));
+    await pending;
+    expect(controller.getSnapshot().state.stage).toBe("choose");
+    expect(controller.getSnapshot().notice).toContain("unavailable");
+    expect(controller.getSnapshot().notice).not.toContain("valid approval");
+    expect(controller.getSnapshot().state.selectedIds).toEqual(selected);
+    expect(interpret).toHaveBeenCalledTimes(2);
+  });
   it("ignores a retiring exact-photo repair after reset, including its final notification", async () => {
     const env = setup(),
       controller = await env.open();

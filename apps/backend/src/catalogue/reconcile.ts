@@ -29,12 +29,17 @@ export function reconcileCatalogue(
   const items: DraftItem[] = model.garments.map((garment, index) => {
     if (
       new Set(garment.sourceIds).size !== garment.sourceIds.length ||
-      garment.sourceIds.some((source) => !sources.has(source)) ||
-      (garment.grouping === "single" && garment.sourceIds.length !== 1) ||
-      new Set(garment.attributes.map((attr) => attr.name)).size !==
-        garment.attributes.length ||
-      unsupportedCopy.test(`${garment.title} ${garment.description}`)
+      garment.sourceIds.some((source) => !sources.has(source))
     )
+      return deny("UPSTREAM_FAILED", 502);
+    if (garment.grouping === "single" && garment.sourceIds.length !== 1)
+      return deny("UPSTREAM_FAILED", 502);
+    if (
+      new Set(garment.attributes.map((attr) => attr.name)).size !==
+      garment.attributes.length
+    )
+      return deny("UPSTREAM_FAILED", 502);
+    if (unsupportedCopy.test(`${garment.title} ${garment.description}`))
       return deny("UPSTREAM_FAILED", 502);
     const included =
       garment.classification === "clothing" &&
@@ -167,11 +172,14 @@ export function reconcileCatalogue(
     );
     if (
       actual.length !== row.garmentIndexes.length ||
-      actual.some((index) => !row.garmentIndexes.includes(index)) ||
-      (row.kind === "rejected" && actual.length) ||
-      (row.kind === "linked" && !actual.length) ||
-      (row.kind !== "linked" && actual.some((index) => items[index]!.included))
+      actual.some((index) => !row.garmentIndexes.includes(index))
     )
+      return deny("UPSTREAM_FAILED", 502);
+    if (row.kind === "rejected" && actual.length)
+      return deny("UPSTREAM_FAILED", 502);
+    if (row.kind === "linked" && !actual.length)
+      return deny("UPSTREAM_FAILED", 502);
+    if (row.kind !== "linked" && actual.some((index) => items[index]!.included))
       return deny("UPSTREAM_FAILED", 502);
     if (row.kind === "linked")
       return {

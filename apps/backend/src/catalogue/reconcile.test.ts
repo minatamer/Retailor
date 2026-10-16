@@ -2,6 +2,65 @@ import { describe, it, expect } from "vitest";
 import { action, observation } from "../../../../test/fixtures/recognition.js";
 import { reconcileCatalogue } from "./reconcile.js";
 describe("independent catalogue output policy", () => {
+  it("requires exact zero-based reverse links for multiple views and keeps review sources held", () => {
+    const request = action();
+    request.photos = ["source", "back", "shirt"].map((id) => ({
+      ...request.photos[0]!,
+      id,
+      source: { ...request.photos[0]!.source, id },
+      derivative: { ...request.photos[0]!.derivative, id },
+    }));
+    const model = {
+      garments: [
+        {
+          ...observation().garments[0]!,
+          sourceIds: ["source", "back"],
+          grouping: "supported_views",
+          attributes: [],
+        },
+        { ...observation("shirt").garments[0]!, attributes: [] },
+      ],
+      dispositions: [
+        { sourceId: "source", kind: "linked", garmentIndexes: [0], reason: "" },
+        { sourceId: "back", kind: "linked", garmentIndexes: [0], reason: "" },
+        { sourceId: "shirt", kind: "linked", garmentIndexes: [1], reason: "" },
+      ],
+    };
+    const draft = reconcileCatalogue(model, request);
+    expect(draft.items.map((item) => item.product.imageIds)).toEqual([
+      ["source", "back"],
+      ["shirt"],
+    ]);
+    expect(draft.dispositions.map((row) => row.kind)).toEqual([
+      "linked",
+      "linked",
+      "linked",
+    ]);
+    for (const change of [
+      { kind: "linked", garmentIndexes: [] },
+      { kind: "linked", garmentIndexes: [1] },
+      { kind: "review", garmentIndexes: [0] },
+      { kind: "rejected", garmentIndexes: [0] },
+    ]) {
+      const invalid = structuredClone(model);
+      Object.assign(invalid.dispositions[0]!, change);
+      expect(() => reconcileCatalogue(invalid, request)).toThrow(
+        "UPSTREAM_FAILED",
+      );
+    }
+    const held = structuredClone(model);
+    held.garments[0]!.grouping = "uncertain";
+    held.dispositions[0]!.kind = "review";
+    held.dispositions[1]!.kind = "review";
+    expect(reconcileCatalogue(held, request).items[0]!.included).toBe(false);
+    for (const description of ["A linen-look shirt.", "A breathable shirt."]) {
+      const unsupported = structuredClone(model);
+      unsupported.garments[1]!.description = description;
+      expect(() => reconcileCatalogue(unsupported, request)).toThrow(
+        "UPSTREAM_FAILED",
+      );
+    }
+  });
   it("formats generated garment names without changing category, sources or evidence", () => {
     const model = observation();
     model.garments[0]!.title = "  straight-leg jeans  ";
