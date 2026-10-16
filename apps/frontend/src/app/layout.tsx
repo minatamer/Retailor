@@ -5,7 +5,7 @@ import "../styles/fonts.css";
 import "../styles/tokens.css";
 import "../styles/globals.css";
 export const metadata: Metadata = {
-  title: "Retailor — Bring your products. See your store.",
+  title: "Retailor — Bring your products. Leave the rest to us",
   description: "Personalize your clothing store with Tailor beside you.",
   icons: {
     icon: [

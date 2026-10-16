@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Icon } from "../../components/ui/icon";
 import { Brand } from "../../components/ui/brand";
 import { HeroVideo } from "./hero-video";
-import { StoreFamilies } from "./families";
+import { BrandRecipe } from "./brand-recipe";
 import { OwnerLayoutExample } from "./owner-layout-example";
 import { LandingNavigation, SectionNavigation } from "./section-navigation";
 import styles from "./landing.module.css";
@@ -60,7 +60,7 @@ const FAQ = [
   {
     question: "Are the sales and orders real?",
     answer:
-      "They are fictional demo activity. Try healthy-profit, near-break-even or heavy-loss scenarios tied to your actual catalogue. No payment, carrier or Shopify connection runs, and no real customer information is needed.",
+      "They are simulated demo activity tied to your catalogue. Test orders update stock and your dashboard. Checkout uses sandbox payments, with no real charges or shipments.",
   },
   {
     question: "How long does my demo last?",
@@ -98,16 +98,16 @@ export function Landing() {
           <div className={styles.heroCopy}>
             <h1 id="hero-title" tabIndex={-1}>
               <span>Bring your products.</span>
-              <em>See your store.</em>
+              <em>Leave the rest to us</em>
             </h1>
             <p className={styles.heroLead}>
-              <span className={styles.fullLead}>
-                Your clothing. A beautiful storefront. Personalize it with
-                Tailor beside you.
-              </span>
-              <span className={styles.compactLead}>
-                Your clothes. Your store. Personalize with Tailor.
-              </span>
+              Your clothing. A beautiful storefront. An insightful dashboard.
+              Personalize it with{" "}
+              <span className={styles.heroTailor}>
+                <Icon name="sparkle" size={16} />
+                Tailor
+              </span>{" "}
+              beside you.
             </p>
             <div className={styles.heroAction}>
               <Link className={styles.cta} href="/demo" prefetch={false}>
@@ -170,27 +170,7 @@ export function Landing() {
           </ol>
         </section>
 
-        <section
-          className={styles.families}
-          id="storefronts"
-          tabIndex={-1}
-          aria-labelledby="family-title"
-        >
-          <div className={styles.sectionIntro}>
-            <p className={styles.eyebrow}>Personalize your store</p>
-            <h2 id="family-title">
-              Your store.
-              <br />
-              <em>Your style.</em>
-            </h2>
-            <p>
-              Compare three starting looks below. In your demo, personalize page
-              layouts, colours, type and your store name with Tailor, then keep
-              your wordmark or choose an optional logo.
-            </p>
-          </div>
-          <StoreFamilies />
-        </section>
+        <BrandRecipe />
 
         <section
           className={styles.connected}
@@ -222,13 +202,13 @@ export function Landing() {
               </li>
               <li>
                 <Icon name="check" />
-                Three fictional profit-and-loss stories to explore.
+                Sales, stock and finances connected to your catalogue.
               </li>
             </ul>
           </div>
           <div className={styles.faq} id="questions" tabIndex={-1}>
             {FAQ.map((item) => (
-              <details key={item.question}>
+              <details key={item.question} name="landing-faq">
                 <summary>
                   {item.question}
                   <span aria-hidden="true">+</span>
@@ -329,7 +309,7 @@ export function Landing() {
           <Link className={styles.cta} href="/demo" prefetch={false}>
             Build my demo store <Icon name="arrow" />
           </Link>
-          <p>No signup. No real payments. Just possibility.</p>
+          <p>No signup. No real payments. Try it out now.</p>
         </section>
       </main>
       <footer className={styles.footer}>
