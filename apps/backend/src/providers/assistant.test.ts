@@ -42,7 +42,64 @@ const message = (
   status: "completed",
   content: [{ type: "output_text", annotations: [], text }],
 });
+interface SchemaNode {
+  $ref?: string;
+  $defs?: Record<string, SchemaNode>;
+  properties: Record<string, SchemaNode>;
+  items: SchemaNode;
+  anyOf: SchemaNode[];
+  const: string;
+}
+function schemaReference(root: SchemaNode, node: SchemaNode): SchemaNode {
+  if (!node.$ref) return node;
+  const target = root.$defs?.[node.$ref.split("/").at(-1)!];
+  if (!target) throw new Error("Missing provider schema definition");
+  return schemaReference(root, target);
+}
 describe("bounded assistant Responses transport", () => {
+  it("rejects an unsolicited tool after a preparation has switched the transport to final-only", async () => {
+    const input = assistantFixture("creator");
+    const args = Object.fromEntries(
+      Object.keys(AssistantToolArgumentsSchema.shape).map((key) => [key, null]),
+    );
+    const call = (
+      id: string,
+      name: string,
+      fields: Record<string, unknown>,
+    ) => ({
+      type: "function_call",
+      id: `fc_${id}`,
+      call_id: id,
+      name: "retailor",
+      arguments: JSON.stringify({ name, arguments: { ...args, ...fields } }),
+    });
+    const io = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json(
+          response([
+            call("preview", "previewStoreDesign", { template: "gallery" }),
+          ]),
+        ),
+      )
+      .mockResolvedValueOnce(
+        Response.json(response([call("extra", "getDesignPresets", {})])),
+      )
+      .mockResolvedValueOnce(Response.json(response([message()])));
+    await expect(
+      investigateAssistant(
+        input,
+        openAiAssistant("injected-test-key", io),
+        new AbortController().signal,
+        { dispatch: vi.fn(), recordUsage: vi.fn() },
+        ASSISTANT_NOW,
+      ),
+    ).rejects.toMatchObject({ code: "UPSTREAM_FAILED" });
+    expect(io).toHaveBeenCalledTimes(2);
+    const lastBody = JSON.parse(String(io.mock.calls[1]![1]?.body));
+    expect(lastBody.tools).toEqual([]);
+    expect(lastBody.tool_choice).toBe("none");
+  });
   it("carries a finite mixed-layout tool through the actual mocked strict transport as a preview-only proposal", async () => {
     const input = assistantFixture("owner");
     input.prompt = "Studio home, Pulse collection, Gallery product";
@@ -120,8 +177,31 @@ describe("bounded assistant Responses transport", () => {
     expect(JSON.stringify(input)).toBe(before);
   });
   it("accepts acknowledged actions only from validated application tool outputs", async () => {
-    const input = assistantFixture("shopper"),
-      before = JSON.stringify(input.context.graph);
+    const input = assistantFixture("shopper");
+    input.context.graph = structuredClone(input.context.graph);
+    const source = input.context.graph.products[0]!;
+    input.context.graph.products = Array.from({ length: 3 }, (_, index) => ({
+      ...source,
+      id: index === 0 ? source.id : `jeans_product_${index}_abcdefghijklmnop`,
+      title: `Straight jeans ${index}`,
+      attributes: (["colour", "closure", "material"] as const).map((name) => ({
+        name,
+        value: null,
+        provenance: "unknown" as const,
+        sourceIds: [],
+        review: "unknown" as const,
+      })),
+      variants: Array.from({ length: 3 }, (_, size) => ({
+        ...source.variants[0]!,
+        id:
+          index === 0 && size === 0
+            ? source.variants[0]!.id
+            : `jeans_variant_${index}_${size}_abcdefghijklmnop`,
+        size: `${30 + size * 2}/30`,
+        sku: `JEANS-${index}-${size}`,
+      })),
+    }));
+    const before = JSON.stringify(input.context.graph);
     const args = Object.fromEntries(
       Object.keys(AssistantToolArgumentsSchema.shape).map((key) => [key, null]),
     );
@@ -141,7 +221,7 @@ describe("bounded assistant Responses transport", () => {
       .mockResolvedValueOnce(
         Response.json(
           response([
-            call("filter", "applyCatalogueFilter", {
+            call("search", "searchCatalogue", {
               category: "jeans",
               maximum: 6000,
             }),
@@ -149,7 +229,14 @@ describe("bounded assistant Responses transport", () => {
         ),
       )
       .mockResolvedValueOnce(
-        Response.json(response([call("policies", "getStorePolicies", {})])),
+        Response.json(
+          response([
+            call("filter", "applyCatalogueFilter", {
+              category: "jeans",
+              maximum: 6000,
+            }),
+          ]),
+        ),
       )
       .mockResolvedValueOnce(
         Response.json(
@@ -171,7 +258,17 @@ describe("bounded assistant Responses transport", () => {
       new AbortController().signal,
       { dispatch: vi.fn(), recordUsage: vi.fn() },
       ASSISTANT_NOW,
-    );
+    ).catch((error: unknown) => {
+      throw new Error(
+        JSON.stringify({
+          failure: error instanceof Error ? error.message : "unknown",
+          dispatched: io.mock.calls.length,
+          bodyBytes: io.mock.calls.map((call) =>
+            Buffer.byteLength(String(call[1]?.body)),
+          ),
+        }),
+      );
+    });
     expect(result.reply.navigation).toEqual({
       kind: "filter",
       category: "jeans",
@@ -181,6 +278,48 @@ describe("bounded assistant Responses transport", () => {
     });
     expect(JSON.stringify(input.context.graph)).toBe(before);
     const finalBody = JSON.parse(String(io.mock.calls[2]![1]?.body));
+    const finalProperties = finalBody.text.format.schema.properties;
+    const prosePattern = new RegExp(finalProperties.text.pattern, "u");
+    expect(
+      prosePattern.test("Here are matching pieces within your budget."),
+    ).toBe(true);
+    for (const unsafe of ["Under $50", "3 jeans", "20%", "<b>Sale</b>"])
+      expect(prosePattern.test(unsafe)).toBe(false);
+    const finalSchema = finalBody.text.format.schema;
+    const references = schemaReference(
+      finalSchema,
+      schemaReference(finalSchema, finalProperties.references).items,
+    );
+    const claims = schemaReference(
+      finalSchema,
+      schemaReference(finalSchema, finalProperties.claims).items,
+    );
+    expect(references).not.toHaveProperty("oneOf");
+    expect(claims).not.toHaveProperty("oneOf");
+    expect(references.anyOf).toHaveLength(2);
+    expect(claims.properties.kind!.const).toBe("attribute");
+    for (const branches of [references.anyOf]) {
+      const tags = branches.map((branch) => branch.properties.kind!.const);
+      expect(new Set(tags).size).toBe(tags.length);
+    }
+    const firstBody = JSON.parse(String(io.mock.calls[0]![1]?.body));
+    const parameters = firstBody.tools[0].parameters;
+    const filterSchema = parameters.properties.arguments;
+    const resolve = (schema: SchemaNode) => schemaReference(parameters, schema);
+    expect(filterSchema.properties.minimum.anyOf.map(resolve)).toEqual([
+      { type: "integer" },
+      { type: "null" },
+    ]);
+    expect(filterSchema.properties.maximum.anyOf.map(resolve)).toEqual(
+      filterSchema.properties.minimum.anyOf.map(resolve),
+    );
+    for (const call of io.mock.calls)
+      expect(Buffer.byteLength(String(call[1]?.body))).toBeLessThanOrEqual(
+        11000,
+      );
+    expect([...filterSchema.required].sort()).toEqual(
+      Object.keys(filterSchema.properties).sort(),
+    );
     expect(finalBody.text.format.schema.properties).not.toHaveProperty(
       "navigation",
     );
@@ -252,6 +391,26 @@ describe("bounded assistant Responses transport", () => {
       ).reply.text,
     ).toBe(reply.text);
     expect(io).toHaveBeenCalledTimes(3);
+    const ownerFormat = JSON.parse(String(io.mock.calls[2]![1]?.body)).text
+      .format;
+    expect(
+      schemaReference(
+        ownerFormat.schema,
+        schemaReference(
+          ownerFormat.schema,
+          ownerFormat.schema.properties.references,
+        ).items,
+      ).anyOf,
+    ).toHaveLength(4);
+    expect(
+      schemaReference(
+        ownerFormat.schema,
+        schemaReference(
+          ownerFormat.schema,
+          ownerFormat.schema.properties.claims,
+        ).items,
+      ).anyOf,
+    ).toHaveLength(2);
   });
   it("sends stateless foreground strict output and replays reasoning with exact call output", async () => {
     const args = {

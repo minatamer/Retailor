@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Design } from "@retailor/contracts/design";
-import { resolvedTemplates } from "@retailor/contracts/design";
+import { resolvedTemplates, THEME_LABELS } from "@retailor/contracts/design";
 
 export interface Palette {
   label: string;
@@ -20,7 +20,7 @@ export interface Palette {
 }
 export const PALETTES: Record<Design["theme"], Palette> = {
   navy: {
-    label: "Navy / Lime",
+    label: THEME_LABELS.navy,
     mood: "Deep navy with vivid lime actions",
     canvas: "#ffffff",
     surface: "#ffffff",
@@ -36,7 +36,7 @@ export const PALETTES: Record<Design["theme"], Palette> = {
     image: "#ffffff",
   },
   ink: {
-    label: "Ink / Paper",
+    label: THEME_LABELS.ink,
     mood: "Quiet confidence",
     canvas: "#f6f4ef",
     surface: "#ffffff",
@@ -52,7 +52,7 @@ export const PALETTES: Record<Design["theme"], Palette> = {
     image: "#e9e5dc",
   },
   cobalt: {
-    label: "Cobalt / Cloud",
+    label: THEME_LABELS.cobalt,
     mood: "Fresh, forward, expressive",
     canvas: "#f0f3fc",
     surface: "#ffffff",
@@ -68,7 +68,7 @@ export const PALETTES: Record<Design["theme"], Palette> = {
     image: "#e7e9ef",
   },
   oxblood: {
-    label: "Oxblood / Blush",
+    label: THEME_LABELS.oxblood,
     mood: "Warm editorial character",
     canvas: "#faf0f0",
     surface: "#fffafb",
@@ -84,7 +84,7 @@ export const PALETTES: Record<Design["theme"], Palette> = {
     image: "#eee0de",
   },
   pine: {
-    label: "Pine / Sand",
+    label: THEME_LABELS.pine,
     mood: "Grounded and considered",
     canvas: "#f5f1e6",
     surface: "#fffdf8",

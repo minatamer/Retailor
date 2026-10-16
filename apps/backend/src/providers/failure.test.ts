@@ -1,5 +1,9 @@
 import { expect, it, vi } from "vitest";
-import { APIError, APIConnectionTimeoutError } from "openai";
+import {
+  APIError,
+  APIConnectionError,
+  APIConnectionTimeoutError,
+} from "openai";
 import { providerFailure } from "./failure.js";
 import { publicError } from "@retailor/contracts/api";
 import { openAiCatalogue } from "../catalogue/provider.js";
@@ -10,6 +14,75 @@ import {
   ASSISTANT_NOW,
 } from "../../test/assistant-fixture.js";
 import { action } from "../../../../test/fixtures/recognition.js";
+import { failureDiagnostic } from "../http/diagnostics.js";
+
+it("correlates rejected provider requests with finite private categories without retaining upstream content", () => {
+  for (const [code, param, expected] of [
+    ["invalid_function_parameters", null, "ProviderSchemaRejected"],
+    [null, "tools[0].parameters.PRIVATE", "ProviderSchemaRejected"],
+    [null, "include", "ProviderIncludeRejected"],
+    [null, "tool_choice", "ProviderToolChoiceRejected"],
+    [null, "parallel_tool_calls", "ProviderParallelRejected"],
+    [null, "input[0].PRIVATE", "ProviderInputRejected"],
+    ["PRIVATE_CODE", "PRIVATE_PARAM", "ProviderBadRequest"],
+  ] as const) {
+    const failure = providerFailure(
+      APIError.generate(
+        400,
+        { error: { code, param, message: "PRIVATE_MESSAGE" } },
+        "PRIVATE_MESSAGE",
+        new Headers(),
+      ),
+      new AbortController().signal,
+    );
+    expect(failure).toMatchObject({
+      name: expected,
+      code: "UPSTREAM_FAILED",
+      status: 502,
+      message: "UPSTREAM_FAILED",
+    });
+    const diagnostic = failureDiagnostic(
+      failure,
+      "req_provider",
+      "/v1/assistant/creator",
+      failure.code,
+      failure.status,
+    );
+    expect(diagnostic.exception).toBe(expected);
+    expect(JSON.stringify(diagnostic)).not.toContain("PRIVATE");
+    expect(
+      JSON.stringify(publicError(failure.code, "req_provider")),
+    ).not.toContain("Provider");
+    expect(failure.cause).toBeUndefined();
+  }
+  for (const [error, expected] of [
+    [
+      new APIConnectionError({ message: "PRIVATE_TRANSPORT" }),
+      "ProviderConnectionFailure",
+    ],
+    [
+      APIError.generate(
+        500,
+        { error: { message: "PRIVATE_HTTP" } },
+        "PRIVATE_HTTP",
+        new Headers(),
+      ),
+      "ProviderHttpFailure",
+    ],
+  ] as const) {
+    const failure = providerFailure(error, new AbortController().signal);
+    const diagnostic = failureDiagnostic(
+      failure,
+      "req_test",
+      "/v1/assistant/owner",
+      failure.code,
+      failure.status,
+    );
+    expect(diagnostic.exception).toBe(expected);
+    expect(JSON.stringify(diagnostic)).not.toContain("PRIVATE");
+    expect(JSON.stringify(failure)).not.toContain("PRIVATE");
+  }
+});
 
 it("distinguishes operator quota/auth/configuration from temporary rate and deadline without raw content", () => {
   const signal = new AbortController().signal;

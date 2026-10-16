@@ -20,6 +20,14 @@ const names = new Set([
   "ZodError",
   "AbortError",
   "OperationFailure",
+  "ProviderSchemaRejected",
+  "ProviderIncludeRejected",
+  "ProviderToolChoiceRejected",
+  "ProviderParallelRejected",
+  "ProviderInputRejected",
+  "ProviderBadRequest",
+  "ProviderHttpFailure",
+  "ProviderConnectionFailure",
 ]);
 export function failureDiagnostic(
   error: unknown,

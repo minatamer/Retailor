@@ -16,6 +16,7 @@ import {
   StorePageSchema,
   resolvedTemplates,
   DEFAULT_THEME,
+  THEME_LABELS,
 } from "@retailor/contracts/design";
 import { displayMinor } from "@retailor/commerce/currency";
 import { stockOf } from "@retailor/commerce/selectors";
@@ -63,6 +64,26 @@ export interface AssistantToolResult {
   navigation: AssistantNavigation | null;
   proposal: AssistantProposal | null;
 }
+export const TOOL_ARGUMENT_KEYS: Record<
+  AssistantToolName,
+  readonly (keyof AssistantToolArguments)[]
+> = {
+  getDesignPresets: [],
+  getProductFacts: ["productId"],
+  getCurrencyQuote: [],
+  getStorePolicies: [],
+  searchCatalogue: ["query", "category", "minimum", "maximum"],
+  applyCatalogueFilter: ["query", "category", "minimum", "maximum"],
+  getMetricFacts: ["factIds"],
+  openRegisteredView: ["view"],
+  startRegisteredTour: [],
+  previewStoreDesign: ["template", "pageTemplates", "theme", "typography"],
+  prepareLogoGeneration: [],
+  prepareBagChange: ["variantId", "quantity"],
+  inspectRecords: ["recordKind", "recordId"],
+  prepareOperation: ["operation", "recordId", "prefill", "query"],
+  prepareScenarioSwitch: ["scenario"],
+};
 function only(
   args: AssistantToolArguments,
   allowed: readonly (keyof AssistantToolArguments)[],
@@ -90,6 +111,7 @@ export function executeAssistantTool(
     { graph, focusedRegistry, payload } = prepared,
     c = payload.context;
   if (!ROLE_TOOLS[c.role].includes(name)) return deny("FORBIDDEN", 403);
+  only(args, TOOL_ARGUMENT_KEYS[name]);
   const result = (
     data: unknown,
     references: AssistantReference[] = [],
@@ -129,10 +151,10 @@ export function executeAssistantTool(
   };
   switch (name) {
     case "getDesignPresets":
-      only(args, []);
       return result({
         templates: TemplateSchema.options,
         themes: ThemeSchema.options,
+        themeLabels: THEME_LABELS,
         defaultTheme: DEFAULT_THEME,
         themeDirections: Object.fromEntries(
           ThemeSchema.options.map((theme) => [
@@ -147,20 +169,17 @@ export function executeAssistantTool(
           "One template applies to all pages by default. Optional pageTemplates assigns each page independently. Keep shared colour/type and use accepted presets only. Suggestions do not guarantee sales; application preview/acceptance owns changes.",
       });
     case "getProductFacts":
-      only(args, ["productId"]);
       if (!args.productId) return deny("INVALID_INPUT", 400);
       return result(describe(args.productId), [
         { kind: "product", productId: args.productId },
       ]);
     case "getCurrencyQuote":
-      only(args, []);
       return result({
         scope: c.currency,
         policy:
           "This is the actual current display scope; no guessed or automatic substitute rate.",
       });
     case "getStorePolicies":
-      only(args, []);
       return result({
         payment: "Simulated orders; no real payment.",
         delivery: "Sample delivery fee only; no real shipment.",
@@ -170,7 +189,6 @@ export function executeAssistantTool(
       });
     case "searchCatalogue":
     case "applyCatalogueFilter": {
-      only(args, ["query", "category", "minimum", "maximum"]);
       if (
         args.minimum !== null &&
         args.maximum !== null &&
@@ -197,7 +215,13 @@ export function executeAssistantTool(
       return result(
         {
           matched: matches.length,
-          products: matches.slice(0, 6).map((p) => describe(p.id)),
+          products: matches
+            .slice(0, 6)
+            .map((p) =>
+              name === "applyCatalogueFilter"
+                ? { id: p.id, title: p.title, category: p.category }
+                : describe(p.id),
+            ),
           note: "Price bounds use exact rounded displayed unit prices, before sample delivery. Unknown attributes do not prove a material exclusion.",
         },
         matches.slice(0, 6).map((p) => ({ kind: "product", productId: p.id })),
@@ -213,7 +237,6 @@ export function executeAssistantTool(
       );
     }
     case "getMetricFacts": {
-      only(args, ["factIds"]);
       if (!args.factIds?.length) return deny("INVALID_INPUT", 400);
       const selected = focusedRegistry.filter((f) =>
         args.factIds!.includes(f.factId),
@@ -245,14 +268,12 @@ export function executeAssistantTool(
       );
     }
     case "openRegisteredView":
-      only(args, ["view"]);
       if (!args.view) return deny("INVALID_INPUT", 400);
       return result({ view: args.view }, [], {
         kind: "owner-view",
         view: args.view,
       });
     case "startRegisteredTour":
-      only(args, []);
       return result(
         {
           role: c.role,
@@ -263,7 +284,6 @@ export function executeAssistantTool(
         { kind: "tour", role: c.role },
       );
     case "previewStoreDesign":
-      only(args, ["template", "pageTemplates", "theme", "typography"]);
       if (
         !args.template &&
         !args.pageTemplates &&
@@ -287,7 +307,6 @@ export function executeAssistantTool(
         },
       );
     case "prepareLogoGeneration":
-      only(args, []);
       return result(
         {
           eligible: c.designConfirmed,
@@ -299,7 +318,6 @@ export function executeAssistantTool(
         c.designConfirmed ? { kind: "logo-offer" } : null,
       );
     case "prepareBagChange": {
-      only(args, ["variantId", "quantity"]);
       if (!args.variantId || !args.quantity) return deny("INVALID_INPUT", 400);
       const p = graph.products.find((p) =>
           p.variants.some((v) => v.id === args.variantId),
@@ -325,7 +343,6 @@ export function executeAssistantTool(
       );
     }
     case "inspectRecords": {
-      only(args, ["recordKind", "recordId"]);
       if (!args.recordKind || !args.recordId) return deny("INVALID_INPUT", 400);
       const record = assistantRecord(prepared, args.recordKind, args.recordId);
       if (!record) return deny("STALE", 409);
@@ -338,7 +355,6 @@ export function executeAssistantTool(
       ]);
     }
     case "prepareOperation": {
-      only(args, ["operation", "recordId", "prefill", "query"]);
       if (!args.operation) return deny("INVALID_INPUT", 400);
       if (!args.recordId && !operationEligible(graph, args.operation, null)) {
         const matches = operationTargets(
@@ -386,7 +402,6 @@ export function executeAssistantTool(
       );
     }
     case "prepareScenarioSwitch": {
-      only(args, ["scenario"]);
       if (!args.scenario) return deny("INVALID_INPUT", 400);
       return result(
         {

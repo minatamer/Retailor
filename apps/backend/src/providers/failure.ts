@@ -1,4 +1,8 @@
-import { APIError, APIConnectionTimeoutError } from "openai";
+import {
+  APIError,
+  APIConnectionError,
+  APIConnectionTimeoutError,
+} from "openai";
 import { OperationFailure } from "../security/errors.js";
 
 const accountCodes = new Set([
@@ -19,6 +23,11 @@ export function providerFailure(
   if (signal.aborted || error instanceof APIConnectionTimeoutError)
     return new OperationFailure("DEADLINE", 504);
   if (error instanceof OperationFailure) return error;
+  if (error instanceof APIConnectionError) {
+    const failure = new OperationFailure("UPSTREAM_FAILED", 502);
+    failure.name = "ProviderConnectionFailure";
+    return failure;
+  }
   if (error instanceof APIError) {
     if (
       error.status === 401 ||
@@ -30,6 +39,28 @@ export function providerFailure(
     )
       return new OperationFailure("OPERATOR_REQUIRED", 503);
     if (error.status === 429) return new OperationFailure("BUSY", 429);
+    if (error.status === 400) {
+      const failure = new OperationFailure("UPSTREAM_FAILED", 502);
+      failure.name =
+        error.code === "invalid_function_parameters" ||
+        error.code === "invalid_json_schema" ||
+        error.param === "tools" ||
+        error.param?.startsWith("tools[")
+          ? "ProviderSchemaRejected"
+          : error.param === "include"
+            ? "ProviderIncludeRejected"
+            : error.param === "tool_choice"
+              ? "ProviderToolChoiceRejected"
+              : error.param === "parallel_tool_calls"
+                ? "ProviderParallelRejected"
+                : error.param === "input" || error.param?.startsWith("input[")
+                  ? "ProviderInputRejected"
+                  : "ProviderBadRequest";
+      return failure;
+    }
+    const failure = new OperationFailure("UPSTREAM_FAILED", 502);
+    failure.name = "ProviderHttpFailure";
+    return failure;
   }
   return new OperationFailure("UPSTREAM_FAILED", 502);
 }

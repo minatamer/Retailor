@@ -59,6 +59,16 @@ describe("private failure correlation", () => {
       locations: ["routes.js:42:3"],
     });
     expect(JSON.stringify(event)).not.toContain("PRIVATE");
+    error.name = "ProviderBadRequest PRIVATE";
+    expect(
+      failureDiagnostic(
+        error,
+        "req_test",
+        "/v1/assistant/owner",
+        "UPSTREAM_FAILED",
+        502,
+      ).exception,
+    ).toBe("unknown");
     const stderr = vi
       .spyOn(process.stderr, "write")
       .mockImplementation(() => true);

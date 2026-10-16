@@ -3,6 +3,7 @@ import {
   assistantFence,
 } from "@retailor/contracts/assistant";
 import type { AssistantPayload } from "@retailor/contracts/assistant";
+import { THEME_LABELS } from "@retailor/contracts/design";
 import { parseGraph, freeze } from "@retailor/commerce/graph";
 import { facts } from "@retailor/commerce/facts";
 import { validateSnapshot } from "@retailor/commerce/currency";
@@ -119,23 +120,31 @@ export function modelProjection(prepared: PreparedAssistantContext) {
       id: p.id,
       title: p.title,
       category: p.category,
-      attributes: p.attributes.map((a) => ({
-        name: a.name,
-        value: a.review === "confirmed" ? a.value : null,
-        provenance: a.provenance,
-        review: a.review,
-      })),
-      variants: p.variants
-        .filter((v) => !v.archived)
-        .slice(0, 2)
-        .map((v) => ({
-          id: v.id,
-          size: v.size,
-          colour: v.colour,
-          priceUsdCents: v.price,
-          availableUnits: stockOf(graph, v.id),
-          ...(c.role === "owner" ? { demoUnitCostCents: v.unitCost } : {}),
-        })),
+      attributes:
+        c.role === "shopper" && p.id !== c.selectedProductId
+          ? undefined
+          : p.attributes.map((a) => ({
+              name: a.name,
+              value: a.review === "confirmed" ? a.value : null,
+              provenance: a.provenance,
+              review: a.review,
+            })),
+      variants:
+        c.role === "shopper" && p.id !== c.selectedProductId
+          ? undefined
+          : p.variants
+              .filter((v) => !v.archived)
+              .slice(0, 2)
+              .map((v) => ({
+                id: v.id,
+                size: v.size,
+                colour: v.colour,
+                priceUsdCents: v.price,
+                availableUnits: stockOf(graph, v.id),
+                ...(c.role === "owner"
+                  ? { demoUnitCostCents: v.unitCost }
+                  : {}),
+              })),
       photosAvailable: p.imageIds.every((id) =>
         c.availablePhotoIds.includes(id),
       ),
@@ -145,6 +154,7 @@ export function modelProjection(prepared: PreparedAssistantContext) {
     currency: c.currency,
     scope: c.scope,
     design: c.role !== "shopper" ? c.design : null,
+    themeLabels: c.role !== "shopper" ? THEME_LABELS : null,
     products,
     selection: {
       day: c.selectedDay,

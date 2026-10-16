@@ -9,6 +9,13 @@ export const PageTemplatesSchema = z.strictObject({
   product: TemplateSchema,
 });
 export const ThemeSchema = z.enum(["navy", "ink", "cobalt", "oxblood", "pine"]);
+export const THEME_LABELS: Record<z.infer<typeof ThemeSchema>, string> = {
+  navy: "Navy / Lime",
+  ink: "Ink / Paper",
+  cobalt: "Cobalt / Cloud",
+  oxblood: "Oxblood / Blush",
+  pine: "Pine / Sand",
+};
 export const DEFAULT_THEME: z.infer<typeof ThemeSchema> = "navy";
 export const TypographySchema = z.enum(["inter", "editorial", "modern"]);
 export const AdditionalHeroPhotosSchema = z.tuple([

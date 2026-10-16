@@ -1,11 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
-import { ThemeSchema, DEFAULT_THEME } from "@retailor/contracts/design";
+import {
+  ThemeSchema,
+  DEFAULT_THEME,
+  THEME_LABELS,
+} from "@retailor/contracts/design";
 import { AssistantToolArgumentsSchema } from "@retailor/contracts/assistant";
 import {
   assistantFixture,
   ASSISTANT_NOW,
 } from "../../test/assistant-fixture.js";
-import { prepareAssistantContext } from "./context.js";
+import { prepareAssistantContext, modelProjection } from "./context.js";
 import { executeAssistantTool } from "./tools.js";
 import { investigateAssistant } from "./service.js";
 import { fixtureAssistant } from "./fake.js";
@@ -58,6 +62,7 @@ describe("finite restored merchant tones", () => {
     const result = executeAssistantTool(prepared, "getDesignPresets", args());
     expect(result.data).toMatchObject({
       themes: ThemeSchema.options,
+      themeLabels: THEME_LABELS,
       defaultTheme: DEFAULT_THEME,
       themeDirections: {
         navy: "deep navy with vivid lime accents",
@@ -67,6 +72,9 @@ describe("finite restored merchant tones", () => {
         pine: "grounded considered simplicity",
       },
     });
+    expect(Object.keys(THEME_LABELS)).toEqual(ThemeSchema.options);
+    expect(THEME_LABELS.cobalt).toBe("Cobalt / Cloud");
+    expect(modelProjection(prepared).themeLabels).toEqual(THEME_LABELS);
     for (const theme of ThemeSchema.options)
       expect(
         executeAssistantTool(prepared, "previewStoreDesign", {
