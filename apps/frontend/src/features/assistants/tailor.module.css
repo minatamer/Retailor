@@ -131,6 +131,30 @@
   font-size: 11px;
   line-height: 1.4;
 }
+.referenceList .garmentReference {
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.referencePhoto {
+  width: 54px;
+  height: 68px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--platform-selected);
+}
+.referencePhoto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.referenceContent {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .proposal {
   border-top: 1px solid var(--platform-line);
   margin-top: 12px;

@@ -2,6 +2,7 @@
 import type { ChatMessage } from "./conversation";
 import { replyCurrent } from "./conversation";
 import type { AssistantContext } from "@retailor/contracts/assistant";
+import { colourImageIds } from "@retailor/contracts/product";
 import { useSession } from "../session/context";
 import {
   resolveDashboardTarget,
@@ -15,6 +16,7 @@ import { formatUsd } from "@retailor/commerce/money";
 import styles from "./tailor.module.css";
 import { OPERATION_LABELS } from "../operations/form-shell";
 import { layoutLabel } from "../store-design/presets";
+import { GarmentImage, type StorePhoto } from "../storefront/gallery";
 export function Reply({
   message,
   context,
@@ -76,6 +78,7 @@ export function Reply({
         <div className={styles.referenceList} aria-label="Current sources">
           {result.reply.references.map((ref, index) => {
             let title: string, detail: string;
+            let thumbnail: StorePhoto | undefined;
             if (ref.kind === "fact") {
               const target = ref.day
                 ? { kind: "day" as const, day: ref.day, factId: ref.factId }
@@ -104,6 +107,14 @@ export function Reply({
                 ref.kind === "variant" ? v.id === ref.variantId : !v.archived,
               );
               if (!product) return null;
+              const available = controller.photos.availableIds();
+              const photoId = colourImageIds(product, variant?.colour).find(
+                (id) => available.has(id),
+              );
+              const photo = photoId
+                ? controller.photos.view(photoId)
+                : undefined;
+              if (photo && photoId) thumbnail = { ...photo, id: photoId };
               title = product.title;
               detail = variant
                 ? `${formatDisplay(variant.price, context.currency)} · ${variant.size} · ${variant.colour} · ${stockOf(state.graph, variant.id)} available units`
@@ -115,13 +126,27 @@ export function Reply({
             return (
               <button
                 key={`${ref.kind}:${index}`}
+                className={thumbnail ? styles.garmentReference : undefined}
                 onClick={() =>
                   controller.openAssistantReference(message.id, index)
                 }
               >
-                <strong>{title}</strong>
-                <span>{detail}</span>
-                <small>Show source ↗</small>
+                {thumbnail && (
+                  <span className={styles.referencePhoto}>
+                    <GarmentImage
+                      photo={thumbnail}
+                      title=""
+                      onFailure={(id) =>
+                        controller.photos.reportUnavailable(id)
+                      }
+                    />
+                  </span>
+                )}
+                <span className={styles.referenceContent}>
+                  <strong>{title}</strong>
+                  <span>{detail}</span>
+                  <small>Show source ↗</small>
+                </span>
               </button>
             );
           })}
