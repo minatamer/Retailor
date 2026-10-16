@@ -16,7 +16,6 @@ import {
   TOUR_SETTLE_MS,
 } from "./tour-layout";
 import type { TourRect, TourViewport } from "./tour-layout";
-import { waitForTourPage } from "./tour-readiness";
 import styles from "./tour.module.css";
 
 type Layout = {
@@ -55,7 +54,6 @@ function TourGuide({
   const seamless = useRef(false);
   const transitioning = useRef(false);
   const startTimer = useRef(0);
-  const [welcomeReady, setWelcomeReady] = useState(false);
   const [started, setStarted] = useState(false);
   const [layout, setLayout] = useState<Layout | null>(null);
   const [view, setView] = useState<TourViewport>(viewport);
@@ -65,7 +63,6 @@ function TourGuide({
   const steps = TOUR_STEPS[tour.role],
     step = steps[tour.index],
     from = tour.from ?? 0;
-  useEffect(() => waitForTourPage(document, () => setWelcomeReady(true)), []);
   // Measure next text invisibly before deciding whether its card and hole stay put.
   useLayoutEffect(() => {
     if (pending === null || !layout) return;
@@ -280,8 +277,7 @@ function TourGuide({
     };
   }, [key, started, step]);
   const current = started && layout?.key === key;
-  const visibleKey =
-    !started && welcomeReady ? "welcome" : current ? key : null;
+  const visibleKey = !started ? "welcome" : current ? key : null;
   useEffect(() => {
     if (visibleKey && !typing())
       card.current
@@ -410,7 +406,7 @@ function TourGuide({
   return createPortal(
     <div className={styles.layer}>
       {started && content(pending ?? tour.index, true)}
-      {!started && welcomeReady ? (
+      {!started ? (
         <div
           className={styles.presentation}
           data-tour-presentation="welcome"

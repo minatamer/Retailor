@@ -24,7 +24,7 @@ import { GarmentImage } from "../storefront/gallery";
 import { logoEligible, brandValues } from "./setup";
 import type { SetupStep } from "./setup";
 import styles from "./tailor.module.css";
-import { ConversationPanel } from "./conversation-panel";
+import { ConversationComposer, ConversationPanel } from "./conversation-panel";
 import { LogoPanel } from "./logo-panel";
 import { Tour } from "./tour";
 import { roleOf } from "./context";
@@ -130,12 +130,20 @@ export function Tailor() {
       const active = document.activeElement;
       if (
         !(active instanceof HTMLElement) ||
-        !pane.contains(active) ||
         !active.matches("input,textarea,[contenteditable=true]")
       )
         return;
+      const composer = pane.parentElement?.querySelector<HTMLElement>(
+        "[data-tailor-composer]",
+      );
+      const scroller = pane.contains(active)
+        ? pane
+        : composer?.contains(active)
+          ? composer
+          : null;
+      if (!scroller) return;
       const input = active.getBoundingClientRect(),
-        bounds = pane.getBoundingClientRect();
+        bounds = scroller.getBoundingClientRect();
       const delta =
         input.bottom > bounds.bottom - 8
           ? input.bottom - bounds.bottom + 8
@@ -143,7 +151,10 @@ export function Tailor() {
             ? input.top - bounds.top - 8
             : 0;
       if (delta)
-        pane.scrollTo({ top: pane.scrollTop + delta, behavior: "smooth" });
+        scroller.scrollTo({
+          top: scroller.scrollTop + delta,
+          behavior: "smooth",
+        });
     };
     const observer = new ResizeObserver(revealField);
     observer.observe(pane);
@@ -209,7 +220,10 @@ export function Tailor() {
           <Icon name="arrow" />
         </button>
       ) : (
-        <TailorPanel companion={companion}>
+        <TailorPanel
+          companion={companion}
+          onCollapse={() => controller.toggleTailor(false)}
+        >
           <div className={styles.conversation} ref={conversation}>
             {creator ? (
               <>
@@ -407,22 +421,7 @@ export function Tailor() {
             )}
             <ConversationPanel />
           </div>
-          <footer className={styles.footer}>
-            <span>
-              <span className={styles.liveDot} />{" "}
-              {creator
-                ? "Preview changes instantly"
-                : "One collection, one companion"}
-            </span>
-            <button
-              type="button"
-              onClick={() => controller.toggleTailor(false)}
-              aria-label="Collapse Tailor and see full preview"
-              title="Collapse Tailor"
-            >
-              <Icon name="down" size={16} />
-            </button>
-          </footer>
+          <ConversationComposer />
         </TailorPanel>
       )}
       <Tour />
@@ -431,9 +430,11 @@ export function Tailor() {
 }
 function TailorPanel({
   companion,
+  onCollapse,
   children,
 }: {
   companion: string;
+  onCollapse: () => void;
   children: ReactNode;
 }) {
   const [enlarged, setEnlarged] = useState(false);
@@ -460,6 +461,14 @@ function TailorPanel({
           aria-pressed={enlarged}
         >
           <Icon name={enlarged ? "restore" : "expand"} />
+        </button>
+        <button
+          type="button"
+          onClick={onCollapse}
+          aria-label="Collapse Tailor and see full preview"
+          title="Collapse Tailor"
+        >
+          <Icon name="down" size={16} />
         </button>
       </header>
       {children}

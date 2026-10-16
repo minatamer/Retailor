@@ -113,7 +113,7 @@ export const TOUR_STEPS: Record<
     {
       target: "owner-kpis",
       title: "Exact numbers with their working",
-      text: "Open a headline for its formula, included records and exclusions. Operating result includes costs, expenses and losses.",
+      text: "Open a headline for its formula, included records and exclusions. Operating profit includes costs, expenses and losses.",
     },
     {
       target: "owner-trend",

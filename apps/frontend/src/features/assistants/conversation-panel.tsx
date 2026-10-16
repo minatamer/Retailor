@@ -6,25 +6,19 @@ import { Reply } from "./reply";
 import { FormShell } from "../operations/form-shell";
 import { OperationResult } from "./operation-result";
 import { dashboardModel } from "../dashboard/model";
+import { Icon } from "../../components/ui/icon";
 import styles from "./tailor.module.css";
 export function ConversationPanel() {
   const {
       controller,
       state,
-      assistantDraft,
       assistantBusy,
-      logoBusy,
       assistantNotice,
       ownerForm,
       ownerSurface,
       ownerResult,
     } = useSession(),
     role = roleOf(state);
-  const canSend =
-    !assistantBusy &&
-    !logoBusy &&
-    Boolean(assistantDraft.trim()) &&
-    controller.canAttemptAi();
   const messages = state.conversation.filter((m) => m.role === role);
   const context = controller.assistantContext();
   const model = useMemo(
@@ -87,16 +81,33 @@ export function ConversationPanel() {
           {assistantNotice}
         </p>
       )}
-      <form
-        className={styles.composer}
-        onSubmit={(event) => {
-          event.preventDefault();
-          void controller.sendAssistant();
-        }}
-      >
-        <label htmlFor="tailor-prompt">
-          Ask Tailor <small>{assistantDraft.length}/2000</small>
-        </label>
+    </section>
+  );
+}
+
+export function ConversationComposer() {
+  const { controller, state, assistantDraft, assistantBusy, logoBusy } =
+    useSession();
+  const role = roleOf(state);
+  const canSend =
+    !assistantBusy &&
+    !logoBusy &&
+    Boolean(assistantDraft.trim()) &&
+    controller.canAttemptAi();
+  return (
+    <form
+      className={styles.composer}
+      data-tailor-composer
+      aria-label="Message Tailor"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void controller.sendAssistant();
+      }}
+    >
+      <label htmlFor="tailor-prompt">
+        Ask Tailor <small>{assistantDraft.length}/2000</small>
+      </label>
+      <div className={styles.composerBox}>
         <textarea
           id="tailor-prompt"
           rows={3}
@@ -124,29 +135,30 @@ export function ConversationPanel() {
                 : "Show me the jeans under €80…"
           }
         />
-        <p id="tailor-prompt-hint" className={styles.composerHint}>
-          {state.fixture && "Demo chat · Simulated replies. "}
-          Enter to send · Shift+Enter for a new line
+        <button
+          className={styles.sendButton}
+          type={assistantBusy ? "button" : "submit"}
+          disabled={!assistantBusy && !canSend}
+          aria-label={assistantBusy ? "Cancel request" : "Send message"}
+          title={assistantBusy ? "Cancel request" : "Send message (Enter)"}
+          data-cancel={assistantBusy || undefined}
+          onClick={
+            assistantBusy ? () => controller.cancelAssistant() : undefined
+          }
+        >
+          <Icon name={assistantBusy ? "close" : "arrow"} size={16} />
+        </button>
+      </div>
+      <p id="tailor-prompt-hint" className={styles.srOnly}>
+        Enter to send · Shift+Enter for a new line
+      </p>
+      {!state.fixture && (
+        <p className={styles.note}>
+          Send shares this demo’s records, prompt and recent role messages with
+          OpenAI for this one answer. Photos are excluded. A maximum of twelve
+          live turns is shared across roles.
         </p>
-        {!state.fixture && (
-          <p className={styles.note}>
-            Send shares this demo’s records, prompt and recent role messages
-            with OpenAI for this one answer. Photos are excluded. A maximum of
-            twelve live turns is shared across roles.
-          </p>
-        )}
-        <div className={styles.composerActions}>
-          <button type="submit" disabled={!canSend}>
-            {assistantBusy ? "Sending…" : "Send"}{" "}
-            <span aria-hidden="true">→</span>
-          </button>
-          {assistantBusy && (
-            <button type="button" onClick={() => controller.cancelAssistant()}>
-              Cancel request
-            </button>
-          )}
-        </div>
-      </form>
-    </section>
+      )}
+    </form>
   );
 }
