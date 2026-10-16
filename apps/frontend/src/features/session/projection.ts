@@ -252,6 +252,9 @@ export function restoreProjection(
     throw new Error("Saved shopping references need repair");
   return {
     ...state,
+    // Saved provenance cannot select the current transport or label new fixture work as live.
+    // Public-mode rejection above runs before adopting this runtime's mode.
+    fixture: fixtureAllowed,
     graph:
       state.scenario && !state.stripeCheckout
         ? completeDemoReviews(graph, state.scenario.preset)

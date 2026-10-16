@@ -1,0 +1,11 @@
+# RTL-142 — repeat code quality and behavior audit
+
+16 October 2026. Status: locally implemented and validated; approved explicit commit follows the clean settled review. The owner requests another thorough quality audit followed by STRIDE/security review, authorizes minimal remedies without another review gate, and approves file-level plans, staging and commits after clean validation. Functionality must remain intact; keep the scope appropriate to a demo. No delegation, push, paid request or cloud mutation is included.
+
+Audit current tracked implementation, tests and tooling against the RTL-023 quality baseline and subsequent features. Record actual inventory, runtime/import reachability, confirmed defects and deliberately retained complexity. Inspect session/photo lifecycle, exact commerce, checkout, role-specific chat, store design, rendering/motion, private errors/logs and CI/release tooling. Identifier counts and file length alone do not justify deletion or extraction.
+
+Implement only independently confirmed, useful corrections with meaningful regression coverage. Preserve current mode authority, public/live fixture restrictions, exact financial state, bounded lifecycle/cancellation and all existing security controls. Validate the settled diff read-only, fix confirmed review findings, then run the applicable six local gates and changed-path browser checks. Distinguish actual checks from prior evidence and pending hosted/physical/provider acceptance.
+
+Record the audit in `docs/audits/RTL-142-CODE-QUALITY.md`, actual commands and reviews in `docs/validation/RTL-142.md`, and the final explicit allocation in the [commit plan](../commit-plans/RTL-142.md). Stage only those validated paths, inspect the index and commit. Perform the security review afterward as its own ticket against this settled candidate.
+
+Precision references: root instructions; [RTL-023 quality audit](../audits/RTL-023-CODE-QUALITY.md), [security dispositions](../validation/RTL-023-SECURITY.md), [current security](../engineering/SECURITY.md), [lifecycle](../engineering/LIFECYCLE.md), [local logos](../engineering/LOGOS.md), [checkout evidence](../validation/RTL-097.md), [recent live fixes](../validation/RTL-140.md).

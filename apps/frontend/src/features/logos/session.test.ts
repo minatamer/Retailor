@@ -9,6 +9,47 @@ import { ApiRequestError } from "../../http/api-error";
 const environments: ReturnType<typeof environment>[] = [];
 afterEach(() => environments.splice(0).forEach((env) => env.dispose()));
 
+it("restores live work in development with current mode authority and never restores its fixture projection publicly", async () => {
+  const env = environment();
+  environments.push(env);
+  const live = await env.open({ fixtureAllowed: false });
+  await live.photos.add([file("one")]);
+  const identity = live.getSnapshot().state.graph.workspaceId;
+  expect(live.getSnapshot().state.fixture).toBe(false);
+  live.dispose();
+  const request = vi.fn<LogoRequester>(async (input, _signal, dispatch) => {
+    if (input.mode !== "fake") throw new ApiRequestError("UNAVAILABLE");
+    dispatch();
+    return result(input, new Date(env.clock()).toISOString());
+  });
+  const restored = await env.open({
+    logoRequest: request,
+    logoVerify: async (row) => row,
+  });
+  expect(restored.getSnapshot().state.graph.workspaceId).toBe(identity);
+  expect(restored.photos.availableIds().size).toBe(1);
+  expect(restored.getSnapshot().state.fixture).toBe(true);
+  expect(request).not.toHaveBeenCalled();
+  await restored.draftCatalogue();
+  restored.publish();
+  restored.useCurrentLook();
+  restored.prepareLogo();
+  await restored.generateLogos();
+  expect(request).toHaveBeenCalledOnce();
+  expect(request.mock.calls[0]![0].mode).toBe("fake");
+  expect(restored.getSnapshot().state.logos.candidates).toHaveLength(3);
+  expect(JSON.parse(env.storage.getItem(SESSION_KEY)!).fixture).toBe(true);
+  restored.dispose();
+  const publicController = await env.open({ fixtureAllowed: false });
+  expect(publicController.getSnapshot().state.graph.workspaceId).not.toBe(
+    identity,
+  );
+  expect(publicController.getSnapshot().recoveryNotice).toContain(
+    "unavailable",
+  );
+  expect(request).toHaveBeenCalledOnce();
+});
+
 it("keeps local logo generation independent of AI operator attention and restores without dispatch", async () => {
   const env = environment();
   environments.push(env);

@@ -1,5 +1,7 @@
 # Retailor implementation tickets
 
+Repeat quality audit: [RTL-142](RTL-142-repeat-code-quality-audit.md) reviews current ownership, behavior and structure after the demo revisions. Its confirmed restore-mode correction preserves the catalogue/records and public fixture rejection. [Validation](../validation/RTL-142.md) records current gates and browser recovery; the subsequent STRIDE batch owns dependency/Linux/scanner evidence.
+
 Editorial project README: [RTL-141](RTL-141-editorial-readme.md) adds the owner's selected navy/lime garment artwork and a marketing-led product story, refreshes obsolete feature wording and retains setup, architecture and evidence links. [Validation](../validation/RTL-141.md) records documentation/image checks and the approved commit scope; application bytes and external release status remain unchanged.
 
 Approved live-fix commit batch: [RTL-140](RTL-140-commit-live-demo-fixes.md) allocates the33 final RTL-138/139 and packaging paths into five cohesive commits under the owner's explicit stage/commit approval. [Packaging evidence](../validation/RTL-140.md) records exact-byte/staged verification and the actual ledger. This later authorization supersedes those tickets' historical no-commit scope; existing live-quality limits and external release status remain unchanged.
