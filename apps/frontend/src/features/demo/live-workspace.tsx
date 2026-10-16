@@ -7,27 +7,13 @@ import { assistantRequester } from "../assistants/request";
 import { logoRequester } from "../logos/request";
 import { ApiRequestError } from "../../http/api-error";
 import { Button } from "../../components/ui/button";
+import { Icon } from "../../components/ui/icon";
+import { mountVerification, type Turnstile } from "./turnstile";
 import styles from "./workspace.module.css";
 interface Challenge {
   siteKey: string;
   action: "catalogue" | "assistant" | "logos";
   finish(token?: string): void;
-}
-interface Turnstile {
-  render(
-    container: HTMLElement,
-    options: {
-      sitekey: string;
-      action: string;
-      size: "compact";
-      theme: "light";
-      callback(token: string): void;
-      "error-callback"(): void;
-      "expired-callback"(): void;
-      retry: "never";
-    },
-  ): string;
-  remove(id: string): void;
 }
 declare global {
   interface Window {
@@ -89,69 +75,61 @@ export function LiveWorkspace() {
 function ChallengeDialog({ challenge }: { challenge: Challenge }) {
   const [scriptReady, setScriptReady] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null),
-    container = useRef<HTMLDivElement>(null),
-    widget = useRef<string | null>(null);
+    container = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const ownedDialog = dialog.current;
-    if (ownedDialog && !ownedDialog.open) ownedDialog.showModal();
-    if (
-      scriptReady &&
-      container.current &&
-      window.turnstile &&
-      widget.current === null
-    ) {
-      try {
-        widget.current = window.turnstile.render(container.current, {
-          sitekey: challenge.siteKey,
-          action: challenge.action,
-          size: "compact",
-          theme: "light",
-          retry: "never",
-          callback: (token) => challenge.finish(token),
-          "error-callback": () => challenge.finish(),
-          "expired-callback": () => challenge.finish(),
-        });
-      } catch {
-        challenge.finish();
-      }
-    }
+    if (!scriptReady || !container.current || !window.turnstile) return;
+    const dispose = mountVerification(
+      window.turnstile,
+      container.current,
+      challenge,
+      () => {
+        if (ownedDialog && !ownedDialog.open) ownedDialog.showModal();
+      },
+    );
     return () => {
-      try {
-        if (widget.current !== null) window.turnstile?.remove(widget.current);
-      } catch {
-        /* Third-party cleanup cannot prevent owned cancellation. */
-      }
-      widget.current = null;
+      dispose();
       ownedDialog?.close();
     };
   }, [scriptReady, challenge]);
   return (
     <dialog
       ref={dialog}
-      className={styles.dialog}
+      className={styles.challengeDialog}
       aria-labelledby="challenge-heading"
+      aria-describedby="challenge-description"
       onCancel={(event) => {
         event.preventDefault();
         challenge.finish();
       }}
     >
+      <header className={styles.challengeHeader}>
+        <span className={styles.challengeMark}>
+          <Icon name="sparkle" size={24} />
+        </span>
+        <span>Ready when you are</span>
+      </header>
       <h2 id="challenge-heading">One quick check.</h2>
-      <p>
+      <p id="challenge-description">
         {challenge.action === "catalogue"
-          ? "Verify this deliberate draft request. Only selected photo previews go to OpenAI; originals stay in your browser."
+          ? "Before we draft your collection, complete the check below. Only selected photo previews go to OpenAI; originals stay in your browser."
           : challenge.action === "logos"
-            ? "Verify this logo batch. Your name and styling stay on this server; no AI provider receives them."
-            : "Verify this deliberate Tailor turn. This demo’s records, prompt and recent role messages provide context. Photos are excluded."}
+            ? "Before we create your logos, complete the check below. Your name and styling stay on this server; no AI provider receives them."
+            : "Before Tailor replies, complete the check below. Your demo’s records, message and recent conversation provide context. Photos are excluded."}
       </p>
-      <div ref={container} />
+      <div className={styles.challengeVerification}>
+        <div ref={container} />
+      </div>
       <Script
         src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
         onReady={() => setScriptReady(true)}
         onError={() => challenge.finish()}
       />
-      <Button variant="secondary" onClick={() => challenge.finish()}>
-        Cancel and keep my work
-      </Button>
+      <footer className={styles.challengeFooter}>
+        <Button variant="secondary" onClick={() => challenge.finish()}>
+          Cancel and keep my work
+        </Button>
+      </footer>
     </dialog>
   );
 }
