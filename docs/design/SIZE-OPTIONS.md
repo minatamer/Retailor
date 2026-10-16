@@ -1,5 +1,7 @@
 # Add size — editable clothing option defaults
 
+**16 October 2026, RTL-120 — current removal behavior:** Original/default and newly added sizes can be removed during catalogue review and owner editing. Remove size is hidden when its colour has only one remaining size; matching ignores surrounding whitespace and case. Removing an active row requires another active same-colour size, so archived history cannot stand in for the last sellable size. Owner removal retains role/form/review fences and the existing commerce authority archives referenced options instead of erasing history. Changes remain unsaved until the normal Save or reviewed confirmation; Cancel discards them. Surviving values/identities/photos and Add size bounds remain intact. [Ticket](../tickets/RTL-120-removable-default-sizes.md), [validation](../validation/RTL-120.md). This supersedes the earlier new-row-only removal restriction below.
+
 15 October 2026, RTL-070. Add a size to the same colour using that colour's most recent current row. Copy its editable price, unit cost and opening units exactly; give the option a fresh identity/SKU, keep all existing options and focus the new size input. These are convenient editable defaults, not observed stock or measured fit. Save applies only through normal catalogue validation or owner review/confirm. Cancel discards the addition.
 
 - Alphabetic: XXS → XS → S → M → L → XL → XXL → XXXL; preserve numeric extended style such as 2XL → 3XL. Supported bounded extensions stop with an empty editable label.

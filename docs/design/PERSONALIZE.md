@@ -15,17 +15,21 @@ Keep the photos, products, bag, stock and owner records connected. Preview/confi
 
 ## Surface inventory
 
-| Surface                                  | Intended message                                                                                       |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Navbar                                   | Personalize; existing native target and clean normal activation                                        |
-| Landing hero lead and third process step | Personalize your store with Tailor; approved main headline stays                                       |
-| Showcase                                 | Personalize your store / Your store. Your style.; real preview families are starting looks             |
-| Showcase caption                         | Explore illustrative examples here; personalize layouts, colours, type and branding in your demo       |
-| FAQs                                     | How can I personalize my store? Explain actual choices, manual/Tailor control and optional logo review |
-| Tailor marketing example                 | Ask to personalize the store; choose a starting look with a real preview                               |
-| Metadata                                 | Clothing-photo demo with personalization and Tailor, without publishing/payment promises               |
-| Demo                                     | Personalize store after catalogue review, Personalize progress step and storefront return action       |
-| Creator Tailor/tour                      | Personalize as the journey; supported choices retain clear layout/colour/type/brand labels             |
-| Owner                                    | Personalize sidebar/entry/guidance; existing design draft and Apply/Cancel remain                      |
+| Surface                                  | Intended message                                                                                        |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Navbar                                   | Personalize; existing native target and clean normal activation                                         |
+| Landing hero lead and third process step | Personalize your store with Tailor; approved main headline stays                                        |
+| Brand recipe                             | Personalize your store / Make it yours.; 3 layouts, 5 palettes and 3 type styles in a compact navy band |
+| Recipe supporting line                   | Add your name, headline, photos and optional logo                                                       |
+| FAQs                                     | How can I personalize my store? Explain actual choices, manual/Tailor control and optional logo review  |
+| Tailor marketing example                 | Ask to personalize the store; choose a starting look with a real preview                                |
+| Metadata                                 | Clothing-photo demo with personalization and Tailor, without publishing/payment promises                |
+| Demo                                     | Personalize store after catalogue review, Personalize progress step and storefront return action        |
+| Creator Tailor/tour                      | Personalize as the journey; supported choices retain clear layout/colour/type/brand labels              |
+| Owner                                    | Personalize sidebar/entry/guidance; existing design draft and Apply/Cancel remain                       |
 
 Actual word choices and responsive evidence are recorded in [validation](../validation/RTL-067.md). Preserve authored motion, keyboard/focus, the larger Meet Tailor label, FAQs navigation, centered footer and deferred background-video direction. Future film work should use the same personalization message when separately requested; no media work is part of this change.
+
+## Compact brand recipe — RTL-116
+
+16 October 2026. The owner selects the first proposed replacement for the tall landing showcase: a full-width navy band with a white “Make it yours.” headline, three oversized lime counts and one short branding line. The supported counts derive from the existing template/palette/type presets; no screenshot, layout chooser or embedded storefront remains inside this section. The owner's live feedback adds first-view counting from zero to the totals, a tilted clothing label, an underline stroke and decorative layout/palette/type ingredients using actual supported colours/fonts. One bounded frame owner and one observer clean up on completion/unmount; accessible totals stay stable. Content stays available before hydration or without an observer. Keep the existing Personalize anchor/focus and actual demo controls. Optional logos still require a deliberate visitor action. [Ticket](../tickets/RTL-116-brand-recipe-personalization.md), [actual validation](../validation/RTL-116.md).

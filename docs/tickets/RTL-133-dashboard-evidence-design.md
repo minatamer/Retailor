@@ -1,0 +1,15 @@
+# RTL-133 — readable dashboard evidence dialogs
+
+**Final batch update — 16 October 2026:** [RTL-137](../validation/RTL-137.md) records all six passing settled gates (634/634 unit tests), final read-only review and the owner's explicit staging/commit approval. This supersedes the earlier deferred-check/no-commit packaging state below; dated observations and external/physical limitations remain.
+
+16 October 2026. Status: **Implemented; final batch validation pending.** The owner requests a substantial information-design improvement across the shared dashboard evidence and contributing-record dialogs, using the supplied metric/order screenshots as examples. The shared shell and all13 record presentations are redesigned. [Actual observations and settled source review](../validation/RTL-133.md) cover desktop, phone, short landscape, all record kinds, source/back/close, precision, pagination and zero/unavailable/excluded states. Automated gates remain deferred under the owner's edit-batch instruction; earlier work stays preserved and uncommitted.
+
+Acceptance:
+
+1. A consistent responsive dialog shell with a compact persistent header/close control and independently scrolling content. Lead metric views with a navy summary, meaningful scope/date context and plain-language explanation; use green for small actions/selection accents, never whole green cards.
+2. Put contributing records ahead of detailed arithmetic. Use readable record names, dates, statuses and amounts instead of raw identifier buttons. Retain all bounded50-record pagination, exclusions/unavailable states, day/product navigation and exact calculation/numerator/denominator/scope/revision information in expandable details.
+3. Redesign all13 current record kinds with structured fields, financial summaries, garment/option rows, readable timelines and contextual linked-record actions. Preserve exact stored money, historical snapshots, origin disclosure, current/historical distinctions, all existing fields/links and raw identifiers/timestamps in expandable metadata. Keep validated photos/failure handling and missing-reference states honest.
+4. Preserve the existing session/controller authority, native modal/Escape containment, opener focus, source/back navigation and evidence scroll restoration. No financial/contract/model/provider/log/security mutation, global dialog rewrite, dependency or paid/cloud action. Owner operation forms and unrelated confirmation/navigation dialogs remain outside this evidence presentation scope.
+5. Quick actual desktop/phone/short checks of metric → record → linked record → back/close, representative record kinds, expanded precision and missing/zero behavior where available. Automated gates remain deferred under the owner's edit-batch instruction unless an actual error requires a focused check. Record pending broader coverage accurately; no staging, commit, delegation or publication.
+
+Precision: [allocation](../commit-plans/RTL-133.md), current EvidenceDrawer/RecordDetail/state/model/fact schemas, RTL-023 preservation dispositions, latest owner navy/white/green preferences and installed Next client/CSS Modules guidance.
