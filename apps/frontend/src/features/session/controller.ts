@@ -89,7 +89,10 @@ import { CommandSchema } from "@retailor/contracts/commands";
 import type { CommerceCommand } from "@retailor/contracts/commands";
 import type { ProductInput } from "@retailor/contracts/product";
 import { ProductInputSchema } from "@retailor/contracts/product";
-import { suggestSizeOption } from "../catalogue/size-options";
+import {
+  canRemoveSizeOption,
+  suggestSizeOption,
+} from "../catalogue/size-options";
 import { applyCommand } from "@retailor/commerce/commands";
 import { emptyGraph, freeze } from "@retailor/commerce/graph";
 import { BrowserPhotoCache, CacheConflict } from "../photos/cache";
@@ -1134,6 +1137,26 @@ export class SessionController {
     return this.snapshot.ownerForm?.variants.some((row) => row.id === next.id)
       ? next.id
       : undefined;
+  }
+  removeOwnerVariant(id: string, expectedFormId = this.snapshot.ownerForm?.id) {
+    const form = this.snapshot.ownerForm;
+    if (
+      !this.ownerAllowed() ||
+      !form ||
+      form.id !== expectedFormId ||
+      !canRemoveSizeOption(form.variants, id)
+    )
+      return false;
+    this.editOwnerRows(
+      "variants",
+      form.variants.filter((row) => row.id !== id),
+      "human",
+      form.id,
+    );
+    return (
+      this.snapshot.ownerForm?.id === form.id &&
+      !this.snapshot.ownerForm.variants.some((row) => row.id === id)
+    );
   }
   editOwnerRows<
     K extends "variants" | "photoIds" | "lines" | "unitsSelection" | "refunds",
@@ -2857,7 +2880,7 @@ export class SessionController {
           stripeCheckout: null,
           checkoutOrders: [],
         },
-        "Catalogue accepted. This is your local demo; no website was published externally.",
+        "",
       );
       this.protectDesignPhotos();
       this.update({ dialog: null }, false);

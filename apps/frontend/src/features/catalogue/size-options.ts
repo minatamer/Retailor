@@ -11,6 +11,25 @@ export interface SizeOptionDraft {
   archived: boolean;
 }
 type Sizing = ProductInput["sizingSystemId"];
+
+/** An active colour keeps a sellable size; an archived colour keeps a row. */
+export function canRemoveSizeOption(
+  rows: readonly Pick<SizeOptionDraft, "id" | "colour" | "archived">[],
+  id: string,
+) {
+  const target = rows.find((row) => row.id === id);
+  return (
+    !!target &&
+    rows.some(
+      (row) =>
+        row.id !== id &&
+        row.colour.trim().toLowerCase() ===
+          target.colour.trim().toLowerCase() &&
+        (target.archived || !row.archived),
+    )
+  );
+}
+
 const ALPHA = [
   "XXXS",
   "XXS",

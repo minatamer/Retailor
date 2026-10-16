@@ -30,6 +30,82 @@ function apply(controller: Awaited<ReturnType<typeof setup>>["controller"]) {
   return review;
 }
 describe("reviewed owner forms and atomic scenario identity", () => {
+  it("guards default-size removal per current colour and form identity while keeping edits and cancel", async () => {
+    const { controller } = await setup();
+    const before = controller.getSnapshot().state.graph;
+    const product = before.products[0]!;
+    controller.openOwnerOperation("updateProduct", product.id);
+    const form = controller.getSnapshot().ownerForm!;
+    const [first, second, third] = form.variants;
+    controller.editOwnerRows(
+      "variants",
+      form.variants.map((row) => ({
+        ...row,
+        colour: row.id === third!.id ? "Black" : " Blue ",
+        price: "71.05",
+      })),
+    );
+    expect(controller.removeOwnerVariant(first!.id, form.id)).toBe(true);
+    expect(controller.getSnapshot().ownerForm!.variants).toMatchObject([
+      { id: second!.id, colour: " Blue ", price: "71.05" },
+      { id: third!.id, colour: "Black", price: "71.05" },
+    ]);
+    const remaining = controller.getSnapshot().ownerForm;
+    expect(controller.removeOwnerVariant(second!.id, form.id)).toBe(false);
+    expect(controller.removeOwnerVariant(third!.id, form.id)).toBe(false);
+    expect(controller.removeOwnerVariant("unknown", form.id)).toBe(false);
+    expect(controller.getSnapshot().ownerForm).toBe(remaining);
+    expect(controller.getSnapshot().state.graph).toBe(before);
+    controller.closeOwnerOperation();
+    controller.openOwnerOperation("updateProduct", product.id);
+    const reopened = controller.getSnapshot().ownerForm!;
+    expect(reopened.variants.map((row) => row.id)).toEqual(
+      product.variants.map((row) => row.id),
+    );
+    expect(controller.removeOwnerVariant(first!.id, form.id)).toBe(false);
+    controller.reviewOwnerOperation();
+    expect(controller.getSnapshot().ownerReview).not.toBeNull();
+    expect(controller.removeOwnerVariant(first!.id, reopened.id)).toBe(true);
+    expect(controller.getSnapshot().ownerReview).toBeNull();
+    expect(controller.getSnapshot().ownerForm!.dirty).toContain("variants");
+    expect(controller.getSnapshot().state.graph).toBe(before);
+  });
+  it("reviews size removal and archives referenced history without counting it as an active replacement", async () => {
+    const { controller } = await setup();
+    const product = controller.getSnapshot().state.graph.products[0]!;
+    const removed = product.variants[0]!;
+    controller.openOwnerOperation("saveOrderDraft");
+    controller.editOwnerRows("lines", [
+      { variantId: removed.id, quantity: "1" },
+    ]);
+    apply(controller);
+    controller.openOwnerOperation(
+      "placeOrder",
+      controller.getSnapshot().state.graph.orderDrafts[0]!.id,
+    );
+    apply(controller);
+    const before = controller.getSnapshot().state.graph;
+    controller.openOwnerOperation("updateProduct", product.id);
+    expect(controller.removeOwnerVariant(removed.id)).toBe(true);
+    expect(controller.getSnapshot().state.graph).toBe(before);
+    const review = apply(controller)!;
+    const graph = controller.getSnapshot().state.graph;
+    const changed = graph.products.find((row) => row.id === product.id)!;
+    expect(changed.variants.find((row) => row.id === removed.id)).toEqual({
+      ...removed,
+      archived: true,
+    });
+    expect(
+      changed.variants.filter((row) => !row.archived).map((row) => row.id),
+    ).toEqual(product.variants.slice(1).map((row) => row.id));
+    expect(graph.orders).toEqual(before.orders);
+    expect(graph.movements).toEqual(before.movements);
+    controller.confirmOwnerOperation(review);
+    expect(controller.getSnapshot().state.graph).toBe(graph);
+    controller.openOwnerOperation("updateProduct", product.id);
+    expect(controller.removeOwnerVariant(product.variants[1]!.id)).toBe(true);
+    expect(controller.removeOwnerVariant(product.variants[2]!.id)).toBe(false);
+  });
   it("keeps expense filters bounded and ephemeral, and gracefully retires saved visits navigation without losing records", async () => {
     const { env, controller } = await setup(true);
     const graph = controller.getSnapshot().state.graph;

@@ -1,6 +1,44 @@
 import { describe, expect, it } from "vitest";
-import { nextSize, suggestSizeOption } from "./size-options";
+import {
+  canRemoveSizeOption,
+  nextSize,
+  suggestSizeOption,
+} from "./size-options";
 import type { SizeOptionDraft } from "./size-options";
+
+describe("removing sizes without losing a colour option", () => {
+  it("allows original sizes down to one per normalized colour, independently of other colours", () => {
+    const rows = [
+      { id: "blue-s", colour: " Blue ", archived: false },
+      { id: "blue-m", colour: "blue", archived: false },
+      { id: "black-s", colour: "Black", archived: false },
+    ];
+    expect(canRemoveSizeOption(rows, "blue-s")).toBe(true);
+    expect(canRemoveSizeOption(rows, "blue-m")).toBe(true);
+    expect(canRemoveSizeOption(rows, "black-s")).toBe(false);
+    const remaining = rows.filter((row) => row.id !== "blue-s");
+    expect(canRemoveSizeOption(remaining, "blue-m")).toBe(false);
+    expect(canRemoveSizeOption(remaining, "black-s")).toBe(false);
+    expect(canRemoveSizeOption(remaining, "blue-s")).toBe(false);
+    expect(canRemoveSizeOption([], "unknown")).toBe(false);
+    expect(rows).toHaveLength(3);
+  });
+  it("does not treat an archived peer as the replacement for the last active size", () => {
+    const rows = [
+      { id: "active", colour: "Blue", archived: false },
+      { id: "history", colour: "Blue", archived: true },
+    ];
+    expect(canRemoveSizeOption(rows, "active")).toBe(false);
+    expect(canRemoveSizeOption(rows, "history")).toBe(true);
+    expect(canRemoveSizeOption([rows[1]!], "history")).toBe(false);
+    expect(
+      canRemoveSizeOption(
+        [...rows, { id: "older", colour: "Blue", archived: true }],
+        "history",
+      ),
+    ).toBe(true);
+  });
+});
 
 describe("bounded suggestions from entered clothing sizes", () => {
   it.each([

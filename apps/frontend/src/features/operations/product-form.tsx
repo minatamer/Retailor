@@ -1,6 +1,7 @@
 "use client";
 import { CATEGORY_LABELS } from "@retailor/contracts/product";
 import { useRef } from "react";
+import { canRemoveSizeOption } from "../catalogue/size-options";
 import { CategorySchema } from "@retailor/contracts/product";
 import { Button } from "../../components/ui/button";
 import { useSession } from "../session/context";
@@ -260,19 +261,23 @@ export function ProductForm() {
               />
               Stop selling this option; preserve its history
             </label>
-            <Button
-              type="button"
-              variant="quiet"
-              disabled={form.variants.length < 2}
-              onClick={() =>
-                controller.editOwnerRows(
-                  "variants",
-                  form.variants.filter((v) => v.id !== variant.id),
-                )
-              }
-            >
-              Remove option
-            </Button>
+            {canRemoveSizeOption(form.variants, variant.id) && (
+              <Button
+                type="button"
+                variant="quiet"
+                aria-label={`Remove size ${variant.size || "option"} for ${variant.colour}`}
+                onClick={() => {
+                  focusNewSize.current =
+                    form.variants[index + 1]?.id ??
+                    form.variants[index - 1]?.id ??
+                    null;
+                  if (!controller.removeOwnerVariant(variant.id, form.id))
+                    focusNewSize.current = null;
+                }}
+              >
+                Remove size
+              </Button>
+            )}
           </fieldset>
         ))}
       </div>

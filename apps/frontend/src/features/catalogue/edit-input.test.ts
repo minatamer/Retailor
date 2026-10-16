@@ -24,6 +24,31 @@ async function fixture() {
   return { product, form, draft };
 }
 describe("catalogue form decoding and safe notices", () => {
+  it("saves removal of default sizes with the last size, exact edits and colour photos intact", async () => {
+    const { product, form, draft } = await fixture();
+    const original = {
+      ...product,
+      colourPhotos: [
+        { colour: product.variants[0]!.colour, photoIds: product.imageIds },
+      ],
+    };
+    draft.items[0]!.product = original;
+    const survivor = original.variants.at(-1)!;
+    const editing = { ...original, variants: [survivor] };
+    form.set("size_0", survivor.size);
+    form.set("colour_0", survivor.colour);
+    const edited = readCatalogueEdit(editing, form);
+    const accepted = reviseDraft(draft, product.id, edited);
+    expect(accepted.items[0]!.product.variants).toEqual([
+      { ...survivor, price: 6805, unitCost: 2040, openingStock: 15 },
+    ]);
+    expect(accepted.items[0]!.product.colourPhotos).toEqual(
+      original.colourPhotos,
+    );
+    expect(accepted.items[0]!.product.imageIds).toEqual(original.imageIds);
+    expect(accepted.corrections[0]!.before.variants).toEqual(original.variants);
+    expect(draft.items[0]!.product.variants).toHaveLength(3);
+  });
   it("saves a suggested extra size with exact edited values and rejects duplicate size/colour without changing the old draft", async () => {
     const { product, form, draft } = await fixture();
     const rows = product.variants.map((variant) => ({

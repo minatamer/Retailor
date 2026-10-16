@@ -13,7 +13,11 @@ import { Button } from "../../components/ui/button";
 import { useSession } from "../session/context";
 import type { DraftItem } from "./draft";
 import { readCatalogueEdit, catalogueEditNotice } from "./edit-input";
-import { sizeOptionFields, suggestSizeOption } from "./size-options";
+import {
+  canRemoveSizeOption,
+  sizeOptionFields,
+  suggestSizeOption,
+} from "./size-options";
 import styles from "../../components/ui/photo-dialog.module.css";
 
 function fieldsFor(product: ProductInput) {
@@ -55,15 +59,14 @@ export function ProductEditor({
   const [originalOptionIds] = useState(
     () => new Set(product.variants.map((row) => row.id)),
   );
-  const options = optionRows.filter(
-    (row) =>
-      product.variants.some((variant) => variant.id === row.original.id) ||
-      (!originalOptionIds.has(row.original.id) &&
-        product.variants.some(
-          (variant) =>
-            variant.colour.toLowerCase() === row.original.colour.toLowerCase(),
-        )),
-  );
+  const isCurrentOption = (row: (typeof optionRows)[number]) =>
+    product.variants.some((variant) => variant.id === row.original.id) ||
+    (!originalOptionIds.has(row.original.id) &&
+      product.variants.some(
+        (variant) =>
+          variant.colour.toLowerCase() === row.original.colour.toLowerCase(),
+      ));
+  const options = optionRows.filter(isCurrentOption);
   const focusOption = useRef<string | null>(null);
   const [optionNotice, setOptionNotice] = useState("");
   const optionLimit = Math.min(
@@ -358,7 +361,7 @@ export function ProductEditor({
               </select>
             </label>
             <label>
-              Product copy
+              Product description
               <textarea {...input("description")} maxLength={1000} rows={3} />
             </label>
             <p className={styles.intro}>
@@ -446,19 +449,28 @@ export function ProductEditor({
                           Add size
                         </Button>
                       )}
-                    {!product.variants.some((row) => row.id === variant.id) && (
+                    {canRemoveSizeOption(
+                      options.map((row) => row.fields),
+                      variant.id,
+                    ) && (
                       <Button
                         variant="quiet"
-                        aria-label={`Remove added size ${optionFields.size || "option"} for ${optionFields.colour}`}
+                        aria-label={`Remove size ${optionFields.size || "option"} for ${optionFields.colour}`}
                         onClick={(event) => {
                           focusPhotoDialog(event.currentTarget);
-                          setOptions((current) =>
-                            current.filter(
-                              (row) => row.original.id !== variant.id,
-                            ),
-                          );
+                          setOptions((current) => {
+                            const visible = current.filter(isCurrentOption);
+                            return canRemoveSizeOption(
+                              visible.map((row) => row.fields),
+                              variant.id,
+                            )
+                              ? current.filter(
+                                  (row) => row.original.id !== variant.id,
+                                )
+                              : current;
+                          });
                           setOptionNotice(
-                            "Added size removed. Other edits are kept.",
+                            "Size removed. Other edits are kept.",
                           );
                         }}
                       >
