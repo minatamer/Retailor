@@ -6,117 +6,130 @@ import { stockOf, orderFinancialState } from "@retailor/commerce/selectors";
 import { useSession } from "../session/context";
 import { GarmentImage } from "../storefront/gallery";
 import { dashboardRecord } from "./state";
+import { describeRecord, readable } from "./evidence-presentation";
+import { EvidenceDate, EvidenceFields, RecordLink } from "./evidence-ui";
 import styles from "./dashboard.module.css";
+
 export function RecordDetail({ reference }: { reference: string }) {
   const { state, controller } = useSession(),
-    graph = state.graph,
-    resolved = dashboardRecord(graph, reference);
-  const link = (ref: string) => (
-    <button
-      type="button"
-      className={styles.sourceLink}
-      onClick={() => controller.openDashboardSource(ref)}
-    >
-      {ref.replace(":", " · ")} ↗
-    </button>
-  );
-  const product = (id: string) => {
-    const p = graph.products.find((p) => p.id === id);
-    if (!p)
-      return (
-        <p>
-          The current product is unavailable; the historical record remains.
-        </p>
-      );
-    const photoId = p.imageIds.find((id) => controller.photos.view(id)),
-      photo = photoId ? controller.photos.view(photoId) : undefined;
-    return (
-      <div className={styles.productDetail}>
-        {photo && photoId ? (
-          <GarmentImage
-            photo={{ ...photo, id: photoId }}
-            title={p.title}
-            onFailure={(id) => controller.photos.reportUnavailable(id)}
-          />
-        ) : (
-          <p>Photo needs repair; no substitute is shown.</p>
-        )}
-        <h4>{p.title}</h4>
-        <p>
-          Current garment · {CATEGORY_LABELS[p.category]} ·{" "}
-          {p.archived ? "Archived from shopping" : "Offered in storefront"}
-        </p>
-        {p.variants.map((v) => (
-          <p key={v.id}>
-            {link(`variant:${v.id}`)} {v.size} · {v.colour} ·{" "}
-            {formatUsd(v.price)} current price · {formatUsd(v.unitCost)}{" "}
-            disclosed future cost · {stockOf(graph, v.id)} current units
-          </p>
-        ))}
-      </div>
-    );
-  };
+    graph = state.graph;
+  const resolved = dashboardRecord(graph, reference);
   if (!resolved)
     return (
-      <p>
-        This reference is unavailable in the current scenario. The displayed
-        facts have been recomputed; choose a current contributor.
+      <p className={styles.empty}>
+        This record is no longer available in the current demo. Go back to the
+        figure to choose a current record.
       </p>
     );
-  const r = resolved.record;
+  const info = describeRecord(graph, resolved),
+    record = resolved.record;
   const sourceOrigin =
     resolved.kind === "line"
       ? resolved.origin
-      : "origin" in r
-        ? r.origin
+      : "origin" in record
+        ? record.origin
         : undefined;
-  const origin = sourceOrigin
-    ? sourceOrigin === "seeded_scenario"
-      ? "Synthetic seeded history"
-      : "Local demo action"
-    : "Current catalogue identity; costs, options and stock are demo inputs";
+  const origin =
+    sourceOrigin === "seeded_scenario"
+      ? "Demo history"
+      : sourceOrigin
+        ? "Your demo activity"
+        : "Current catalogue · Demo inputs";
+  const link = (ref: string, label?: string) => (
+    <RecordLink reference={ref} {...(label ? { label } : {})} />
+  );
   return (
     <article className={styles.recordDetail}>
-      <p className={styles.caption}>
-        {origin} · {reference}
-        {resolved.kind === "line"
-          ? ` · Historical placement ${resolved.placedAt}`
-          : ""}
-      </p>
+      <div className={styles.recordSummary}>
+        <span className={styles.evidenceBadge}>{origin}</span>
+        <div className={styles.recordSummaryTitle}>
+          <h3>{info.title}</h3>
+          {info.value && (
+            <div className={styles.recordHeadlineValue}>
+              <strong>{info.value}</strong>
+              <small>{info.valueLabel}</small>
+            </div>
+          )}
+        </div>
+        <p>
+          {info.detail}
+          {info.at && (
+            <>
+              {" "}
+              · <EvidenceDate value={info.at} />
+            </>
+          )}
+        </p>
+      </div>
       {(() => {
         switch (resolved.kind) {
           case "order": {
             const o = resolved.record;
             return (
               <>
-                <h4>Historical placed order</h4>
-                <p>
-                  {o.placedAt} · {o.state} · {orderFinancialState(graph, o.id)}{" "}
-                  · {o.actor}
-                </p>
-                <p>
-                  Original merchandise {formatUsd(o.merchandise)} · discount{" "}
-                  {formatUsd(o.discount)} · delivery {formatUsd(o.delivery)} ·
-                  tax {formatUsd(o.tax)} · recorded total {formatUsd(o.total)}
-                </p>
-                {o.lines.map((l) => (
-                  <div key={l.id}>
-                    <p>
-                      {l.title} · {l.size} · {l.colour} · {l.quantity} ×{" "}
-                      {formatUsd(l.unitPrice)} · captured cost{" "}
-                      {formatUsd(l.unitCost)} each
-                    </p>
-                    {link(`line:${l.id}`)}
-                    {link(`product:${l.productId}`)}
+                <EvidenceFields
+                  items={[
+                    ["Fulfilment", readable(o.state)],
+                    ["Refund status", orderFinancialState(graph, o.id)],
+                  ]}
+                />
+                <details className={styles.evidencePrecision}>
+                  <summary>Order amount breakdown</summary>
+                  <div className={styles.precisionContent}>
+                    <EvidenceFields
+                      items={[
+                        ["Merchandise", formatUsd(o.merchandise)],
+                        ["Discount", formatUsd(o.discount)],
+                        ["Delivery", formatUsd(o.delivery)],
+                        ["Tax", formatUsd(o.tax)],
+                        ["Recorded total", formatUsd(o.total)],
+                      ]}
+                    />
                   </div>
-                ))}
-                {o.buyerId && link(`buyer:${o.buyerId}`)}
-                {o.trafficId && link(`traffic:${o.trafficId}`)}
-                {graph.refunds
-                  .filter((r) => r.orderId === o.id)
-                  .map((r) => (
-                    <div key={r.id}>{link(`refund:${r.id}`)}</div>
+                </details>
+                <section className={styles.recordSection}>
+                  <h3>Garments in this order</h3>
+                  <p className={styles.evidenceHint}>
+                    These are the details captured when the order was placed.
+                  </p>
+                  {o.lines.map((l) => (
+                    <div className={styles.snapshotItem} key={l.id}>
+                      <div className={styles.snapshotHeading}>
+                        <div>
+                          <strong>{l.title}</strong>
+                          <small>
+                            {l.colour} · {l.size} · Quantity {l.quantity}
+                          </small>
+                        </div>
+                        <strong>
+                          {formatUsd(exactProduct(l.quantity, l.unitPrice))}
+                        </strong>
+                      </div>
+                      <EvidenceFields
+                        items={[
+                          ["Price per item", formatUsd(l.unitPrice)],
+                          ["Captured cost per item", formatUsd(l.unitCost)],
+                        ]}
+                      />
+                      <div className={styles.recordLinks}>
+                        {link("line:" + l.id, "Inspect historical item")}
+                        {link("product:" + l.productId, "View current garment")}
+                      </div>
+                    </div>
                   ))}
+                </section>
+                <section className={styles.recordSection}>
+                  <h3>Related records</h3>
+                  <div className={styles.recordLinks}>
+                    {o.buyerId && link("buyer:" + o.buyerId)}
+                    {o.trafficId && link("traffic:" + o.trafficId)}
+                    {graph.refunds
+                      .filter((r) => r.orderId === o.id)
+                      .map((r) => (
+                        <RecordLink key={r.id} reference={"refund:" + r.id} />
+                      ))}
+                  </div>
+                </section>
               </>
             );
           }
@@ -124,43 +137,117 @@ export function RecordDetail({ reference }: { reference: string }) {
             const l = resolved.record;
             return (
               <>
-                <h4>{l.title} · Historical line snapshot</h4>
-                <p>
-                  {l.size} · {l.colour} · {l.quantity} units · recorded{" "}
-                  {formatUsd(l.unitPrice)} price / {formatUsd(l.unitCost)} cost
-                  each
+                <EvidenceFields
+                  items={[
+                    ["Colour", l.colour],
+                    ["Size", l.size],
+                    ["Quantity", l.quantity],
+                    ["Recorded price per item", formatUsd(l.unitPrice)],
+                    ["Captured cost per item", formatUsd(l.unitCost)],
+                    [
+                      "Net allocations per item",
+                      l.unitNet.map(formatUsd).join(" · "),
+                    ],
+                  ]}
+                />
+                <p className={styles.evidenceHint}>
+                  This historical snapshot and its discounted unit allocations
+                  preserve the original transaction.
                 </p>
-                <p>
-                  Discounted unit allocations:{" "}
-                  {l.unitNet.map(formatUsd).join(", ")}. These preserve the
-                  original transaction.
-                </p>
-                {link(`order:${resolved.orderId}`)}
-                {link(`product:${l.productId}`)}
+                <div className={styles.recordLinks}>
+                  {link("order:" + resolved.orderId, "View the order")}
+                  {link("product:" + l.productId, "View current garment")}
+                </div>
               </>
             );
           }
-          case "product":
-            return product(resolved.record.id);
+          case "product": {
+            const p = resolved.record,
+              photoId = p.imageIds.find((id) => controller.photos.view(id)),
+              photo = photoId ? controller.photos.view(photoId) : undefined;
+            return (
+              <>
+                <div className={styles.productEvidence}>
+                  {photo && photoId ? (
+                    <GarmentImage
+                      photo={{ ...photo, id: photoId }}
+                      title={p.title}
+                      onFailure={(id) =>
+                        controller.photos.reportUnavailable(id)
+                      }
+                    />
+                  ) : (
+                    <p className={styles.evidenceHint}>
+                      Photo needs repair; no substitute is shown.
+                    </p>
+                  )}
+                  <EvidenceFields
+                    items={[
+                      ["Category", CATEGORY_LABELS[p.category]],
+                      [
+                        "Store status",
+                        p.archived
+                          ? "Archived from shopping"
+                          : "Offered in storefront",
+                      ],
+                    ]}
+                  />
+                </div>
+                <section className={styles.recordSection}>
+                  <h3>Size & colour options</h3>
+                  <div className={styles.recordLinks}>
+                    {p.variants.map((v) => (
+                      <div className={styles.snapshotItem} key={v.id}>
+                        {link("variant:" + v.id)}
+                        <EvidenceFields
+                          items={[
+                            ["Future demo cost", formatUsd(v.unitCost)],
+                            ["Current units", stockOf(graph, v.id)],
+                          ]}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </>
+            );
+          }
           case "variant": {
             const v = resolved.record;
             return (
               <>
-                <h4>{v.sku} · Current option</h4>
-                <p>
-                  {v.size} · {v.colour} · {v.archived ? "Archived" : "Active"}
-                </p>
-                <p>
-                  Opening {v.openingStock} units from {v.openedAt} · current{" "}
-                  {stockOf(graph, v.id)} units · {formatUsd(v.price)} price ·{" "}
-                  {formatUsd(v.unitCost)} future demo cost.
-                </p>
-                {link(`product:${resolved.productId}`)}
-                {graph.movements
-                  .filter((m) => m.variantId === v.id)
-                  .map((m) => (
-                    <div key={m.id}>{link(`movement:${m.id}`)}</div>
-                  ))}
+                <EvidenceFields
+                  items={[
+                    ["Colour", v.colour],
+                    ["Size", v.size],
+                    ["SKU", v.sku],
+                    ["Status", v.archived ? "Archived" : "Active"],
+                    ["Current stock", stockOf(graph, v.id) + " units"],
+                    ["Opening stock", v.openingStock + " units"],
+                    [
+                      "Opening date",
+                      <EvidenceDate key="opened" value={v.openedAt} />,
+                    ],
+                    ["Current price", formatUsd(v.price)],
+                    ["Future demo cost", formatUsd(v.unitCost)],
+                  ]}
+                />
+                <div className={styles.recordLinks}>
+                  {link(
+                    "product:" + resolved.productId,
+                    "View current garment",
+                  )}
+                </div>
+                <section className={styles.recordSection}>
+                  <h3>Stock movements</h3>
+                  <div className={styles.recordLinks}>
+                    {graph.movements
+                      .filter((m) => m.variantId === v.id)
+                      .map((m) => (
+                        <RecordLink key={m.id} reference={"movement:" + m.id} />
+                      ))}
+                  </div>
+                </section>
               </>
             );
           }
@@ -168,18 +255,30 @@ export function RecordDetail({ reference }: { reference: string }) {
             const r = resolved.record;
             return (
               <>
-                <h4>Issued financial refund</h4>
-                <p>
-                  {r.at} · Delivery {formatUsd(r.delivery)} · Tax{" "}
-                  {formatUsd(r.tax)}. No automatic stock/cost restoration.
+                <EvidenceFields
+                  items={[
+                    ["Issued", <EvidenceDate key="issued" value={r.at} />],
+                    ["Delivery refunded", formatUsd(r.delivery)],
+                    ["Tax refunded", formatUsd(r.tax)],
+                  ]}
+                />
+                <section className={styles.recordSection}>
+                  <h3>Refunded items</h3>
+                  {r.lines.map((l) => (
+                    <div className={styles.snapshotItem} key={l.lineId}>
+                      {link("line:" + l.lineId)}
+                      <EvidenceFields
+                        items={[["Merchandise refunded", formatUsd(l.amount)]]}
+                      />
+                    </div>
+                  ))}
+                </section>
+                <p className={styles.evidenceHint}>
+                  A refund does not automatically restore stock or sold cost.
                 </p>
-                {r.lines.map((l) => (
-                  <div key={l.lineId}>
-                    {link(`line:${l.lineId}`)}
-                    <p>{formatUsd(l.amount)} merchandise refunded</p>
-                  </div>
-                ))}
-                {link(`order:${r.orderId}`)}
+                <div className={styles.recordLinks}>
+                  {link("order:" + r.orderId, "View the order")}
+                </div>
               </>
             );
           }
@@ -187,27 +286,56 @@ export function RecordDetail({ reference }: { reference: string }) {
             const r = resolved.record;
             return (
               <>
-                <h4>Physical return · {r.reason}</h4>
-                <p>
-                  {r.state} · Requested {r.requestedAt} · Received{" "}
-                  {r.receivedAt ?? "Not received"} · Restocked{" "}
-                  {r.restockedAt ?? "Not restocked"}
+                <EvidenceFields
+                  items={[
+                    ["Status", readable(r.state)],
+                    ["Reason", readable(r.reason)],
+                  ]}
+                />
+                <ol className={styles.recordTimeline}>
+                  {(
+                    [
+                      ["Requested", r.requestedAt],
+                      ["Approved", r.approvedAt],
+                      ["Received", r.receivedAt],
+                      ["Restocked", r.restockedAt],
+                      ["Closed", r.closedAt],
+                    ] as const
+                  ).map(([label, at]) => (
+                    <li key={label} data-reached={Boolean(at)}>
+                      <strong>{label}</strong>
+                      <EvidenceDate value={at} empty="Not yet" />
+                    </li>
+                  ))}
+                </ol>
+                <section className={styles.recordSection}>
+                  <h3>Returned items</h3>
+                  {r.lines.map((l) => (
+                    <div className={styles.snapshotItem} key={l.lineId}>
+                      {link("line:" + l.lineId)}
+                      <EvidenceFields
+                        items={[
+                          [
+                            "Physical units",
+                            l.units.map((u) => u + 1).join(", "),
+                          ],
+                          [
+                            "Inspected restockable units",
+                            l.restockable.map((u) => u + 1).join(", ") ||
+                              "None",
+                          ],
+                        ]}
+                      />
+                    </div>
+                  ))}
+                </section>
+                <p className={styles.evidenceHint}>
+                  Receiving a return does not issue a refund. Only inspected,
+                  eligible restock reverses sold cost.
                 </p>
-                <p>
-                  Physical receipt does not issue money. Only inspected eligible
-                  restock reverses sold cost.
-                </p>
-                {r.lines.map((l) => (
-                  <div key={l.lineId}>
-                    {link(`line:${l.lineId}`)}
-                    <p>
-                      Physical units {l.units.map((u) => u + 1).join(", ")} ·
-                      Restockable inspected units{" "}
-                      {l.restockable.map((u) => u + 1).join(", ") || "None"}
-                    </p>
-                  </div>
-                ))}
-                {link(`order:${r.orderId}`)}
+                <div className={styles.recordLinks}>
+                  {link("order:" + r.orderId, "View the order")}
+                </div>
               </>
             );
           }
@@ -215,16 +343,22 @@ export function RecordDetail({ reference }: { reference: string }) {
             const e = resolved.record;
             return (
               <>
-                <h4>
-                  {e.category} · {formatUsd(e.amount)}
-                </h4>
-                <p>
-                  {e.at} · {e.kind} · {e.note}
-                </p>
-                {e.parentId && link(`expense:${e.parentId}`)}
-                <p>
-                  Posted financial history. Corrections/void remain linked and
-                  inspectable.
+                <EvidenceFields
+                  items={[
+                    ["Category", readable(e.category)],
+                    ["Entry type", readable(e.kind)],
+                    ["Posted", <EvidenceDate key="posted" value={e.at} />],
+                    ["Note", e.note || "No note"],
+                  ]}
+                />
+                {e.parentId && (
+                  <div className={styles.recordLinks}>
+                    {link("expense:" + e.parentId, "View original expense")}
+                  </div>
+                )}
+                <p className={styles.evidenceHint}>
+                  Posted financial history. Corrections and voids remain linked
+                  to the original entry.
                 </p>
               </>
             );
@@ -233,17 +367,20 @@ export function RecordDetail({ reference }: { reference: string }) {
             const m = resolved.record;
             return (
               <>
-                <h4>
-                  {m.kind} · {m.units} signed units
-                </h4>
-                <p>
-                  {m.at} · {m.reason}
-                </p>
-                {link(`variant:${m.variantId}`)}
-                {m.lineId && link(`line:${m.lineId}`)}
-                <p>
-                  Linked source {m.sourceId}. Current stock includes this
-                  movement once.
+                <EvidenceFields
+                  items={[
+                    ["Movement", readable(m.kind)],
+                    ["Signed units", m.units],
+                    ["Recorded", <EvidenceDate key="at" value={m.at} />],
+                    ["Reason", m.reason],
+                  ]}
+                />
+                <div className={styles.recordLinks}>
+                  {link("variant:" + m.variantId)}
+                  {m.lineId && link("line:" + m.lineId)}
+                </div>
+                <p className={styles.evidenceHint}>
+                  Current stock includes this linked movement once.
                 </p>
               </>
             );
@@ -252,15 +389,23 @@ export function RecordDetail({ reference }: { reference: string }) {
             const w = resolved.record;
             return (
               <>
-                <h4>Available-stock writeoff</h4>
-                <p>
-                  {w.at} · {w.quantity} units × {formatUsd(w.unitCost)} captured
-                  cost = {formatUsd(exactProduct(w.quantity, w.unitCost))} ·{" "}
-                  {w.reason}
-                </p>
-                {link(`variant:${w.variantId}`)}
-                <p>
-                  Sold damaged returns retain sold cost and do not become a
+                <EvidenceFields
+                  items={[
+                    ["Recorded", <EvidenceDate key="at" value={w.at} />],
+                    ["Units written off", w.quantity],
+                    ["Captured unit cost", formatUsd(w.unitCost)],
+                    [
+                      "Total cost",
+                      formatUsd(exactProduct(w.quantity, w.unitCost)),
+                    ],
+                    ["Reason", w.reason],
+                  ]}
+                />
+                <div className={styles.recordLinks}>
+                  {link("variant:" + w.variantId)}
+                </div>
+                <p className={styles.evidenceHint}>
+                  Sold damaged returns retain sold cost; they do not create a
                   second warehouse writeoff.
                 </p>
               </>
@@ -270,12 +415,17 @@ export function RecordDetail({ reference }: { reference: string }) {
             const c = resolved.record;
             return (
               <>
-                <h4>Cancellation reversal</h4>
-                <p>
-                  {c.at} · merchandise {formatUsd(c.merchandise)} · delivery{" "}
-                  {formatUsd(c.delivery)} · tax {formatUsd(c.tax)}
-                </p>
-                {link(`order:${c.orderId}`)}
+                <EvidenceFields
+                  items={[
+                    ["Cancelled", <EvidenceDate key="at" value={c.at} />],
+                    ["Merchandise reversed", formatUsd(c.merchandise)],
+                    ["Delivery reversed", formatUsd(c.delivery)],
+                    ["Tax reversed", formatUsd(c.tax)],
+                  ]}
+                />
+                <div className={styles.recordLinks}>
+                  {link("order:" + c.orderId, "View the order")}
+                </div>
               </>
             );
           }
@@ -283,26 +433,42 @@ export function RecordDetail({ reference }: { reference: string }) {
             const t = resolved.record;
             return (
               <>
-                <h4>Known demo visit</h4>
-                <p>
-                  {t.startedAt} start · {t.lastAt} latest observation ·{" "}
-                  {t.actor}
+                <EvidenceFields
+                  items={[
+                    ["Visitor role", readable(t.actor)],
+                    [
+                      "Latest observation",
+                      <EvidenceDate key="last" value={t.lastAt} />,
+                    ],
+                  ]}
+                />
+                <ol className={styles.recordTimeline}>
+                  {(
+                    [
+                      ["Visit started", t.startedAt],
+                      ["Viewed a garment", t.engagedAt],
+                      ["Added to bag", t.bagAt],
+                      ["Reached checkout", t.checkoutAt],
+                    ] as const
+                  ).map(([label, at]) => (
+                    <li key={label} data-reached={Boolean(at)}>
+                      <strong>{label}</strong>
+                      <EvidenceDate value={at} empty="Not reached" />
+                    </li>
+                  ))}
+                </ol>
+                <p className={styles.evidenceHint}>
+                  One eligible shopper visit counts once. Owner and designer
+                  visits are excluded.
                 </p>
-                <p>
-                  Engagement {t.engagedAt ?? "Not reached"} · bag{" "}
-                  {t.bagAt ?? "Not reached"} · checkout{" "}
-                  {t.checkoutAt ?? "Not reached"}
-                </p>
-                <p>
-                  One eligible shopper visit counts once. Owner/designer visits
-                  are excluded.
-                </p>
-                {t.orderIds.map((id) => (
-                  <div key={id}>{link(`order:${id}`)}</div>
-                ))}
-                {t.productIds.map((id) => (
-                  <div key={id}>{link(`product:${id}`)}</div>
-                ))}
+                <div className={styles.recordLinks}>
+                  {t.orderIds.map((id) => (
+                    <RecordLink key={id} reference={"order:" + id} />
+                  ))}
+                  {t.productIds.map((id) => (
+                    <RecordLink key={id} reference={"product:" + id} />
+                  ))}
+                </div>
               </>
             );
           }
@@ -310,16 +476,21 @@ export function RecordDetail({ reference }: { reference: string }) {
             const b = resolved.record;
             return (
               <>
-                <h4>{b.label} · Fictional identity</h4>
-                <p>
-                  No real customer contact information is collected. New/repeat
-                  cohorts use known non-cancelled order dates.
+                <p className={styles.evidenceHint}>
+                  This is a fictional customer. No real contact information is
+                  collected. New and repeat cohorts use known, non-cancelled
+                  order dates.
                 </p>
-                {graph.orders
-                  .filter((o) => o.buyerId === b.id)
-                  .map((o) => (
-                    <div key={o.id}>{link(`order:${o.id}`)}</div>
-                  ))}
+                <section className={styles.recordSection}>
+                  <h3>Linked orders</h3>
+                  <div className={styles.recordLinks}>
+                    {graph.orders
+                      .filter((o) => o.buyerId === b.id)
+                      .map((o) => (
+                        <RecordLink key={o.id} reference={"order:" + o.id} />
+                      ))}
+                  </div>
+                </section>
               </>
             );
           }
@@ -327,21 +498,50 @@ export function RecordDetail({ reference }: { reference: string }) {
             const f = resolved.record;
             return (
               <>
-                <h4>{f.rating} / 5 · Synthetic feedback</h4>
-                <p>
-                  {f.at} · {f.comment}
-                </p>
-                {link(`product:${f.productId}`)}
-                {f.orderId && link(`order:${f.orderId}`)}
-                <p>
-                  This authored small sample does not prove demand or guaranteed
-                  conversion.
+                <blockquote className={styles.evidenceQuote}>
+                  {f.comment || "No written comment."}
+                </blockquote>
+                <div className={styles.recordLinks}>
+                  {link("product:" + f.productId)}
+                  {f.orderId && link("order:" + f.orderId)}
+                </div>
+                <p className={styles.evidenceHint}>
+                  This authored demo review is part of a small fictional sample;
+                  it does not predict demand or conversion.
                 </p>
               </>
             );
           }
         }
       })()}
+      <details className={styles.evidencePrecision}>
+        <summary>Record references & exact dates</summary>
+        <EvidenceFields
+          items={[
+            ["Reference", <code key="reference">{reference}</code>],
+            ["Origin", sourceOrigin ?? "Current catalogue identity"],
+            ...(resolved.kind === "line"
+              ? [
+                  ["Historical placement", resolved.placedAt] as const,
+                  ["Order reference", resolved.orderId] as const,
+                ]
+              : []),
+            ...Object.entries(record)
+              .filter(
+                ([key, value]) =>
+                  typeof value === "string" &&
+                  (key === "id" || key.endsWith("Id") || key.endsWith("At")),
+              )
+              .map(
+                ([key, value]) =>
+                  [
+                    readable(key.replace(/([a-z])([A-Z])/gu, "$1 $2")),
+                    <code key={key}>{String(value)}</code>,
+                  ] as const,
+              ),
+          ]}
+        />
+      </details>
     </article>
   );
 }

@@ -16,10 +16,10 @@ export const PERIOD_LABELS: Record<DashboardPeriod, string> = {
   all: "All activity",
 };
 export const METRIC_LABELS: Partial<Record<MetricFact["factId"], string>> = {
-  net_sales: "Net merchandise sales",
+  net_sales: "Net sales",
   included_orders: "Included orders",
   aov: "Average merchandise order",
-  operating_result: "Simulated operating result",
+  operating_result: "Operating profit",
   awaiting_fulfilment: "Awaiting fulfilment",
   open_returns: "Open return requests",
   low_stock: "Low-stock options",
@@ -33,7 +33,7 @@ export const METRIC_LABELS: Partial<Record<MetricFact["factId"], string>> = {
   expenses: "Operating expenses",
   inventory_loss: "Inventory loss",
   gross_margin: "Gross margin",
-  result_margin: "Result margin",
+  result_margin: "Operating profit margin",
   new_buyer_share: "New fictional buyers",
   repeat_buyer_share: "Repeat fictional buyers",
   average_rating: "Synthetic rating",
@@ -154,7 +154,7 @@ export function resolveDashboardTarget(
             label:
               target.factId === "net_units"
                 ? "Product net units"
-                : "Product net contribution",
+                : "Product net sales",
             fact: target.factId === "net_units" ? row.units : row.fact,
           }
         : null;

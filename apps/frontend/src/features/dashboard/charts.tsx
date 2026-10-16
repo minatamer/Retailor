@@ -1,12 +1,13 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import type { MetricFact } from "@retailor/contracts/facts";
 import { formatUsd } from "@retailor/commerce/money";
 import { useSession } from "../session/context";
 import type { DashboardTarget } from "./state";
-import { factDisplay } from "./model";
+import { factDisplay, METRIC_LABELS } from "./model";
 import type { DashboardModel } from "./model";
+import { evidenceDate } from "./evidence-presentation";
 import styles from "./dashboard.module.css";
 export interface ChartMark {
   key: string;
@@ -137,6 +138,15 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
   const { controller, state } = useSession(),
     series = state.dashboard.series;
   const [hovered, setHovered] = useState<string | null>(null);
+  const tooltipId = useId();
+  useEffect(() => {
+    if (!hovered) return;
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setHovered(null);
+    };
+    document.addEventListener("keydown", dismiss);
+    return () => document.removeEventListener("keydown", dismiss);
+  }, [hovered]);
   const marks: ChartMark[] = model.days.map((day) => ({
     key: day.day,
     label: day.day,
@@ -144,10 +154,10 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
     target: { kind: "day", day: day.day },
   }));
   const pinned = state.dashboard.pinned;
-  const active =
-    marks.find((m) => m.key === hovered) ??
+  const selectedDay =
     marks.find((m) => pinned?.kind === "day" && m.key === pinned.day) ??
     marks.at(-1);
+  const active = marks.find((m) => m.key === hovered) ?? selectedDay;
   const geometry = useMemo(() => {
     const values = model.days.map(
         (d) => (series === "net_sales" ? d.sales : d.result).value,
@@ -167,6 +177,9 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
     );
     return { available, min, max, zero: y(0), actual, points };
   }, [model.days, series]);
+  const hoveredIndex = marks.findIndex((mark) => mark.key === hovered),
+    hoveredMark = marks[hoveredIndex],
+    hoveredPoint = geometry.actual[hoveredIndex];
   return (
     <ChartPanel
       title="How is the story changing?"
@@ -181,7 +194,7 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
             aria-pressed={series === s}
             onClick={() => controller.setDashboardSeries(s)}
           >
-            {s === "net_sales" ? "Net merchandise" : "Simulated result"}
+            {METRIC_LABELS[s]}
           </button>
         ))}
       </div>
@@ -192,33 +205,99 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
             <span>USD · Zero baseline</span>
             <span>{formatUsd(geometry.min)}</span>
           </div>
-          <svg
-            viewBox="0 0 640 230"
-            role="img"
-            aria-label={`${series === "net_sales" ? "Net merchandise" : "Simulated result"} across ${marks.length} recorded UTC days. Exact values and interactive day controls below.`}
+          <div
+            className={styles.trendCanvas}
+            onPointerLeave={() => setHovered(null)}
           >
-            <path
-              d={`M24 ${geometry.zero} H616`}
-              stroke="var(--platform-control-line)"
-              strokeDasharray="4 5"
-            />
-            <MotionLine points={geometry.points} zero={geometry.zero} />
-            {geometry.actual.map((point, i) => (
-              <circle
-                key={marks[i]!.key}
-                cx={point[0]}
-                cy={point[1]}
-                r={active?.key === marks[i]!.key ? 6 : 3}
-                fill={
-                  active?.key === marks[i]!.key
-                    ? "var(--platform-action)"
-                    : "var(--platform-surface)"
-                }
-                stroke="var(--platform-action)"
-                strokeWidth="2"
+            <svg
+              viewBox="0 0 640 230"
+              role="img"
+              aria-label={`${METRIC_LABELS[series]} across ${marks.length} recorded UTC days. Hover the graph or use the day controls for exact values.`}
+            >
+              <path
+                d={`M24 ${geometry.zero} H616`}
+                stroke="var(--platform-control-line)"
+                strokeDasharray="4 5"
               />
-            ))}
-          </svg>
+              <MotionLine points={geometry.points} zero={geometry.zero} />
+              {hoveredPoint && (
+                <line
+                  className={styles.pointGuide}
+                  x1={hoveredPoint[0]}
+                  x2={hoveredPoint[0]}
+                  y1="0"
+                  y2="230"
+                  aria-hidden="true"
+                />
+              )}
+              {geometry.actual.map((point, i) => (
+                <circle
+                  key={marks[i]!.key}
+                  cx={point[0]}
+                  cy={point[1]}
+                  r={active?.key === marks[i]!.key ? 6 : 3}
+                  fill={
+                    hovered === marks[i]!.key
+                      ? "var(--platform-lime)"
+                      : active?.key === marks[i]!.key
+                        ? "var(--platform-action)"
+                        : "var(--platform-surface)"
+                  }
+                  stroke="var(--platform-action)"
+                  strokeWidth="2"
+                />
+              ))}
+              <g aria-hidden="true">
+                {geometry.actual.map((point, i) => {
+                  const left = i
+                      ? (geometry.actual[i - 1]![0]! + point[0]!) / 2
+                      : 0,
+                    right =
+                      i + 1 < marks.length
+                        ? (point[0]! + geometry.actual[i + 1]![0]!) / 2
+                        : 640,
+                    mark = marks[i]!;
+                  return (
+                    <rect
+                      key={mark.key}
+                      x={left}
+                      y="0"
+                      width={right - left}
+                      height="230"
+                      fill="transparent"
+                      pointerEvents="all"
+                      onPointerEnter={(event) => {
+                        if (event.pointerType !== "touch") setHovered(mark.key);
+                      }}
+                      onClick={() => {
+                        setHovered(mark.key);
+                        controller.pinDashboard(mark.target);
+                      }}
+                    />
+                  );
+                })}
+              </g>
+            </svg>
+            {hoveredMark && hoveredPoint && (
+              <div
+                id={tooltipId}
+                role="tooltip"
+                className={styles.pointTooltip}
+                style={
+                  {
+                    "--point-x": `${(hoveredPoint[0]! / 640) * 100}%`,
+                    "--point-y": `${(hoveredPoint[1]! / 230) * 100}%`,
+                  } as CSSProperties
+                }
+              >
+                <time dateTime={hoveredMark.label}>
+                  {evidenceDate(hoveredMark.label, false)} · UTC
+                </time>
+                <span>{METRIC_LABELS[series]}</span>
+                <strong>{factDisplay(hoveredMark.fact)}</strong>
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <p className={styles.empty}>
@@ -244,6 +323,9 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
             key={mark.key}
             type="button"
             aria-pressed={pinned?.kind === "day" && pinned.day === mark.key}
+            aria-describedby={
+              geometry.available && hovered === mark.key ? tooltipId : undefined
+            }
             onPointerEnter={(event) => {
               if (event.pointerType !== "touch") setHovered(mark.key);
             }}
@@ -256,22 +338,14 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
           </button>
         ))}
       </div>
-      {active && (
-        <div className={styles.tooltip}>
-          <div>
-            <strong>
-              {active.label} · {factDisplay(active.fact)}
-            </strong>
-            <p>
-              {active.fact.reason ??
-                "Exact UTC observation. Tap a day to pin it; focus and hover expose the same value."}
-            </p>
-          </div>
+      {selectedDay && (
+        <div className={styles.trendActions}>
           <button
             type="button"
-            onClick={() => controller.openDashboardEvidence(active.target)}
+            aria-label={`View day details for ${evidenceDate(selectedDay.label, false)} UTC`}
+            onClick={() => controller.openDashboardEvidence(selectedDay.target)}
           >
-            View this day’s evidence ↗
+            View {evidenceDate(selectedDay.label, false)} details ↗
           </button>
         </div>
       )}

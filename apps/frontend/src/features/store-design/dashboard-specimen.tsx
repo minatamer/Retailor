@@ -61,7 +61,7 @@ export function DashboardSpecimen() {
       <div className={styles.kpiGrid}>
         {[
           {
-            label: "Net merchandise sales",
+            label: "Net sales",
             amount: "$572.00",
             hint: "8 example orders",
             icon: "↗",
@@ -79,7 +79,7 @@ export function DashboardSpecimen() {
             icon: "↗",
           },
           {
-            label: "Operating result",
+            label: "Operating profit",
             amount: "$200.00",
             hint: "$286 costs · $86 expenses",
             icon: "↗",

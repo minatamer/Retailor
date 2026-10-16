@@ -290,11 +290,11 @@ function EffectReview() {
   const { ownerReview, ownerForm, state } = useSession();
   if (!ownerReview || !ownerForm) return null;
   const amounts = [
-    { label: "Net merchandise", value: ownerReview.effect.netSales },
+    { label: "Net sales", value: ownerReview.effect.netSales },
     { label: "Sold cost", value: ownerReview.effect.soldCost },
     { label: "Operating expenses", value: ownerReview.effect.expenses },
     { label: "Inventory loss", value: ownerReview.effect.inventoryLoss },
-    { label: "Demo result", value: ownerReview.effect.operatingResult },
+    { label: "Operating profit", value: ownerReview.effect.operatingResult },
   ];
   const changed = amounts.filter((amount) => amount.value !== 0);
   return (

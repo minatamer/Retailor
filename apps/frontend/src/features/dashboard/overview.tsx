@@ -92,18 +92,7 @@ export function DashboardOverview() {
             </button>
           ))}
         </div>
-        <span>
-          USD ·{" "}
-          {new Date(model.scope.asOf).toLocaleString("en-US", {
-            timeZone: "UTC",
-          })}{" "}
-          UTC as of
-        </span>
       </div>
-      <p className={styles.caption}>
-        Real local records, fictional business activity. Costs, traffic and
-        customers are disclosed demo inputs. {model.comparison.reason}
-      </p>
       {model.comparison.registry && (
         <button
           type="button"
@@ -115,7 +104,7 @@ export function DashboardOverview() {
             })
           }
         >
-          Previous period net merchandise:{" "}
+          Previous period net sales:{" "}
           {factDisplay(
             model.comparison.registry.find((f) => f.factId === "net_sales")!,
           )}{" "}
@@ -189,125 +178,140 @@ export function DashboardOverview() {
         <SalesTrend model={model} />
       </div>
       <div className={styles.panelGrid}>
-        <RankedBars
-          title="Which garments contribute?"
-          note="Ranked net merchandise by actual product identity. Net units subtract cancellations and physical receipts, independently of refunds. Current names/photos link to immutable historical snapshots."
-          marks={productMarks}
-          limit={6}
-        />
-        <RankedBars
-          title="Where do demo visits reach?"
-          note="One nested session-start cohort, observed through as-of. Fictional seeded visits plus limited local shopper visits; owner/designer actions are excluded. Counts are unique visits, not clicks or orders."
-          marks={funnelMarks}
-          ordered
-        />
-        <RankedBars
-          title="What is the category mix?"
-          note="Current catalogue categories group exact historical product contributions. Signed contributions use bars around zero; a category rename does not rewrite old order snapshots."
-          marks={model.categories.map((r) => ({
-            key: r.category,
-            label: CATEGORY_LABELS[r.category],
-            fact: r.fact,
-            target: { kind: "category", category: r.category },
-          }))}
-        />
-        <RankedBars
-          title="Where does operating spend go?"
-          note="Posted demo expenses and linked signed corrections/voids, by posting date. Negative adjustments remain negative; inventory purchases are not charged again as operating spend."
-          marks={model.expenses.map((r) => ({
-            key: r.category,
-            label: r.category,
-            fact: r.fact,
-            target: { kind: "expense", category: r.category },
-          }))}
-        />
-        <RankedBars
-          title="Which options need attention?"
-          note="Lowest available active options first. Two units or fewer needs attention; balances are current as-of, independent of the sales period. Open actual movements from each option."
-          marks={inventoryMarks}
-          ordered
-          limit={8}
-        />
-        <RankedBars
-          title="Why were clothes received back?"
-          note="Recorded reasons for physical units actually received in this period. Requested returns and financial refunds are separate; this fictional small sample does not predict demand."
-          marks={model.returnReasons.map((r) => ({
-            key: r.reason,
-            label: r.reason.replaceAll("-", " "),
-            fact: r.fact,
-            target: { kind: "return-reason", reason: r.reason },
-          }))}
-        />
-        <RankedBars
-          title="Who are the fictional buyers?"
-          note="Distinct known non-cancelled-order buyers in this period. Repeat means a prior non-cancelled order before period start. Unknown IDs are excluded explicitly; no customer PII is collected."
-          marks={(["new_buyer_share", "repeat_buyer_share"] as const).map(
-            (id) => {
+        <div className={styles.panelColumn}>
+          <RankedBars
+            title="Which garments contribute?"
+            note="Ranked net sales by actual product identity. Net units subtract cancellations and physical receipts, independently of refunds. Current names/photos link to immutable historical snapshots."
+            marks={productMarks}
+            limit={6}
+          />
+          <RankedBars
+            title="Which options need attention?"
+            note="Lowest available active options first. Two units or fewer needs attention; balances are current as-of, independent of the sales period. Open actual movements from each option."
+            marks={inventoryMarks}
+            ordered
+            limit={8}
+          />
+          <RankedBars
+            title="Who are the fictional buyers?"
+            note="Distinct known non-cancelled-order buyers in this period. Repeat means a prior non-cancelled order before period start. Unknown IDs are excluded explicitly; no customer PII is collected."
+            marks={(["new_buyer_share", "repeat_buyer_share"] as const).map(
+              (id) => {
+                const fact = model.registry.find((f) => f.factId === id)!;
+                return {
+                  key: id,
+                  label: labelOf(fact),
+                  fact,
+                  target: { kind: "metric", factId: id },
+                  magnitude: fact.numerator,
+                  magnitudeLabel: "fictional buyers",
+                };
+              },
+            )}
+            ordered
+          />
+          <RankedBars
+            title="What explains the demo result?"
+            note="Event-dated merchandise, sold-cost snapshots, operating expenses and available-stock loss. Negative cost reversals or corrections remain signed. This is simulated performance, not bank balance or cash flow."
+            marks={(
+              [
+                "net_sales",
+                "sold_cost",
+                "expenses",
+                "inventory_loss",
+                "operating_result",
+              ] as const
+            ).map((id) => {
               const fact = model.registry.find((f) => f.factId === id)!;
               return {
                 key: id,
                 label: labelOf(fact),
                 fact,
                 target: { kind: "metric", factId: id },
-                magnitude: fact.numerator,
-                magnitudeLabel: "fictional buyers",
               };
-            },
-          )}
-          ordered
-        />
-        <RankedBars
-          title="What explains the demo result?"
-          note="Event-dated merchandise, sold-cost snapshots, operating expenses and available-stock loss. Negative cost reversals or corrections remain signed. This is simulated performance, not bank balance or cash flow."
-          marks={(
+            })}
+            ordered
+          />
+        </div>
+        <div className={styles.panelColumn}>
+          <RankedBars
+            title="Where do demo visits reach?"
+            note="One nested session-start cohort, observed through as-of. Fictional seeded visits plus limited local shopper visits; owner/designer actions are excluded. Counts are unique visits, not clicks or orders."
+            marks={funnelMarks}
+            ordered
+          />
+          <RankedBars
+            title="What is the category mix?"
+            note="Current catalogue categories group exact historical product contributions. Signed contributions use bars around zero; a category rename does not rewrite old order snapshots."
+            marks={model.categories.map((r) => ({
+              key: r.category,
+              label: CATEGORY_LABELS[r.category],
+              fact: r.fact,
+              target: { kind: "category", category: r.category },
+            }))}
+          />
+          <RankedBars
+            title="Where does operating spend go?"
+            note="Posted demo expenses and linked signed corrections/voids, by posting date. Negative adjustments remain negative; inventory purchases are not charged again as operating spend."
+            marks={model.expenses.map((r) => ({
+              key: r.category,
+              label: r.category,
+              fact: r.fact,
+              target: { kind: "expense", category: r.category },
+            }))}
+          />
+          <RankedBars
+            title="Why were clothes received back?"
+            note="Recorded reasons for physical units actually received in this period. Requested returns and financial refunds are separate; this fictional small sample does not predict demand."
+            marks={model.returnReasons.map((r) => ({
+              key: r.reason,
+              label: r.reason.replaceAll("-", " "),
+              fact: r.fact,
+              target: { kind: "return-reason", reason: r.reason },
+            }))}
+          />
+        </div>
+      </div>
+      <section
+        className={styles.metricGroup}
+        aria-labelledby="store-health-heading"
+      >
+        <div className={styles.panelHeading}>
+          <h3 id="store-health-heading">Store health</h3>
+        </div>
+        <div className={styles.relatedFacts}>
+          {(
             [
-              "net_sales",
-              "sold_cost",
-              "expenses",
-              "inventory_loss",
-              "operating_result",
+              "gross_margin",
+              "result_margin",
+              "refunded_order_rate",
+              "returned_unit_rate",
+              "average_rating",
             ] as const
           ).map((id) => {
             const fact = model.registry.find((f) => f.factId === id)!;
-            return {
-              key: id,
-              label: labelOf(fact),
-              fact,
-              target: { kind: "metric", factId: id },
-            };
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() =>
+                  controller.openDashboardEvidence({
+                    kind: "metric",
+                    factId: id,
+                  })
+                }
+              >
+                <span>{labelOf(fact)}</span>
+                <strong>{factDisplay(fact)}</strong>
+                <small>
+                  {fact.reason ??
+                    `${fact.numerator} / ${fact.denominator} registered basis`}
+                </small>
+              </button>
+            );
           })}
-          ordered
-        />
-      </div>
-      <div className={styles.relatedFacts}>
-        {(
-          [
-            "gross_margin",
-            "result_margin",
-            "refunded_order_rate",
-            "returned_unit_rate",
-            "average_rating",
-          ] as const
-        ).map((id) => {
-          const fact = model.registry.find((f) => f.factId === id)!;
-          return (
-            <button
-              key={id}
-              type="button"
-              onClick={() =>
-                controller.openDashboardEvidence({ kind: "metric", factId: id })
-              }
-            >
-              <span>{labelOf(fact)}</span>
-              <strong>{factDisplay(fact)}</strong>
-              <small>
-                {fact.reason ??
-                  `${fact.numerator} / ${fact.denominator} registered basis`}
-              </small>
-            </button>
-          );
-        })}
-      </div>
+        </div>
+      </section>
       <EvidenceDrawer model={model} />
     </div>
   );
