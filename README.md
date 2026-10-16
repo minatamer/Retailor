@@ -1,29 +1,104 @@
+<div align="center">
+
 # Retailor
 
-Logo generation is local in every app mode: the storefront's bundled fonts and three authored marks replace the former AI image provider. One deliberate batch still supports spelling review, all-page preview and selection. Production retains its existing anti-bot/signing protections while logo generation is independent of paid AI enablement and OpenAI credentials. See [current logo policy](docs/engineering/LOGOS.md).
+**Your clothing. A beautiful storefront. An insightful dashboard.**
 
-Retailor is a clothing-only ecommerce demo: upload photos, review the AI-drafted catalogue, then let Tailor guide template, colour, typography and optional logo choices with a live preview. Three coherent three-page templates, four themes and three typography families produce 36 curated looks. Storefront and owner dashboard share one bounded browser workspace with product CRUD, bag/stock, simulated orders, returns/refunds, expenses, scenarios, exact chart evidence, export/reset and expiry. [Stripe sandbox checkout](docs/operations/CHECKOUT-STORAGE.md) shows the visitor's store name, selected options and uploaded photos; a verified payment return places the connected local demo order once and updates its bag/stock. It makes no real charge or shipment. Sandbox enablement/storage are fixed server settings; only the test API key stays in backend environment. No commerce database or shipping provider is involved.
+Personalize it with Tailor beside you.
 
-The fifteen shipped sample photos are original AI-generated clothing assets with a checked manifest/provenance. Every deliberate new public sample draft requires fresh live recognition; development output is visibly a fixture. Every product needs a validated available photo, including Tailor-created products. A wordmark is the default; optional three-logo generation follows confirmed colour/typography. English/USD are the baseline; optional dated EUR conversion applies to storefront display while owner finances stay USD.
+[The experience](#the-experience) · [Run locally](#run-locally) · [Project guide](#project-guide)
 
-The local demo is implemented in fake/paid-off mode. Actual paid-provider/account/billing/retention, owner/physical and hosted acceptance remain pending. Production rejects fake mode and safely disables paid operations without accepted prerequisites. Local Linux images and release files do not imply publication. See the [ticket queue](docs/tickets/README.md) for actual evidence.
+<img src="docs/assets/retailor-overview.png" width="1200" alt="Retailor editorial artwork: navy and lime typography reading Bring your products. Leave the rest to us., with blue jeans, an ivory shirt, fashion photo prints, the Tailor star and an illustrative dashboard chart." />
+
+</div>
+
+A few clothing photos. A brand that feels like yours. A place to see how it all comes together.
+
+Retailor is an interactive clothing ecommerce demo that takes your garments from photos to a reviewable catalogue, a personalized storefront and a connected owner dashboard. Tailor stays beside you through the experience: shaping the design, helping shoppers explore products and making the numbers easier to understand.
+
+## The experience
+
+| Start with           | Make it yours                                                                                                                                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Your clothes**     | Upload garment photos or explore the supplied sample collection. Review drafted names, descriptions and colours, then adjust size, price and stock defaults before including products in your store.               |
+| **Your style**       | Mix Home, Collection and Product layouts from three design families. Choose from five palettes and three typography families, name your store and keep a wordmark or explore three optional local logo directions. |
+| **Your storefront**  | Browse the collection, open products, choose options and build a bag. Garment cards in Tailor chat include small photos and open the referenced product.                                                           |
+| **Your perspective** | Move into the owner dashboard for connected garments, orders, returns, refunds and expenses. Hover over chart points for values and open the records behind a day or figure.                                       |
+
+The same workspace connects the shopping experience and the business view. A verified sandbox checkout return places a local demo order once and updates its bag, stock and owner records.
+
+## Tailor, beside you
+
+Ask for a different colour palette. Find jeans within a budget. Understand the day's operating profit. Prepare an expense for review.
+
+Tailor works with the current store and the role you are using. Supported requests can open products, filter the collection, preview a design or prepare a reviewed action. Source cards connect replies to the relevant garments and records, so you can keep exploring from the conversation.
+
+Every product needs an available, validated photo. Catalogue drafts and prepared changes stay reviewable; the assistant is part of the workflow, with the actual limited live results documented in the [walkthrough evidence](docs/validation/RTL-138.md).
 
 ## Run locally
 
-Use Node **24.19.0** and pinned pnpm **11.25.0**. Run `pnpm install --frozen-lockfile`, then `pnpm dev:backend` and `pnpm dev:frontend` in separate terminals. Open [Retailor on 4310](http://127.0.0.1:4310); backend liveness is [4311 /v1/health](http://127.0.0.1:4311/v1/health). These dedicated ports avoid sibling apps on 3000/4000. Launchers check ownership/listeners and refuse occupied ports; they never select another port or stop an existing service.
+Use **Node 24.19.0** and **pnpm 11.25.0**.
 
-No key/env file is required for fake development. Optional ignored `apps/frontend/.env.local` and `apps/backend/.env.local` load through normal app startup; committed `.env.example` files have safe defaults/blank secrets. Dev launchers force fake/paid-off inherited flags without changing the parent environment. Do not read sibling env files. Stop the **owning terminal** with Ctrl+C and verify its listener/process tree; never kill by executable name or port alone.
+```sh
+pnpm install --frozen-lockfile
+```
 
-`pnpm check` runs format, lint, strict app/test types, executable boundaries, isolated unpaid tests and both production builds. `pnpm build` compiles public workspace packages before apps. Development `.next-dev` stays separate from production `.next`. After a build, `pnpm start:backend` and `pnpm start:frontend` preserve normal explicit configuration in separate terminals; stop existing owned listeners first. Publication is separately authorized, never a build/test side effect.
+Start the backend and frontend in separate terminals:
 
-## Documentation and release preparation
+```sh
+pnpm dev:backend
+```
 
-All 22 tickets' independent local work is covered; required paid/owner/hosted acceptance remains pending. The [operator release status](docs/operations/RELEASE-STATUS.md) lists exact evidence, missing inputs and next checks. [Hosted verification](docs/operations/HOSTED-VERIFICATION.md) includes local-only preflight and bounded read-only GET tooling; no real hosted check or publication is inferred.
+```sh
+pnpm dev:frontend
+```
 
-- [Detailed blueprint](docs/RETAILOR_DEMO_SOURCE_OF_TRUTH.md) and [visual PM overview](docs/RETAILOR_OVERVIEW.html)
-- [Documentation navigation](docs/README.md), [22 tickets](docs/tickets/README.md) and actual [validation](docs/validation)
-- [Frontend guide](apps/frontend/README.md), [backend guide](apps/backend/README.md), [foundation](docs/engineering/FOUNDATION.md) and [security](docs/engineering/SECURITY.md)
-- [Image concurrency research/evidence](docs/engineering/IMAGE-CONCURRENCY.md)
-- [Provider prerequisites](docs/operations/PROVIDERS.md), [evaluation worksheet](docs/operations/EVALUATION.md) and [manual Linux release/rollback packet](docs/operations/RELEASE.md)
+Open [Retailor on port 4310](http://127.0.0.1:4310). Backend liveness is available at [port 4311 /v1/health](http://127.0.0.1:4311/v1/health).
 
-The backbone is strict ESM TypeScript, Next/React and Express in a pnpm workspace. `packages/contracts` owns narrow public schemas; `packages/commerce` owns pure exact domain/financial rules. Next's fixed server bridge keeps backend identity/configuration private. Explicit backend startup alone loads environment and listens. Intended hosting is Cloud Run, Artifact Registry, Secret Manager and Cloudflare with an IAM-private backend; resource/domain ownership is unconfirmed. Docker helpers use isolated uniquely owned local containers, no host ports and no provider access. They are explicit manual commands outside ordinary checks. Archived [concept](docs/retailor.md) and [HTML](docs/retailor.html) remain historical references.
+Development starts with fake AI and paid operations off; no API key or environment file is required. The launchers enforce these defaults and check the dedicated ports before starting. They refuse occupied ports instead of selecting replacements or stopping another service.
+
+Optional app-local configuration loads from ignored `apps/frontend/.env.local` and `apps/backend/.env.local` files. Committed `.env.example` files contain safe defaults and blank secrets. For live recognition/chat and checkout prerequisites, use the [backend guide](apps/backend/README.md), [provider guide](docs/operations/PROVIDERS.md) and [sandbox checkout guide](docs/operations/CHECKOUT-STORAGE.md).
+
+Stop the owning terminal with **Ctrl+C** and verify its listener/process tree before restarting. Never stop another app by executable name or port alone.
+
+### Quality checks and production builds
+
+```sh
+pnpm check
+```
+
+This runs formatting, lint, strict app/test types, import boundaries, isolated unpaid unit tests and both production builds. `pnpm build` compiles the public workspace packages before the apps. Development output in `.next-dev` stays separate from production `.next`.
+
+After building, `pnpm start:backend` and `pnpm start:frontend` run in separate terminals with normal explicit configuration. Stop existing owned listeners first. Production rejects fake AI; live availability depends on the paid master and required credentials. See [provider operations](docs/operations/PROVIDERS.md) for configuration and admission limits.
+
+## Inside the demo
+
+- **Photos:** nineteen supplied sample images have recorded provenance. Each deliberate public sample draft requires fresh live recognition; fake development uses explicit fixtures. Photo recognition can need grouping corrections during review.
+- **Branding:** a wordmark is the default. Optional logos use bundled fonts and three authored local compositions in every app mode, with spelling review and all-page preview before selection. See the [logo policy](docs/engineering/LOGOS.md).
+- **Commerce:** business activity is fictional. Stripe sandbox checkout makes no real charge or shipment; its selected photo sharing, storage and return behavior are documented in the [checkout guide](docs/operations/CHECKOUT-STORAGE.md).
+- **Workspace:** storefront and dashboard share one bounded browser session with restore, export, reset and expiry. English/USD is the baseline; optional dated EUR conversion changes storefront display while owner finances remain USD. See the [workspace lifecycle](docs/engineering/LIFECYCLE.md).
+- **Artwork:** the README hero is generated editorial artwork. Actual interface behavior and provider results are recorded separately in validation.
+
+## Built with
+
+| Layer                            | Responsibility                                                                                                                                  |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Next.js + React**              | Storefront, owner dashboard and one bounded session controller. Fixed server bridge operations keep backend identity and configuration private. |
+| **Express**                      | Explicit startup, validated operation routes and injected providers. Live-provider failure remains distinct from development fixtures.          |
+| **`packages/contracts`**         | Narrow browser-safe public schemas shared across the workspace.                                                                                 |
+| **`packages/commerce`**          | Pure, exact domain and financial rules behind the connected records and charts.                                                                 |
+| **pnpm + strict ESM TypeScript** | Workspace builds, public package boundaries and shared quality gates.                                                                           |
+
+## Project guide
+
+| Read                                                                                                                                                               | For                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| [Frontend](apps/frontend/README.md) · [Backend](apps/backend/README.md)                                                                                            | App setup, commands and configuration.                                                                     |
+| [Documentation map](docs/README.md) · [Product blueprint](docs/RETAILOR_DEMO_SOURCE_OF_TRUTH.md) · [Visual overview](docs/RETAILOR_OVERVIEW.html)                  | Product scope, architecture and the original design story. Later ticket decisions govern revised behavior. |
+| [Foundation](docs/engineering/FOUNDATION.md) · [Security](docs/engineering/SECURITY.md)                                                                            | Boundaries, runtime design and retained controls.                                                          |
+| [Recognition](docs/engineering/RECOGNITION.md) · [Image concurrency](docs/engineering/IMAGE-CONCURRENCY.md)                                                        | Photo processing, grouping and bounded work.                                                               |
+| [Tickets](docs/tickets/README.md) · [Validation records](docs/validation)                                                                                          | Implementation decisions, actual checks and remaining limitations.                                         |
+| [Release status](docs/operations/RELEASE-STATUS.md) · [Hosted verification](docs/operations/HOSTED-VERIFICATION.md) · [Release packet](docs/operations/RELEASE.md) | Operator evidence, deployment prerequisites and rollback preparation.                                      |
+| [Provider operations](docs/operations/PROVIDERS.md) · [Evaluation worksheet](docs/operations/EVALUATION.md)                                                        | Live configuration and provider evaluation.                                                                |
+
+The latest committed application snapshot passed all six local quality gates, including **646 unit tests**. Actual local live checks covered sample/upload processing and selected creator, shopper and dashboard actions, with imperfect full-sample grouping and limited conversational coverage recorded in [RTL-138](docs/validation/RTL-138.md). [RTL-140](docs/validation/RTL-140.md) binds the completed application checks to the committed files. Current public/paid release acceptance, refreshed Linux/image/scanner evidence, hosted ingress/account-cost enforcement and physical-device acceptance remain unverified. Local results do not imply deployment approval.

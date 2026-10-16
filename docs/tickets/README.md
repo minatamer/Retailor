@@ -1,5 +1,7 @@
 # Retailor implementation tickets
 
+Editorial project README: [RTL-141](RTL-141-editorial-readme.md) adds the owner's selected navy/lime garment artwork and a marketing-led product story, refreshes obsolete feature wording and retains setup, architecture and evidence links. [Validation](../validation/RTL-141.md) records documentation/image checks and the approved commit scope; application bytes and external release status remain unchanged.
+
 Approved live-fix commit batch: [RTL-140](RTL-140-commit-live-demo-fixes.md) allocates the33 final RTL-138/139 and packaging paths into five cohesive commits under the owner's explicit stage/commit approval. [Packaging evidence](../validation/RTL-140.md) records exact-byte/staged verification and the actual ledger. This later authorization supersedes those tickets' historical no-commit scope; existing live-quality limits and external release status remain unchanged.
 
 Chat garment photos: [RTL-139](RTL-139-chat-garment-thumbnails.md) adds compact supplied garment thumbnails to current Tailor source cards while preserving whole-card product navigation. [Validation](../validation/RTL-139.md) records actual changed-path checks and local gates as completed. The later RTL-140 batch preserves and commits the approved RTL-138/139 work.
