@@ -12,6 +12,9 @@
 .workspace[data-full-page="true"] .main {
   flex: 1;
 }
+.workspace[data-storefront-workspace="true"] {
+  background: var(--store-canvas);
+}
 .workspace[data-storefront-workspace="true"] .main {
   width: 100%;
   margin: 0;
@@ -216,8 +219,8 @@
   padding-block: 12px max(20px, env(safe-area-inset-bottom));
 }
 .workspace[data-storefront-workspace="true"] .footer {
-  border-top: 0;
-  padding-top: 0;
+  border-top-color: var(--store-border);
+  padding-top: 12px;
   gap: 16px;
 }
 .attribution {
@@ -388,10 +391,56 @@
 }
 .excluded {
   border-style: dashed;
+  border-color: var(--platform-muted);
 }
-.excluded .cardPhoto img {
-  filter: saturate(0.4);
-  opacity: 0.65;
+.reviewPhoto {
+  display: block;
+  position: relative;
+  isolation: isolate;
+}
+.reviewPhoto img {
+  transition:
+    filter 0.25s,
+    opacity 0.25s;
+}
+.excluded .reviewPhoto img {
+  filter: grayscale(1);
+  opacity: 0.42;
+}
+.excluded .cardBody {
+  color: var(--platform-muted);
+}
+.excludedCover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff2e, #ffffff80);
+  pointer-events: none;
+}
+.excludedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 30px;
+  padding: 10px 16px;
+  background: var(--platform-action);
+  color: var(--platform-action-text);
+  box-shadow: 0 4px 16px #242b601a;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.excludedCaption {
+  margin-top: 10px;
+  color: var(--platform-text);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.5;
 }
 .cardPhoto {
   aspect-ratio: 4/4.5;

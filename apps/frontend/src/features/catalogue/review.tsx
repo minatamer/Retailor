@@ -155,13 +155,25 @@ export function CatalogueReview() {
                 type="button"
                 className={photoStyles.openPhoto}
                 onClick={() => setEditing(product.id)}
-                aria-label={`Edit ${product.title}`}
+                aria-label={`Edit ${product.title}${item.included ? "" : ", excluded from store"}`}
               >
-                <PhotoStack
-                  photos={photos}
-                  count={product.imageIds.length}
-                  label={product.title}
-                />
+                <span className={styles.reviewPhoto}>
+                  <PhotoStack
+                    photos={photos}
+                    count={product.imageIds.length}
+                    label={product.title}
+                  />
+                  {!item.included && (
+                    <span className={styles.excludedCover}>
+                      <span className={styles.excludedBadge}>
+                        <Icon name="close" size={18} /> Excluded
+                      </span>
+                      <span className={styles.excludedCaption}>
+                        Not in your store
+                      </span>
+                    </span>
+                  )}
+                </span>
                 <span className={styles.cardBody}>
                   <small>
                     {CATEGORY_LABELS[product.category]} ·{" "}
@@ -221,7 +233,7 @@ export function CatalogueReview() {
                     : ""}
                 </span>
                 <Button
-                  variant="quiet"
+                  variant={item.included ? "quiet" : "secondary"}
                   onClick={() => controller.include(product.id, !item.included)}
                 >
                   {item.included ? "Exclude" : "Include garment"}

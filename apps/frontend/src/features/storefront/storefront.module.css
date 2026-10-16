@@ -719,20 +719,6 @@
   gap: 12px;
   text-align: center;
 }
-.footer strong {
-  max-width: 100%;
-  font-family: var(--store-heading);
-  font-size: 22px;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-.footerLogo {
-  display: block;
-  width: min(240px, 100%);
-  height: auto;
-  max-height: 56px;
-  object-fit: contain;
-}
 .footer button {
   font-size: 10px;
   line-height: 1.6;

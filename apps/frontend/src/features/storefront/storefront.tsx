@@ -400,26 +400,13 @@ export function Storefront({
               />
             ))}
         </div>
-        <footer className={styles.footer}>
-          {input.logoUrl && design.logoId ? (
-            <Image
-              unoptimized
-              width={input.logoSize?.width ?? 240}
-              height={input.logoSize?.height ?? 56}
-              className={styles.footerLogo}
-              src={input.logoUrl}
-              alt={design.name}
-              onError={() => actions.logoFailed?.(design.logoId!)}
-            />
-          ) : (
-            <strong>{design.name}</strong>
-          )}
-          {!(input.fullPage && !preview) && (
+        {!(input.fullPage && !preview) && (
+          <footer className={styles.footer}>
             <button onClick={actions.owner} data-tailor-target="store-owner">
               {preview ? "Back to garment review" : "Owner workspace"} ↗
             </button>
-          )}
-        </footer>
+          </footer>
+        )}
       </div>
     </section>
   );

@@ -20,6 +20,7 @@ import { BagDialog } from "../bag/bag-dialog";
 import { selectedScope } from "../currency/display";
 import { OwnerWorkspace } from "../dashboard/owner-workspace";
 import { OwnerDesign } from "../store-design/owner-design";
+import { merchantStyle } from "../store-design/presets";
 import styles from "./workspace.module.css";
 export function Workspace({
   fixtureAllowed,
@@ -80,6 +81,13 @@ function WorkspaceFlow() {
   return (
     <main
       className={styles.workspace}
+      style={
+        state.stage === "storefront"
+          ? merchantStyle(
+              state.designEditing ? state.previewDesign : state.acceptedDesign,
+            )
+          : undefined
+      }
       data-owner-workspace={state.stage === "dashboard" ? "true" : undefined}
       data-storefront-workspace={
         state.stage === "storefront" ? "true" : undefined
