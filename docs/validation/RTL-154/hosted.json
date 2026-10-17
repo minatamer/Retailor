@@ -1,0 +1,1112 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-17T11:22:48.437Z",
+  "deploymentRevision": "eb704fb9e453d74e2275a33e887c8a8aaf1500d3",
+  "sourceFingerprint": "645969e052880bbb143a0ff345e82c1b914520eeb1ea2f3c680342e027d4470f",
+  "projectId": "retailor-511714",
+  "region": "europe-west1",
+  "canonicalFrontendOrigin": "https://retailor-frontend-188132745113.europe-west1.run.app",
+  "registryRepository": "retailor",
+  "immutableCandidateTag": "rtl154-eb704fb",
+  "audience": "Public frontend / IAM-private backend",
+  "paidAIEnabled": false,
+  "publicReleaseAccepted": false,
+  "services": {
+    "backend": {
+      "service": "retailor-backend",
+      "primaryUrl": "https://retailor-backend-xmacampiyq-ew.a.run.app",
+      "managedUrls": [
+        "https://retailor-backend-188132745113.europe-west1.run.app",
+        "https://retailor-backend-xmacampiyq-ew.a.run.app"
+      ],
+      "revision": "retailor-backend-00002-z6r",
+      "ready": true,
+      "traffic": [
+        {
+          "percent": 100,
+          "revisionName": "retailor-backend-00002-z6r"
+        }
+      ],
+      "registryImage": "europe-west1-docker.pkg.dev/retailor-511714/retailor/backend@sha256:f516175efb04d54ef8a2017e940b13de1b6464199da93929beb56d9f59406eca",
+      "runtimeIdentity": "retailor-backend@retailor-511714.iam.gserviceaccount.com",
+      "iamInvokerEnforced": true,
+      "iamBindings": [
+        {
+          "members": [
+            "serviceAccount:retailor-frontend@retailor-511714.iam.gserviceaccount.com"
+          ],
+          "role": "roles/run.invoker"
+        }
+      ],
+      "ingress": "all",
+      "minInstances": 0,
+      "maxServiceInstances": 1,
+      "maxRevisionInstances": 1,
+      "cpu": "1",
+      "memory": "1Gi",
+      "concurrency": 4,
+      "timeoutSeconds": 200,
+      "startupProbe": {
+        "failureThreshold": 24,
+        "httpGet": {
+          "path": "/v1/health",
+          "port": 4311
+        },
+        "periodSeconds": 5,
+        "timeoutSeconds": 2
+      },
+      "cpuThrottling": true,
+      "startupCpuBoost": false,
+      "environment": {
+        "APP_ENV": "production",
+        "FAKE_MODE": "false",
+        "PAID_DEMO_ENABLED": "false",
+        "FRONTEND_ORIGIN": "https://retailor-frontend-188132745113.europe-west1.run.app"
+      },
+      "secretReferences": [
+        {
+          "environment": "OPENAI_API_KEY",
+          "secret": "OPENAI_API_KEY",
+          "version": "1"
+        },
+        {
+          "environment": "TURNSTILE_SECRET_KEY",
+          "secret": "TURNSTILE_SECRET_KEY",
+          "version": "1"
+        },
+        {
+          "environment": "TURNSTILE_SITE_KEY",
+          "secret": "TURNSTILE_SITE_KEY",
+          "version": "1"
+        },
+        {
+          "environment": "GRANT_SIGNING_SECRET",
+          "secret": "GRANT_SIGNING_SECRET",
+          "version": "1"
+        },
+        {
+          "environment": "STRIPE_API_KEY",
+          "secret": "STRIPE_API_KEY",
+          "version": "1"
+        }
+      ]
+    },
+    "frontend": {
+      "service": "retailor-frontend",
+      "primaryUrl": "https://retailor-frontend-xmacampiyq-ew.a.run.app",
+      "managedUrls": [
+        "https://retailor-frontend-188132745113.europe-west1.run.app",
+        "https://retailor-frontend-xmacampiyq-ew.a.run.app"
+      ],
+      "revision": "retailor-frontend-00001-fp5",
+      "ready": true,
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100,
+          "revisionName": "retailor-frontend-00001-fp5"
+        }
+      ],
+      "registryImage": "europe-west1-docker.pkg.dev/retailor-511714/retailor/frontend@sha256:1ed2d5b23c1e34fd1f39ca32d828bd97d77659dfcc86feed1349eca0e9446ff5",
+      "runtimeIdentity": "retailor-frontend@retailor-511714.iam.gserviceaccount.com",
+      "iamInvokerEnforced": true,
+      "iamBindings": [
+        {
+          "members": ["allUsers"],
+          "role": "roles/run.invoker"
+        }
+      ],
+      "ingress": "all",
+      "minInstances": 0,
+      "maxServiceInstances": 1,
+      "maxRevisionInstances": 1,
+      "cpu": "1",
+      "memory": "512Mi",
+      "concurrency": 8,
+      "timeoutSeconds": 210,
+      "startupProbe": {
+        "failureThreshold": 24,
+        "periodSeconds": 5,
+        "tcpSocket": {
+          "port": 4310
+        },
+        "timeoutSeconds": 2
+      },
+      "cpuThrottling": true,
+      "startupCpuBoost": false,
+      "environment": {
+        "APP_ENV": "production",
+        "RETAILOR_DEV": "false",
+        "RETAILOR_ORIGIN_GUARD": "disabled",
+        "FRONTEND_ORIGIN": "https://retailor-frontend-188132745113.europe-west1.run.app",
+        "BACKEND_ORIGIN": "https://retailor-backend-xmacampiyq-ew.a.run.app",
+        "BACKEND_AUDIENCE": "https://retailor-backend-xmacampiyq-ew.a.run.app"
+      },
+      "secretReferences": []
+    }
+  },
+  "verification": {
+    "privateBootstrap": {
+      "schemaVersion": 1,
+      "observedAt": "2026-10-17T11:09:43.626Z",
+      "projectId": "retailor-511714",
+      "region": "europe-west1",
+      "execution": "Actual private Cloud Run HTTPS GETs, operator token held in memory only",
+      "unauthenticated": [
+        {
+          "origin": "https://retailor-backend-xmacampiyq-ew.a.run.app",
+          "path": "/v1/health",
+          "status": 403,
+          "denied": true
+        },
+        {
+          "origin": "https://retailor-backend-xmacampiyq-ew.a.run.app",
+          "path": "/v1/config",
+          "status": 403,
+          "denied": true
+        },
+        {
+          "origin": "https://retailor-backend-188132745113.europe-west1.run.app",
+          "path": "/v1/health",
+          "status": 403,
+          "denied": true
+        },
+        {
+          "origin": "https://retailor-backend-188132745113.europe-west1.run.app",
+          "path": "/v1/config",
+          "status": 403,
+          "denied": true
+        },
+        {
+          "origin": "https://retailor-frontend-188132745113.europe-west1.run.app",
+          "path": "/",
+          "status": 403,
+          "denied": true
+        },
+        {
+          "origin": "https://retailor-frontend-188132745113.europe-west1.run.app",
+          "path": "/api/retailor/v1/config",
+          "status": 403,
+          "denied": true
+        },
+        {
+          "origin": "https://retailor-frontend-188132745113.europe-west1.run.app",
+          "path": "/sample/forme/F20.webp",
+          "status": 403,
+          "denied": true
+        },
+        {
+          "origin": "https://retailor-frontend-xmacampiyq-ew.a.run.app",
+          "path": "/",
+          "status": 403,
+          "denied": true
+        },
+        {
+          "origin": "https://retailor-frontend-xmacampiyq-ew.a.run.app",
+          "path": "/api/retailor/v1/config",
+          "status": 403,
+          "denied": true
+        },
+        {
+          "origin": "https://retailor-frontend-xmacampiyq-ew.a.run.app",
+          "path": "/sample/forme/F20.webp",
+          "status": 403,
+          "denied": true
+        }
+      ],
+      "backend": [
+        {
+          "path": "/v1/health",
+          "status": 200,
+          "expected": 200,
+          "bytes": 65
+        },
+        {
+          "path": "/v1/ready",
+          "status": 503,
+          "expected": 503,
+          "bytes": 47
+        },
+        {
+          "path": "/v1/config",
+          "status": 200,
+          "expected": 200,
+          "bytes": 340
+        }
+      ],
+      "frontend": {
+        "schemaVersion": 1,
+        "observedAt": "2026-10-17T11:09:43.622Z",
+        "execution": "hosted-read-only-get",
+        "origin": "https://retailor-frontend-188132745113.europe-west1.run.app",
+        "expectPaid": false,
+        "plannedRequests": 36,
+        "completedRequests": 36,
+        "paidRequests": 0,
+        "automaticRetries": 0,
+        "outcome": "pass",
+        "rows": [
+          {
+            "path": "/",
+            "status": 200,
+            "bytes": 42724,
+            "durationMs": 125,
+            "sha256": null,
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/demo",
+            "status": 200,
+            "bytes": 10263,
+            "durationMs": 111,
+            "sha256": null,
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/design",
+            "status": 404,
+            "bytes": 8622,
+            "durationMs": 107,
+            "sha256": null,
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/api/retailor/v1/config",
+            "status": 200,
+            "bytes": 340,
+            "durationMs": 139,
+            "sha256": null,
+            "capabilities": {
+              "mode": "live",
+              "paidEnabled": false,
+              "visionAvailable": false,
+              "tailorAvailable": false,
+              "logosAvailable": true,
+              "eurAvailable": true
+            },
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/api/retailor/v1/not-an-operation",
+            "status": 404,
+            "bytes": 167,
+            "durationMs": 99,
+            "sha256": null,
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F01.webp",
+            "status": 200,
+            "bytes": 175264,
+            "durationMs": 265,
+            "sha256": "1cece25a55b40ca865604049d6dfd351f2261ba0ee6b08b34d8e067b35b1e06f",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F02.webp",
+            "status": 200,
+            "bytes": 85032,
+            "durationMs": 233,
+            "sha256": "16dd4882013a3ade901a26b050c0fd2d4b0fd2b185401fa12c361c52358aeecc",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F03.webp",
+            "status": 200,
+            "bytes": 70614,
+            "durationMs": 111,
+            "sha256": "bdbfa926f23b612e5c4586942e6320ac1ff886960b6f0e65ada1f8b37dcc5e9b",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F04.webp",
+            "status": 200,
+            "bytes": 120532,
+            "durationMs": 150,
+            "sha256": "3f53f55da75732b47f03885c9b82b83836f6f43c6bbff5705f928dba83dc4146",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F05.webp",
+            "status": 200,
+            "bytes": 26440,
+            "durationMs": 93,
+            "sha256": "780c14b5cc04ffb3ad5e27b7d74ecb2dacfb49816b480ed9323676887439ba3d",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F06.webp",
+            "status": 200,
+            "bytes": 86174,
+            "durationMs": 118,
+            "sha256": "b8773a56592808e8737c006c3ca43af996d3c6cad51e991a4c4b242a43cc2f00",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F07.webp",
+            "status": 200,
+            "bytes": 69360,
+            "durationMs": 115,
+            "sha256": "55ec131ef0e5ac6d9bc4db08858a21dde7baa3e78071ae59aec22e781a556338",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F08.webp",
+            "status": 200,
+            "bytes": 123974,
+            "durationMs": 133,
+            "sha256": "ad5de867adb239d5c28ee338b40faa4bb82a8f212127de39e4969f732539f2e7",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F09.webp",
+            "status": 200,
+            "bytes": 59234,
+            "durationMs": 116,
+            "sha256": "d99820cddcf457f415ee34eec9c06a949929b47124bd32a0c18c42ca6a425a29",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F10.webp",
+            "status": 200,
+            "bytes": 92798,
+            "durationMs": 130,
+            "sha256": "19214941f6a8cecc1b4f87fc3b04913c2c2ef55fa500408a83964b03f5275f47",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F11.webp",
+            "status": 200,
+            "bytes": 251246,
+            "durationMs": 196,
+            "sha256": "46ac9d2da862fb76482192115709a83baa152cbd6213053fbc1226753a7e278e",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F12.webp",
+            "status": 200,
+            "bytes": 33314,
+            "durationMs": 104,
+            "sha256": "3ebc75ea35a7dfc6df6d5c5e5166021ef05998879ea4030720e8fc919a99d9aa",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F13.webp",
+            "status": 200,
+            "bytes": 32898,
+            "durationMs": 100,
+            "sha256": "a76a2a46a651d73af604dd68bf92b29256d3ac5f9b54204f4035987668a98576",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F14.webp",
+            "status": 200,
+            "bytes": 123148,
+            "durationMs": 124,
+            "sha256": "b19a2dd86a5a3511326931731eea8f09f70f8e0bff23f754f0a362d04207bc62",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F15.webp",
+            "status": 200,
+            "bytes": 55984,
+            "durationMs": 120,
+            "sha256": "10703c61fdd98328b109066a5e7776910867e06066bad7bbcf17042834a0e8d3",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F16.webp",
+            "status": 200,
+            "bytes": 208514,
+            "durationMs": 146,
+            "sha256": "be863622ccecc956b4d6531f8c16025c764663db989f22687093a8bb7bc53cd8",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F17.webp",
+            "status": 200,
+            "bytes": 75496,
+            "durationMs": 98,
+            "sha256": "68eda8004781af7a163f8ebfb309036acb11ba47de0e9e892a90c639ed2f0173",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F18.webp",
+            "status": 200,
+            "bytes": 49282,
+            "durationMs": 100,
+            "sha256": "85cd5abf6d0871ce2cdc308fe12d2443dd9f28cd7295b19edf5d508f6e9ee3e4",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F19.webp",
+            "status": 200,
+            "bytes": 182096,
+            "durationMs": 149,
+            "sha256": "3bfd09508ff9a648ea0a73a0f765ca37cfb891b5e6eb1a3a618b441ea1c5f106",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F20.webp",
+            "status": 200,
+            "bytes": 34508,
+            "durationMs": 99,
+            "sha256": "e03f0dd9e30915787531d1b09515071449d0d98180780058a18b16929d1c2b77",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/manifest.json",
+            "status": 200,
+            "bytes": 7404,
+            "durationMs": 100,
+            "sha256": "35f6c41f0f00aa974b0c673a402958f31dfff247c983117b6a7d1416f7ecc2ce",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/inter-latin-wght-normal.woff2",
+            "status": 200,
+            "bytes": 48256,
+            "durationMs": 113,
+            "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/dm-sans-latin-wght-normal.woff2",
+            "status": 200,
+            "bytes": 36932,
+            "durationMs": 94,
+            "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/dm-serif-display-latin-400-normal.woff2",
+            "status": 200,
+            "bytes": 24744,
+            "durationMs": 104,
+            "sha256": "fdf61e20fd2c0108e0ea28da4daca0035205b4b7fc031a3974b865b704de160a",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/dm-serif-display-latin-400-italic.woff2",
+            "status": 200,
+            "bytes": 24572,
+            "durationMs": 94,
+            "sha256": "ed8b291611e32fa2d2900488dd48fc95faf0957b2ef7ddf1527e8d21dd9cf2df",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/manrope-latin-wght-normal.woff2",
+            "status": 200,
+            "bytes": 24836,
+            "durationMs": 102,
+            "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/inter-OFL.txt",
+            "status": 200,
+            "bytes": 4477,
+            "durationMs": 95,
+            "sha256": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/dm-sans-OFL.txt",
+            "status": 200,
+            "bytes": 4502,
+            "durationMs": 85,
+            "sha256": "6fbd040a29c2037a765dfb9f2561e9965b5c95c6dcb5dce516089d63d5f17af7",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/dm-serif-display-OFL.txt",
+            "status": 200,
+            "bytes": 4599,
+            "durationMs": 95,
+            "sha256": "e9d4ced9825bf03a6b634c37fe8ae974f6d1b80fbb0bd3ae9b089987e4dc541b",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/manrope-OFL.txt",
+            "status": 200,
+            "bytes": 4383,
+            "durationMs": 93,
+            "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/provenance.json",
+            "status": 200,
+            "bytes": 2068,
+            "durationMs": 99,
+            "sha256": "9204e11248f2f22dacbe874101181b0a10d1ed6d07a69d114ac8f94ca9bdf2e5",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          }
+        ],
+        "limitations": [
+          "GET delivery/config only: no IAM denial, genuine AI, Turnstile/action admission, live smoke, visual motion, lifecycle, peak capacity or rollback is established.",
+          "Expected paid capability does not enable or authorize a provider call."
+        ]
+      },
+      "paidRequests": 0,
+      "tokenSaved": false,
+      "secretValuesRead": false,
+      "limitations": [
+        "Private unpaid GET verification; public origin/edge/account controls and paid connected/browser smoke remain unverified",
+        "Authenticated frontend config proves the actual workload-identity bridge to the IAM-private backend",
+        "No secret value, token, model call, payment or storage object is generated by this helper"
+      ]
+    },
+    "publicFrontend": {
+      "schemaVersion": 1,
+      "observedAt": "2026-10-17T11:21:41.510Z",
+      "ownerInstruction": "Remove frontend authentication; backend remains private",
+      "frontend": {
+        "schemaVersion": 1,
+        "observedAt": "2026-10-17T11:21:39.736Z",
+        "execution": "hosted-read-only-get",
+        "origin": "https://retailor-frontend-188132745113.europe-west1.run.app",
+        "expectPaid": false,
+        "plannedRequests": 36,
+        "completedRequests": 36,
+        "paidRequests": 0,
+        "automaticRetries": 0,
+        "outcome": "pass",
+        "rows": [
+          {
+            "path": "/",
+            "status": 200,
+            "bytes": 42724,
+            "durationMs": 546,
+            "sha256": null,
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/demo",
+            "status": 200,
+            "bytes": 10263,
+            "durationMs": 97,
+            "sha256": null,
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/design",
+            "status": 404,
+            "bytes": 8622,
+            "durationMs": 121,
+            "sha256": null,
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/api/retailor/v1/config",
+            "status": 200,
+            "bytes": 340,
+            "durationMs": 139,
+            "sha256": null,
+            "capabilities": {
+              "mode": "live",
+              "paidEnabled": false,
+              "visionAvailable": false,
+              "tailorAvailable": false,
+              "logosAvailable": true,
+              "eurAvailable": true
+            },
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/api/retailor/v1/not-an-operation",
+            "status": 404,
+            "bytes": 167,
+            "durationMs": 221,
+            "sha256": null,
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F01.webp",
+            "status": 200,
+            "bytes": 175264,
+            "durationMs": 380,
+            "sha256": "1cece25a55b40ca865604049d6dfd351f2261ba0ee6b08b34d8e067b35b1e06f",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F02.webp",
+            "status": 200,
+            "bytes": 85032,
+            "durationMs": 223,
+            "sha256": "16dd4882013a3ade901a26b050c0fd2d4b0fd2b185401fa12c361c52358aeecc",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F03.webp",
+            "status": 200,
+            "bytes": 70614,
+            "durationMs": 429,
+            "sha256": "bdbfa926f23b612e5c4586942e6320ac1ff886960b6f0e65ada1f8b37dcc5e9b",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F04.webp",
+            "status": 200,
+            "bytes": 120532,
+            "durationMs": 204,
+            "sha256": "3f53f55da75732b47f03885c9b82b83836f6f43c6bbff5705f928dba83dc4146",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F05.webp",
+            "status": 200,
+            "bytes": 26440,
+            "durationMs": 101,
+            "sha256": "780c14b5cc04ffb3ad5e27b7d74ecb2dacfb49816b480ed9323676887439ba3d",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F06.webp",
+            "status": 200,
+            "bytes": 86174,
+            "durationMs": 151,
+            "sha256": "b8773a56592808e8737c006c3ca43af996d3c6cad51e991a4c4b242a43cc2f00",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F07.webp",
+            "status": 200,
+            "bytes": 69360,
+            "durationMs": 124,
+            "sha256": "55ec131ef0e5ac6d9bc4db08858a21dde7baa3e78071ae59aec22e781a556338",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F08.webp",
+            "status": 200,
+            "bytes": 123974,
+            "durationMs": 152,
+            "sha256": "ad5de867adb239d5c28ee338b40faa4bb82a8f212127de39e4969f732539f2e7",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F09.webp",
+            "status": 200,
+            "bytes": 59234,
+            "durationMs": 115,
+            "sha256": "d99820cddcf457f415ee34eec9c06a949929b47124bd32a0c18c42ca6a425a29",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F10.webp",
+            "status": 200,
+            "bytes": 92798,
+            "durationMs": 120,
+            "sha256": "19214941f6a8cecc1b4f87fc3b04913c2c2ef55fa500408a83964b03f5275f47",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F11.webp",
+            "status": 200,
+            "bytes": 251246,
+            "durationMs": 517,
+            "sha256": "46ac9d2da862fb76482192115709a83baa152cbd6213053fbc1226753a7e278e",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F12.webp",
+            "status": 200,
+            "bytes": 33314,
+            "durationMs": 269,
+            "sha256": "3ebc75ea35a7dfc6df6d5c5e5166021ef05998879ea4030720e8fc919a99d9aa",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F13.webp",
+            "status": 200,
+            "bytes": 32898,
+            "durationMs": 122,
+            "sha256": "a76a2a46a651d73af604dd68bf92b29256d3ac5f9b54204f4035987668a98576",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F14.webp",
+            "status": 200,
+            "bytes": 123148,
+            "durationMs": 280,
+            "sha256": "b19a2dd86a5a3511326931731eea8f09f70f8e0bff23f754f0a362d04207bc62",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F15.webp",
+            "status": 200,
+            "bytes": 55984,
+            "durationMs": 239,
+            "sha256": "10703c61fdd98328b109066a5e7776910867e06066bad7bbcf17042834a0e8d3",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F16.webp",
+            "status": 200,
+            "bytes": 208514,
+            "durationMs": 338,
+            "sha256": "be863622ccecc956b4d6531f8c16025c764663db989f22687093a8bb7bc53cd8",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F17.webp",
+            "status": 200,
+            "bytes": 75496,
+            "durationMs": 254,
+            "sha256": "68eda8004781af7a163f8ebfb309036acb11ba47de0e9e892a90c639ed2f0173",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F18.webp",
+            "status": 200,
+            "bytes": 49282,
+            "durationMs": 155,
+            "sha256": "85cd5abf6d0871ce2cdc308fe12d2443dd9f28cd7295b19edf5d508f6e9ee3e4",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F19.webp",
+            "status": 200,
+            "bytes": 182096,
+            "durationMs": 520,
+            "sha256": "3bfd09508ff9a648ea0a73a0f765ca37cfb891b5e6eb1a3a618b441ea1c5f106",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/F20.webp",
+            "status": 200,
+            "bytes": 34508,
+            "durationMs": 115,
+            "sha256": "e03f0dd9e30915787531d1b09515071449d0d98180780058a18b16929d1c2b77",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/sample/forme/manifest.json",
+            "status": 200,
+            "bytes": 7404,
+            "durationMs": 99,
+            "sha256": "35f6c41f0f00aa974b0c673a402958f31dfff247c983117b6a7d1416f7ecc2ce",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/inter-latin-wght-normal.woff2",
+            "status": 200,
+            "bytes": 48256,
+            "durationMs": 157,
+            "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/dm-sans-latin-wght-normal.woff2",
+            "status": 200,
+            "bytes": 36932,
+            "durationMs": 145,
+            "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/dm-serif-display-latin-400-normal.woff2",
+            "status": 200,
+            "bytes": 24744,
+            "durationMs": 113,
+            "sha256": "fdf61e20fd2c0108e0ea28da4daca0035205b4b7fc031a3974b865b704de160a",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/dm-serif-display-latin-400-italic.woff2",
+            "status": 200,
+            "bytes": 24572,
+            "durationMs": 117,
+            "sha256": "ed8b291611e32fa2d2900488dd48fc95faf0957b2ef7ddf1527e8d21dd9cf2df",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/manrope-latin-wght-normal.woff2",
+            "status": 200,
+            "bytes": 24836,
+            "durationMs": 168,
+            "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/inter-OFL.txt",
+            "status": 200,
+            "bytes": 4477,
+            "durationMs": 126,
+            "sha256": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/dm-sans-OFL.txt",
+            "status": 200,
+            "bytes": 4502,
+            "durationMs": 123,
+            "sha256": "6fbd040a29c2037a765dfb9f2561e9965b5c95c6dcb5dce516089d63d5f17af7",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/dm-serif-display-OFL.txt",
+            "status": 200,
+            "bytes": 4599,
+            "durationMs": 114,
+            "sha256": "e9d4ced9825bf03a6b634c37fe8ae974f6d1b80fbb0bd3ae9b089987e4dc541b",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/manrope-OFL.txt",
+            "status": 200,
+            "bytes": 4383,
+            "durationMs": 139,
+            "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          },
+          {
+            "path": "/fonts/provenance.json",
+            "status": 200,
+            "bytes": 2068,
+            "durationMs": 130,
+            "sha256": "9204e11248f2f22dacbe874101181b0a10d1ed6d07a69d114ac8f94ca9bdf2e5",
+            "capabilities": null,
+            "mimeValid": true,
+            "outcome": "pass"
+          }
+        ],
+        "limitations": [
+          "GET delivery/config only: no IAM denial, genuine AI, Turnstile/action admission, live smoke, visual motion, lifecycle, peak capacity or rollback is established.",
+          "Expected paid capability does not enable or authorize a provider call."
+        ]
+      },
+      "backendUnauthenticatedDenied": [
+        {
+          "origin": "https://retailor-backend-188132745113.europe-west1.run.app",
+          "path": "/v1/health",
+          "status": 403
+        },
+        {
+          "origin": "https://retailor-backend-188132745113.europe-west1.run.app",
+          "path": "/v1/config",
+          "status": 403
+        },
+        {
+          "origin": "https://retailor-backend-xmacampiyq-ew.a.run.app",
+          "path": "/v1/health",
+          "status": 403
+        },
+        {
+          "origin": "https://retailor-backend-xmacampiyq-ew.a.run.app",
+          "path": "/v1/config",
+          "status": 403
+        }
+      ],
+      "wrongOriginAdmission": {
+        "status": 403,
+        "code": "FORBIDDEN"
+      },
+      "paidAIEnabled": false,
+      "paidProviderRequests": 0,
+      "publicFrontendVerified": true,
+      "backendPrivateVerified": true,
+      "limitations": [
+        "Cloudflare origin/rate controls and independent OpenAI cutoff acceptance remain pending",
+        "Only frontend IAM is opened; paid AI remains off",
+        "No connected model, challenge, payment, storage or physical/visual/lifecycle smoke performed"
+      ]
+    }
+  },
+  "cloudCostControls": {
+    "cloudRun": {
+      "currency": "USD",
+      "monthlyCap": 5,
+      "state": "CONFIGURED",
+      "scope": "Retailor Cloud Run only",
+      "enforcedRefusalTested": false
+    },
+    "projectAlerts": {
+      "currency": "USD",
+      "monthlyBudget": 10,
+      "thresholds": [0.5, 0.8, 1],
+      "cap": false
+    },
+    "openAI": {
+      "ownerReportedCurrency": "USD",
+      "ownerReportedCap": 5,
+      "accountSettingsIndependentlyInspected": false,
+      "cutoffRefusalTested": false,
+      "autoRechargeVerifiedOff": false
+    },
+    "limitations": [
+      "Cloud Run cap does not cap Artifact Registry, Secret Manager, storage or OpenAI",
+      "CONFIGURED is not an exercised cutoff; enforcement delay and already in-flight work can exceed a cap"
+    ]
+  },
+  "checkoutStorage": {
+    "projectId": "retailor-511714",
+    "bucket": "retailor-511714-checkout-photos",
+    "uniformAccess": true,
+    "publicAccessPrevention": "enforced",
+    "softDeleteSeconds": 0,
+    "deleteAfterDays": 1,
+    "backendBucketObjectUser": true,
+    "backendSelfTokenCreatorGranted": true,
+    "backendProjectQuotaConsumerGranted": true,
+    "objectsReadOrWrittenByThisDeployment": false,
+    "actualSigningAndPaymentRecheckPending": true
+  },
+  "firstReleaseRecovery": {
+    "compatiblePriorPair": false,
+    "backendBootstrapRevision": "retailor-backend-00001-wqc",
+    "procedure": "Keep paid AI false and frontend IAM private; do not route to a paid-enabled revision for recovery"
+  },
+  "pending": [
+    "Public Cloudflare seal/rate/all-origin acceptance",
+    "Independent OpenAI cutoff/reset/overlap/outstanding-usage/retention evidence",
+    "Connected hosted paid sample/Tailor/checkout and physical/visual/lifecycle acceptance",
+    "Owner-requested generated frontend URL is public while domain/Cloudflare controls remain pending; paid AI stays off"
+  ],
+  "secretValuesRead": false,
+  "tokensSaved": false,
+  "paidProviderRequests": 0,
+  "publicFrontendEnabled": true,
+  "ownerPublicFrontendInstruction": "Owner explicitly requests removing frontend authentication after clarifying public frontend/private backend; no paid-master enablement requested"
+}

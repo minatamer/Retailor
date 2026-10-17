@@ -220,8 +220,8 @@ export async function probeHosted({
             mode !== "live" ||
             paidEnabled !== expectPaid ||
             (expectPaid && (!vision.available || !tailor.available)) ||
-            (!expectPaid &&
-              (vision.available || tailor.available || logos.available))
+            // Native logo directions are local and independent of paid AI.
+            (!expectPaid && (vision.available || tailor.available))
           )
             row.outcome = "fail";
         }

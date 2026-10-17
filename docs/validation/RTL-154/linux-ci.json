@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "observedAt": "2026-10-17T10:58:29.617Z",
+  "observedAt": "2026-10-17T11:15:43.787Z",
   "source": {
-    "baseRevision": "4d908d46e8d6b64c70bf30327ba1d70af82bf098",
+    "baseRevision": "eb704fb9e453d74e2275a33e887c8a8aaf1500d3",
     "dirtyWhenVerified": true,
     "fingerprint": "645969e052880bbb143a0ff345e82c1b914520eeb1ea2f3c680342e027d4470f",
     "appInputFiles": 307,
@@ -11,16 +11,16 @@
     "normalization": false
   },
   "image": {
-    "id": "sha256:5d7113a36b80ed30f7b2f5cb6f86762ab12b82435e7bb0ae4a47c9a229c7182d",
+    "id": "sha256:98b88f5c802a0206111529128b97288a8540a2164ba87165cb86cdac1ceccc00",
     "os": "linux",
     "architecture": "amd64",
-    "bytes": 1833648213
+    "bytes": 1833761880
   },
   "observed": {
     "platform": "linux",
     "node": "v24.19.0",
     "pnpm": "11.25.0",
-    "temporaryGitRevision": "08f83fbaf57dd144cc9c298ab057ab6a6ecf8737",
+    "temporaryGitRevision": "42e8c34af2fa6c64649263aa36ed081595a6c9be",
     "fingerprint": "645969e052880bbb143a0ff345e82c1b914520eeb1ea2f3c680342e027d4470f",
     "matchesLocalLinuxEvidence": true,
     "paidRequests": 0,
@@ -42,7 +42,7 @@
     },
     "unit": {
       "passed": true,
-      "tests": 671,
+      "tests": 674,
       "files": 106
     },
     "productionBuild": true
@@ -54,7 +54,7 @@
   },
   "originalGitMetadata": false,
   "localEnvironment": false,
-  "rawBuildLogSha256": "31a1b17aef2fb97ba5f4c2ed7bb429cc40840667adcb1913715ed6cfe77d5e7d",
+  "rawBuildLogSha256": "ea461a8018685a5c8fcbc625ee4578228e4b68ecf6e8c6f3747a2904ba671e75",
   "verificationDockerfileSha256": "34ed3625a1de8c373553ad00d836abc3a83834754b34eb8fe9bfa6abe7aafb7f",
   "limitations": [
     "Actual local Linux run, not a GitHub job or hosted acceptance",

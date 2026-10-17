@@ -177,6 +177,65 @@ describe("bounded read-only hosted observations", () => {
     expect(result.rows.at(-1).capabilities.paidEnabled).toBe(true);
     expect(result.paidRequests).toBe(0);
   });
+  it("accepts native logos while paid AI remains disabled", async () => {
+    const fetch = vi.fn(async (url) => {
+      const path = new URL(url).pathname;
+      if (path.endsWith("/config"))
+        return Response.json({
+          ...off,
+          logos: { available: true, reason: "ready" },
+        });
+      if (path.endsWith("/not-an-operation"))
+        return Response.json(error, { status: 404 });
+      return new Response("HTML", {
+        headers,
+        status: path === "/design" ? 404 : 200,
+      });
+    });
+    const result = await probeHosted({
+      origin: "https://shop.example.com",
+      assets: [],
+      fetchImpl: fetch,
+    });
+    expect(result.outcome).toBe("pass");
+    expect(
+      result.rows.find((row) => row.capabilities)?.capabilities,
+    ).toMatchObject({
+      paidEnabled: false,
+      visionAvailable: false,
+      tailorAvailable: false,
+      logosAvailable: true,
+    });
+    expect(result.paidRequests).toBe(0);
+    expect(fetch).toHaveBeenCalledTimes(5);
+  });
+  it.each(["vision", "tailor"])(
+    "rejects available %s even with the paid flag disabled and native logos ready",
+    async (capability) => {
+      const fetch = vi.fn(async (url) => {
+        const path = new URL(url).pathname;
+        if (path.endsWith("/config"))
+          return Response.json({
+            ...off,
+            logos: { available: true, reason: "ready" },
+            [capability]: { available: true, reason: "ready" },
+          });
+        return new Response("HTML", {
+          headers,
+          status: path === "/design" ? 404 : 200,
+        });
+      });
+      const result = await probeHosted({
+        origin: "https://shop.example.com",
+        assets: [],
+        fetchImpl: fetch,
+      });
+      expect(result.outcome).toBe("unaccepted");
+      expect(fetch).toHaveBeenCalledTimes(4);
+      expect(result.rows.at(-1).capabilities.paidEnabled).toBe(false);
+      expect(result.paidRequests).toBe(0);
+    },
+  );
   it("loads precisely the approved shipped photos/fonts/licences without guest paths", async () => {
     const assets = await hostedAssetInventory();
     expect(assets).toHaveLength(31);

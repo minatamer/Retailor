@@ -1,9 +1,11 @@
 # RTL-154 — first Cloud Run deployment
 
-Status: Linux candidate verified; owner-authorized private deployment in progress.
+Status: Actual public frontend/private backend deployment and unpaid verification pass; paid/security acceptance pending.
 
 The owner requests deploying the manually accepted `4d908d4` candidate to Google Cloud. The existing Retailor project has billing enabled but initially lacks Cloud Run, Artifact Registry and Secret Manager APIs or runtime identities. Existing checkout storage belongs to Retailor and must be preserved. `tryretailor.com` is not purchased; use generated managed service URLs for a private first deployment and do not buy a domain.
 
 Follow [the allocation](../commit-plans/RTL-154.md), [release packet](../operations/RELEASE.md), [hosted checks](../operations/HOSTED-VERIFICATION.md) and approved [security dispositions](../audits/RTL-023-SECURITY.md). Fix the discovered Docker context exclusion of F20, rebuild and verify actual Linux images and refresh scanner evidence. Preserve source mismatch checks, IAM-private backend, separate runtime identities, finite runtime settings, normal origin/admission controls and paid-off bootstrap. Do not substitute local manual success for required hosted edge/account acceptance.
 
 Record actual immutable registry images, revisions, traffic, IAM, authenticated bridge and unpaid delivery/config observations. Keep missing domain, public origin protection, account cutoff/retention and connected hosted paid/physical tests explicit. First-release recovery is paid off plus private frontend until a compatible prior pair exists. No provider request or domain purchase is authorized by this ticket.
+
+Actual result: [validation](../validation/RTL-154.md) and [sanitized hosted metadata](../validation/RTL-154/hosted.json) record the deployed pair, five pinned secret versions, configured Cloud Run cap/project alerts and49 initial private observations. Settled Linux gates pass674 tests/106 files after correcting a stale native-logo expectation in release tooling; app/image bytes are unchanged. The owner's latest instruction explicitly removes frontend authentication while retaining a private backend. Public frontend delivery passes36 checks, direct backend denial passes4 checks and wrong-origin admission returns403. Paid AI remains off, and required Cloudflare/account/connected release acceptance stays unverified.
