@@ -30,6 +30,7 @@ export interface PhotoSnapshot {
   progress: number;
   total: number;
   notice: string;
+  noticeKind: "status" | "warning";
   issues: readonly { name: string; message: string }[];
   revision: number;
 }
@@ -68,6 +69,7 @@ export class PhotoController {
     progress: 0,
     total: 0,
     notice: "",
+    noticeKind: "status",
     issues: [],
     revision: 0,
   };
@@ -97,6 +99,9 @@ export class PhotoController {
     this.snapshot = {
       ...this.snapshot,
       ...patch,
+      noticeKind:
+        patch.noticeKind ??
+        (patch.notice !== undefined ? "warning" : this.snapshot.noticeKind),
       links: this.links.map((row) => [...row]),
       items: this.selected.flatMap((id) => {
         const item = this.entries.get(id);
@@ -140,6 +145,7 @@ export class PhotoController {
         notice: enabled
           ? "Matching views and colours can be linked when you process photos."
           : "Automatic linking is off. Your manual photo groups are kept.",
+        noticeKind: "status",
       },
       true,
     );
@@ -172,6 +178,7 @@ export class PhotoController {
     this.update(
       {
         notice: `${members.length} photos linked as one product. Open the card to edit its photos.`,
+        noticeKind: "status",
         linksInitialized: true,
         autoLink: automatic ? this.snapshot.autoLink : false,
       },
@@ -192,6 +199,7 @@ export class PhotoController {
     this.update(
       {
         notice: "Photo unlinked. It is kept as a separate product photo.",
+        noticeKind: "status",
         linksInitialized: true,
         autoLink: false,
       },
@@ -206,7 +214,11 @@ export class PhotoController {
       group === row ? [id, ...group.filter((member) => member !== id)] : group,
     );
     this.update(
-      { notice: "Cover photo updated.", linksInitialized: true },
+      {
+        notice: "Cover photo updated.",
+        noticeKind: "status",
+        linksInitialized: true,
+      },
       true,
     );
   }
@@ -221,7 +233,11 @@ export class PhotoController {
     [next[index], next[target]] = [next[target]!, next[index]!];
     this.links = this.links.map((row) => (row === group ? next : row));
     this.update(
-      { notice: "Photo order updated.", linksInitialized: true },
+      {
+        notice: "Photo order updated.",
+        noticeKind: "status",
+        linksInitialized: true,
+      },
       true,
     );
   }
@@ -468,6 +484,7 @@ export class PhotoController {
                 notice: recovery
                   ? ""
                   : "Photo ready in memory. Temporary storage is unavailable, so refreshing may lose this photo.",
+                noticeKind: recovery ? "status" : "warning",
               },
               true,
             );
@@ -526,6 +543,7 @@ export class PhotoController {
     this.update({
       busy: false,
       notice: "Selection cancelled. Your accepted photos are kept.",
+      noticeKind: "status",
     });
   }
   move(id: string, direction: -1 | 1) {
@@ -554,7 +572,10 @@ export class PhotoController {
     this.entries.delete(id);
     this.urls.revoke(item.url);
     this.update(
-      { notice: "Photo removed. Other accepted photos are kept." },
+      {
+        notice: "Photo removed. Other accepted photos are kept.",
+        noticeKind: "status",
+      },
       true,
     );
     await this.cache.remove(id).catch(() => {
@@ -576,6 +597,7 @@ export class PhotoController {
     this.update({
       busy: true,
       notice: "Checking your locally saved photos…",
+      noticeKind: "status",
       issues: [],
     });
     const issues: { name: string; message: string }[] = [];
@@ -724,6 +746,7 @@ export class PhotoController {
           notice: issues.length
             ? "Your valid photos are kept. Missing photos need repair."
             : "Local photos restored and verified. No processing request was repeated.",
+          noticeKind: "status",
         },
         true,
       );
@@ -789,6 +812,7 @@ export class PhotoController {
     this.update({
       busy: true,
       notice: "Checking the exact saved photo identity…",
+      noticeKind: "status",
     });
     try {
       const decoded = await this.decode(
@@ -834,6 +858,7 @@ export class PhotoController {
           notice: recoverable
             ? "Exact garment photo restored. No interpretation was repeated."
             : "Exact photo restored in memory. Storage is unavailable, so refreshing may lose it.",
+          noticeKind: recoverable ? "status" : "warning",
         },
         true,
       );
@@ -852,7 +877,7 @@ export class PhotoController {
       }
     }
   }
-  async reset(notice = "Photos cleared. Start with a fresh collection.") {
+  async reset(notice?: string) {
     this.cancel();
     const generation = this.generation;
     for (const item of this.entries.values()) this.urls.revoke(item.url);
@@ -865,7 +890,8 @@ export class PhotoController {
         issues: [],
         progress: 0,
         total: 0,
-        notice,
+        notice: notice ?? "Photos cleared. Start with a fresh collection.",
+        noticeKind: notice === undefined ? "status" : "warning",
         linksInitialized: false,
         autoLink: true,
       },

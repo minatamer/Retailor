@@ -29,6 +29,7 @@ export function PhotoPicker({
     controller.getSnapshot,
   );
   const id = useId();
+  const warning = state.noticeKind === "warning" ? state.notice : "";
   const [editing, setEditing] = useState<string | null>(null);
   return (
     <section aria-labelledby={`${id}-heading`} className={styles.picker}>
@@ -83,9 +84,6 @@ export function PhotoPicker({
           </Button>
         </div>
       )}
-      <p className={styles.notice} role="status">
-        {state.notice}
-      </p>
       {state.items.length > 0 && (
         <>
           <div className={styles.linkHeading}>
@@ -121,8 +119,18 @@ export function PhotoPicker({
           </ol>
         </>
       )}
-      {state.issues.length > 0 && (
-        <ul className={styles.issues} aria-label="Photo selection notices">
+      {(warning || state.issues.length > 0) && (
+        <ul
+          className={styles.issues}
+          aria-label="Photo selection notices"
+          aria-live="polite"
+        >
+          {warning && (
+            <li>
+              <strong>Photo needs attention</strong>
+              <span>{warning}</span>
+            </li>
+          )}
           {state.issues.map((issue, index) => (
             <li key={index}>
               <strong>{issue.name}</strong>
