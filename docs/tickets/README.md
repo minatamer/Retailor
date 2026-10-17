@@ -1,5 +1,9 @@
 # Retailor implementation tickets
 
+**17 October2026 owner acceptance:** full manual testing of the current RTL-144–153 local application passes. The owner authorizes local staging/commits of the complete unstaged batch. [Signoff and final validation](../validation/MANUAL-2026-10-17.md) preserves the known F19 manual-linking limitation and separates this acceptance from pending public/paid release and hosted evidence.
+
+Alternate-view recognition: [RTL-153](RTL-153-alternate-view-recognition.md) v7 accepts both F01/F16 jeans views and F05/F20 tee colourways in the owner's live run (75.542s backend).20 photos yield16 included products; F19 remains manually correctable. Owner full manual signoff, all six final gates (671 tests/106 files) and settled read-only review pass; local staging/commits are authorized. [Actual evidence](../validation/RTL-153.md) preserves earlier failures and corrected-sample limits. No push, deployment, new agent provider submission or cloud action.
+
 Processing copy removal: [RTL-152](RTL-152-remove-processing-helper.md) removes the requested processing headline and live waiting/percentage helper, preserving actual progress and cancellation. Scoped read-only source review is clean; tests remain deferred by the owner. [Validation](../validation/RTL-152.md) records actual results. No staging/commit or external action is included.
 
 Photo-caption spacing: [RTL-151](RTL-151-photo-caption-spacing.md) adds side/bottom breathing room inside selected-photo cards and wraps long filenames. Scoped read-only source review is clean; tests remain deferred by the owner. [Validation](../validation/RTL-151.md) records actual results. No staging/commit or external action is included.

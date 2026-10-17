@@ -159,7 +159,7 @@ function WorkspaceFlow() {
                   <aside className={styles.sample}>
                     <h3>Try the sample collection</h3>
                     <p>
-                      No photos handy? Try 19 photos of 15 garments, including
+                      No photos handy? Try 20 photos of 15 garments, including
                       different views and colours. Preview them first, then
                       create your product draft.
                     </p>

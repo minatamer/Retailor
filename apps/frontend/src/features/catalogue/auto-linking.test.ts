@@ -31,6 +31,29 @@ describe("source-backed fixture grouping and reversible colour edits", () => {
   it("leaves different jeans cuts separate instead of matching merely by category", async () => {
     expect((await fixture(["F01", "F02"])).draft.items).toHaveLength(2);
   });
+  it("maps the exact white/black tee colourway to one authored product while keeping the blue tee separate", async () => {
+    const { draft } = await fixture(["F05", "F06", "F20"]);
+    expect(draft.items).toHaveLength(2);
+    const tee = draft.items.find((item) =>
+      item.product.imageIds.includes("F05"),
+    )!.product;
+    expect(tee.imageIds).toEqual(["F05", "F20"]);
+    expect(tee.colourPhotos).toEqual([
+      { colour: "White", photoIds: ["F05"] },
+      { colour: "Black", photoIds: ["F20"] },
+    ]);
+    expect(
+      tee.variants.map((variant) => [variant.colour, variant.size]),
+    ).toEqual(
+      ["White", "Black"].flatMap((colour) =>
+        ["S", "M", "L"].map((size) => [colour, size]),
+      ),
+    );
+    expect(
+      draft.items.find((item) => item.product.imageIds.includes("F06"))!.product
+        .imageIds,
+    ).toEqual(["F06"]);
+  });
   it("holds oversized opt-out expansion for review instead of exceeding twenty products", async () => {
     const { draft, id } = await fixture();
     const extra = await Promise.all(

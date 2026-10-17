@@ -216,11 +216,11 @@
       "path": "/sample/forme/F16.webp",
       "image": {
         "id": "F16",
-        "hash": "9e19af76e4040f0cb00efae88ffa3b4f1adfee007032ecc0b3412a14cccc13ee",
+        "hash": "be863622ccecc956b4d6531f8c16025c764663db989f22687093a8bb7bc53cd8",
         "mime": "image/webp",
         "width": 1122,
         "height": 1402,
-        "bytes": 163602
+        "bytes": 208514
       },
       "role": "alternate",
       "relatedTo": "F01",
@@ -261,14 +261,29 @@
       "path": "/sample/forme/F19.webp",
       "image": {
         "id": "F19",
-        "hash": "e3841201cd2024e1434c4d750a5b156191c5af80efef576102a7f56638a1fe84",
+        "hash": "3bfd09508ff9a648ea0a73a0f765ca37cfb891b5e6eb1a3a618b441ea1c5f106",
         "mime": "image/webp",
         "width": 1122,
         "height": 1402,
-        "bytes": 130436
+        "bytes": 182096
       },
       "role": "colourway",
       "relatedTo": "F01",
+      "origin": "generated_demo"
+    },
+    {
+      "id": "F20",
+      "path": "/sample/forme/F20.webp",
+      "image": {
+        "id": "F20",
+        "hash": "e03f0dd9e30915787531d1b09515071449d0d98180780058a18b16929d1c2b77",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 34508
+      },
+      "role": "colourway",
+      "relatedTo": "F05",
       "origin": "generated_demo"
     }
   ]

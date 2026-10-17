@@ -32,7 +32,7 @@ describe("reset and deliberate sample selection", () => {
     first.dispose();
     const restored = await env.open();
     await restored.sample();
-    expect(restored.photos.getSnapshot().items).toHaveLength(19);
+    expect(restored.photos.getSnapshot().items).toHaveLength(20);
     expect(restored.getSnapshot().state.photoLinks).toEqual([]);
     expect(restored.getSnapshot().state.photoLinksInitialized).toBe(false);
     expect(restored.getSnapshot().state.draft).toBeNull();
@@ -104,12 +104,12 @@ describe("reset and deliberate sample selection", () => {
     await controller.sample();
     expect(controller.getSnapshot().state.selectedIds).toEqual(ids);
     expect(controller.getSnapshot().state.photoLinks).toEqual(chosenLinks);
-    expect(controller.photos.getSnapshot().items).toHaveLength(19);
+    expect(controller.photos.getSnapshot().items).toHaveLength(20);
     expect(controller.photos.getSnapshot().issues).toEqual([]);
     expect(
       env.caches.get(controller.getSnapshot().state.graph.workspaceId)!.rows
         .size,
-    ).toBe(19);
+    ).toBe(20);
     await controller.photos.add([sampleFiles()[0]!]);
     expect(
       controller.photos.getSnapshot().issues.map((issue) => issue.message),
@@ -135,12 +135,12 @@ describe("reset and deliberate sample selection", () => {
     expect(controller.getSnapshot().state.selectedIds).toEqual(
       expect.arrayContaining([cached, own]),
     );
-    expect(controller.photos.getSnapshot().items).toHaveLength(20);
+    expect(controller.photos.getSnapshot().items).toHaveLength(21);
     expect(controller.photos.getSnapshot().issues).toEqual([]);
     expect(
       env.caches.get(controller.getSnapshot().state.graph.workspaceId)!.rows
         .size,
-    ).toBe(20);
+    ).toBe(21);
   });
 
   it("starts clean across three sample, draft, reset and recovery cycles", async () => {
@@ -150,12 +150,12 @@ describe("reset and deliberate sample selection", () => {
     for (let cycle = 0; cycle < 3; cycle++) {
       const identity = controller.getSnapshot().state.graph.workspaceId;
       await controller.sample();
-      expect(controller.photos.getSnapshot().items).toHaveLength(19);
+      expect(controller.photos.getSnapshot().items).toHaveLength(20);
       expect(controller.photos.getSnapshot().issues).toEqual([]);
       expect(controller.getSnapshot().state.photoLinks).toEqual([]);
       await controller.draftCatalogue();
       expect(controller.getSnapshot().state.draft?.items).toHaveLength(15);
-      expect(controller.getSnapshot().state.photoLinks).toHaveLength(3);
+      expect(controller.getSnapshot().state.photoLinks).toHaveLength(4);
       controller.publish();
       expect(controller.getSnapshot().state.graph.products).toHaveLength(15);
       await controller.reset();
@@ -197,7 +197,7 @@ describe("reset and deliberate sample selection", () => {
     release(files);
     await retired;
     expect(controller.getSnapshot().state.selectedIds).toEqual(ids);
-    expect(controller.photos.getSnapshot().items).toHaveLength(19);
+    expect(controller.photos.getSnapshot().items).toHaveLength(20);
     expect(controller.photos.getSnapshot().issues).toEqual([]);
     expect(controller.getSnapshot().sampleBusy).toBe(false);
   });
@@ -222,10 +222,10 @@ describe("reset and deliberate sample selection", () => {
       "could not be removed",
     );
     expect(controller.getSnapshot().recoveryNotice).not.toContain("PRIVATE_");
-    expect(oldCache.rows.size).toBe(19);
+    expect(oldCache.rows.size).toBe(20);
     expect(other.photos.getSnapshot().items).toHaveLength(1);
     await controller.sample();
-    expect(controller.photos.getSnapshot().items).toHaveLength(19);
+    expect(controller.photos.getSnapshot().items).toHaveLength(20);
     expect(controller.photos.getSnapshot().issues).toEqual([]);
     expect(other.photos.getSnapshot().items).toHaveLength(1);
   });

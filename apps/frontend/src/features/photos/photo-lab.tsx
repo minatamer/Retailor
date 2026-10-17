@@ -100,7 +100,7 @@ export function PhotoLab() {
           <p className={styles.eyebrow}>Meet FORME</p>
           <h2>A good collection to begin with.</h2>
           <p>
-            15 garments in 19 generated demo photographs, including alternate
+            15 garments in 20 generated demo photographs, including alternate
             views. No prewritten catalogue—processing will interpret the actual
             images.
           </p>

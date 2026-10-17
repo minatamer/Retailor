@@ -208,7 +208,7 @@ export async function verifyContainers(frontendImage, backendImage) {
       const html=await(await fetch('http://127.0.0.1:8080/')).text();const chunk=html.match(/src="([^"]+\.js[^\"]*)"/);if(!chunk)throw new Error('No static script');const staticResponse=await fetch('http://127.0.0.1:8080'+chunk[1].replaceAll('&amp;','&'));if(staticResponse.status!==200)throw new Error('Static delivery failed');console.log(JSON.stringify({photos,fonts,staticStatus:staticResponse.status}));
     `,
     );
-    assert.equal(assetRecord.photos.length, 19);
+    assert.equal(assetRecord.photos.length, 20);
     assert.equal(
       assetRecord.fonts.filter(({ name }) => name.endsWith(".woff2")).length,
       5,

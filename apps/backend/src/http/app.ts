@@ -10,7 +10,7 @@ import { logoRoutes } from "../brand/routes.js";
 import { admissionRoutes } from "../security/admission-routes.js";
 import { OperationFailure } from "../security/errors.js";
 import { ingress } from "./ingress.js";
-import { failureDiagnostic, reportFailure } from "./diagnostics.js";
+import { failureDiagnostic, reportDiagnostic } from "./diagnostics.js";
 import type { DiagnosticSink } from "./diagnostics.js";
 export function createApp(
   runtime: Runtime,
@@ -67,7 +67,7 @@ export function createApp(
     runtime.frontendOrigin,
     !!runtime.recognition,
   );
-  recognitionRoutes(app, runtime.recognition);
+  recognitionRoutes(app, runtime.recognition, diagnostics);
   assistantRoutes(app, runtime.assistant);
   logoRoutes(app, runtime.logos);
   currencyRoutes(app, runtime.currency);
@@ -95,7 +95,7 @@ export function createApp(
           : code === "INVALID_INPUT"
             ? 400
             : 500;
-    reportFailure(
+    reportDiagnostic(
       diagnostics,
       failureDiagnostic(error, res.locals.requestId, req.path, code, status),
     );

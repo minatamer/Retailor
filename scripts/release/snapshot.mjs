@@ -58,7 +58,7 @@ export function isBuildInput(path) {
     )
   )
     return true;
-  return /^apps\/frontend\/public\/(?:sample\/forme\/(?:F(?:0[1-9]|1[0-9])\.webp|manifest\.json)|fonts\/(?:[a-z0-9-]+\.woff2|[a-z0-9-]+-OFL\.txt|provenance\.json)|landing\/(?:jeans-(?:indigo|black|light)\.webp|hero-film\.mp4|hero-poster\.webp|hero-provenance\.json))$/u.test(
+  return /^apps\/frontend\/public\/(?:sample\/forme\/(?:F(?:0[1-9]|1[0-9]|20)\.webp|manifest\.json)|fonts\/(?:[a-z0-9-]+\.woff2|[a-z0-9-]+-OFL\.txt|provenance\.json)|landing\/(?:jeans-(?:indigo|black|light)\.webp|hero-film\.mp4|hero-poster\.webp|hero-provenance\.json))$/u.test(
     path,
   );
 }

@@ -63,9 +63,13 @@ export function developmentDraft(
           : "Blue"
         : asset && originalIndex === 2
           ? "Charcoal"
-          : asset && originalIndex === 6
-            ? "Ivory"
-            : "Demo colour";
+          : asset && originalIndex === 4
+            ? asset.id === "F20"
+              ? "Black"
+              : "White"
+            : asset && originalIndex === 6
+              ? "Ivory"
+              : "Demo colour";
     const productId = id(),
       price = PRICES[originalIndex] ?? 5400,
       category = CATEGORIES[originalIndex] ?? "other-clothing";
@@ -127,7 +131,7 @@ export function developmentDraft(
     }),
     corrections: [],
   });
-  for (const primary of ["F01", "F03", "F07"]) {
+  for (const primary of ["F01", "F03", "F05", "F07"]) {
     const hashes = new Set(
       SAMPLE.assets
         .filter((asset) => asset.id === primary || asset.relatedTo === primary)

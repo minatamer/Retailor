@@ -40,7 +40,7 @@ const FAQ = [
   {
     question: "What can I bring?",
     answer:
-      "Clothing photos: jeans, tees, hoodies, dresses, formalwear, beachwear and more. Static JPEG, PNG or WebP, up to 4 MiB per image and 24 photos. Every garment needs a valid photograph. You can also try nineteen original generated sample photos, with linked views of the same garment.",
+      "Clothing photos: jeans, tees, hoodies, dresses, formalwear, beachwear and more. Static JPEG, PNG or WebP, up to 4 MiB per image and 24 photos. Every garment needs a valid photograph. You can also try twenty original generated sample photos, with different views and colours of the same garment.",
   },
   {
     question: "How can I personalize my store?",

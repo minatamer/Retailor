@@ -1,24 +1,28 @@
 # Independent catalogue evaluation seam
 
+**17 October2026 v7 sample repair:** owner approved replacing generated F16/F19 with plain-denim photographs after a direct surface-texture mismatch was found against F01. [New exact asset/prompt provenance](../../research/RTL-153-JEANS-REPAIR.json) preserves old hashes and failed attempts; selected regeneration has small framing/proportion differences. The twenty assets now total1,955,908 bytes and retain15 intended designs. A new successful run would establish this corrected sample's behavior only; it cannot retroactively pass the old dataset or establish general accuracy. Comparison disagreements are advisory so structurally valid predictions remain manually correctable. Actual source/disposition/evidence validation remains required; fresh owner live acceptance is pending.
+
+**Current positive grouping cases — RTL-153, 17 October 2026:** the sample now has twenty photos of fifteen authored designs. F01/F16 must form one supported front/rear jeans product; F19 tests its charcoal colourway. F05/F20 must form one white/black tee product with mapped colour options. F03/F17 and F07/F18 test the other alternate views. F02 remains a different jeans cut; F06 remains a different blue tee design. These expectations are for independent evaluation, never runtime recognition instructions or a live fixture fallback. The new black tee's [exact edit/byte provenance](../../research/RTL-153-SAMPLE-COLOUR.json) is separate from [actual live evidence](../../validation/RTL-153.md). Original fifteen-photo expectations and historical pending statements below precede the later RTL-138 live walkthrough and this revision.
+
 These expectations were written from the actual shipped FORME photos, visually inspected in the RTL-003 contact sheet. They are not imported by either runtime or the development fixture. No live model result has been recorded. RTL-020 owns the authorized paid run, independent scoring, accepted model policy and content-free aggregate evidence.
 
-| Actual input | Visible garment expectation | Required source/grouping evidence |
-| --- | --- | --- |
-| F01 | Blue straight-leg jeans | One distinct garment, F01 primary |
-| F02 | Black wide-leg jeans | Distinct from F01; F02 primary |
-| F03 | Black pullover hoodie | One garment; no material/fit assertion |
-| F04 | Cream zip hoodie | Distinct from F03; visible zipper draft |
-| F05 | White short-sleeved tee | One garment; no fabric assertion |
-| F06 | Blue short-sleeved tee | Distinct from F05 despite category similarity |
-| F07 | Cream button-front shirt | Shirt category; visible closure only |
-| F08 | Olive overshirt | Overshirt or shirt with reviewable category |
-| F09 | Dark trousers | Trousers; no inferred dimensions or occasion guarantee |
-| F10 | Beige blazer | Blazer; visible lapels/closure only |
-| F11 | Brown cardigan | Cardigan/knitwear; no fibre claim |
-| F12 | Burgundy sleeveless dress | Dress; no gender or fit promise |
-| F13 | Black flared skirt | Skirt; no inferred waistband measurement |
-| F14 | Beige shorts | Shorts; no size/fibre claim |
-| F15 | Green drawstring shorts | Shorts; swimwear only as a reviewable hypothesis |
+| Actual input | Visible garment expectation | Required source/grouping evidence                      |
+| ------------ | --------------------------- | ------------------------------------------------------ |
+| F01          | Blue straight-leg jeans     | One distinct garment, F01 primary                      |
+| F02          | Black wide-leg jeans        | Distinct from F01; F02 primary                         |
+| F03          | Black pullover hoodie       | One garment; no material/fit assertion                 |
+| F04          | Cream zip hoodie            | Distinct from F03; visible zipper draft                |
+| F05          | White short-sleeved tee     | One garment; no fabric assertion                       |
+| F06          | Blue short-sleeved tee      | Distinct from F05 despite category similarity          |
+| F07          | Cream button-front shirt    | Shirt category; visible closure only                   |
+| F08          | Olive overshirt             | Overshirt or shirt with reviewable category            |
+| F09          | Dark trousers               | Trousers; no inferred dimensions or occasion guarantee |
+| F10          | Beige blazer                | Blazer; visible lapels/closure only                    |
+| F11          | Brown cardigan              | Cardigan/knitwear; no fibre claim                      |
+| F12          | Burgundy sleeveless dress   | Dress; no gender or fit promise                        |
+| F13          | Black flared skirt          | Skirt; no inferred waistband measurement               |
+| F14          | Beige shorts                | Shorts; no size/fibre claim                            |
+| F15          | Green drawstring shorts     | Shorts; swimwear only as a reviewable hypothesis       |
 
 Run the full 15-photo set and narrower pairs F01/F02, F03/F04 and F05/F06. Every submitted ID needs exactly one valid disposition; similar pieces must remain distinct. Check fresh IDs, actual available photos, strict grouping and editable application defaults independently of copy quality. Unknown material/care/fit stays unknown unless visible label evidence is separately supplied; these primary photos contain no readable care labels. A reviewer should be able to correct a title/category/group without another paid call.
 

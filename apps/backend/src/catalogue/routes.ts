@@ -6,6 +6,12 @@ import {
 } from "@retailor/contracts/recognition";
 import type { PaidAdmission } from "../security/admission.js";
 import type { CatalogueProvider } from "./provider.js";
+import type { CatalogueDraft } from "@retailor/contracts/catalogue";
+import type { ErrorCode } from "@retailor/contracts/api";
+import type { DiagnosticSink } from "../http/diagnostics.js";
+import { reportDiagnostic } from "../http/diagnostics.js";
+import { catalogueDiagnostic } from "./diagnostics.js";
+import type { CataloguePhase } from "./diagnostics.js";
 import { OperationFailure, deny } from "../security/errors.js";
 import { receiveCatalogue } from "./multipart.js";
 import { prepareProviderImages, type SanitizerPorts } from "./sanitize.js";
@@ -49,6 +55,7 @@ async function drainRejected(req: express.Request) {
 export function recognitionRoutes(
   app: Express,
   runtime: RecognitionRuntime | undefined,
+  diagnostics?: DiagnosticSink,
 ) {
   const enabled: express.RequestHandler = (_req, _res, next) =>
     runtime ? next() : next(new OperationFailure("UNAVAILABLE", 503));
@@ -62,6 +69,13 @@ export function recognitionRoutes(
     let lease: ReturnType<PaidAdmission["begin"]> | undefined;
     let files: Map<string, Uint8Array> | undefined,
       images: Map<string, Uint8Array> | undefined;
+    const started = performance.now();
+    let providerStarted: number | undefined,
+      providerMs: number | null = null,
+      observation: unknown,
+      draft: CatalogueDraft | undefined,
+      phase: CataloguePhase = "preparing_images",
+      code: ErrorCode | null = null;
     try {
       const cookie = safetyCookie(req.headers.cookie);
       if (!cookie) return deny("FORBIDDEN", 403);
@@ -93,15 +107,22 @@ export function recognitionRoutes(
       input.files.clear();
       owned.signal.throwIfAborted();
       lease.dispatch();
-      const observation = await runtime!.provider.interpret(
-        lease.action,
-        images,
-        owned.signal,
-        lease.recordUsage,
-      );
+      phase = "interpreting";
+      providerStarted = performance.now();
+      try {
+        observation = await runtime!.provider.interpret(
+          lease.action,
+          images,
+          owned.signal,
+          lease.recordUsage,
+        );
+      } finally {
+        providerMs = performance.now() - providerStarted;
+      }
       images.clear();
       owned.signal.throwIfAborted();
-      const draft = reconcileCatalogue(observation, lease.action);
+      phase = "reconciling";
+      draft = reconcileCatalogue(observation, lease.action);
       res.json(
         RecognitionResultSchema.parse({
           schemaVersion: 1,
@@ -112,13 +133,22 @@ export function recognitionRoutes(
           draft,
         }),
       );
+      phase = "completed";
     } catch (error) {
+      code = owned.signal.aborted
+        ? "DEADLINE"
+        : error instanceof OperationFailure
+          ? error.code
+          : "UPSTREAM_FAILED";
       // A paused rejected upload must not retain an open request indefinitely.
       if (!(await drainRejected(req))) {
         res.set("Connection", "close");
         res.once("finish", () => req.resume());
       }
-      if (owned.signal.aborted) return deny("DEADLINE", 504);
+      if (owned.signal.aborted) {
+        code = "DEADLINE";
+        return deny("DEADLINE", 504);
+      }
       throw error;
     } finally {
       files?.clear();
@@ -127,6 +157,20 @@ export function recognitionRoutes(
       clearTimeout(timer);
       owned.abort();
       res.removeListener("close", abort);
+      if (lease && diagnostics)
+        reportDiagnostic(
+          diagnostics,
+          catalogueDiagnostic({
+            requestId: res.locals.requestId,
+            action: lease.action,
+            observation,
+            ...(phase === "completed" && draft ? { draft } : {}),
+            phase,
+            code,
+            elapsedMs: performance.now() - started,
+            providerMs,
+          }),
+        );
     }
   });
 }

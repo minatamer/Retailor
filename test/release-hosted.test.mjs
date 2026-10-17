@@ -34,7 +34,7 @@ describe("bounded read-only hosted observations", () => {
   it("compares fixed GET delivery without serializing HTML/config content", async () => {
     const content = Buffer.from("public fixture asset"),
       asset = {
-        path: "/sample/forme/F01.webp",
+        path: "/sample/forme/F20.webp",
         bytes: content.length,
         sha256: createHash("sha256").update(content).digest("hex"),
       };
@@ -179,9 +179,9 @@ describe("bounded read-only hosted observations", () => {
   });
   it("loads precisely the approved shipped photos/fonts/licences without guest paths", async () => {
     const assets = await hostedAssetInventory();
-    expect(assets).toHaveLength(30);
+    expect(assets).toHaveLength(31);
     expect(assets.filter(({ path }) => path.endsWith(".webp"))).toHaveLength(
-      19,
+      20,
     );
     expect(assets.filter(({ path }) => path.endsWith(".woff2"))).toHaveLength(
       5,
@@ -189,5 +189,36 @@ describe("bounded read-only hosted observations", () => {
     expect(assets.filter(({ path }) => path.endsWith("-OFL.txt"))).toHaveLength(
       4,
     );
+  });
+  it("accepts the full shipped inventory while rejecting foreign paths or a thirty-second asset before transport", async () => {
+    const assets = await hostedAssetInventory();
+    const fetch = vi.fn(
+      async () => new Response("stop", { status: 302, headers }),
+    );
+    expect(
+      (
+        await probeHosted({
+          origin: "https://shop.example.com",
+          assets,
+          fetchImpl: fetch,
+        })
+      ).outcome,
+    ).toBe("unaccepted");
+    expect(fetch).toHaveBeenCalledTimes(1);
+    for (const invalid of [
+      [{ ...assets[0], path: "/sample/forme/F21.webp" }],
+      [{ ...assets[0], path: "/guest/private-photo.webp" }],
+      [...assets, assets[0]],
+    ]) {
+      const untouched = vi.fn();
+      await expect(
+        probeHosted({
+          origin: "https://shop.example.com",
+          assets: invalid,
+          fetchImpl: untouched,
+        }),
+      ).rejects.toThrow("inventory");
+      expect(untouched).not.toHaveBeenCalled();
+    }
   });
 });

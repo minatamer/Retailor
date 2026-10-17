@@ -19,6 +19,7 @@ describe("release input privacy", () => {
       "packages/commerce/src/ledger.ts",
       "apps/frontend/public/sample/forme/F15.webp",
       "apps/frontend/public/sample/forme/F19.webp",
+      "apps/frontend/public/sample/forme/F20.webp",
       "apps/frontend/public/fonts/inter-OFL.txt",
       "apps/frontend/public/landing/jeans-indigo.webp",
       "apps/frontend/public/landing/jeans-black.webp",
@@ -45,7 +46,7 @@ describe("release input privacy", () => {
       "apps/backend/src/server.test.ts",
       "apps/backend/dist/server.js",
       "apps/frontend/public/sample/forme/visitor.webp",
-      "apps/frontend/public/sample/forme/F20.webp",
+      "apps/frontend/public/sample/forme/F21.webp",
       "apps/frontend/public/design/reference-shirt.png",
       "apps/frontend/public/landing/visitor.webp",
       "apps/frontend/public/landing/visitor.mp4",
@@ -66,7 +67,7 @@ describe("release input privacy", () => {
     expect(result.files.every(({ path }) => isBuildInput(path))).toBe(true);
     expect(
       result.files.filter(({ path }) => /F\d\d\.webp$/u.test(path)),
-    ).toHaveLength(19);
+    ).toHaveLength(20);
     expect(
       result.files.filter(({ path }) => path.endsWith(".woff2")),
     ).toHaveLength(5);

@@ -10,7 +10,7 @@ import { RECOGNITION_LIMITS } from "@retailor/contracts/recognition";
 import { ASSISTANT_LIMITS } from "@retailor/contracts/assistant";
 import { LOGO_LIMITS } from "@retailor/contracts/brand";
 export const LIVE_CASES = Object.freeze([
-  { id: "catalogue_sample", capability: "catalogue", inputCount: 19 },
+  { id: "catalogue_sample", capability: "catalogue", inputCount: 20 },
   { id: "catalogue_upload_subset", capability: "catalogue", inputCount: 3 },
   { id: "shopper_category", capability: "assistant", role: "shopper" },
   { id: "shopper_eur_budget", capability: "assistant", role: "shopper" },

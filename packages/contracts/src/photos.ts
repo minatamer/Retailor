@@ -67,8 +67,8 @@ export const PhotoLinksSchema = z
 export type PhotoLinks = z.infer<typeof PhotoLinksSchema>;
 // Public asset metadata describes inspected bytes, never an authored catalogue.
 export const SampleAssetSchema = z.strictObject({
-  id: z.string().regex(/^F(?:0[1-9]|1[0-9])$/u),
-  path: z.string().regex(/^\/sample\/forme\/F(?:0[1-9]|1[0-9])\.webp$/u),
+  id: z.string().regex(/^F(?:0[1-9]|1[0-9]|20)$/u),
+  path: z.string().regex(/^\/sample\/forme\/F(?:0[1-9]|1[0-9]|20)\.webp$/u),
   image: DerivativeSchema,
   role: z.enum(["primary", "alternate", "colourway"]),
   relatedTo: z
@@ -80,11 +80,11 @@ export const SampleAssetSchema = z.strictObject({
 export const SampleManifestSchema = z
   .strictObject({
     version: z.literal(1),
-    assets: z.array(SampleAssetSchema).length(19),
+    assets: z.array(SampleAssetSchema).length(20),
   })
   .refine(
     ({ assets }) =>
-      new Set(assets.map((asset) => asset.id)).size === 19 &&
+      new Set(assets.map((asset) => asset.id)).size === 20 &&
       assets.every(
         (asset) =>
           asset.image.id === asset.id &&

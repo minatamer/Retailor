@@ -6,7 +6,7 @@ import { composeRuntime } from "../runtime/compose.js";
 import { CurrencyService } from "../currency/service.js";
 import { fixtureCurrency } from "../currency/provider.js";
 import type { FxSnapshot } from "@retailor/contracts/currency";
-import { failureDiagnostic, reportFailure } from "./diagnostics.js";
+import { failureDiagnostic, reportDiagnostic } from "./diagnostics.js";
 class BrokenCurrency extends CurrencyService {
   override async quote(): Promise<FxSnapshot> {
     throw new TypeError("PRIVATE_MARKER cookie/key/prompt detail");
@@ -72,7 +72,7 @@ describe("private failure correlation", () => {
     const stderr = vi
       .spyOn(process.stderr, "write")
       .mockImplementation(() => true);
-    reportFailure(() => {
+    reportDiagnostic(() => {
       throw new Error("PRIVATE_SINK");
     }, event);
     expect(stderr).toHaveBeenCalledTimes(1);

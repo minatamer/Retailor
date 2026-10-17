@@ -1,5 +1,6 @@
 import { isApiRoute } from "@retailor/contracts/api";
 import type { ErrorCode } from "@retailor/contracts/api";
+import type { CatalogueDiagnostic } from "../catalogue/diagnostics.js";
 
 export interface FailureDiagnostic {
   schemaVersion: 1;
@@ -11,7 +12,9 @@ export interface FailureDiagnostic {
   exception: string;
   locations: string[];
 }
-export type DiagnosticSink = (event: FailureDiagnostic) => void;
+export type DiagnosticSink = (
+  event: FailureDiagnostic | CatalogueDiagnostic,
+) => void;
 const names = new Set([
   "Error",
   "TypeError",
@@ -71,9 +74,9 @@ export function backendDiagnostics(): DiagnosticSink {
     process.stderr.write(`${JSON.stringify(event)}\n`);
   };
 }
-export function reportFailure(
+export function reportDiagnostic(
   sink: DiagnosticSink | undefined,
-  event: FailureDiagnostic,
+  event: FailureDiagnostic | CatalogueDiagnostic,
 ) {
   if (!sink) return;
   try {

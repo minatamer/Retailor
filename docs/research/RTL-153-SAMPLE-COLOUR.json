@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-17",
+  "tool": "Built-in ImageGen; existing Sharp WebP encoding",
+  "source": "apps/frontend/public/sample/forme/F05.webp",
+  "sourceHash": "780c14b5cc04ffb3ad5e27b7d74ecb2dacfb49816b480ed9323676887439ba3d",
+  "generated": "C:/Users/minat/.codex/generated_images/01a148cf-f24c-72d1-b0ba-9149694f0287/exec-99f29643-2887-4e21-b873-fcda05c89df9.png",
+  "generatedHash": "17378b7e121da5549a802158e432fd9a94316de3d54d710c6c430fe5e4256488",
+  "output": "apps/frontend/public/sample/forme/F20.webp",
+  "image": {
+    "id": "F20",
+    "hash": "e03f0dd9e30915787531d1b09515071449d0d98180780058a18b16929d1c2b77",
+    "mime": "image/webp",
+    "width": 1122,
+    "height": 1402,
+    "bytes": 34508
+  },
+  "inspection": "Compared visible source and generated output: same crew-neck rib, shoulder/sleeve/body outline, seam/hem placement, drape and studio framing; garment changed to black with visible construction detail. Fictional edited sample, not live recognition evidence or a pixel-identical recolour claim.",
+  "encoding": {
+    "containment": "1600x1600, without enlargement",
+    "format": "webp",
+    "quality": 86,
+    "effort": 5
+  },
+  "prompt": "Use case: precise-object-edit. Asset type: a fictional e-commerce clothing sample, exact colourway of the edit target. Input image: the local F05.webp white crew-neck short-sleeved T-shirt is the EDIT TARGET, not merely a style reference. Change ONLY the garment fabric colour from white to neutral deep black, including matching black neck rib and stitching. Preserve the exact same T-shirt design and photographed geometry: identical crew-neck opening and rib width, shoulder seams, sleeve length/width/angle, body length/width, side seams, hem and stitch lines, every wrinkle/fold/drape, camera angle, position, scale, full garment boundaries and surrounding negative space. Preserve the original grey studio background, lighting direction, ground shadow and framing exactly. Black cloth must retain visible soft highlights and all original seam/fold construction detail. This must read as the very same shirt in another colour, not a newly designed or differently posed black T-shirt. Do not widen, shorten or reshape the body/sleeves/neck; do not add graphics, label text, branding, objects, watermark, person, border or UI. Produce one black T-shirt photograph with the original portrait composition."
+}

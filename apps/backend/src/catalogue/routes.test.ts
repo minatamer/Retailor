@@ -17,6 +17,7 @@ import type { CatalogueAction } from "@retailor/contracts/recognition";
 import { Readable } from "node:stream";
 import type { Request } from "express";
 import { receiveCatalogue } from "./multipart.js";
+import type { DiagnosticSink } from "../http/diagnostics.js";
 const origin = "http://127.0.0.1:4310";
 async function image(id = "source", colour = "#123456") {
   const bytes = await sharp({
@@ -34,7 +35,7 @@ async function image(id = "source", colour = "#123456") {
   };
   return { bytes, photo: { id, source: descriptor, derivative: descriptor } };
 }
-function harness(sanitizer?: SanitizerPorts) {
+function harness(sanitizer?: SanitizerPorts, diagnostics?: DiagnosticSink) {
   const gate = new PaidAdmission({
     secret: "s".repeat(32),
     challenge: { verify: async (proof) => proof === "valid-proof" },
@@ -55,14 +56,17 @@ function harness(sanitizer?: SanitizerPorts) {
     ),
   };
   const base = composeRuntime(parseEnvironment({}), () => "request_test");
-  const app = createApp({
-    ...base,
-    recognition: {
-      admission: gate,
-      provider,
-      ...(sanitizer ? { sanitizer } : {}),
+  const app = createApp(
+    {
+      ...base,
+      recognition: {
+        admission: gate,
+        provider,
+        ...(sanitizer ? { sanitizer } : {}),
+      },
     },
-  });
+    diagnostics,
+  );
   return { app, gate, provider };
 }
 async function admit(
@@ -80,6 +84,224 @@ async function admit(
   };
 }
 describe("bounded admission and actual multipart recognition", () => {
+  it("privately records actual supported-view decisions without adding diagnostic data to public responses", async () => {
+    const sink = vi.fn<DiagnosticSink>();
+    const h = harness(undefined, sink);
+    const batch = [
+      await image("private-front"),
+      await image("private-back", "#234567"),
+    ];
+    const value = { ...action(), photos: batch.map((input) => input.photo) };
+    const model = observation(batch[0]!.photo.id);
+    model.garments[0] = {
+      ...model.garments[0]!,
+      sourceIds: batch.map((input) => input.photo.id),
+      attributes: [],
+      grouping: "supported_views",
+      reviewReason: "Corresponding front and rear construction.",
+    };
+    model.dispositions = batch.map((input) => ({
+      sourceId: input.photo.id,
+      kind: "linked",
+      garmentIndexes: [0],
+      reason: "",
+    }));
+    h.provider.interpret.mockResolvedValue({
+      ...model,
+      comparisons: [
+        {
+          photoPosition: 1,
+          closestPhotoPosition: 2,
+          relationship: "same_garment_views",
+          evidence: ["matching_outline", "matching_seams"],
+        },
+        {
+          photoPosition: 2,
+          closestPhotoPosition: 1,
+          relationship: "same_garment_views",
+          evidence: ["matching_outline", "matching_seams"],
+        },
+      ],
+    } as ReturnType<typeof observation>);
+    const approved = await admit(h.app, value);
+    const submit = request(h.app)
+      .post("/v1/catalogue/interpret")
+      .set("Origin", origin)
+      .set("Cookie", approved.cookie)
+      .field(
+        "manifest",
+        JSON.stringify({ action: value, grant: approved.grant }),
+      );
+    for (const input of batch)
+      submit.attach(input.photo.id, input.bytes, {
+        filename: "preview",
+        contentType: "image/jpeg",
+      });
+    const result = await submit;
+    expect(result.status).toBe(200);
+    expect(result.body.draft.items).toHaveLength(1);
+    expect(result.body.draft.items[0].product.imageIds).toEqual([
+      "private-front",
+      "private-back",
+    ]);
+    expect(h.provider.interpret).toHaveBeenCalledTimes(1);
+    expect(sink).toHaveBeenCalledTimes(1);
+    expect(sink.mock.calls[0]![0]).toMatchObject({
+      event: "catalogue_decision",
+      phase: "completed",
+      code: null,
+      groupingIssue: null,
+      comparisons: [
+        {
+          photoPosition: 1,
+          closestPhotoPosition: 2,
+          relationship: "same_garment_views",
+        },
+        {
+          photoPosition: 2,
+          closestPhotoPosition: 1,
+          relationship: "same_garment_views",
+        },
+      ],
+      decisions: [{ grouping: "supported_views", photoPositions: [1, 2] }],
+      acceptedGroups: [{ included: true, photoPositions: [1, 2] }],
+    });
+    expect(JSON.stringify(sink.mock.calls[0]![0])).not.toContain("private-");
+    expect(JSON.stringify(result.body)).not.toMatch(
+      /catalogue_decision|photoPositions|promptVersion|providerMs|comparisons|groupingIssue|reasoningEffort/u,
+    );
+    await request(h.app).get("/v1/config").expect(200);
+    expect(sink).toHaveBeenCalledTimes(1);
+  });
+  it("records schema and relationship rejection privately while preserving safe failure and admission cleanup", async () => {
+    for (const invalid of [
+      { PRIVATE_RAW: "untrusted response" },
+      {
+        ...observation(),
+        garments: [
+          { ...observation().garments[0]!, sourceIds: ["PRIVATE_FOREIGN"] },
+        ],
+      },
+      {
+        ...observation(),
+        garments: [
+          {
+            ...observation().garments[0]!,
+            attributes: [
+              {
+                name: "fit",
+                value: "PRIVATE_BAD_ATTRIBUTE",
+                sourceIds: [],
+                evidence: "unknown",
+              },
+            ],
+          },
+        ],
+      },
+    ]) {
+      const sink = vi.fn<DiagnosticSink>();
+      const h = harness(undefined, sink);
+      const input = await image();
+      const value = { ...action(), photos: [input.photo] };
+      h.provider.interpret.mockResolvedValue(
+        invalid as ReturnType<typeof observation>,
+      );
+      const approved = await admit(h.app, value);
+      const result = await request(h.app)
+        .post("/v1/catalogue/interpret")
+        .set("Origin", origin)
+        .set("Cookie", approved.cookie)
+        .field(
+          "manifest",
+          JSON.stringify({ action: value, grant: approved.grant }),
+        )
+        .attach(input.photo.id, input.bytes, {
+          filename: "preview",
+          contentType: "image/jpeg",
+        });
+      expect(result.status).toBe(502);
+      const event = sink.mock.calls
+        .map(([entry]) => entry)
+        .find((entry) => entry.event === "catalogue_decision");
+      expect(event).toMatchObject({
+        phase: "reconciling",
+        code: "UPSTREAM_FAILED",
+        acceptedGroups: [],
+      });
+      expect(JSON.stringify(event)).not.toContain("PRIVATE");
+      expect(JSON.stringify(result.body)).not.toMatch(
+        /PRIVATE|decisions|photoPositions/u,
+      );
+      expect(h.gate.counters()).toEqual({ active: 0 });
+      expect(h.provider.interpret).toHaveBeenCalledTimes(1);
+    }
+  });
+  it("returns valid separated products for manual correction despite a declared pair match", async () => {
+    const sink = vi.fn<DiagnosticSink>();
+    const h = harness(undefined, sink);
+    const batch = [
+      await image("private-front"),
+      await image("private-back", "#234567"),
+    ];
+    const value = { ...action(), photos: batch.map((input) => input.photo) };
+    const model = {
+      garments: batch.map((input) => observation(input.photo.id).garments[0]!),
+      dispositions: batch.map((input, index) => ({
+        sourceId: input.photo.id,
+        kind: "linked",
+        garmentIndexes: [index],
+        reason: "",
+      })),
+      comparisons: [
+        {
+          photoPosition: 1,
+          closestPhotoPosition: 2,
+          relationship: "same_garment_views",
+          evidence: ["matching_outline", "matching_seams"],
+        },
+        {
+          photoPosition: 2,
+          closestPhotoPosition: 1,
+          relationship: "same_garment_views",
+          evidence: ["matching_outline", "matching_seams"],
+        },
+      ],
+    };
+    h.provider.interpret.mockResolvedValue(model);
+    const approved = await admit(h.app, value);
+    const submit = request(h.app)
+      .post("/v1/catalogue/interpret")
+      .set("Origin", origin)
+      .set("Cookie", approved.cookie)
+      .field(
+        "manifest",
+        JSON.stringify({ action: value, grant: approved.grant }),
+      );
+    for (const input of batch)
+      submit.attach(input.photo.id, input.bytes, {
+        filename: "preview",
+        contentType: "image/jpeg",
+      });
+    const result = await submit;
+    expect(result.status).toBe(200);
+    expect(
+      result.body.draft.items.map(
+        (item: { product: { imageIds: string[] } }) => item.product.imageIds,
+      ),
+    ).toEqual([["private-front"], ["private-back"]]);
+    expect(sink.mock.calls[0]![0]).toMatchObject({
+      phase: "completed",
+      code: null,
+      groupingPolicy: "advisory",
+      groupingIssue: "supported_pair_split",
+      acceptedGroupCount: 2,
+    });
+    expect(JSON.stringify(result.body)).not.toMatch(
+      /comparisons|groupingIssue|groupingPolicy|attributeIssues/u,
+    );
+    expect(h.provider.interpret).toHaveBeenCalledTimes(1);
+    expect(h.gate.counters()).toEqual({ active: 0 });
+  });
   it("reports native capacity pressure safely before provider dispatch and releases its unspent reservation", async () => {
     const capacity = new ImageCapacity(),
       h = harness({ capacity, rss: () => IMAGE_WORKER_LIMITS.rssBytes }),
@@ -540,7 +762,7 @@ describe("bounded admission and actual multipart recognition", () => {
       active: 0,
     });
   });
-  it("sanitizes the real 19-photo sample and a distinct 24-image batch within the envelope", async () => {
+  it("sanitizes the real 20-photo sample and a distinct 24-image batch within the envelope", async () => {
     const root = new URL(
       "../../../../apps/frontend/public/sample/forme/",
       import.meta.url,
@@ -556,7 +778,7 @@ describe("bounded admission and actual multipart recognition", () => {
       files,
       new AbortController().signal,
     );
-    expect(prepared.size).toBe(19);
+    expect(prepared.size).toBe(20);
     for (const bytes of prepared.values())
       expect(inspectRaster(bytes).privateMetadata).toBe(false);
     const batch = await Promise.all(

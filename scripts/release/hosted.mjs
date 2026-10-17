@@ -72,7 +72,7 @@ export async function hostedAssetInventory() {
   const assets = [];
   for (const path of paths) {
     if (
-      !/^\/(?:sample\/forme\/(?:F(?:0[1-9]|1[0-9])\.webp|manifest\.json)|fonts\/[a-zA-Z0-9-]+\.(?:woff2|txt|json))$/u.test(
+      !/^\/(?:sample\/forme\/(?:F(?:0[1-9]|1[0-9]|20)\.webp|manifest\.json)|fonts\/[a-zA-Z0-9-]+\.(?:woff2|txt|json))$/u.test(
         path,
       )
     )
@@ -101,10 +101,10 @@ export async function probeHosted({
     throw new Error("Invalid hosted probe configuration");
   if (
     !Array.isArray(assets) ||
-    assets.length > 30 ||
+    assets.length > 31 ||
     assets.some(
       (asset) =>
-        !/^\/(?:sample\/forme\/(?:F(?:0[1-9]|1[0-9])\.webp|manifest\.json)|fonts\/[a-zA-Z0-9-]+\.(?:woff2|txt|json))$/u.test(
+        !/^\/(?:sample\/forme\/(?:F(?:0[1-9]|1[0-9]|20)\.webp|manifest\.json)|fonts\/[a-zA-Z0-9-]+\.(?:woff2|txt|json))$/u.test(
           asset.path,
         ) ||
         !Number.isSafeInteger(asset.bytes) ||

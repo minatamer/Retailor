@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { ModelCatalogueSchema } from "@retailor/contracts/recognition";
 import type { CatalogueAction } from "@retailor/contracts/recognition";
 import { parseDraft } from "@retailor/contracts/catalogue";
 import type { DraftItem } from "@retailor/contracts/catalogue";
 import { namedColour, formatGarmentTitle } from "@retailor/contracts/product";
 import { deny } from "../security/errors.js";
+import { CatalogueObservationSchema } from "./grouping.js";
+import { attributeIssue } from "./attributes.js";
 
-const visible = new Set(["colour", "pattern", "closure", "sleeve", "neckline"]);
 const unsupportedCopy =
   /\b(cotton|wool|linen|silk|polyester|cashmere|organic|sustainable|waterproof|antibacterial|guaranteed|recycled|true.to.size|slimming|breathable|premium.fabric)\b/iu;
 /** References are evidence, never authority. No model owns IDs or financial defaults. */
@@ -15,7 +15,7 @@ export function reconcileCatalogue(
   action: CatalogueAction,
   id: () => string = randomUUID,
 ) {
-  const parsed = ModelCatalogueSchema.safeParse(input);
+  const parsed = CatalogueObservationSchema.safeParse(input);
   if (!parsed.success) return deny("UPSTREAM_FAILED", 502);
   const model = parsed.data,
     sources = new Set(action.photos.map((photo) => photo.id));
@@ -84,17 +84,7 @@ export function reconcileCatalogue(
     )
       return deny("UPSTREAM_FAILED", 502);
     const attributes = garment.attributes.map((attr) => {
-      if (
-        new Set(attr.sourceIds).size !== attr.sourceIds.length ||
-        attr.sourceIds.some((source) => !garment.sourceIds.includes(source)) ||
-        (attr.evidence !== "unknown" &&
-          (!attr.sourceIds.length || attr.value === null)) ||
-        (attr.evidence === "visual" && !visible.has(attr.name)) ||
-        (attr.evidence === "label" &&
-          !["material", "care"].includes(attr.name)) ||
-        (attr.evidence === "unknown" &&
-          (attr.value !== null || attr.sourceIds.length))
-      )
+      if (attributeIssue(attr, garment.sourceIds))
         return deny("UPSTREAM_FAILED", 502);
       return {
         name: attr.name,

@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-17",
+  "tool": "Codex built-in ImageGen; existing Sharp format encoding",
+  "authorization": "Owner explicitly requested correcting both generated rear-view and charcoal sample images.",
+  "reason": "F16/F19 had decorative swirl-like surface texture absent from original F01. Actual v6 model linked those two while marking F01/F16 uncertain; exact causal reason is not proven.",
+  "selected": [
+    {
+      "id": "F16",
+      "generated": "C:/Users/minat/.codex/generated_images/01a148cf-f24c-72d1-b0ba-9149694f0287/exec-617795de-eb9f-4c32-bf02-e156adecbcc3.png",
+      "promptKey": "jeansRepairPlainPrompts",
+      "promptIndex": 0,
+      "previousImage": {
+        "id": "F16",
+        "hash": "9e19af76e4040f0cb00efae88ffa3b4f1adfee007032ecc0b3412a14cccc13ee",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 163602
+      },
+      "generatedHash": "c0792acdfeb1a9406ac5ba10dab1048b2bd982aa60a353298b5f123db129ba31",
+      "output": {
+        "path": "apps/frontend/public/sample/forme/F16.webp",
+        "image": {
+          "id": "F16",
+          "hash": "be863622ccecc956b4d6531f8c16025c764663db989f22687093a8bb7bc53cd8",
+          "mime": "image/webp",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 208514
+        }
+      }
+    },
+    {
+      "id": "F19",
+      "generated": "C:/Users/minat/.codex/generated_images/01a148cf-f24c-72d1-b0ba-9149694f0287/exec-a1acdb82-1d5c-4069-bc3d-e73c9fe40c6e.png",
+      "promptKey": "jeansRepairPlainPrompts",
+      "promptIndex": 1,
+      "previousImage": {
+        "id": "F19",
+        "hash": "e3841201cd2024e1434c4d750a5b156191c5af80efef576102a7f56638a1fe84",
+        "mime": "image/webp",
+        "width": 1122,
+        "height": 1402,
+        "bytes": 130436
+      },
+      "generatedHash": "95f0950fc6101d8c2365dea30a4210898b8346010d9264550bcaedb403d7f3f0",
+      "output": {
+        "path": "apps/frontend/public/sample/forme/F19.webp",
+        "image": {
+          "id": "F19",
+          "hash": "3bfd09508ff9a648ea0a73a0f765ca37cfb891b5e6eb1a3a618b441ea1c5f106",
+          "mime": "image/webp",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 182096
+        }
+      }
+    }
+  ],
+  "inspection": "Selected regenerated plain-denim rear/charcoal photographs, inspected inline. Full straight-leg garments, expected pockets/seams/views and beige backdrop retained at design level; no prominent decorative swirls, text, branding, UI or person. Regeneration changes framing/proportions slightly; not a pixel-identical edit or real garment evidence. Earlier exact-target edit attempts retained unwanted texture and were not shipped.",
+  "encoding": "Sharp; inside1600px, without enlargement, rotate orientation, metadata stripped, WebP quality86 effort5.",
+  "acceptance": "Fresh owner manual full-sample run required. This changes the evaluation input and does not establish general-model accuracy. Old hashes and previous failed evidence remain recorded.",
+  "history": [
+    {
+      "batch": "jeansRepairPrompts",
+      "requests": [
+        {
+          "key": "jeansRearRepair",
+          "paths": [
+            "C:\\Users\\minat\\Work\\Retailor\\apps\\frontend\\public\\sample\\forme\\F16.webp",
+            "C:\\Users\\minat\\Work\\Retailor\\apps\\frontend\\public\\sample\\forme\\F01.webp"
+          ],
+          "prompt": "Use case: precise-object-edit. Asset type: fictional e-commerce sample rear product photograph. Input image 1 is the EDIT TARGET (rear view). Input image 2 is the supporting ORIGINAL FRONT identity/fabric reference of the same jeans. Correct ONLY the unrealistic all-over swirl/paisley/etched-looking texture in image 1: replace it with plain natural denim grain, matching the blue indigo cloth colour, grain scale and ordinary wear/fading in image 2. This is plain jeans, absolutely no decorative pattern, print, swirls, embroidery, jacquard or rippling etching. Preserve image 1's exact rear view, full garment outline/proportions, straight legs, waistband/belt loops, rear yoke, two plain patch pockets, every stitch/seam/hem, pose, location, framing, warm beige background and soft light/shadow. Keep a photorealistic small diagonal denim weave with gentle natural variation, not plastic-smooth. Do not copy front pockets/button/fly onto the rear. One full pair, entire waistband to both hems visible, same portrait composition. No text, logo, watermark, UI, additional objects or changed design."
+        },
+        {
+          "key": "jeansCharcoalRepair",
+          "paths": [
+            "C:\\Users\\minat\\Work\\Retailor\\apps\\frontend\\public\\sample\\forme\\F19.webp",
+            "C:\\Users\\minat\\Work\\Retailor\\apps\\frontend\\public\\sample\\forme\\F01.webp"
+          ],
+          "prompt": "Use case: precise-object-edit. Asset type: fictional e-commerce sample charcoal colourway photograph. Input image 1 is the EDIT TARGET (charcoal front jeans). Input image 2 is the supporting ORIGINAL BLUE FRONT identity/fabric reference. Correct ONLY the unrealistic all-over swirl/paisley/etched-looking texture in image 1: replace it with plain natural denim grain matching the small grain scale and ordinary wear/fading of image 2, while retaining image 1's charcoal/washed-black fabric colour. It must be the same plain straight-leg jeans as image 2 in a charcoal colour, with no decorative pattern, print, swirls, embroidery, jacquard or rippling etching. Preserve the exact front construction and outline: cut, waistband, belt loops, pocket openings/coin pocket, rivets/button/fly, seams, hems, straight legs, full garment pose/position/scale, warm beige background, framing and soft light/shadow. Small realistic diagonal denim weave with gentle natural variation, not plastic-smooth. One full pair, entire waistband to both hems visible, same portrait composition. No text, logos, watermark, UI, people, extra objects or redesigned features."
+        }
+      ]
+    },
+    {
+      "batch": "jeansRepairPromptsV2",
+      "requests": [
+        {
+          "key": "jeansRearRepairV2",
+          "prompt": "Use case: product-mockup. Supporting identity reference: the provided fictional photograph of plain blue straight-leg jeans. Produce ONE new photorealistic BACK VIEW photograph of exactly this same jeans design. The fabric must be ORDINARY PLAIN BLUE DENIM: tiny straight diagonal twill fibres, natural indigo wash and modest soft fading; absolutely no large decorative pattern, no swirls, no paisley, no lace-like/etched/wavy line texture, no printing or embroidery. Match this reference's medium blue colour, garment width/length, straight leg silhouette, belt loops, outer/inner leg seam, hem width/stitching. Show the actual BACK with rear yoke, central rear seam and two plain simple patch pockets; front fly, front button and front pocket openings are hidden on the far side. Photograph the whole single pair hanging/flat, legs straight, full waistband and both hems visible, centered in the same warm beige neutral studio background with the same framing/soft diffuse lighting. No folded/cropped parts, people, labels, writing, logos, watermark or additional objects. The requested change from the reference is viewpoint only. PRIORITY: convincing smooth plain denim cloth with small linear weave; do not introduce any decorative surface motif."
+        },
+        {
+          "key": "jeansCharcoalRepairV2",
+          "prompt": "Use case: precise-object-edit. EDIT TARGET is the supplied original blue front jeans photograph. Make the exact same photograph and garment in another colour: change ONLY its blue denim fabric to neutral washed-black/charcoal plain denim, with tonal charcoal stitching where appropriate and unchanged metal hardware. Preserve precisely the straight-leg cut, full outline, leg lengths/widths, waistband, belt loops, front pockets and coin pocket, rivets/button/fly, seams, hems, pose, position, scale, complete framing, beige background, shadows and lighting. Keep the existing original small natural diagonal denim weave and smooth washed shading. Absolutely NO decorative pattern: no swirls, paisley, wavy etched line texture, embroidery, print or jacquard. Ordinary plain charcoal denim, not ornamental fabric. Entire garment from waist to both hems visible. No labels, text, logo, watermark, people, collage or additional objects."
+        }
+      ]
+    },
+    {
+      "batch": "jeansRepairPlainPrompts",
+      "requests": [
+        {
+          "key": "jeansRearPlain",
+          "prompt": "Photorealistic ecommerce catalogue photograph of the BACK of one pair of medium-blue straight-leg jeans. Ordinary undecorated jeans, plain smooth matte blue denim surface with very fine almost invisible linear weave. The fabric is visually uniform, with only gentle broad natural fading, no visible all-over motif or raised/etched surface. Rear yoke seam, two simple rectangular rear patch pockets with shallow pentagonal bottoms and no pocket embroidery, central rear seam, five belt loops, gold-brown simple seam stitching, straight full legs with simple double stitched hems. Narrow straight cut, not baggy or flared. Full waistband through both hems visible, garment centered upright, waist spans roughly 40% of frame width, legs reach roughly 90% of frame height, entire garment about 83% frame height. Empty warm ivory-beige studio background, soft diffuse light and a gentle shadow behind the garment, portrait4:5. No person/mannequin, no distress holes, no text, no labels/logos/brand, no extra objects. CRITICAL: completely PLAIN smooth fabric; NO paisley, swirls, waves, ornamental lines, embroidery, print, jacquard, stippling, noise or decorative pattern."
+        },
+        {
+          "key": "jeansCharcoalPlain",
+          "prompt": "Photorealistic ecommerce catalogue photograph of the FRONT of one pair of washed-charcoal straight-leg jeans. Ordinary undecorated five-pocket jeans, smooth matte dark charcoal denim fabric with very fine almost invisible linear weave and only broad soft grey natural wear fading at upper thighs/knees; no visible all-over motif or etched surface. Standard waistband and five belt loops, centered silver metal waist button and fly, two curved front pocket openings, small coin pocket inside right pocket, small copper rivets, subtle tonal charcoal/tan simple stitching and straight full narrow legs with double stitched hems. Not baggy or flared. Full waistband through both hems visible, garment centered upright, waist spans roughly40% of frame width, garment roughly83% frame height, slight natural separation between legs. Empty warm ivory-beige studio background, soft diffuse light, gentle shadow behind garment, portrait4:5. No person/mannequin, holes, writing, labels/logos/brand, extra objects. CRITICAL: completely PLAIN smooth fabric; NO paisley, swirls, waves, ornamental lines, embroidery, print, jacquard, stippling, noise or decorative pattern."
+        }
+      ]
+    },
+    {
+      "batch": "jeansRepairFinalPrompts",
+      "requests": [
+        {
+          "key": "jeansRearFinal",
+          "paths": [
+            "C:\\Users\\minat\\Work\\Retailor\\apps\\frontend\\public\\sample\\forme\\F16.webp",
+            "C:\\Users\\minat\\.codex\\generated_images\\01a148cf-f24c-72d1-b0ba-9149694f0287\\exec-617795de-eb9f-4c32-bf02-e156adecbcc3.png"
+          ],
+          "prompt": "Image 1 is the EDIT TARGET and provides the exact geometry/composition to preserve. Image 2 provides ONLY the plain smooth blue fabric surface to transfer. REPAINT ALL BLUE FABRIC in image1 using the smooth unpatterned surface appearance of image2. Completely erase the wavy decorative micro-lines/swirls/paisley on image1, replacing them with visually smooth matte medium-blue cloth with gentle broad shading. Do not preserve ANY old decorative texture, including on waistband, pockets and legs. Tiny grain may be nearly invisible; prefer smooth cloth over any curving line pattern. Preserve every original garment edge and contour, rear pockets, yoke and other seams, tan stitching, belt loops, hems, pose, scale, generous top/bottom margins, beige backdrop and soft light. DO NOT copy image2's garment outline or framing. Full original rear view with both legs, no cropped parts, no words/logos/watermark/extra objects. This is a surface repaint, not a redesigned garment. The only permitted visible change is removing the patterned texture."
+        },
+        {
+          "key": "jeansCharcoalFinal",
+          "paths": [
+            "C:\\Users\\minat\\Work\\Retailor\\apps\\frontend\\public\\sample\\forme\\F19.webp",
+            "C:\\Users\\minat\\.codex\\generated_images\\01a148cf-f24c-72d1-b0ba-9149694f0287\\exec-a1acdb82-1d5c-4069-bc3d-e73c9fe40c6e.png"
+          ],
+          "prompt": "Image1 is the EDIT TARGET and provides the exact geometry/composition to preserve. Image2 provides ONLY the plain smooth charcoal fabric surface to transfer. REPAINT ALL CHARCOAL FABRIC in image1 with the unpatterned smooth matte cloth surface of image2. Completely remove the swirling decorative micro-lines/paisley/etched texture from image1 on the waist, pockets and legs; use gentle broad fading/shading and barely visible tiny straight weave. Prefer smooth cloth over any curving line texture. Preserve all image1 edges/proportions exactly: straight legs, pocket openings/coin pocket, rivets, button, fly, belt loops, seams and hems, full garment pose/position/scale, generous original margins, beige background and light/shadow. DO NOT copy image2's larger garment outline or framing. No crop, words, logos, watermark, people or extra objects. Only repaint the fabric surface; do not redesign the jeans."
+        }
+      ]
+    }
+  ],
+  "originalFrontHash": "1cece25a55b40ca865604049d6dfd351f2261ba0ee6b08b34d8e067b35b1e06f",
+  "totalSampleBytes": 1955908
+}
