@@ -4261,9 +4261,7 @@ export class SessionController {
       );
     }
   }
-  async reset(
-    notice = "Fresh collection. Your previous temporary workspace has been cleared.",
-  ) {
+  async reset(notice = "") {
     if (!this.active || this.resetting) return;
     this.resetting = true;
     this.cancelOperation();
@@ -4333,7 +4331,7 @@ export class SessionController {
         ready: true,
         recoveryNotice,
         notice: this.aiAttention
-          ? `${notice} AI still needs attention from the demo owner; reload after it is restored.`
+          ? `${notice} AI still needs attention from the demo owner; reload after it is restored.`.trim()
           : notice,
       });
       if (
