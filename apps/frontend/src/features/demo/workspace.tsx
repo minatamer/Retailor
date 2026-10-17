@@ -313,11 +313,6 @@ function Processing({ step }: { step: ProcessStep }) {
         <Icon name="sparkle" size={48} />
       </div>
       <span className={styles.eyebrow}>Your collection, taking shape</span>
-      <h1>
-        Good things
-        <br />
-        <em>are coming into focus.</em>
-      </h1>
       <p role="status">{step}…</p>
       <ul>
         {PROCESS_STEPS.map((label, index) => (
@@ -337,11 +332,11 @@ function Processing({ step }: { step: ProcessStep }) {
           </li>
         ))}
       </ul>
-      <p className={styles.finePrint}>
-        {state.fixture
-          ? "Local authored fixture processing; no AI request is made."
-          : "Waiting for the actual result. No percentage is estimated."}
-      </p>
+      {state.fixture && (
+        <p className={styles.finePrint}>
+          Local authored fixture processing; no AI request is made.
+        </p>
+      )}
       <Button variant="secondary" onClick={() => controller.cancel()}>
         Cancel and keep my photos
       </Button>

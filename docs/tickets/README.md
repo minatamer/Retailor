@@ -1,5 +1,7 @@
 # Retailor implementation tickets
 
+Processing copy removal: [RTL-152](RTL-152-remove-processing-helper.md) removes the requested processing headline and live waiting/percentage helper, preserving actual progress and cancellation. Scoped read-only source review is clean; tests remain deferred by the owner. [Validation](../validation/RTL-152.md) records actual results. No staging/commit or external action is included.
+
 Photo-caption spacing: [RTL-151](RTL-151-photo-caption-spacing.md) adds side/bottom breathing room inside selected-photo cards and wraps long filenames. Scoped read-only source review is clean; tests remain deferred by the owner. [Validation](../validation/RTL-151.md) records actual results. No staging/commit or external action is included.
 
 Reachable photo-draft action: [RTL-150](RTL-150-sticky-photo-draft-action.md) aligns the explanation and CTA in one row and keeps the action area sticky at the viewport bottom within the picker, with a narrow-screen stack. Scoped read-only source review is clean; tests remain deferred by the owner. [Validation](../validation/RTL-150.md) records actual results. No staging/commit or external action is included.
