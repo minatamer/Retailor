@@ -291,7 +291,7 @@
 }
 .photoMeta {
   display: block;
-  padding: 10px 0 2px;
+  padding: 12px 14px 14px;
 }
 .photoMeta strong {
   display: block;
@@ -305,6 +305,7 @@
   font-size: 10px;
   color: var(--platform-muted);
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 .photoActions {
   display: flex;
