@@ -207,6 +207,12 @@
   outline: var(--focus-ring-width) solid var(--platform-text);
   outline-offset: var(--focus-ring-offset);
 }
+.upload input,
+.sources :is(button, summary),
+.progress button,
+.openPhoto {
+  scroll-margin-block-end: calc(200px + env(safe-area-inset-bottom));
+}
 .linkHeading {
   display: flex;
   align-items: center;
@@ -351,14 +357,26 @@
   border-top: 1px solid var(--platform-line);
 }
 .processing {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   border-top: 1px solid var(--platform-line);
-  padding-top: 20px;
+  background: var(--platform-surface);
+  box-shadow: 0 -12px 24px #242b6008;
+  padding: 16px 0 calc(16px + env(safe-area-inset-bottom));
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+.processing .note {
+  min-width: 0;
+  flex: 1;
+  margin: 0;
 }
 .processing button {
-  align-self: end;
+  flex: none;
+  white-space: nowrap;
 }
 .sample {
   min-width: 0;
@@ -550,6 +568,14 @@
   .selectionHeading {
     flex-direction: column;
     gap: 12px;
+  }
+  .processing {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .processing button {
+    width: 100%;
   }
   .footer {
     align-items: start;
