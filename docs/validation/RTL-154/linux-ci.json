@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-17T10:58:29.617Z",
+  "source": {
+    "baseRevision": "4d908d46e8d6b64c70bf30327ba1d70af82bf098",
+    "dirtyWhenVerified": true,
+    "fingerprint": "645969e052880bbb143a0ff345e82c1b914520eeb1ea2f3c680342e027d4470f",
+    "appInputFiles": 307,
+    "qualityInputFilesCompared": 379,
+    "exactHostContextBytes": true,
+    "normalization": false
+  },
+  "image": {
+    "id": "sha256:5d7113a36b80ed30f7b2f5cb6f86762ab12b82435e7bb0ae4a47c9a229c7182d",
+    "os": "linux",
+    "architecture": "amd64",
+    "bytes": 1833648213
+  },
+  "observed": {
+    "platform": "linux",
+    "node": "v24.19.0",
+    "pnpm": "11.25.0",
+    "temporaryGitRevision": "08f83fbaf57dd144cc9c298ab057ab6a6ecf8737",
+    "fingerprint": "645969e052880bbb143a0ff345e82c1b914520eeb1ea2f3c680342e027d4470f",
+    "matchesLocalLinuxEvidence": true,
+    "paidRequests": 0,
+    "networkRequests": 0,
+    "publicReleaseAccepted": false
+  },
+  "commands": [
+    "pnpm install --frozen-lockfile",
+    "pnpm check",
+    "node scripts/release/preflight.mjs"
+  ],
+  "gates": {
+    "format": true,
+    "lint": true,
+    "typecheck": true,
+    "boundaries": {
+      "passed": true,
+      "modules": 209
+    },
+    "unit": {
+      "passed": true,
+      "tests": 671,
+      "files": 106
+    },
+    "productionBuild": true
+  },
+  "network": {
+    "install": "Official registry during image preparation",
+    "gates": "none",
+    "verification": "none"
+  },
+  "originalGitMetadata": false,
+  "localEnvironment": false,
+  "rawBuildLogSha256": "31a1b17aef2fb97ba5f4c2ed7bb429cc40840667adcb1913715ed6cfe77d5e7d",
+  "verificationDockerfileSha256": "34ed3625a1de8c373553ad00d836abc3a83834754b34eb8fe9bfa6abe7aafb7f",
+  "limitations": [
+    "Actual local Linux run, not a GitHub job or hosted acceptance",
+    "Temporary Git identity differs from owner repository; exact source/test/tool bytes compared independently",
+    "Explicitly blank OPENAI_API_KEY test ENV; no secret supplied",
+    "No paid AI, Stripe, cloud storage or hosted acceptance from this isolated check"
+  ]
+}

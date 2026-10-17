@@ -17,6 +17,7 @@
 !apps/frontend/public/sample/forme/
 !apps/frontend/public/sample/forme/F0[1-9].webp
 !apps/frontend/public/sample/forme/F1[0-9].webp
+!apps/frontend/public/sample/forme/F20.webp
 !apps/frontend/public/sample/forme/manifest.json
 !apps/frontend/public/fonts/
 !apps/frontend/public/fonts/*.woff2
