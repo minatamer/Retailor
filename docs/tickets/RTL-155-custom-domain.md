@@ -1,0 +1,13 @@
+# RTL-155 — connect the verified custom domain
+
+Status: Paused at owner request. DNS propagated and matching origin revisions prepared at zero traffic; certificate verification and traffic cutover incomplete.
+
+The owner verifies `tryretailor.com`, adds it to Turnstile and explicitly asks to connect it to the existing Cloud Run frontend while keeping the backend private. Follow [the allocation](../commit-plans/RTL-155.md), preserve [RTL-154 deployment evidence](../validation/RTL-154.md), and return the exact mapping-generated A/AAAA records for the owner to enter in Cloudflare.
+
+Scope is the apex domain only, project `retailor-511714`, region `europe-west1`, service `retailor-frontend`. Inspect the active account and verified ownership; reuse an existing matching mapping or create a missing one without override. Preserve private backend IAM, current immutable images, pinned secret versions, paid master, resource limits and backend bridge URL/audience. Origin changes must be coordinated with DNS/HTTPS readiness so the existing URL is not unnecessarily broken. No Firebase/load balancer, DNS mutation, paid model smoke, secret-value access or independent security acceptance is included. Cloud Run direct domain mapping remains a Preview feature, previously disclosed to the owner.
+
+Initial result: [validation](../validation/RTL-155.md) and [mapping metadata](../validation/RTL-155/domain.json) record verified ownership, the new apex mapping, four A/four AAAA records and `CertificatePending`. Initial service configuration/traffic/IAM are unchanged; public readiness/config and two backend denials pass on recheck. Preserve the first readiness504 without claiming a proven cause or adding app retries.
+
+Subsequent result: the owner adds all eight records. Authoritative and public DNS checks confirm them. Frontend `retailor-frontend-00002-xj6` and backend `retailor-backend-00004-22g` are prepared with only `FRONTEND_ORIGIN=https://tryretailor.com` changed, at zero traffic; the original pair still serves100% at the last inspection. Images, secrets, paid enablement, limits and backend bridge identity/audience are preserved; no IAM change is made. HTTPS still fails and Google reports `CertificatePending` at the last check. The owner explicitly stops checking and will request a later recheck. [Saved cutover state](../validation/RTL-155/cutover.json) records preparation rather than completion.
+
+The latest request authorizes staging/committing current work only. Reconcile and review local documentation against saved evidence without resuming any external check or cloud operation, then commit the seven allocated files. No push, automation or paid request.

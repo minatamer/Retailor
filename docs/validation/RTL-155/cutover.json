@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "status": "Paused by owner; cutover incomplete",
+  "lastHTTPSCheckAt": "2026-10-17T12:32:03.026Z",
+  "projectId": "retailor-511714",
+  "region": "europe-west1",
+  "targetOrigin": "https://tryretailor.com",
+  "dnsPropagated": true,
+  "dnsObservation": [
+    {
+      "type": "A",
+      "answers": [
+        "216.239.36.21",
+        "216.239.32.21",
+        "216.239.38.21",
+        "216.239.34.21"
+      ]
+    },
+    {
+      "type": "AAAA",
+      "answers": [
+        "2001:4860:4802:38::15",
+        "2001:4860:4802:36::15",
+        "2001:4860:4802:32::15",
+        "2001:4860:4802:34::15"
+      ]
+    },
+    {
+      "type": "CAA",
+      "code": "ENODATA"
+    }
+  ],
+  "authoritativeAndPublicResolverEvidence": {
+    "observedAt": "2026-10-17T12:10:13.558Z",
+    "probes": [
+      {
+        "resolver": "suzanne.ns.cloudflare.com",
+        "type": "A",
+        "answers": [
+          "216.239.36.21",
+          "216.239.34.21",
+          "216.239.32.21",
+          "216.239.38.21"
+        ]
+      },
+      {
+        "resolver": "suzanne.ns.cloudflare.com",
+        "type": "AAAA",
+        "answers": [
+          "2001:4860:4802:34::15",
+          "2001:4860:4802:36::15",
+          "2001:4860:4802:32::15",
+          "2001:4860:4802:38::15"
+        ]
+      },
+      {
+        "resolver": "suzanne.ns.cloudflare.com",
+        "type": "TXT",
+        "answers": ["Google verification TXT present"]
+      },
+      {
+        "resolver": "quinton.ns.cloudflare.com",
+        "type": "A",
+        "answers": [
+          "216.239.38.21",
+          "216.239.36.21",
+          "216.239.32.21",
+          "216.239.34.21"
+        ]
+      },
+      {
+        "resolver": "quinton.ns.cloudflare.com",
+        "type": "AAAA",
+        "answers": [
+          "2001:4860:4802:32::15",
+          "2001:4860:4802:36::15",
+          "2001:4860:4802:38::15",
+          "2001:4860:4802:34::15"
+        ]
+      },
+      {
+        "resolver": "quinton.ns.cloudflare.com",
+        "type": "TXT",
+        "answers": ["Google verification TXT present"]
+      },
+      {
+        "resolver": "dns.google",
+        "type": "A",
+        "status": 200,
+        "dnsStatus": 0,
+        "answers": [
+          {
+            "type": 1,
+            "data": "216.239.36.21"
+          },
+          {
+            "type": 1,
+            "data": "216.239.34.21"
+          },
+          {
+            "type": 1,
+            "data": "216.239.38.21"
+          },
+          {
+            "type": 1,
+            "data": "216.239.32.21"
+          }
+        ]
+      },
+      {
+        "resolver": "dns.google",
+        "type": "AAAA",
+        "status": 200,
+        "dnsStatus": 0,
+        "answers": [
+          {
+            "type": 28,
+            "data": "2001:4860:4802:34::15"
+          },
+          {
+            "type": 28,
+            "data": "2001:4860:4802:36::15"
+          },
+          {
+            "type": 28,
+            "data": "2001:4860:4802:38::15"
+          },
+          {
+            "type": 28,
+            "data": "2001:4860:4802:32::15"
+          }
+        ]
+      },
+      {
+        "resolver": "cloudflare-dns.com",
+        "type": "A",
+        "status": 200,
+        "dnsStatus": 0,
+        "answers": [
+          {
+            "type": 1,
+            "data": "216.239.36.21"
+          },
+          {
+            "type": 1,
+            "data": "216.239.38.21"
+          },
+          {
+            "type": 1,
+            "data": "216.239.34.21"
+          },
+          {
+            "type": 1,
+            "data": "216.239.32.21"
+          }
+        ]
+      },
+      {
+        "resolver": "cloudflare-dns.com",
+        "type": "AAAA",
+        "status": 200,
+        "dnsStatus": 0,
+        "answers": [
+          {
+            "type": 28,
+            "data": "2001:4860:4802:36::15"
+          },
+          {
+            "type": 28,
+            "data": "2001:4860:4802:34::15"
+          },
+          {
+            "type": 28,
+            "data": "2001:4860:4802:38::15"
+          },
+          {
+            "type": 28,
+            "data": "2001:4860:4802:32::15"
+          }
+        ]
+      }
+    ]
+  },
+  "httpsAtLastCheck": {
+    "authorized": false,
+    "code": "ECONNRESET"
+  },
+  "mappingConditionsAtLastCheck": [
+    {
+      "lastTransitionTime": "2026-10-17T12:00:37.671096Z",
+      "message": "Waiting for certificate provisioning. You must configure your DNS records for certificate issuance to begin.",
+      "reason": "CertificatePending",
+      "status": "Unknown",
+      "type": "Ready"
+    },
+    {
+      "lastTransitionTime": "2026-10-17T12:01:37.930600Z",
+      "message": "Certificate issuance pending.",
+      "reason": "CertificatePending",
+      "status": "Unknown",
+      "type": "CertificateProvisioned"
+    },
+    {
+      "lastTransitionTime": "2026-10-17T12:00:37.671096Z",
+      "status": "True",
+      "type": "DomainRoutable"
+    }
+  ],
+  "services": {
+    "frontend": {
+      "service": "retailor-frontend",
+      "servingRevision": "retailor-frontend-00001-fp5",
+      "servingTrafficPercent": 100,
+      "servingOrigin": "https://retailor-frontend-188132745113.europe-west1.run.app",
+      "preparedRevision": "retailor-frontend-00002-xj6",
+      "preparedTrafficPercent": 0,
+      "preparedOrigin": "https://tryretailor.com",
+      "image": "europe-west1-docker.pkg.dev/retailor-511714/retailor/frontend@sha256:1ed2d5b23c1e34fd1f39ca32d828bd97d77659dfcc86feed1349eca0e9446ff5",
+      "onlyPreparedOriginChanged": true,
+      "imagesSecretsLimitsPreserved": true
+    },
+    "backend": {
+      "service": "retailor-backend",
+      "servingRevision": "retailor-backend-00003-hlj",
+      "servingTrafficPercent": 100,
+      "servingOrigin": "https://retailor-frontend-188132745113.europe-west1.run.app",
+      "preparedRevision": "retailor-backend-00004-22g",
+      "preparedTrafficPercent": 0,
+      "preparedOrigin": "https://tryretailor.com",
+      "image": "europe-west1-docker.pkg.dev/retailor-511714/retailor/backend@sha256:f516175efb04d54ef8a2017e940b13de1b6464199da93929beb56d9f59406eca",
+      "onlyPreparedOriginChanged": true,
+      "imagesSecretsLimitsPreserved": true
+    }
+  },
+  "backendIAMObservedBeforePreparation": [
+    {
+      "members": [
+        "serviceAccount:retailor-frontend@retailor-511714.iam.gserviceaccount.com"
+      ],
+      "role": "roles/run.invoker"
+    }
+  ],
+  "backendIAMMutationPerformed": false,
+  "earlierBackendPrivacyEvidence": {
+    "observedAt": "2026-10-17T12:02:28.996Z",
+    "backendPrivateVerified": true,
+    "unauthenticatedDenials": [
+      {
+        "origin": "https://retailor-backend-188132745113.europe-west1.run.app",
+        "path": "/v1/health",
+        "status": 403
+      },
+      {
+        "origin": "https://retailor-backend-xmacampiyq-ew.a.run.app",
+        "path": "/v1/health",
+        "status": 403
+      }
+    ]
+  },
+  "sourceFingerprint": "645969e052880bbb143a0ff345e82c1b914520eeb1ea2f3c680342e027d4470f",
+  "buildInputCount": 307,
+  "paidEnabled": true,
+  "paidProviderRequests": 0,
+  "challengeVerificationRequests": 0,
+  "secretValuesRead": false,
+  "tokensSaved": false,
+  "canonicalOriginCutoverPending": true,
+  "ownerStoppedChecks": true,
+  "automationCreated": false,
+  "resumeAuthorizationRequiredFromOwner": true,
+  "pending": [
+    "Owner requests another certificate check",
+    "Observe hostname-valid trusted HTTPS and Google mapping readiness",
+    "Reinspect prepared revisions and private backend policy, then explicitly route matching pair at100%",
+    "Verify custom-domain readiness/config, origin admission and direct backend denials",
+    "Cloudflare proxy/origin-seal/rates and independent connected/account acceptance remain unverified"
+  ],
+  "limitations": [
+    "No external lookup or cloud mutation performed to prepare this commit; this records saved observations only",
+    "Last observed certificate status is not a statement about current external state",
+    "No successful domain HTTPS, traffic cutover or real Turnstile/paid/browser result is claimed",
+    "Initial operator TLS probes preserved trust/SNI/hostname validation and used a fresh resolver only to bypass local negative DNS caching"
+  ]
+}

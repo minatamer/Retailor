@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-17T12:02:28.996Z",
+  "projectId": "retailor-511714",
+  "region": "europe-west1",
+  "domain": "tryretailor.com",
+  "mappedService": "retailor-frontend",
+  "createdAt": "2026-10-17T12:00:30.939804Z",
+  "mappingConditions": [
+    {
+      "lastTransitionTime": "2026-10-17T12:00:37.671096Z",
+      "message": "Waiting for certificate provisioning. You must configure your DNS records for certificate issuance to begin.",
+      "reason": "CertificatePending",
+      "status": "Unknown",
+      "type": "Ready"
+    },
+    {
+      "lastTransitionTime": "2026-10-17T12:00:37.671096Z",
+      "status": "Unknown",
+      "type": "CertificateProvisioned"
+    },
+    {
+      "lastTransitionTime": "2026-10-17T12:00:37.671096Z",
+      "status": "True",
+      "type": "DomainRoutable"
+    }
+  ],
+  "resourceRecords": [
+    {
+      "type": "A",
+      "name": "@",
+      "content": "216.239.32.21",
+      "ttl": "Auto",
+      "proxy": "DNS only"
+    },
+    {
+      "type": "A",
+      "name": "@",
+      "content": "216.239.34.21",
+      "ttl": "Auto",
+      "proxy": "DNS only"
+    },
+    {
+      "type": "A",
+      "name": "@",
+      "content": "216.239.36.21",
+      "ttl": "Auto",
+      "proxy": "DNS only"
+    },
+    {
+      "type": "A",
+      "name": "@",
+      "content": "216.239.38.21",
+      "ttl": "Auto",
+      "proxy": "DNS only"
+    },
+    {
+      "type": "AAAA",
+      "name": "@",
+      "content": "2001:4860:4802:32::15",
+      "ttl": "Auto",
+      "proxy": "DNS only"
+    },
+    {
+      "type": "AAAA",
+      "name": "@",
+      "content": "2001:4860:4802:34::15",
+      "ttl": "Auto",
+      "proxy": "DNS only"
+    },
+    {
+      "type": "AAAA",
+      "name": "@",
+      "content": "2001:4860:4802:36::15",
+      "ttl": "Auto",
+      "proxy": "DNS only"
+    },
+    {
+      "type": "AAAA",
+      "name": "@",
+      "content": "2001:4860:4802:38::15",
+      "ttl": "Auto",
+      "proxy": "DNS only"
+    }
+  ],
+  "dnsBefore": {
+    "observedAt": "2026-10-17T12:01:08.552Z",
+    "rows": [
+      {
+        "type": "NS",
+        "answers": ["suzanne.ns.cloudflare.com", "quinton.ns.cloudflare.com"]
+      },
+      {
+        "type": "A",
+        "code": "ENODATA"
+      },
+      {
+        "type": "AAAA",
+        "code": "ENODATA"
+      },
+      {
+        "type": "CAA",
+        "code": "ENODATA"
+      }
+    ]
+  },
+  "services": {
+    "frontend": {
+      "service": "retailor-frontend",
+      "revision": "retailor-frontend-00001-fp5",
+      "trafficPercent": 100,
+      "image": "europe-west1-docker.pkg.dev/retailor-511714/retailor/frontend@sha256:1ed2d5b23c1e34fd1f39ca32d828bd97d77659dfcc86feed1349eca0e9446ff5",
+      "canonicalOrigin": "https://retailor-frontend-188132745113.europe-west1.run.app",
+      "configurationUnchanged": true
+    },
+    "backend": {
+      "service": "retailor-backend",
+      "revision": "retailor-backend-00003-hlj",
+      "trafficPercent": 100,
+      "image": "europe-west1-docker.pkg.dev/retailor-511714/retailor/backend@sha256:f516175efb04d54ef8a2017e940b13de1b6464199da93929beb56d9f59406eca",
+      "canonicalOrigin": "https://retailor-frontend-188132745113.europe-west1.run.app",
+      "configurationUnchanged": true
+    }
+  },
+  "backendIAMBindings": [
+    {
+      "members": [
+        "serviceAccount:retailor-frontend@retailor-511714.iam.gserviceaccount.com"
+      ],
+      "role": "roles/run.invoker"
+    }
+  ],
+  "backendPrivateVerified": true,
+  "backendUnauthenticatedDenied": [
+    {
+      "origin": "https://retailor-backend-188132745113.europe-west1.run.app",
+      "path": "/v1/health",
+      "status": 403
+    },
+    {
+      "origin": "https://retailor-backend-xmacampiyq-ew.a.run.app",
+      "path": "/v1/health",
+      "status": 403
+    }
+  ],
+  "initialReadinessAttempt": {
+    "status": 504,
+    "outcome": "Initial bounded readiness check failed before config/denial checks; separately rechecked, no service mutation or application retry added"
+  },
+  "existingFrontendReadiness": {
+    "status": 200,
+    "ready": true,
+    "mode": "live",
+    "paidEnabled": true,
+    "visionAvailable": true,
+    "tailorAvailable": true
+  },
+  "sourceFingerprint": "645969e052880bbb143a0ff345e82c1b914520eeb1ea2f3c680342e027d4470f",
+  "buildInputCount": 307,
+  "paidProviderRequests": 0,
+  "secretValuesRead": false,
+  "tokensSaved": false,
+  "canonicalOriginCutoverPending": true,
+  "ownerEntersDNS": true,
+  "pending": [
+    "Owner installs the eight apex A/AAAA records at Cloudflare",
+    "Google-managed certificate provisioning and actual domain HTTPS verification",
+    "Coordinate FRONTEND_ORIGIN on both services after DNS/certificate readiness",
+    "Cloudflare proxy/origin-seal/rate and independent account/connected release acceptance remain unverified"
+  ],
+  "limitations": [
+    "Mapping resource is created; domain HTTPS and a working custom-domain AI flow are not yet established",
+    "Service configuration and traffic are preserved so current managed-URL flow keeps working",
+    "Cloud Run direct domain mapping is Preview; no Firebase/load-balancer or www mapping created",
+    "No paid model, Turnstile verification, Stripe or storage-object request dispatched"
+  ]
+}
