@@ -13,6 +13,7 @@
     "build": "pnpm build:shared && pnpm --filter @retailor/backend build && pnpm --filter @retailor/frontend build",
     "dev:backend": "pnpm build:shared && pnpm --filter @retailor/backend dev",
     "dev:frontend": "pnpm build:shared && pnpm --filter @retailor/frontend dev",
+    "dev:frontend:live": "pnpm build:shared && pnpm --filter @retailor/frontend dev:live",
     "start:backend": "pnpm --filter @retailor/backend start",
     "start:frontend": "pnpm --filter @retailor/frontend start",
     "format": "prettier --write apps packages scripts test *.json *.mjs *.ts .github",

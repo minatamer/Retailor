@@ -1,9 +1,9 @@
 import { fileURLToPath } from "node:url";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants.js";
 
 const nextConfig = {
   output: "standalone",
   outputFileTracingRoot: fileURLToPath(new URL("../../", import.meta.url)),
-  distDir: process.env.RETAILOR_DEV === "true" ? ".next-dev" : ".next",
   poweredByHeader: false,
   devIndicators: false,
   // Fixed API uploads bypass Proxy; other routes have no body-driven actions.
@@ -44,4 +44,7 @@ const nextConfig = {
     ];
   },
 };
-export default nextConfig;
+export default (phase) => ({
+  ...nextConfig,
+  distDir: phase === PHASE_DEVELOPMENT_SERVER ? ".next-dev" : ".next",
+});

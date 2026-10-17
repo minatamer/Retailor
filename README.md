@@ -71,6 +71,8 @@ This runs formatting, lint, strict app/test types, import boundaries, isolated u
 
 After building, `pnpm start:backend` and `pnpm start:frontend` run in separate terminals with normal explicit configuration. Stop existing owned listeners first. Production rejects fake AI; live availability depends on the paid master and required credentials. See [provider operations](docs/operations/PROVIDERS.md) for configuration and admission limits.
 
+For frontend hot reload with an already-running live backend, use `pnpm dev:frontend:live`. This explicit mode preserves app-local configuration and uses the live workspace on [4310](http://127.0.0.1:4310); it does not force paid mode on or change backend settings. It binds to loopback and keeps development output in `.next-dev`. Ordinary `pnpm dev:frontend` retains its fake/paid-off defaults.
+
 ## Inside the demo
 
 - **Photos:** nineteen supplied sample images have recorded provenance. Each deliberate public sample draft requires fresh live recognition; fake development uses explicit fixtures. Photo recognition can need grouping corrections during review.

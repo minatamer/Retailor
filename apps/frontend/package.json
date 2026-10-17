@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node ../../scripts/frontend.mjs dev",
+    "dev:live": "node ../../scripts/frontend.mjs dev-live",
     "start": "node ../../scripts/frontend.mjs start",
     "build": "next build",
     "typecheck": "tsc --noEmit"
