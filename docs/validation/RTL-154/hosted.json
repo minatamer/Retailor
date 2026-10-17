@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "observedAt": "2026-10-17T11:22:48.437Z",
+  "observedAt": "2026-10-17T11:32:02.748Z",
   "deploymentRevision": "eb704fb9e453d74e2275a33e887c8a8aaf1500d3",
   "sourceFingerprint": "645969e052880bbb143a0ff345e82c1b914520eeb1ea2f3c680342e027d4470f",
   "projectId": "retailor-511714",
@@ -9,7 +9,7 @@
   "registryRepository": "retailor",
   "immutableCandidateTag": "rtl154-eb704fb",
   "audience": "Public frontend / IAM-private backend",
-  "paidAIEnabled": false,
+  "paidAIEnabled": true,
   "publicReleaseAccepted": false,
   "services": {
     "backend": {
@@ -19,12 +19,12 @@
         "https://retailor-backend-188132745113.europe-west1.run.app",
         "https://retailor-backend-xmacampiyq-ew.a.run.app"
       ],
-      "revision": "retailor-backend-00002-z6r",
+      "revision": "retailor-backend-00003-hlj",
       "ready": true,
       "traffic": [
         {
           "percent": 100,
-          "revisionName": "retailor-backend-00002-z6r"
+          "revisionName": "retailor-backend-00003-hlj"
         }
       ],
       "registryImage": "europe-west1-docker.pkg.dev/retailor-511714/retailor/backend@sha256:f516175efb04d54ef8a2017e940b13de1b6464199da93929beb56d9f59406eca",
@@ -60,7 +60,7 @@
       "environment": {
         "APP_ENV": "production",
         "FAKE_MODE": "false",
-        "PAID_DEMO_ENABLED": "false",
+        "PAID_DEMO_ENABLED": "true",
         "FRONTEND_ORIGIN": "https://retailor-frontend-188132745113.europe-west1.run.app"
       },
       "secretReferences": [
@@ -89,7 +89,8 @@
           "secret": "STRIPE_API_KEY",
           "version": "1"
         }
-      ]
+      ],
+      "resolvedLinuxAmd64Image": "europe-west1-docker.pkg.dev/retailor-511714/retailor/backend@sha256:10fa917d3ae0f9e61c7612bc5181755f05673fb07526e201838489c334ce598f"
     },
     "frontend": {
       "service": "retailor-frontend",
@@ -1102,11 +1103,67 @@
     "Public Cloudflare seal/rate/all-origin acceptance",
     "Independent OpenAI cutoff/reset/overlap/outstanding-usage/retention evidence",
     "Connected hosted paid sample/Tailor/checkout and physical/visual/lifecycle acceptance",
-    "Owner-requested generated frontend URL is public while domain/Cloudflare controls remain pending; paid AI stays off"
+    "Owner-requested generated frontend URL is public while domain/Cloudflare controls remain pending; owner subsequently enables paid AI explicitly"
   ],
   "secretValuesRead": false,
   "tokensSaved": false,
   "paidProviderRequests": 0,
   "publicFrontendEnabled": true,
-  "ownerPublicFrontendInstruction": "Owner explicitly requests removing frontend authentication after clarifying public frontend/private backend; no paid-master enablement requested"
+  "ownerPublicFrontendInstruction": "Owner explicitly requests public frontend/private backend, then separately enables paid AI after confirming secrets and spending caps",
+  "paidModeActivation": {
+    "schemaVersion": 1,
+    "observedAt": "2026-10-17T11:32:02.748Z",
+    "ownerInstruction": "Turn paid AI on; owner confirms secrets and spending caps are configured",
+    "backendRevision": "retailor-backend-00003-hlj",
+    "trafficPercent": 100,
+    "paidEnabled": true,
+    "mode": "live",
+    "readiness": {
+      "schemaVersion": 1,
+      "ready": true,
+      "mode": "live"
+    },
+    "capabilities": {
+      "vision": {
+        "available": true,
+        "reason": "ready"
+      },
+      "tailor": {
+        "available": true,
+        "reason": "ready"
+      },
+      "logos": {
+        "available": true,
+        "reason": "ready"
+      },
+      "eur": {
+        "available": true,
+        "reason": "ready"
+      },
+      "checkout": {
+        "available": true,
+        "reason": "ready"
+      },
+      "admissionSiteKeyPresent": true
+    },
+    "backendUnauthenticatedDenied": [
+      {
+        "origin": "https://retailor-backend-188132745113.europe-west1.run.app",
+        "status": 403
+      },
+      {
+        "origin": "https://retailor-backend-xmacampiyq-ew.a.run.app",
+        "status": 403
+      }
+    ],
+    "paidProviderRequests": 0,
+    "secretValuesRead": false,
+    "tokensSaved": false,
+    "limitations": [
+      "Readiness/config confirm enablement and required credential presence, not model access or output quality",
+      "Owner explicitly enables paid AI; independent cutoff/retention and Cloudflare evidence remain unverified",
+      "No paid model, Stripe, storage object or challenge request dispatched"
+    ]
+  },
+  "ownerPaidAIInstruction": "Turn paid AI on; owner confirms secrets and spending caps are configured"
 }
