@@ -1,203 +1,44 @@
 {
   "schemaVersion": 1,
-  "status": "Paused by owner; cutover incomplete",
-  "lastHTTPSCheckAt": "2026-10-17T12:32:03.026Z",
+  "observedAt": "2026-10-17T13:42:09.625Z",
   "projectId": "retailor-511714",
   "region": "europe-west1",
-  "targetOrigin": "https://tryretailor.com",
-  "dnsPropagated": true,
-  "dnsObservation": [
-    {
-      "type": "A",
-      "answers": [
-        "216.239.36.21",
-        "216.239.32.21",
-        "216.239.38.21",
-        "216.239.34.21"
-      ]
-    },
-    {
-      "type": "AAAA",
-      "answers": [
-        "2001:4860:4802:38::15",
-        "2001:4860:4802:36::15",
-        "2001:4860:4802:32::15",
-        "2001:4860:4802:34::15"
-      ]
-    },
-    {
-      "type": "CAA",
-      "code": "ENODATA"
-    }
-  ],
-  "authoritativeAndPublicResolverEvidence": {
-    "observedAt": "2026-10-17T12:10:13.558Z",
-    "probes": [
-      {
-        "resolver": "suzanne.ns.cloudflare.com",
-        "type": "A",
-        "answers": [
-          "216.239.36.21",
-          "216.239.34.21",
-          "216.239.32.21",
-          "216.239.38.21"
-        ]
-      },
-      {
-        "resolver": "suzanne.ns.cloudflare.com",
-        "type": "AAAA",
-        "answers": [
-          "2001:4860:4802:34::15",
-          "2001:4860:4802:36::15",
-          "2001:4860:4802:32::15",
-          "2001:4860:4802:38::15"
-        ]
-      },
-      {
-        "resolver": "suzanne.ns.cloudflare.com",
-        "type": "TXT",
-        "answers": ["Google verification TXT present"]
-      },
-      {
-        "resolver": "quinton.ns.cloudflare.com",
-        "type": "A",
-        "answers": [
-          "216.239.38.21",
-          "216.239.36.21",
-          "216.239.32.21",
-          "216.239.34.21"
-        ]
-      },
-      {
-        "resolver": "quinton.ns.cloudflare.com",
-        "type": "AAAA",
-        "answers": [
-          "2001:4860:4802:32::15",
-          "2001:4860:4802:36::15",
-          "2001:4860:4802:38::15",
-          "2001:4860:4802:34::15"
-        ]
-      },
-      {
-        "resolver": "quinton.ns.cloudflare.com",
-        "type": "TXT",
-        "answers": ["Google verification TXT present"]
-      },
-      {
-        "resolver": "dns.google",
-        "type": "A",
-        "status": 200,
-        "dnsStatus": 0,
-        "answers": [
-          {
-            "type": 1,
-            "data": "216.239.36.21"
-          },
-          {
-            "type": 1,
-            "data": "216.239.34.21"
-          },
-          {
-            "type": 1,
-            "data": "216.239.38.21"
-          },
-          {
-            "type": 1,
-            "data": "216.239.32.21"
-          }
-        ]
-      },
-      {
-        "resolver": "dns.google",
-        "type": "AAAA",
-        "status": 200,
-        "dnsStatus": 0,
-        "answers": [
-          {
-            "type": 28,
-            "data": "2001:4860:4802:34::15"
-          },
-          {
-            "type": 28,
-            "data": "2001:4860:4802:36::15"
-          },
-          {
-            "type": 28,
-            "data": "2001:4860:4802:38::15"
-          },
-          {
-            "type": 28,
-            "data": "2001:4860:4802:32::15"
-          }
-        ]
-      },
-      {
-        "resolver": "cloudflare-dns.com",
-        "type": "A",
-        "status": 200,
-        "dnsStatus": 0,
-        "answers": [
-          {
-            "type": 1,
-            "data": "216.239.36.21"
-          },
-          {
-            "type": 1,
-            "data": "216.239.38.21"
-          },
-          {
-            "type": 1,
-            "data": "216.239.34.21"
-          },
-          {
-            "type": 1,
-            "data": "216.239.32.21"
-          }
-        ]
-      },
-      {
-        "resolver": "cloudflare-dns.com",
-        "type": "AAAA",
-        "status": 200,
-        "dnsStatus": 0,
-        "answers": [
-          {
-            "type": 28,
-            "data": "2001:4860:4802:36::15"
-          },
-          {
-            "type": 28,
-            "data": "2001:4860:4802:34::15"
-          },
-          {
-            "type": 28,
-            "data": "2001:4860:4802:38::15"
-          },
-          {
-            "type": 28,
-            "data": "2001:4860:4802:32::15"
-          }
-        ]
-      }
+  "canonicalOrigin": "https://tryretailor.com",
+  "dns": {
+    "A": ["216.239.36.21", "216.239.38.21", "216.239.34.21", "216.239.32.21"],
+    "AAAA": [
+      "2001:4860:4802:38::15",
+      "2001:4860:4802:32::15",
+      "2001:4860:4802:34::15",
+      "2001:4860:4802:36::15"
     ]
   },
-  "httpsAtLastCheck": {
-    "authorized": false,
-    "code": "ECONNRESET"
+  "dnsResolver": "1.1.1.1",
+  "https": {
+    "authorized": true,
+    "protocol": "TLSv1.3",
+    "subject": {
+      "CN": "tryretailor.com"
+    },
+    "issuer": {
+      "C": "US",
+      "O": "Google Trust Services",
+      "CN": "WR3"
+    },
+    "subjectAltName": "DNS:tryretailor.com",
+    "validFrom": "Oct 17 11:48:02 2026 GMT",
+    "validTo": "Jan 15 12:38:53 2027 GMT"
   },
-  "mappingConditionsAtLastCheck": [
+  "mappingReady": true,
+  "mappingConditions": [
     {
-      "lastTransitionTime": "2026-10-17T12:00:37.671096Z",
-      "message": "Waiting for certificate provisioning. You must configure your DNS records for certificate issuance to begin.",
-      "reason": "CertificatePending",
-      "status": "Unknown",
+      "lastTransitionTime": "2026-10-17T12:57:08.399777Z",
+      "status": "True",
       "type": "Ready"
     },
     {
-      "lastTransitionTime": "2026-10-17T12:01:37.930600Z",
-      "message": "Certificate issuance pending.",
-      "reason": "CertificatePending",
-      "status": "Unknown",
+      "lastTransitionTime": "2026-10-17T12:57:08.399777Z",
+      "status": "True",
       "type": "CertificateProvisioned"
     },
     {
@@ -209,54 +50,102 @@
   "services": {
     "frontend": {
       "service": "retailor-frontend",
-      "servingRevision": "retailor-frontend-00001-fp5",
-      "servingTrafficPercent": 100,
-      "servingOrigin": "https://retailor-frontend-188132745113.europe-west1.run.app",
-      "preparedRevision": "retailor-frontend-00002-xj6",
-      "preparedTrafficPercent": 0,
-      "preparedOrigin": "https://tryretailor.com",
+      "revision": "retailor-frontend-00002-xj6",
+      "trafficPercent": 100,
+      "canonicalOrigin": "https://tryretailor.com",
       "image": "europe-west1-docker.pkg.dev/retailor-511714/retailor/frontend@sha256:1ed2d5b23c1e34fd1f39ca32d828bd97d77659dfcc86feed1349eca0e9446ff5",
-      "onlyPreparedOriginChanged": true,
-      "imagesSecretsLimitsPreserved": true
+      "serviceIdentity": "retailor-frontend@retailor-511714.iam.gserviceaccount.com",
+      "onlyOriginChanged": true,
+      "secretReferencesUnchanged": true,
+      "limitsUnchanged": true,
+      "invokerIAMEnforced": true
     },
     "backend": {
       "service": "retailor-backend",
-      "servingRevision": "retailor-backend-00003-hlj",
-      "servingTrafficPercent": 100,
-      "servingOrigin": "https://retailor-frontend-188132745113.europe-west1.run.app",
-      "preparedRevision": "retailor-backend-00004-22g",
-      "preparedTrafficPercent": 0,
-      "preparedOrigin": "https://tryretailor.com",
+      "revision": "retailor-backend-00004-22g",
+      "trafficPercent": 100,
+      "canonicalOrigin": "https://tryretailor.com",
       "image": "europe-west1-docker.pkg.dev/retailor-511714/retailor/backend@sha256:f516175efb04d54ef8a2017e940b13de1b6464199da93929beb56d9f59406eca",
-      "onlyPreparedOriginChanged": true,
-      "imagesSecretsLimitsPreserved": true
+      "serviceIdentity": "retailor-backend@retailor-511714.iam.gserviceaccount.com",
+      "onlyOriginChanged": true,
+      "secretReferencesUnchanged": true,
+      "limitsUnchanged": true,
+      "invokerIAMEnforced": true
     }
   },
-  "backendIAMObservedBeforePreparation": [
-    {
-      "members": [
-        "serviceAccount:retailor-frontend@retailor-511714.iam.gserviceaccount.com"
-      ],
-      "role": "roles/run.invoker"
-    }
-  ],
-  "backendIAMMutationPerformed": false,
-  "earlierBackendPrivacyEvidence": {
-    "observedAt": "2026-10-17T12:02:28.996Z",
-    "backendPrivateVerified": true,
-    "unauthenticatedDenials": [
+  "iam": {
+    "frontend": [
       {
-        "origin": "https://retailor-backend-188132745113.europe-west1.run.app",
-        "path": "/v1/health",
-        "status": 403
-      },
+        "members": ["allUsers"],
+        "role": "roles/run.invoker"
+      }
+    ],
+    "backend": [
       {
-        "origin": "https://retailor-backend-xmacampiyq-ew.a.run.app",
-        "path": "/v1/health",
-        "status": 403
+        "members": [
+          "serviceAccount:retailor-frontend@retailor-511714.iam.gserviceaccount.com"
+        ],
+        "role": "roles/run.invoker"
       }
     ]
   },
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 42724
+    },
+    {
+      "path": "/demo",
+      "status": 200,
+      "bytes": 10263
+    },
+    {
+      "path": "/sample/forme/F20.webp",
+      "status": 200,
+      "bytes": 34508
+    },
+    {
+      "path": "/api/retailor/v1/ready",
+      "status": 200,
+      "ready": true,
+      "mode": "live"
+    },
+    {
+      "path": "/api/retailor/v1/config",
+      "status": 200,
+      "paidEnabled": true,
+      "visionAvailable": true,
+      "tailorAvailable": true,
+      "admissionSiteKeyPresent": true
+    },
+    {
+      "path": "/api/retailor/v1/admission",
+      "method": "POST",
+      "origin": "https://tryretailor.com",
+      "status": 400,
+      "purpose": "Matching domain origin passes bridge/backend origin checks and empty input is rejected before challenge/provider work"
+    },
+    {
+      "path": "/api/retailor/v1/admission",
+      "method": "POST",
+      "origin": "https://untrusted.example",
+      "status": 403
+    }
+  ],
+  "backendPrivateVerified": true,
+  "backendUnauthenticatedDenied": [
+    {
+      "origin": "https://retailor-backend-188132745113.europe-west1.run.app",
+      "path": "/v1/health",
+      "status": 403
+    },
+    {
+      "origin": "https://retailor-backend-xmacampiyq-ew.a.run.app",
+      "path": "/v1/health",
+      "status": 403
+    }
+  ],
   "sourceFingerprint": "645969e052880bbb143a0ff345e82c1b914520eeb1ea2f3c680342e027d4470f",
   "buildInputCount": 307,
   "paidEnabled": true,
@@ -264,21 +153,26 @@
   "challengeVerificationRequests": 0,
   "secretValuesRead": false,
   "tokensSaved": false,
-  "canonicalOriginCutoverPending": true,
-  "ownerStoppedChecks": true,
-  "automationCreated": false,
-  "resumeAuthorizationRequiredFromOwner": true,
+  "canonicalOriginCutoverPending": false,
   "pending": [
-    "Owner requests another certificate check",
-    "Observe hostname-valid trusted HTTPS and Google mapping readiness",
-    "Reinspect prepared revisions and private backend policy, then explicitly route matching pair at100%",
-    "Verify custom-domain readiness/config, origin admission and direct backend denials",
-    "Cloudflare proxy/origin-seal/rates and independent connected/account acceptance remain unverified"
+    "Cloudflare proxy/origin-seal/rates remain unverified; DNS-only mapping is not edge protection",
+    "Independent provider cutoff/retention and connected paid/checkout/physical acceptance remain unverified",
+    "No www mapping or redirect configured"
   ],
   "limitations": [
-    "No external lookup or cloud mutation performed to prepare this commit; this records saved observations only",
-    "Last observed certificate status is not a statement about current external state",
-    "No successful domain HTTPS, traffic cutover or real Turnstile/paid/browser result is claimed",
-    "Initial operator TLS probes preserved trust/SNI/hostname validation and used a fresh resolver only to bypass local negative DNS caching"
+    "Operator verification includes ordinary DNS HTTPS GETs and explicit fresh-resolver checks; normal certificate trust/SNI/hostname validation remain enabled",
+    "Configuration and safe-negative HTTP checks do not establish successful real Turnstile challenge, paid AI output or a browser quality walkthrough"
+  ],
+  "ownerResumedAfterDomainWorkingReport": true,
+  "previousPausedRecordCommit": "05aafb6",
+  "ordinaryDNSHTTPSChecks": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/demo",
+      "status": 200
+    }
   ]
 }
