@@ -1,5 +1,7 @@
 # Retailor implementation tickets
 
+Photo confirmation removal: [RTL-148](RTL-148-remove-photo-checked-notice.md) removes only the selected successful photo-check notice, retaining validation and the storage-unavailable warning. Scoped read-only review is clean; tests remain deferred. [Validation](../validation/RTL-148.md) records actual results. No staging/commit or external action is included.
+
 Live frontend hot reload: [RTL-147](RTL-147-live-frontend-hot-reload.md) adds `pnpm dev:frontend:live`, preserving live configuration/composition while enabling Next dev and separate `.next-dev` output. The local frontend is running with HMR connected, config remains live/paid-enabled and scoped read-only review is clean; tests remain deferred by the owner. [Validation](../validation/RTL-147.md) records actual operational results. No staging/commit or external action is included.
 
 Sample-purpose copy: [RTL-146](RTL-146-explain-sample-purpose.md) replaces the selected sample footnote with a short invitation to try the demo right away. Scoped read-only review is clean and the paid-mode local frontend is refreshed; tests remain deferred by the owner. [Validation](../validation/RTL-146.md) records actual results. No staging/commit or external action is included.

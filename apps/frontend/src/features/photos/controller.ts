@@ -466,7 +466,7 @@ export class PhotoController {
             this.update(
               {
                 notice: recovery
-                  ? "Photo checked. Originals stay local; only inspected previews are used for processing."
+                  ? ""
                   : "Photo ready in memory. Temporary storage is unavailable, so refreshing may lose this photo.",
               },
               true,
