@@ -197,8 +197,7 @@ function WorkspaceFlow() {
                       </Button>
                     )}
                     <p className={styles.finePrint}>
-                      Original generated photos from FORME. Garments and
-                      matching photos are suggested when you create the draft.
+                      Use these sample photos to try the demo right away.
                     </p>
                   </aside>
                 }

@@ -1,5 +1,7 @@
 # Retailor implementation tickets
 
+Sample-purpose copy: [RTL-146](RTL-146-explain-sample-purpose.md) replaces the selected sample footnote with a short invitation to try the demo right away. Scoped read-only review is clean and the paid-mode local frontend is refreshed; tests remain deferred by the owner. [Validation](../validation/RTL-146.md) records actual results. No staging/commit or external action is included.
+
 Reset success notice removal: [RTL-145](RTL-145-remove-reset-success-notice.md) removes only the ordinary reset success copy while preserving cleanup and explicit warnings. Scoped read-only review is clean and the paid-mode local frontend is refreshed; tests remain deferred under the owner's latest instruction. [Validation](../validation/RTL-145.md) records actual results. No staging/commit or external action is included.
 
 Landing hero fade-in: [RTL-144](RTL-144-hero-content-fade-in.md) adds a single opacity-only entrance for the existing heading, supporting text and CTA together. Actual reload, responsive, keyboard/CTA and section-navigation checks pass, as do all six local gate outcomes; [validation](../validation/RTL-144.md) records the initial sandbox test-runner failure and successful follow-up. Settled read-only review has no actionable findings. No staging/commit or external action is included.
