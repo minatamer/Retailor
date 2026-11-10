@@ -21,6 +21,74 @@ async function prepared() {
   return { env, controller };
 }
 describe("session-owned demo orientation", () => {
+  it("walks from the store through every Shopify feature and back without changing products or activity", async () => {
+    const { controller: c } = await prepared();
+    c.finishTour();
+    c.useCurrentLook();
+    c.keepWordmark();
+    c.acceptDesign();
+    c.continueFromConnection();
+    const graph = c.getSnapshot().state.graph;
+    const shopifySteps = TOUR_STEPS.shopper
+      .map((step, index) => ({ step, index }))
+      .filter(({ step }) => step.ownerView === "connections");
+    expect(shopifySteps).toHaveLength(6);
+    const first = shopifySteps[0]!.index;
+    c.tourStep(first);
+    expect(c.getSnapshot().state.stage).toBe("dashboard");
+    expect(c.getSnapshot().state.ownerView).toBe("connections");
+    expect(c.getSnapshot().tour).toMatchObject({
+      role: "shopper",
+      index: first,
+      from: 4,
+    });
+    c.tourStep(first - 1);
+    expect(c.getSnapshot().state.stage).toBe("storefront");
+    for (const { index } of shopifySteps) {
+      c.tourStep(index);
+      expect(c.getSnapshot().state.stage).toBe("dashboard");
+      expect(c.getSnapshot().state.ownerView).toBe("connections");
+      expect(c.getSnapshot().state.graph).toBe(graph);
+      expect(c.getSnapshot().shopify.status).toBeNull();
+    }
+    c.tourStep(shopifySteps.at(-1)!.index + 1);
+    expect(c.getSnapshot().state.stage).toBe("storefront");
+    c.tourStep(first);
+    c.finishTour();
+    expect(c.getSnapshot().tour).toBeNull();
+    expect(c.getSnapshot().state.ownerView).toBe("connections");
+    expect(c.getSnapshot().state.graph).toBe(graph);
+  });
+  it("replays Shopify in the owner tour, returns Back to overview and still exits on ordinary stage navigation or expiry", async () => {
+    const { env, controller: c } = await prepared();
+    c.finishTour();
+    c.useCurrentLook();
+    c.keepWordmark();
+    c.acceptDesign();
+    c.continueFromConnection();
+    c.finishTour();
+    c.go("dashboard");
+    const graph = c.getSnapshot().state.graph;
+    c.startTour();
+    const first = TOUR_STEPS.owner.findIndex(
+      (step) => step.ownerView === "connections",
+    );
+    c.tourStep(first);
+    expect(c.getSnapshot().state.ownerView).toBe("connections");
+    c.tourStep(first - 1);
+    expect(c.getSnapshot().state.ownerView).toBe("overview");
+    c.tourStep(first);
+    c.go("storefront");
+    expect(c.getSnapshot().tour).toBeNull();
+    c.go("dashboard");
+    c.startTour();
+    c.tourStep(first);
+    expect(c.getSnapshot().tour?.role).toBe("owner");
+    expect(c.getSnapshot().state.graph).toBe(graph);
+    env.advance(7200001);
+    c.tourStep(first + 1);
+    expect(c.getSnapshot().tour).toBeNull();
+  });
   it("offers the welcome without navigating and only visits the initial step on Start", async () => {
     const { controller: c } = await prepared();
     c.finishTour();
