@@ -151,6 +151,7 @@ export class ShopifyService {
         pending: null,
         shop: null,
         catalogue: null,
+        collectionBrowse: null,
       });
       return {
         cookie: issued,
@@ -179,7 +180,12 @@ export class ShopifyService {
         schemaVersion: 1,
         available: true,
         simulated: this.provider.simulated,
-        state: installation?.state ?? "disconnected",
+        state:
+          installation?.state ??
+          (binding.pending?.outcome === "pending" &&
+          binding.pending.expiresAt > this.clock()
+            ? "authorizing"
+            : "disconnected"),
         shop: installation?.shop ?? null,
         name: installation?.verified ? installation.name : null,
         currency: installation?.verified ? installation.currency : null,
@@ -210,7 +216,7 @@ export class ShopifyService {
     input: ShopifyConnect,
   ) {
     const state = fresh();
-    const authorizationUrl = this.provider.authorizationUrl(input.shop, state);
+    const authorizationUrl = this.provider.installationUrl();
     await this.ledger.transact((data) => {
       const now = this.clock();
       const binding = authenticated(
@@ -221,92 +227,41 @@ export class ShopifyService {
         now,
       );
       spend(binding.connects, now, 10);
-      if (binding.shop && binding.shop !== input.shop)
-        return deny("STALE", 409);
-      let installation = data.installations.find(
-        (item) => item.shop === input.shop,
-      );
-      const previousRates =
-        installation?.state === "cleaned"
-          ? {
-              calls: structuredClone(installation.calls),
-              cleanupCalls: structuredClone(installation.cleanupCalls),
-            }
-          : undefined;
+      // Shopify's initial App URL request has no Retailor nonce. Only one
+      // pending attempt in this browser can own that signed return.
       if (
-        installation?.state === "cleaned" &&
-        !installation.tokens &&
-        !installation.lease
-      ) {
-        const previous = installation;
-        const previousBinding = data.bindings.find(
-          (item) => item.id === previous.bindingId,
-        );
-        if (previousBinding)
-          previousBinding.lifetimeCreates = Math.max(
-            previousBinding.lifetimeCreates,
-            previous.products.length,
-          );
-        data.installations = data.installations.filter(
-          (item) => item !== previous,
-        );
-        for (const old of data.bindings)
-          if (old.id === previous.bindingId) old.shop = null;
-        installation = undefined;
-      }
-      const retryPending =
-        installation?.state === "authorizing" &&
-        binding.pending?.outcome === "pending";
-      if (
-        installation &&
-        (installation.bindingId !== binding.id ||
-          installation.appId !== this.appId ||
-          (installation.state !== "needs_attention" && !retryPending) ||
-          (installation.lease && installation.lease.expiresAt > now))
+        data.bindings.some(
+          (item) =>
+            item.id !== binding.id &&
+            item.cookieHash === binding.cookieHash &&
+            item.expiresAt > now &&
+            item.pending?.outcome === "pending" &&
+            item.pending.expiresAt > now,
+        )
       )
         return deny("BUSY", 429);
-      if (!installation) {
-        if (data.installations.length >= SHOPIFY_LIMITS.installations)
-          return deny("BUSY", 429);
-        installation = {
-          shop: input.shop,
-          appId: this.appId,
-          bindingId: binding.id,
-          shopId: "",
-          name: "",
-          currency: "",
-          verified: false,
-          accessBlocked: false,
-          state: "authorizing",
-          tokens: null,
-          tokenVersion: 0,
-          lease: null,
-          expiresAt: binding.expiresAt,
-          endedAt: null,
-          connectedAt: 0,
-          cleanupCalls: previousRates?.cleanupCalls ?? { start: now, count: 0 },
-          maintenanceDue: 0,
-          maintenanceAttempts: 0,
-          refreshUnknown: false,
-          uninstallDispatched: false,
-          notice: null,
-          noticeVersion: 0,
-          calls: previousRates?.calls ?? { start: now, count: 0 },
-          products: [],
-        };
-        data.installations.push(installation);
-      }
-      installation.state = "authorizing";
-      if (installation.uninstallDispatched) return deny("STALE", 409);
-      binding.shop = input.shop;
+      const installation = installationFor(data, binding);
+      const reusable =
+        installation?.state === "cleaned" &&
+        !installation.tokens &&
+        !installation.lease;
+      if (
+        installation &&
+        (installation.appId !== this.appId ||
+          (!reusable &&
+            (!["needs_attention", "authorizing"].includes(installation.state) ||
+              installation.uninstallDispatched ||
+              (installation.lease && installation.lease.expiresAt > now))))
+      )
+        return deny("BUSY", 429);
       binding.pending = {
         stateHash: shopifyHash(state),
         stateValue: state,
-        shop: input.shop,
+        shop: null,
         expiresAt: Math.min(binding.expiresAt, now + SHOPIFY_LIMITS.oauthMs),
         returnTo: input.returnTo,
         outcome: "pending",
-        cleanupOnly: installation.endedAt !== null,
+        cleanupOnly: installation?.endedAt != null,
       };
     });
     return { schemaVersion: 1 as const, authorizationUrl };
@@ -454,30 +409,139 @@ export class ShopifyService {
   }
   async install(cookie: string | undefined, query: string) {
     const params = this.provider.verifyQuery(query, this.clock());
-    if (!cookie) return deny("FORBIDDEN", 403);
-    // Never guess an originating tab from a browser-wide cookie.
-    const candidates = await this.ledger.inspect((data) =>
-      data.bindings.filter(
+    if (
+      !cookie ||
+      params.has("code") ||
+      params.has("error") ||
+      params.has("state")
+    )
+      return deny("FORBIDDEN", 403);
+    const shop = params.get("shop")!;
+    return this.ledger.transact((data) => {
+      const now = this.clock();
+      const candidates = data.bindings.filter(
         (item) =>
           item.cookieHash === shopifyHash(cookie) &&
-          item.expiresAt > this.clock() &&
+          item.expiresAt > now &&
           item.pending?.outcome === "pending" &&
-          item.pending.shop === params.get("shop") &&
-          item.pending.expiresAt > this.clock(),
-      ),
-    );
-    if (candidates.length !== 1) return deny("FORBIDDEN", 403);
-    const pending = candidates[0]!.pending!;
-    if (!pending.stateValue) return deny("FORBIDDEN", 403);
-    // The nonce is encrypted at rest and erased before exchange; only a unique
-    // user-initiated attempt may resume through Shopify's signed install entry.
-    return {
-      schemaVersion: 1 as const,
-      authorizationUrl: this.provider.authorizationUrl(
-        pending.shop,
-        pending.stateValue,
-      ),
-    };
+          item.pending.expiresAt > now,
+      );
+      if (candidates.length !== 1) return deny("FORBIDDEN", 403);
+      const binding = candidates[0]!,
+        pending = binding.pending!;
+      if (!pending.stateValue || (pending.shop && pending.shop !== shop))
+        return deny("FORBIDDEN", 403);
+      if (binding.shop && binding.shop !== shop) return deny("STALE", 409);
+      let installation = data.installations.find((item) => item.shop === shop);
+      const previousBinding = data.bindings.find(
+        (item) => item.id === installation?.bindingId,
+      );
+      // Exchange admission durably spends two calls before any token HTTP.
+      // A cancelled/expired reservation with zero calls has never dispatched
+      // an exchange. Unknown exchanges retain their reservation and cleanup.
+      const abandoned =
+        installation &&
+        !installation.tokens &&
+        installation.tokenVersion === 0 &&
+        !installation.verified &&
+        !installation.shopId &&
+        installation.calls.count === 0 &&
+        installation.products.length === 0 &&
+        !installation.collection &&
+        !installation.lease &&
+        !installation.uninstallDispatched &&
+        ((installation.state === "cleanup_pending" &&
+          installation.endedAt !== null &&
+          (!previousBinding?.pending ||
+            previousBinding.pending.outcome === "cancelled")) ||
+          (installation.state === "authorizing" &&
+            previousBinding?.pending?.outcome === "pending" &&
+            previousBinding.pending.expiresAt <= now));
+      const previousRates =
+        installation && (installation.state === "cleaned" || abandoned)
+          ? {
+              calls: structuredClone(installation.calls),
+              cleanupCalls: structuredClone(installation.cleanupCalls),
+            }
+          : undefined;
+      if (
+        installation &&
+        (installation.state === "cleaned" || abandoned) &&
+        !installation.tokens &&
+        !installation.lease
+      ) {
+        const previous = installation;
+        if (previousBinding) {
+          previousBinding.lifetimeCreates = Math.max(
+            previousBinding.lifetimeCreates,
+            previous.products.length,
+          );
+          if (abandoned && previousBinding.id !== binding.id)
+            previousBinding.pending = null;
+        }
+        data.installations = data.installations.filter(
+          (item) => item !== previous,
+        );
+        for (const old of data.bindings)
+          if (old.id === previous.bindingId) old.shop = null;
+        installation = undefined;
+      }
+      const retryPending =
+        installation?.state === "authorizing" &&
+        binding.pending?.outcome === "pending";
+      if (
+        installation &&
+        (installation.bindingId !== binding.id ||
+          installation.appId !== this.appId ||
+          (installation.state !== "needs_attention" && !retryPending) ||
+          (installation.lease && installation.lease.expiresAt > now))
+      )
+        return deny("BUSY", 429);
+      if (!installation) {
+        if (data.installations.length >= SHOPIFY_LIMITS.installations)
+          return deny("BUSY", 429);
+        installation = {
+          shop,
+          appId: this.appId,
+          bindingId: binding.id,
+          shopId: "",
+          name: "",
+          currency: "",
+          verified: false,
+          accessBlocked: false,
+          state: "authorizing",
+          tokens: null,
+          tokenVersion: 0,
+          lease: null,
+          expiresAt: binding.expiresAt,
+          endedAt: null,
+          connectedAt: 0,
+          cleanupCalls: previousRates?.cleanupCalls ?? { start: now, count: 0 },
+          maintenanceDue: 0,
+          maintenanceAttempts: 0,
+          refreshUnknown: false,
+          uninstallDispatched: false,
+          notice: null,
+          noticeVersion: 0,
+          calls: previousRates?.calls ?? { start: now, count: 0 },
+          products: [],
+          collection: null,
+        };
+        data.installations.push(installation);
+      }
+      installation.state = "authorizing";
+      if (installation.uninstallDispatched) return deny("STALE", 409);
+      binding.shop = shop;
+      pending.shop = shop;
+      pending.cleanupOnly = installation.endedAt !== null;
+      return {
+        schemaVersion: 1 as const,
+        authorizationUrl: this.provider.authorizationUrl(
+          shop,
+          pending.stateValue,
+        ),
+      };
+    });
   }
   async simulate(
     cookie: string | undefined,
@@ -504,14 +568,14 @@ export class ShopifyService {
         return deny("STALE", 409);
       return structuredClone(binding.pending);
     });
+    const shop = pending.shop ?? "retailor-demo.myshopify.com";
+    // Fixture consent can sign a query for either step; no live-provider fallback.
+    const installQuery = this.provider.installQuery?.(shop, this.clock());
+    if (!installQuery) return deny("NOT_FOUND", 404);
+    await this.install(cookie, installQuery);
     return this.callback(
       cookie,
-      this.provider.consent(
-        pending.shop,
-        pending.stateValue!,
-        approved,
-        this.clock(),
-      ),
+      this.provider.consent(shop, pending.stateValue!, approved, this.clock()),
       signal,
     );
   }
