@@ -7,13 +7,16 @@ import type {
   ShopifyStatus,
   ShopifyProductSummary,
   ShopifyExportInput,
+  ShopifyImportResult,
   ShopifyExportSummary,
 } from "@retailor/contracts/shopify";
-import type { Product } from "@retailor/contracts/product";
+import type { Product, ProductInput } from "@retailor/contracts/product";
 import type { ShopifyRequester } from "./request";
 import { ApiRequestError } from "../../http/api-error";
 
 export const SHOPIFY_TAB_KEY = "retailor.shopify.tab.v1";
+export const SHOPIFY_IMPORT_PREPARING = "Preparing Shopify import...";
+const SHOPIFY_IMPORT_COMMITTING = "Importing into Retailor...";
 const ProofSchema = z.strictObject({
   workspaceId: z.string().max(100),
   proof: ShopifyProofSchema,
@@ -33,6 +36,12 @@ export interface ShopifyView {
   notice: string;
   reference: string;
   consent: boolean;
+  collections: {
+    items: { id: string; title: string }[];
+    nextCursor: string | null;
+  } | null;
+  collectionId: string | null;
+  importReview: { products: ProductInput[]; revision: number } | null;
   catalogue: {
     products: ShopifyProductSummary[];
     nextCursor: string | null;
@@ -51,6 +60,9 @@ export const emptyShopifyView = (): ShopifyView => ({
   reference: "",
   consent: false,
   catalogue: null,
+  collections: null,
+  collectionId: null,
+  importReview: null,
   review: null,
 });
 export interface ShopifyContext {
@@ -69,7 +81,11 @@ export class ShopifyController {
   private navigationGeneration = 0;
   private bootstrapping = false;
   private active = true;
+  private committingImport = false;
+  private discarding = Promise.resolve();
   private shown = false;
+  private catalogueShown = false;
+  private initialBrowsePending = false;
   private polls = 0;
   private poll: ReturnType<typeof setTimeout> | undefined;
   private blockedUntil = 0;
@@ -82,6 +98,9 @@ export class ShopifyController {
     private readonly navigate: (url: string) => void = (url) =>
       window.location.assign(url),
     private readonly clock: () => number = Date.now,
+    private readonly discardImport: (
+      products: readonly ProductInput[],
+    ) => void | Promise<void> = () => {},
   ) {}
   getSnapshot() {
     return this.view;
@@ -179,6 +198,7 @@ export class ShopifyController {
         this.operation = undefined;
         this.update({ busy: null });
         this.schedule();
+        this.browseOnEntry();
       }
     }
   }
@@ -207,6 +227,7 @@ export class ShopifyController {
   ) {
     const requestedGeneration = this.generation;
     const requestedNavigation = this.navigationGeneration;
+    await this.discarding;
     await this.initialize();
     if (
       !this.active ||
@@ -245,10 +266,13 @@ export class ShopifyController {
         this.operation = undefined;
         this.update({ busy: null });
         this.schedule();
+        this.browseOnEntry();
       }
     }
   }
   private setStatus(status: ShopifyStatus, signal: AbortSignal) {
+    if (!signal.aborted && this.active && status.state !== "connected")
+      this.cancelImport();
     if (!signal.aborted && this.active)
       this.update({
         status: ShopifyStatusSchema.parse(status),
@@ -264,7 +288,6 @@ export class ShopifyController {
     );
   }
   connect(
-    shop: string,
     returnTo: "onboarding" | "connections",
     beforeLeave: (signal: AbortSignal) => Promise<boolean>,
   ) {
@@ -285,7 +308,6 @@ export class ShopifyController {
           {
             schemaVersion: 1,
             workspaceId: this.context.workspaceId,
-            shop: shop.trim().toLowerCase(),
             returnTo,
           },
           proof,
@@ -299,11 +321,11 @@ export class ShopifyController {
             : null,
           notice: simulated
             ? "This consent screen is a local simulation. No Shopify account is contacted."
-            : "Opening Shopify’s consent screen…",
+            : "Choose your store on Shopify…",
         });
         if (!simulated) this.navigate(result.authorizationUrl);
       },
-      "Shopify could not be opened. Check the test-store address, or continue without connecting.",
+      "Shopify could not be opened. Try again, or continue without connecting.",
     );
   }
   consent(approved: boolean) {
@@ -344,7 +366,8 @@ export class ShopifyController {
             : "The Shopify connection could not be verified. Continue without it, or check Connections.",
     });
   }
-  browse(next = false) {
+  browse(next = false, refreshCollections = false) {
+    if (!next) this.initialBrowsePending = false;
     return this.run(
       "Reading Shopify products…",
       async (signal, proof) => {
@@ -355,21 +378,189 @@ export class ShopifyController {
           cursor ?? null,
           proof,
           signal,
+          ...(this.view.collectionId ? [this.view.collectionId] : []),
         );
         if (!signal.aborted)
           this.update({
-            catalogue,
+            catalogue: {
+              ...catalogue,
+              products: next
+                ? [
+                    ...new Map(
+                      [
+                        ...(this.view.catalogue?.products ?? []),
+                        ...catalogue.products,
+                      ].map((product) => [product.id, product]),
+                    ).values(),
+                  ].slice(0, 100)
+                : catalogue.products,
+            },
             status: this.view.status
               ? { ...this.view.status, currency: catalogue.currency }
               : null,
           });
+        if (!signal.aborted && (refreshCollections || !this.view.collections))
+          await this.loadCollections(signal, proof, false);
       },
       "Shopify products could not be read. Your local collection is unchanged.",
+    );
+  }
+  private async loadCollections(
+    signal: AbortSignal,
+    proof: string,
+    next: boolean,
+  ) {
+    const result = await this.port.collections(
+      this.context.workspaceId,
+      next ? (this.view.collections?.nextCursor ?? null) : null,
+      proof,
+      signal,
+    );
+    if (!signal.aborted)
+      this.update({
+        collections: {
+          items: [
+            ...new Map(
+              [
+                ...(next ? (this.view.collections?.items ?? []) : []),
+                ...result.collections,
+                ...(!next
+                  ? (this.view.collections?.items.filter(
+                      (item) => item.id === this.view.collectionId,
+                    ) ?? [])
+                  : []),
+              ].map((item) => [item.id, item]),
+            ).values(),
+          ].slice(0, 100),
+          nextCursor: result.nextCursor,
+        },
+      });
+  }
+  moreCollections() {
+    if (!this.view.collections?.nextCursor) return;
+    return this.run("Reading collections...", (signal, proof) =>
+      this.loadCollections(signal, proof, true),
+    );
+  }
+  chooseCollection(id: string | null) {
+    if (this.operation || this.view.importReview || this.view.review) return;
+    this.update({ collectionId: id, catalogue: null });
+    return this.browse();
+  }
+  prepareImport(
+    ids: string[],
+    stage: (
+      source: ShopifyImportResult,
+      signal: AbortSignal,
+    ) => Promise<ProductInput>,
+    capacity: number,
+  ) {
+    if (
+      this.operation ||
+      this.view.review ||
+      this.view.importReview ||
+      !this.view.verified ||
+      this.view.status?.state !== "connected" ||
+      this.view.status.currency !== "USD" ||
+      !ids.length ||
+      ids.length > Math.min(20, capacity) ||
+      new Set(ids).size !== ids.length
+    )
+      return;
+    const revision = this.context.revision(),
+      products: ProductInput[] = [];
+    return this.run(
+      SHOPIFY_IMPORT_PREPARING,
+      async (signal, proof) => {
+        try {
+          for (const id of ids) {
+            const source = await this.port.importProduct(
+              this.context.workspaceId,
+              id,
+              proof,
+              signal,
+            );
+            signal.throwIfAborted();
+            if (this.context.revision() !== revision)
+              throw new ApiRequestError("STALE");
+            products.push(await stage(source, signal));
+            signal.throwIfAborted();
+          }
+          if (this.context.revision() !== revision)
+            throw new ApiRequestError("STALE");
+          this.update({ importReview: { products, revision } });
+        } finally {
+          if (!this.view.importReview) await this.releaseImport(products);
+        }
+      },
+      "The selection could not be prepared. Choose products not already in Retailor, with available photos, USD prices and Colour/Size options. Your existing products are kept.",
+    );
+  }
+  private releaseImport(products: readonly ProductInput[]) {
+    if (!products.length) return this.discarding;
+    this.discarding = this.discarding
+      .then(() => this.discardImport(products))
+      .catch(() =>
+        this.update({
+          notice:
+            "Temporary import photos could not be released. Reset this demo before trying again.",
+        }),
+      );
+    return this.discarding;
+  }
+  cancelImport() {
+    const review = this.view.importReview;
+    if (
+      this.view.busy === SHOPIFY_IMPORT_PREPARING ||
+      this.view.busy === SHOPIFY_IMPORT_COMMITTING
+    )
+      this.cancel();
+    this.update({ importReview: null });
+    if (review) void this.releaseImport(review.products);
+    this.schedule();
+  }
+  confirmImport(
+    commit: (
+      products: readonly ProductInput[],
+      revision: number,
+      signal: AbortSignal,
+    ) => Promise<void>,
+  ) {
+    const review = this.view.importReview;
+    if (
+      !review ||
+      !this.view.verified ||
+      this.view.status?.state !== "connected" ||
+      review.revision !== this.context.revision()
+    )
+      return;
+    return this.run(
+      SHOPIFY_IMPORT_COMMITTING,
+      async (signal) => {
+        if (
+          review !== this.view.importReview ||
+          review.revision !== this.context.revision()
+        )
+          throw new ApiRequestError("STALE");
+        this.committingImport = true;
+        try {
+          await commit(review.products, review.revision, signal);
+        } finally {
+          this.committingImport = false;
+        }
+        if (!signal.aborted)
+          this.update({
+            importReview: null,
+            notice: `Imported ${review.products.length} product${review.products.length === 1 ? "" : "s"} into Retailor.`,
+          });
+      },
+      "Import was not completed. Review the selection again; existing Retailor products are kept.",
     );
   }
   prepare(products: Product[], update: boolean) {
     if (
       this.operation ||
+      this.view.importReview ||
       !this.view.verified ||
       this.view.status?.state !== "connected" ||
       this.view.status.currency !== "USD" ||
@@ -528,6 +719,12 @@ export class ShopifyController {
   }
   invalidate() {
     if (
+      !this.committingImport &&
+      this.view.importReview &&
+      this.view.importReview.revision !== this.context.revision()
+    )
+      this.cancelImport();
+    if (
       this.view.review &&
       this.view.review.revision !== this.context.revision()
     ) {
@@ -540,19 +737,44 @@ export class ShopifyController {
       });
     }
   }
-  visible(value: boolean) {
-    if (this.shown === value) return;
+  visible(value: boolean, catalogue = false) {
+    const catalogueShown = value && catalogue;
+    if (this.shown === value && this.catalogueShown === catalogueShown) return;
+    const wasShown = this.shown;
     this.shown = value;
+    this.catalogueShown = catalogueShown;
+    this.initialBrowsePending = catalogueShown;
     this.navigationGeneration++;
-    if (!value) {
+    if (!value || wasShown) {
+      this.cancelImport();
       if (!this.bootstrapping) this.cancel();
       this.update({ review: null, consent: false, catalogue: null });
-    } else {
+    }
+    if (value) {
       this.polls = 0;
       if (!this.bootstrapping && this.proof && !this.view.verified)
         void this.refresh();
-      else this.schedule();
+      else {
+        this.schedule();
+        this.browseOnEntry();
+      }
     }
+  }
+  private browseOnEntry() {
+    if (
+      this.active &&
+      this.shown &&
+      this.catalogueShown &&
+      this.initialBrowsePending &&
+      this.view.available &&
+      this.view.verified &&
+      this.view.status?.state === "connected" &&
+      !this.operation &&
+      !this.view.review &&
+      !this.view.importReview &&
+      !this.view.consent
+    )
+      void this.browse();
   }
   private schedule() {
     if (this.poll) clearTimeout(this.poll);
@@ -563,6 +785,7 @@ export class ShopifyController {
       this.operation ||
       this.view.review ||
       this.view.consent ||
+      this.view.importReview ||
       this.polls >= 12
     )
       return;
@@ -624,6 +847,7 @@ export class ShopifyController {
     return acknowledged;
   }
   dispose() {
+    this.cancelImport();
     this.cancel();
     this.active = false;
   }
