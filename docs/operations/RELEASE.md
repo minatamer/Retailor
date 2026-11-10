@@ -1,5 +1,11 @@
 # Manual Linux release packet
 
+## Shopify local extension — 10 November2026
+
+RTL-162–166 add standalone Shopify auth/products, encrypted integration ownership, signed webhooks, private cleanup and optional onboarding/dashboard UI. [Current local evidence](../validation/RTL-166.md) supersedes older app fingerprints only where actual new proof exists; historical deployed revisions below are preserved. Use the [Shopify resource/native worksheet](SHOPIFY-RESOURCES.md) for the separately authorized integration bucket/key/job/Scheduler/log policy. The existing checkout-photo bucket and ordinary request-based web CPU cannot substitute for that private cleanup ownership/schedule. Native credentials/form, exact2026-10 semantics, separate-organization distribution and hosted acceptance remain pending. No push, deployment, public tunnel or app submission is performed by local verification.
+
+Default preflight now selects `docs/validation/RTL-166/containers.json`; exact application-byte mismatch must still reject. A matching dirty local candidate proves packaging continuity only. Scanner login failure/current remaining dependency advisories must remain visible in the current record; neither a passing build nor historical scan clears them. Public/paid/Shopify publication acceptance is not opened by this packet.
+
 RTL-021 prepares local images and the commands below. **Nothing here authorizes publication, registry pushes, provisioning, IAM/DNS changes, resource purchases or paid requests.** Owner approval with exact project, region, identities, origin, candidate digests, spend envelope and accepted RTL-020 results is required before those actions. RTL-022 records the eventual hosted verdict. No cloud resource, domain or prior revision is assumed to exist.
 
 ## Candidate construction and provenance

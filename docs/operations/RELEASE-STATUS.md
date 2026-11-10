@@ -1,5 +1,9 @@
 # Retailor release status
 
+## Local Shopify candidate — 10 November2026
+
+The owner's AFK execute/validate loop implements RTL-162–165 and prepares RTL-166's integrated handoff. [Actual current evidence](../validation/RTL-166.md) separates local simulation/injected providers, exact-byte Linux packaging, fresh dependency auditing and pending native/hosted acceptance. Optional Connect/Skip, dashboard Connections, read/reviewed draft export/update/remove and independent cleanup are implemented locally. Root/app READMEs and [portfolio copy](SHOPIFY-PORTFOLIO.md) state native testing is pending. This work changes no deployed service, account configuration, domain, paid master or public listing. Historical deployed revisions below still identify the last observed deployment, not these unstaged Shopify bytes. Current image scan/login limitations and residual advisories must not be represented as a clean scan or public release acceptance.
+
 ## Current deployed candidate — 17 October2026
 
 Subsequent owner-authorized domain setup: [RTL-155](../validation/RTL-155.md) creates the verified `tryretailor.com` apex mapping and confirms all eight owner-installed DNS records. The owner pauses checks, commits the prepared state as `05aafb6`, then reports the working domain. Resumed verification confirms trusted HTTPS and a ready mapping; matching frontend `retailor-frontend-00002-xj6` and backend `retailor-backend-00004-22g` are explicitly activated at100%. Both app origins now use `https://tryretailor.com`. Images, secrets, paid enablement, limits and private backend IAM are preserved. [Actual cutover evidence](../validation/RTL-155/cutover.json) records passing domain delivery/ready/config/origin and direct backend-denial checks with no paid request. Cloudflare and independent acceptance limitations remain pending.
