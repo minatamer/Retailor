@@ -21,7 +21,7 @@ const nextConfig = {
       "default-src 'self'",
       `script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com${development ? " 'unsafe-eval'" : ""}`,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' blob: data:",
+      "img-src 'self' blob: data: https://cdn.shopify.com",
       "font-src 'self'",
       `connect-src 'self' https://challenges.cloudflare.com${development ? " ws: wss:" : ""}`,
       "frame-src https://challenges.cloudflare.com",
