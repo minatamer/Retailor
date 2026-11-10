@@ -46,6 +46,8 @@ async function setup() {
   }));
   const provider: ShopifyProvider = {
     simulated: true,
+    installationUrl: () =>
+      "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dtest-app",
     authorizationUrl: (domain, state) =>
       `https://${domain}/admin/oauth/authorize?state=${state}`,
     verifyQuery: (query, time) => verifyShopifyQuery(query, secret, time),
@@ -86,17 +88,27 @@ async function setup() {
       hmac: createHmac("sha256", secret).update(message).digest("hex"),
     }).toString();
   }
+  function installQuery(selectedShop = shop) {
+    const params = {
+      shop: selectedShop,
+      timestamp: String(Math.floor(now / 1000)),
+    };
+    const message = Object.entries(params)
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+      .map(([key, value]) => `${key}=${value}`)
+      .join("&");
+    return new URLSearchParams({
+      ...params,
+      hmac: createHmac("sha256", secret).update(message).digest("hex"),
+    }).toString();
+  }
   async function begin() {
-    const result = await service.connect(
-      issued.cookie,
-      issued.result.tabProof,
-      {
-        schemaVersion: 1,
-        workspaceId: "workspace",
-        shop,
-        returnTo: "onboarding",
-      },
-    );
+    await service.connect(issued.cookie, issued.result.tabProof, {
+      schemaVersion: 1,
+      workspaceId: "workspace",
+      returnTo: "onboarding",
+    });
+    const result = await service.install(issued.cookie, installQuery());
     return new URL(result.authorizationUrl).searchParams.get("state")!;
   }
   async function connect() {
@@ -121,6 +133,7 @@ async function setup() {
     identity,
     issued,
     signed,
+    installQuery,
     begin,
     connect,
     clock: () => now,
@@ -139,6 +152,112 @@ afterEach(async () => {
   }
 });
 describe("session-bound standalone Shopify authorization", () => {
+  it("starts without reserving a shop and binds only the signed Shopify selection", async () => {
+    const h = await setup();
+    const result = await h.service.connect(
+      h.issued.cookie,
+      h.issued.result.tabProof,
+      {
+        schemaVersion: 1,
+        workspaceId: "workspace",
+        returnTo: "connections",
+      },
+    );
+    expect(result.authorizationUrl).toBe(h.provider.installationUrl());
+    expect(
+      await h.service.ledger.inspect((data) => ({
+        count: data.installations.length,
+        shop: data.bindings[0]!.pending!.shop,
+      })),
+    ).toEqual({ count: 0, shop: null });
+    expect(
+      (
+        await h.service.status(
+          h.issued.cookie,
+          h.issued.result.tabProof,
+          "workspace",
+        )
+      ).state,
+    ).toBe("authorizing");
+    expect(h.exchange).not.toHaveBeenCalled();
+    const selected = "chosen-on-shopify.myshopify.com";
+    const response = await h.service.install(
+      h.issued.cookie,
+      h.installQuery(selected),
+    );
+    expect(new URL(response.authorizationUrl).hostname).toBe(selected);
+    expect(
+      await h.service.install(h.issued.cookie, h.installQuery(selected)),
+    ).toEqual(response);
+    await expect(
+      h.service.install(h.issued.cookie, h.installQuery()),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    const state = new URL(response.authorizationUrl).searchParams.get("state")!;
+    await expect(
+      h.service.callback(
+        h.issued.cookie,
+        h.signed(state),
+        new AbortController().signal,
+      ),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(h.exchange).not.toHaveBeenCalled();
+  });
+  it("rejects unsolicited, forged, cross-browser and expired store selections", async () => {
+    const h = await setup();
+    await expect(
+      h.service.install(h.issued.cookie, h.installQuery()),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await h.service.connect(h.issued.cookie, h.issued.result.tabProof, {
+      schemaVersion: 1,
+      workspaceId: "workspace",
+      returnTo: "onboarding",
+    });
+    for (const [cookie, query] of [
+      [undefined, h.installQuery()],
+      ["b".repeat(64), h.installQuery()],
+      [h.issued.cookie, h.installQuery() + "&shop=other.myshopify.com"],
+      [h.issued.cookie, h.installQuery().replace("retailor-test", "tampered")],
+      [h.issued.cookie, h.signed("a".repeat(64))],
+    ] as const)
+      await expect(h.service.install(cookie, query)).rejects.toMatchObject({
+        code: "FORBIDDEN",
+      });
+    h.advance(600001);
+    await expect(
+      h.service.install(h.issued.cookie, h.installQuery()),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(
+      await h.service.ledger.inspect((data) => data.installations.length),
+    ).toBe(0);
+    expect(h.exchange).not.toHaveBeenCalled();
+  });
+  it("prevents ambiguous concurrent browser attempts and rejects legacy ambiguity", async () => {
+    const h = await setup();
+    await h.service.connect(h.issued.cookie, h.issued.result.tabProof, {
+      schemaVersion: 1,
+      workspaceId: "workspace",
+      returnTo: "onboarding",
+    });
+    const second = await h.service.session(h.issued.cookie, {
+      schemaVersion: 1,
+      workspaceId: "second",
+      createdAt: h.clock(),
+    });
+    await expect(
+      h.service.connect(second.cookie, second.result.tabProof, {
+        schemaVersion: 1,
+        workspaceId: "second",
+        returnTo: "connections",
+      }),
+    ).rejects.toMatchObject({ code: "BUSY" });
+    await h.service.ledger.transact((data) => {
+      data.bindings[1]!.pending = structuredClone(data.bindings[0]!.pending);
+    });
+    await expect(
+      h.service.install(h.issued.cookie, h.installQuery()),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(h.exchange).not.toHaveBeenCalled();
+  });
   it("commits a rotated token across a known conditional-write conflict without replaying refresh", async () => {
     const h = await setup();
     await h.connect();
@@ -225,7 +344,7 @@ describe("session-bound standalone Shopify authorization", () => {
       h.clock,
     );
     services.push(resumed);
-    const install = await resumed.install(h.issued.cookie, h.signed(state));
+    const install = await resumed.install(h.issued.cookie, h.installQuery());
     expect(new URL(install.authorizationUrl).searchParams.get("state")).toBe(
       state,
     );
@@ -386,13 +505,13 @@ describe("session-bound standalone Shopify authorization", () => {
       createdAt: h.clock(),
     });
     expect(second.cookie).toBe(h.issued.cookie);
+    await h.service.connect(second.cookie, second.result.tabProof, {
+      schemaVersion: 1,
+      workspaceId: "second",
+      returnTo: "connections",
+    });
     await expect(
-      h.service.connect(second.cookie, second.result.tabProof, {
-        schemaVersion: 1,
-        workspaceId: "second",
-        shop,
-        returnTo: "connections",
-      }),
+      h.service.install(second.cookie, h.installQuery()),
     ).rejects.toMatchObject({ code: "BUSY" });
     expect(h.exchange).toHaveBeenCalledTimes(1);
     await expect(
