@@ -75,6 +75,8 @@ For frontend hot reload with an already-running live backend, use `pnpm dev:fron
 
 ## Inside the demo
 
+**Shopify integration (locally verified; native test pending):** optional Connect/Skip after first design acceptance and Owner workspace → Connections provide standalone OAuth, read-only product browsing, reviewed draft exports with variants/photos/exact USD prices, explicit Update/Remove and cleanup on Disconnect/Reset/original expiry. Connecting creates nothing. Use an eligible Shopify test store; loss of access can require manual removal. Credentials/form, real Shopify API and outside-user/hosted installation still need verification. Try the clearly labelled, key-free [local simulation and setup guide](docs/operations/SHOPIFY.md); [portfolio/GitHub copy](docs/operations/SHOPIFY-PORTFOLIO.md) records what can be claimed now.
+
 - **Photos:** twenty supplied sample images have recorded provenance. Each deliberate public sample draft requires fresh live recognition; fake development uses explicit fixtures. Photo recognition can need grouping corrections during review.
 - **Branding:** a wordmark is the default. Optional logos use bundled fonts and three authored local compositions in every app mode, with spelling review and all-page preview before selection. See the [logo policy](docs/engineering/LOGOS.md).
 - **Commerce:** business activity is fictional. Stripe sandbox checkout makes no real charge or shipment; its selected photo sharing, storage and return behavior are documented in the [checkout guide](docs/operations/CHECKOUT-STORAGE.md).
