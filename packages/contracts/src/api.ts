@@ -99,6 +99,18 @@ export const API_ROUTES = {
     responseLimit: 1024 * 1024,
     timeoutMs: 30000,
   },
+  "shopify/collections": {
+    method: "POST",
+    bodyLimit: 4096,
+    responseLimit: 16384,
+    timeoutMs: 25000,
+  },
+  "shopify/import": {
+    method: "POST",
+    bodyLimit: 4096,
+    responseLimit: 9 * 1024 * 1024,
+    timeoutMs: 120000,
+  },
   "shopify/export": {
     method: "POST",
     bodyLimit: 10 * 1024 * 1024,
