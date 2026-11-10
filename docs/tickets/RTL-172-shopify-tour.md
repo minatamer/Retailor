@@ -1,0 +1,13 @@
+# RTL-172 — Include Shopify throughout the demo tour
+
+10 November 2026. **Implemented and locally validated.** Owner asks that Shopify and all its features be part of the tour. Six shared Shopify steps now appear in the first-store/replayable store and dashboard tours, with an introduction in preview/setup. Actual desktop/phone/Back/Escape/Skip/Done checks and all six settled gates pass (833 tests/124 files). [Validation record](../validation/RTL-172.md) includes the clean read-only review. Preserve RTL-166–171 unstaged work; native Shopify sign-in/import acceptance remains deferred. No external browser, provider mutation, review submission, staging or commits.
+
+## Acceptance
+
+1. Preview/setup orientation mentions the optional Shopify connection before entering the store and the later Connections tab. Both the automatic first-store continuation and replayable dashboard tour visit actual Connections targets.
+2. Cover Shopify-owned sign-in/store selection/consent, optional Skip and no products created on Connect; collection/all-product browsing, photos/descriptions/prices/details/search/selection; reviewed local clothing import and explicit demo stock; reviewed draft exports with photos and the Retailor collection; result checks, explicit updates, photo replacement/removal, lifetime cap, disconnect/reset/original-expiry cleanup and honest manual-cleanup caveat. Keep each step short and useful. Do not claim checkout or arbitrary public installation exists.
+3. Tour navigation is session-owned, finite and reversible with Back. Store tour returns to its storefront steps; owner tour goes to overview for ordinary steps and Connections for Shopify. Skip/Escape/Done/expiry/manual navigation and replay preserve existing lifecycle, immediate welcome, authored-target whitelist, responsive spotlight motion and keyboard focus. No tour action connects, imports, exports, updates, removes or disconnects.
+4. Targets remain meaningful when disconnected/unavailable, without simulated authority/data or any bypass. No new secret/dependency/provider API. Preserve current photo/domain/cleanup fences and all preceding source changes.
+5. Meaningful navigation/graph-preservation regressions, actual Codex in-app desktop/phone/Back/Skip checks, all six local gates, settled read-only review and actual evidence in the validation record. Current-source Linux/images/scanners and native Shopify acceptance stay explicitly separate.
+
+Precision: RTL-095 tour lifecycle, RTL-122 immediate welcome, current TourGuide/target registry/layout, SessionController navigation, RTL-171 current Shopify behavior and operation controls. Installed Next client-boundary docs apply to TSX changes.
