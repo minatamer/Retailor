@@ -91,6 +91,8 @@ import type { ProductInput } from "@retailor/contracts/product";
 import { ShopifyController, emptyShopifyView } from "../shopify/controller";
 import type { ShopifyView } from "../shopify/controller";
 import type { ShopifyRequester } from "../shopify/request";
+import { importCandidate, importedProductId } from "../shopify/import-model";
+import { COMMERCE_LIMITS } from "@retailor/contracts/commerce";
 import { ProductInputSchema } from "@retailor/contracts/product";
 import {
   canRemoveSizeOption,
@@ -572,7 +574,8 @@ export class SessionController {
   }
   private startShopify() {
     if (!this.options.shopifyRequest || !this.active) return;
-    const graph = this.snapshot.state.graph;
+    const graph = this.snapshot.state.graph,
+      photos = this.photos;
     this.shopify = new ShopifyController(
       {
         workspaceId: graph.workspaceId,
@@ -585,6 +588,7 @@ export class SessionController {
       this.options.storage,
       this.options.shopifyNavigate,
       this.clock,
+      (products) => this.discardShopifyImportPhotos(products, photos),
     );
     void this.shopify.initialize();
   }
@@ -596,23 +600,179 @@ export class SessionController {
           this.snapshot.state.ownerView === "connections"))
     );
   }
-  shopifyVisible(visible: boolean) {
-    this.shopify?.visible(visible && this.canManageShopify());
+  shopifyVisible(visible: boolean, catalogue = false) {
+    this.shopify?.visible(visible && this.canManageShopify(), catalogue);
   }
   refreshShopify() {
     if (this.canManageShopify()) return this.shopify?.refresh();
   }
   readShopify(next = false) {
-    if (this.canManageShopify()) return this.shopify?.browse(next);
+    if (this.canManageShopify()) return this.shopify?.browse(next, !next);
+  }
+  chooseShopifyCollection(id: string | null) {
+    if (this.canManageShopify()) return this.shopify?.chooseCollection(id);
+  }
+  moreShopifyCollections() {
+    if (this.canManageShopify()) return this.shopify?.moreCollections();
+  }
+  private async discardShopifyImportPhotos(
+    products: readonly ProductInput[],
+    photos: PhotoController,
+  ) {
+    const used = new Set([
+      ...this.snapshot.state.graph.photos.map((photo) => photo.id),
+      ...this.snapshot.state.selectedIds,
+    ]);
+    for (const id of new Set(products.flatMap((product) => product.imageIds)))
+      if (!used.has(id)) await photos.remove(id);
+  }
+  prepareShopifyImport(ids: string[]) {
+    if (
+      !this.canManageShopify() ||
+      !this.shopify ||
+      this.photos.getSnapshot().busy
+    )
+      return;
+    const graph = this.snapshot.state.graph,
+      photos = this.photos,
+      generation = this.generation;
+    const capacity = Math.min(
+      COMMERCE_LIMITS.activeProducts -
+        graph.products.filter((product) => !product.archived).length,
+      COMMERCE_LIMITS.products - graph.products.length,
+    );
+    return this.shopify.prepareImport(
+      ids,
+      async (source, signal) => {
+        const current = () =>
+          !signal.aborted &&
+          this.canManageShopify() &&
+          this.photos === photos &&
+          generation === this.generation &&
+          this.snapshot.state.graph.revision === graph.revision;
+        const id = await importedProductId(
+          this.snapshot.shopify.status?.shop ?? "",
+          source.product.id,
+        );
+        if (!current()) throw new ApiRequestError("STALE");
+        if (graph.products.some((product) => product.id === id))
+          throw new Error("Duplicate import");
+        // Validate metadata before decoding/downloading into the local cache.
+        importCandidate(source.product, id, ["pending_photo"]);
+        const existing = new Set(photos.availableIds());
+        const cancel = () => photos.cancel();
+        signal.addEventListener("abort", cancel, { once: true });
+        try {
+          signal.throwIfAborted();
+          const files = source.photos.map((photo) => ({
+            name: `${source.product.title.slice(0, 90)}.webp`,
+            blob: new Blob(
+              [
+                Uint8Array.from(atob(photo.base64), (char) =>
+                  char.charCodeAt(0),
+                ),
+              ],
+              { type: photo.image.mime },
+            ),
+          }));
+          const added = await photos.add(files, undefined, false, "reuse");
+          if (!current() || added.length !== files.length)
+            throw new ApiRequestError("STALE");
+          const candidate = importCandidate(source.product, id, [
+            ...new Set(added),
+          ]);
+          photos.require(candidate.imageIds);
+          return candidate;
+        } catch (error) {
+          for (const photoId of photos.availableIds())
+            if (!existing.has(photoId)) await photos.remove(photoId);
+          throw error;
+        } finally {
+          signal.removeEventListener("abort", cancel);
+        }
+      },
+      capacity,
+    );
+  }
+  cancelShopifyImport() {
+    this.shopify?.cancelImport();
+  }
+  confirmShopifyImport(
+    stock: number,
+    confirmedClothing: boolean,
+    categories: Record<string, ProductInput["category"]>,
+  ) {
+    if (
+      !this.canManageShopify() ||
+      !confirmedClothing ||
+      !Number.isSafeInteger(stock) ||
+      stock < 0 ||
+      stock > 10000
+    )
+      return;
+    return this.shopify?.confirmImport(async (products, revision, signal) => {
+      const current = () =>
+        !signal.aborted &&
+        this.canManageShopify() &&
+        this.snapshot.state.graph.revision === revision;
+      const photoIds = [
+        ...new Set(products.flatMap((product) => product.imageIds)),
+      ];
+      if (
+        !current() ||
+        !(await this.photos.checkpoint(photoIds, signal)) ||
+        !current()
+      )
+        throw new ApiRequestError("STALE");
+      const context = {
+        now: new Date(this.clock()).toISOString(),
+        availablePhotoIds: this.photos.availableIds(),
+      };
+      let graph = this.snapshot.state.graph;
+      const descriptors = this.photos
+        .descriptors()
+        .filter((photo) => photoIds.includes(photo.id));
+      const register = applyCommand(
+        graph,
+        this.makeCommand(graph, "registerPhotos", { photos: descriptors }),
+        context,
+      );
+      if (!register.ok) throw new ApiRequestError("INVALID_INPUT");
+      graph = register.graph;
+      for (const product of products) {
+        const candidate = ProductInputSchema.parse({
+          ...product,
+          category: categories[product.id] ?? product.category,
+          variants: product.variants.map((variant) => ({
+            ...variant,
+            openingStock: stock,
+          })),
+        });
+        const result = applyCommand(
+          graph,
+          this.makeCommand(graph, "createProduct", candidate),
+          context,
+        );
+        if (!result.ok) throw new ApiRequestError("INVALID_INPUT");
+        graph = result.graph;
+      }
+      if (!current()) throw new ApiRequestError("STALE");
+      const retained = new Map(
+        this.snapshot.state.photos.map((photo) => [photo.id, photo]),
+      );
+      for (const photo of descriptors) retained.set(photo.id, photo);
+      this.state({ graph, photos: [...retained.values()] });
+      this.protectDesignPhotos();
+    });
   }
   simulateShopify(approved: boolean) {
     if (this.canManageShopify()) return this.shopify?.consent(approved);
   }
-  connectShopify(shop: string) {
+  connectShopify() {
     if (!this.canManageShopify()) return;
     const returnTo =
       this.snapshot.state.stage === "connect" ? "onboarding" : "connections";
-    return this.shopify?.connect(shop, returnTo, async (signal) => {
+    return this.shopify?.connect(returnTo, async (signal) => {
       const state = this.snapshot.state;
       if (
         !this.options.storage ||
@@ -3732,8 +3892,20 @@ export class SessionController {
     ) {
       const tour = this.snapshot.tour;
       const step = TOUR_STEPS[tour.role][index]!;
-      if (tour.role === "owner" && this.snapshot.state.ownerView !== "overview")
-        this.ownerNavigate("overview");
+      const destination = step.ownerView
+        ? "dashboard"
+        : tour.role === "owner"
+          ? "dashboard"
+          : tour.role === "shopper"
+            ? "storefront"
+            : "style";
+      if (this.snapshot.state.stage !== destination) this.go(destination);
+      if (this.snapshot.state.stage !== destination) return;
+      if (
+        destination === "dashboard" &&
+        this.snapshot.state.ownerView !== (step.ownerView ?? "overview")
+      )
+        this.ownerNavigate(step.ownerView ?? "overview");
       if (step.page) {
         const products = this.snapshot.state.graph.products.filter(
           (product) => !product.archived,
@@ -3749,6 +3921,7 @@ export class SessionController {
           ...(step.page === "product" ? { productId } : {}),
         });
       }
+      // Only authored tour navigation restores its identity after go() exits it.
       this.update({ tour: { ...tour, index } }, false);
     }
   }
