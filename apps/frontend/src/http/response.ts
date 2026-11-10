@@ -40,6 +40,20 @@ export async function readApiJson(
       const error = PublicErrorSchema.safeParse(parsed);
       throw new ApiRequestError(
         error.success ? error.data.error.code : "UPSTREAM_FAILED",
+        error.success ? error.data.error.requestId : undefined,
+        (() => {
+          const raw = response.headers.get("retry-after");
+          const milliseconds =
+            raw && /^\d{1,6}$/u.test(raw)
+              ? Number(raw) * 1000
+              : raw
+                ? Date.parse(raw) - Date.now()
+                : 0;
+          return Math.min(
+            3600000,
+            Math.max(0, Number.isFinite(milliseconds) ? milliseconds : 0),
+          );
+        })(),
       );
     }
     return parsed;
