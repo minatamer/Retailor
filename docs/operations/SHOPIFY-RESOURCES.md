@@ -1,5 +1,7 @@
 # Shopify resource and native-acceptance worksheet
 
+**RTL-168 current entry correction (10 November 2026):** Connect no longer collects a store address. For local, unreviewed testing it uses the actual Shopify-generated development install link in `shopify-app.ts`. Shopify owns store selection, then sends a signed App URL request; only that verified selection binds the pending Retailor demo before code-grant consent. One pending attempt per browser cookie prevents cross-tab ambiguity. Reset also cancels attempts which have not selected a store. Original expiry, tab proof, encrypted tokens and ownership cleanup remain required. The owner has now verified the real local store picker, consent and HTTP callback to Connected (Retailor Test, USD, zero exports). The connected onboarding then offers Continue without management buttons or redundant success feedback; management remains in dashboard Connections. This organization-bound link is refused in production. Public visitors need separately supported distribution/listing and native eligibility proof; no App Store review is submitted. See [RTL-168 evidence](../validation/RTL-168.md) and [current setup](../operations/SHOPIFY-LOCAL-SETUP.md).
+
 Prepared10 November2026; **no resource, key, permission, tunnel or schedule is created by this file**. This is the small integration ledger/runner extension to the existing two web services. The storefront remains a temporary browser session. [Setup/recovery](SHOPIFY.md), [current evidence](../validation/RTL-166.md).
 
 ## Fill with non-secret metadata before authorizing hosted work
@@ -27,17 +29,13 @@ Sanitized clothing derivatives go directly to Shopify-managed PRODUCT_IMAGE stag
 
 ## Prepared private runner configuration
 
-Use the **same current backend image**; override command to `node`, single argument `dist/shopify/cleanup-cli.js`. Required normal environment:
+Use the **same current backend image**; override command to `node`, single argument `dist/shopify/cleanup-cli.js`. Set the app's public Client ID, provider `live` and authorized storage project/bucket in `apps/backend/src/config/shopify-app.ts` before building that image. These are source-controlled non-secret settings, not environment secrets. Required normal environment:
 
 ```text
 APP_ENV=production
 FAKE_MODE=false
 PAID_DEMO_ENABLED=false
-SHOPIFY_PROVIDER=live
 FRONTEND_ORIGIN=<canonical HTTPS origin>
-SHOPIFY_CLIENT_ID=<owner app identity>
-SHOPIFY_STORAGE_PROJECT=<authorized project>
-SHOPIFY_STORAGE_BUCKET=<separate integration bucket>
 SHOPIFY_CLIENT_SECRET=<exact secret-version binding, never literal in this file>
 SHOPIFY_ENCRYPTION_KEY=<exact secret-version binding, never literal in this file>
 ```
