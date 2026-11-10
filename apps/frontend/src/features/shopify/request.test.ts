@@ -8,7 +8,7 @@ describe("fixed Shopify browser requests", () => {
       Response.json({
         schemaVersion: 1,
         authorizationUrl:
-          "https://test.myshopify.com/admin/oauth/authorize?state=abc",
+          "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dfixture",
       }),
     );
     const port = shopifyRequester(fetcher),
@@ -18,7 +18,7 @@ describe("fixed Shopify browser requests", () => {
         {
           schemaVersion: 1,
           workspaceId: "workspace",
-          shop: "https://evil.example",
+          ...{ shop: "https://evil.example" },
           returnTo: "onboarding",
         },
         "a".repeat(64),
@@ -30,7 +30,6 @@ describe("fixed Shopify browser requests", () => {
       {
         schemaVersion: 1,
         workspaceId: "workspace",
-        shop: "test.myshopify.com",
         returnTo: "connections",
       },
       "a".repeat(64),
@@ -44,6 +43,7 @@ describe("fixed Shopify browser requests", () => {
       "a".repeat(64),
     );
     expect(JSON.parse(init.body as string)).not.toHaveProperty("url");
+    expect(JSON.parse(init.body as string)).not.toHaveProperty("shop");
   });
   it("preserves safe code/reference and bounded Retry-After without trusting provider error copy", async () => {
     const payload = publicError("BUSY", "req_shopify_test");
