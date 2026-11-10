@@ -20,7 +20,9 @@ export class ShopifyAccessRejected extends OperationFailure {
 }
 export interface ShopifyProvider {
   readonly simulated: boolean;
+  installationUrl(): string;
   consent?(shop: string, state: string, approved: boolean, now: number): string;
+  installQuery?(shop: string, now: number): string;
   authorizationUrl(shop: string, state: string): string;
   verifyQuery(query: string, now: number): URLSearchParams;
   exchange(shop: string, code: string, signal: AbortSignal): Promise<Tokens>;
@@ -135,10 +137,14 @@ export class LiveShopifyProvider implements ShopifyProvider {
       clientId: string;
       secret: string;
       redirectUri: string;
+      developmentInstallUrl: string;
     },
     private readonly http: typeof fetch = fetch,
     private readonly clock: () => number = Date.now,
   ) {}
+  installationUrl() {
+    return this.config.developmentInstallUrl;
+  }
   authorizationUrl(shop: string, state: string) {
     ShopifyShopSchema.parse(shop);
     const url = new URL(`https://${shop}/admin/oauth/authorize`);
