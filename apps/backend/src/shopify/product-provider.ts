@@ -5,6 +5,10 @@ import {
 } from "@retailor/contracts/shopify";
 import { boundedBytes } from "../security/bounded.js";
 import { deny } from "../security/errors.js";
+import { LiveCollectionProvider } from "./collection-provider.js";
+import type { CollectionProvider } from "./collection-provider.js";
+import { importPhotos } from "./import.js";
+import type { ShopifyImportResult } from "@retailor/contracts/shopify";
 
 export const DEMO_NAMESPACE = "$app:retailor_demo";
 export const DEMO_KEY = "session_export";
@@ -66,6 +70,23 @@ export const RemoteProductSchema = z.object({
   description: z.string().max(1200),
   productType: z.string().max(255),
   status: z.enum(["ACTIVE", "DRAFT", "ARCHIVED", "UNLISTED"]),
+  isGiftCard: z.boolean().optional(),
+  priceRangeV2: z
+    .object({
+      minVariantPrice: z.object({
+        amount: z
+          .string()
+          .max(32)
+          .regex(/^\d{1,16}(?:\.\d{1,4})?$/u),
+      }),
+      maxVariantPrice: z.object({
+        amount: z
+          .string()
+          .max(32)
+          .regex(/^\d{1,16}(?:\.\d{1,4})?$/u),
+      }),
+    })
+    .optional(),
   metafield: z.object({ value: z.string().max(64) }).nullable(),
   variants: z.object({
     nodes: z.array(VariantSchema).max(65),
@@ -87,9 +108,22 @@ export interface StagedPhoto {
   alt: string;
 }
 export interface ProductProvider {
+  readonly collections: CollectionProvider;
+  collectionList(
+    context: ProductContext,
+    cursor: string | null,
+  ): Promise<{
+    collections: { id: string; title: string }[];
+    next: string | null;
+  }>;
+  importPhotos(
+    context: ProductContext,
+    product: RemoteProduct,
+  ): Promise<ShopifyImportResult["photos"]>;
   list(
     context: ProductContext,
     cursor: string | null,
+    collectionId?: string | null,
   ): Promise<{ products: RemoteProduct[]; next: string | null }>;
   read(
     context: ProductContext,
@@ -111,6 +145,7 @@ export interface ProductProvider {
     handle: string,
     marker: string,
     photos: readonly StagedPhoto[],
+    collectionId?: string,
   ): Promise<ProductMutation>;
   configure(
     context: ProductContext,
@@ -138,10 +173,11 @@ const UserErrorsSchema = z
 const fields = (
   variants: number,
   media: number,
-) => `id handle title description(truncateAt: 1200) productType status
+) => `id handle title description(truncateAt: 1200) productType status isGiftCard
+  priceRangeV2 { minVariantPrice { amount } maxVariantPrice { amount } }
   metafield(namespace: "${DEMO_NAMESPACE}", key: "${DEMO_KEY}") { value }
   variants(first: ${variants}) { nodes { id title sku price selectedOptions { name value } } pageInfo { hasNextPage } }
-  media(first: ${media}) { nodes { id alt mediaContentType status ... on MediaImage { image { url } } } pageInfo { hasNextPage } }`;
+  media(first: ${media}) { nodes { id alt mediaContentType status ... on MediaImage { image { url(transform:{maxWidth:1600,maxHeight:1600,preferredContentType:WEBP}) } } } pageInfo { hasNextPage } }`;
 function checked<T>(schema: z.ZodType<T>, value: unknown): T {
   const parsed = schema.safeParse(value);
   return parsed.success ? parsed.data : deny("UPSTREAM_FAILED", 502);
@@ -181,10 +217,13 @@ function stageUrl(value: string) {
   return url;
 }
 export class LiveProductProvider implements ProductProvider {
+  readonly collections: CollectionProvider;
   constructor(
     private readonly graphql: GraphqlPort,
     private readonly http: typeof fetch = fetch,
-  ) {}
+  ) {
+    this.collections = new LiveCollectionProvider(graphql);
+  }
   private async query(
     context: ProductContext,
     query: string,
@@ -199,15 +238,71 @@ export class LiveProductProvider implements ProductProvider {
       context.signal,
     );
   }
-  async list(context: ProductContext, cursor: string | null) {
-    // Page summaries keep requested GraphQL cost below the single-query ceiling.
+  async collectionList(context: ProductContext, cursor: string | null) {
     const result = await this.query(
       context,
-      `query RetailorProducts($after: String) { products(first:20,after:$after,sortKey:ID) {
-      nodes { ${fields(4, 2)} } pageInfo { hasNextPage endCursor } } }`,
+      `query RetailorCollections($after:String) { collections(first:20,after:$after,sortKey:ID) { nodes { id title } pageInfo { hasNextPage endCursor } } }`,
       { after: cursor },
     );
     if (hasErrors(result)) return deny("UPSTREAM_FAILED", 502);
+    const data = checked(
+      z.object({
+        data: z.object({
+          collections: z.object({
+            nodes: z
+              .array(
+                z.object({
+                  id: z
+                    .string()
+                    .max(100)
+                    .regex(/^gid:\/\/shopify\/Collection\/\d+$/u),
+                  title: z.string().max(255),
+                }),
+              )
+              .max(20),
+            pageInfo: z.object({
+              hasNextPage: z.boolean(),
+              endCursor: z.string().max(2048).nullable(),
+            }),
+          }),
+        }),
+      }),
+      result,
+    ).data.collections;
+    return {
+      collections: data.nodes,
+      next: data.pageInfo.hasNextPage ? data.pageInfo.endCursor : null,
+    };
+  }
+  importPhotos(context: ProductContext, product: RemoteProduct) {
+    return importPhotos(context, product, this.http);
+  }
+  async list(
+    context: ProductContext,
+    cursor: string | null,
+    collectionId?: string | null,
+  ) {
+    // Page summaries keep requested GraphQL cost below the single-query ceiling.
+    const result = await this.query(
+      context,
+      collectionId
+        ? `query RetailorCollectionProducts($id:ID!,$after:String) { collection(id:$id) { products(first:20,after:$after) { nodes { ${fields(4, 2)} } pageInfo { hasNextPage endCursor } } } }`
+        : `query RetailorProducts($after: String) { products(first:20,after:$after,sortKey:ID) {
+      nodes { ${fields(4, 2)} } pageInfo { hasNextPage endCursor } } }`,
+      collectionId ? { after: cursor, id: collectionId } : { after: cursor },
+    );
+    if (hasErrors(result)) return deny("UPSTREAM_FAILED", 502);
+    const envelope = collectionId
+      ? checked(
+          z.object({
+            data: z.object({
+              collection: z.object({ products: z.unknown() }).nullable(),
+            }),
+          }),
+          result,
+        ).data.collection
+      : null;
+    if (collectionId && !envelope) return deny("NOT_FOUND", 404);
     const data = checked(
       z.object({
         data: z.object({
@@ -220,7 +315,7 @@ export class LiveProductProvider implements ProductProvider {
           }),
         }),
       }),
-      result,
+      collectionId ? { data: envelope } : result,
     ).data.products;
     return {
       products: data.nodes,
@@ -377,6 +472,7 @@ export class LiveProductProvider implements ProductProvider {
     handle: string,
     marker: string,
     photos: readonly StagedPhoto[],
+    collectionId?: string,
   ) {
     const result = await this.query(
       context,
@@ -390,6 +486,7 @@ export class LiveProductProvider implements ProductProvider {
           status: "DRAFT",
           handle,
           tags: ["Retailor demo"],
+          ...(collectionId ? { collectionsToJoin: [collectionId] } : {}),
           metafields: [
             {
               namespace: DEMO_NAMESPACE,
