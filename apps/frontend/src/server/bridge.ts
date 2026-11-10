@@ -27,6 +27,8 @@ import {
   ShopifyProductsResultSchema,
   ShopifyExportResultSchema,
   ShopifyWebhookResultSchema,
+  ShopifyCollectionsResultSchema,
+  ShopifyImportResultSchema,
 } from "@retailor/contracts/shopify";
 const origin = z
   .string()
@@ -280,42 +282,46 @@ export async function forward(
           ? ShopifyWebhookResultSchema
           : path === "shopify/session"
             ? ShopifySessionResultSchema
-            : path === "shopify/products"
-              ? ShopifyProductsResultSchema
-              : path === "shopify/export" ||
-                  path === "shopify/update" ||
-                  path === "shopify/check"
-                ? ShopifyExportResultSchema
-                : path === "shopify/status" ||
-                    path === "shopify/remove" ||
-                    path === "shopify/disconnect" ||
-                    path === "shopify/end"
-                  ? ShopifyStatusSchema
-                  : path === "shopify/connect" || path === "shopify/install"
-                    ? ShopifyAuthorizeSchema
-                    : shopifyCallback
-                      ? ShopifyCallbackSchema
-                      : path === "checkout/identity"
-                        ? CheckoutIdentityResultSchema
-                        : path.startsWith("checkout/")
-                          ? CheckoutResultSchema
-                          : path === "health"
-                            ? HealthSchema
-                            : path === "ready"
-                              ? ReadinessSchema
-                              : path === "config"
-                                ? CapabilitiesSchema
-                                : path === "currency/usd-eur"
-                                  ? FxSnapshotSchema
-                                  : path === "admission"
-                                    ? AdmissionResultSchema
-                                    : path === "catalogue/interpret"
-                                      ? RecognitionResultSchema
-                                      : path.startsWith("assistant/")
-                                        ? AssistantResultSchema
-                                        : path === "brand/logos"
-                                          ? LogoResultSchema
-                                          : null;
+            : path === "shopify/import"
+              ? ShopifyImportResultSchema
+              : path === "shopify/collections"
+                ? ShopifyCollectionsResultSchema
+                : path === "shopify/products"
+                  ? ShopifyProductsResultSchema
+                  : path === "shopify/export" ||
+                      path === "shopify/update" ||
+                      path === "shopify/check"
+                    ? ShopifyExportResultSchema
+                    : path === "shopify/status" ||
+                        path === "shopify/remove" ||
+                        path === "shopify/disconnect" ||
+                        path === "shopify/end"
+                      ? ShopifyStatusSchema
+                      : path === "shopify/connect" || path === "shopify/install"
+                        ? ShopifyAuthorizeSchema
+                        : shopifyCallback
+                          ? ShopifyCallbackSchema
+                          : path === "checkout/identity"
+                            ? CheckoutIdentityResultSchema
+                            : path.startsWith("checkout/")
+                              ? CheckoutResultSchema
+                              : path === "health"
+                                ? HealthSchema
+                                : path === "ready"
+                                  ? ReadinessSchema
+                                  : path === "config"
+                                    ? CapabilitiesSchema
+                                    : path === "currency/usd-eur"
+                                      ? FxSnapshotSchema
+                                      : path === "admission"
+                                        ? AdmissionResultSchema
+                                        : path === "catalogue/interpret"
+                                          ? RecognitionResultSchema
+                                          : path.startsWith("assistant/")
+                                            ? AssistantResultSchema
+                                            : path === "brand/logos"
+                                              ? LogoResultSchema
+                                              : null;
     const validated = schema?.safeParse(parsed);
     if (validated && !validated.success) return fail("UPSTREAM_FAILED", 502);
     const outputHeaders = new Headers({
