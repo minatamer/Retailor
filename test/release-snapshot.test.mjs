@@ -32,6 +32,7 @@ describe("release input privacy", () => {
       "apps/frontend/public/favicon.ico",
       "apps/frontend/public/favicon-96.png",
       "apps/frontend/public/apple-touch-icon.png",
+      "apps/frontend/public/integrations/shopify-logo.svg",
       "apps/backend/src/brand/fonts/inter.ttf",
       "apps/backend/src/brand/fonts/editorial.ttf",
       "apps/backend/src/brand/fonts/modern.ttf",
@@ -52,6 +53,7 @@ describe("release input privacy", () => {
       "apps/frontend/public/landing/visitor.mp4",
       "apps/frontend/public/landing/.env.local",
       "apps/frontend/public/brand/visitor.svg",
+      "apps/frontend/public/integrations/visitor.svg",
       "apps/frontend/public/brand/.env.local",
       "apps/frontend/public/favicon-visitor.png",
       "apps/backend/src/brand/fonts/visitor.ttf",
@@ -119,6 +121,7 @@ describe("release input privacy", () => {
     for (const directory of [
       "apps/frontend/public/fonts",
       "apps/frontend/public/landing",
+      "apps/frontend/public/integrations",
       "apps/backend/src/brand/fonts",
       "packages/contracts",
       "packages/commerce",
@@ -159,6 +162,10 @@ describe("release input privacy", () => {
     await writeFile(
       resolve(repository, "apps/frontend/public/landing/hero-film.mp4"),
       binary,
+    );
+    await writeFile(
+      resolve(repository, "apps/frontend/public/integrations/shopify-logo.svg"),
+      '<svg xmlns="http://www.w3.org/2000/svg"/>\n',
     );
     git(repository, ["init", "--quiet"]);
     git(repository, ["config", "core.autocrlf", "false"]);
@@ -240,6 +247,14 @@ describe("release input privacy", () => {
     );
     expect((await sourceSnapshot(changed)).fingerprint).not.toBe(
       beforeFontEdit.fingerprint,
+    );
+    const beforeIntegrationEdit = await sourceSnapshot(changed);
+    await writeFile(
+      resolve(changed, "apps/frontend/public/integrations/shopify-logo.svg"),
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"/>\n',
+    );
+    expect((await sourceSnapshot(changed)).fingerprint).not.toBe(
+      beforeIntegrationEdit.fingerprint,
     );
   });
 });
