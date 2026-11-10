@@ -1,7 +1,12 @@
+import { importPhotos } from "./import.js";
 import { randomBytes, createHmac } from "node:crypto";
 import { deny } from "../security/errors.js";
 import { verifyShopifyQuery } from "./provider.js";
 import type { ShopifyProvider } from "./provider.js";
+import type {
+  CollectionProvider,
+  RemoteCollection,
+} from "./collection-provider.js";
 import type { Tokens } from "./model.js";
 import type {
   ProductContext,
@@ -14,6 +19,48 @@ import type {
 
 /** Explicit development adapter. No network, image bytes, disk or live fallback. */
 export class FixtureShopify implements ShopifyProvider, ProductProvider {
+  private groups = new Map<string, Map<string, RemoteCollection>>();
+  private collectionRecords(shop: string) {
+    let rows = this.groups.get(shop);
+    if (!rows) {
+      rows = new Map();
+      this.groups.set(shop, rows);
+    }
+    return rows;
+  }
+  readonly collections: CollectionProvider = {
+    read: async (context, identifier) => {
+      await this.admitted(context);
+      const rows = this.collectionRecords(context.shop);
+      const row =
+        "id" in identifier
+          ? rows.get(identifier.id)
+          : [...rows.values()].find(
+              (item) => item.handle === identifier.handle,
+            );
+      if (!row) return null;
+      const result = structuredClone(row);
+      result.products.nodes = result.products.nodes.filter((item) =>
+        this.records(context.shop).has(item.id),
+      );
+      return result;
+    },
+    create: async (context, intent) => {
+      await this.admitted(context);
+      const row: RemoteCollection = {
+        id: `gid://shopify/Collection/${this.next++}`,
+        handle: intent.handle,
+        metafield: { value: intent.marker },
+        products: { nodes: [], pageInfo: { hasNextPage: false } },
+      };
+      this.collectionRecords(context.shop).set(row.id, row);
+      return structuredClone(row);
+    },
+    remove: async (context, id) => {
+      await this.admitted(context);
+      return this.collectionRecords(context.shop).delete(id);
+    },
+  };
   readonly simulated = true;
   private shops = new Map<string, Map<string, RemoteProduct>>();
   private tokens = new Map<string, Tokens>();
@@ -22,11 +69,17 @@ export class FixtureShopify implements ShopifyProvider, ProductProvider {
     readonly secret: string,
     readonly clock: () => number = Date.now,
   ) {}
+  installationUrl() {
+    return "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dfixture";
+  }
   authorizationUrl(shop: string, state: string) {
     return `https://${shop}/admin/oauth/authorize?state=${state}`;
   }
   verifyQuery(query: string, now: number) {
     return verifyShopifyQuery(query, this.secret, now);
+  }
+  installQuery(shop: string, now: number) {
+    return this.signed({ shop, timestamp: String(Math.floor(now / 1000)) });
   }
   consent(shop: string, state: string, approved: boolean, now: number) {
     if (
@@ -64,6 +117,9 @@ export class FixtureShopify implements ShopifyProvider, ProductProvider {
         ? { code: "simulated_consent" }
         : { error: "access_denied" }),
     };
+    return this.signed(params);
+  }
+  private signed(params: Record<string, string>) {
     const message = Object.entries(params)
       .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
       .map(([key, value]) => `${key}=${value}`)
@@ -141,12 +197,49 @@ export class FixtureShopify implements ShopifyProvider, ProductProvider {
     await context.admit();
     this.verified(context.shop, context.access);
   }
-  async list(context: ProductContext, cursor: string | null) {
+  async collectionList(context: ProductContext, cursor: string | null) {
+    await this.admitted(context);
+    const offset = cursor ? Number(cursor.slice(1)) : 0;
+    if (!Number.isSafeInteger(offset) || offset < 0 || offset > 100)
+      return deny("INVALID_INPUT", 400);
+    const rows = [...this.collectionRecords(context.shop).values()];
+    return {
+      collections: rows
+        .slice(offset, offset + 20)
+        .map((row) => ({ id: row.id, title: "Retailor" })),
+      next: rows.length > offset + 20 ? `c${offset + 20}` : null,
+    };
+  }
+  importPhotos(context: ProductContext, product: RemoteProduct) {
+    return importPhotos(
+      context,
+      product,
+      async () =>
+        new Response(
+          Buffer.from(
+            "UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoDAAMAAUAmJaQAA3AA/vxvIAA=",
+            "base64",
+          ),
+        ),
+    );
+  }
+  async list(
+    context: ProductContext,
+    cursor: string | null,
+    collectionId?: string | null,
+  ) {
     await this.admitted(context);
     const offset = cursor ? Number(cursor.slice(1)) : 0;
     if (!Number.isSafeInteger(offset) || offset < 0 || offset > 256)
       return deny("INVALID_INPUT", 400);
-    const all = this.snapshot(context.shop);
+    const group = collectionId
+      ? this.collectionRecords(context.shop).get(collectionId)
+      : null;
+    if (collectionId && !group) return deny("NOT_FOUND", 404);
+    const all = this.snapshot(context.shop).filter(
+      (row) =>
+        !group || group.products.nodes.some((member) => member.id === row.id),
+    );
     return {
       products: all.slice(offset, offset + 20),
       next: all.length > offset + 20 ? `c${offset + 20}` : null,
@@ -191,6 +284,7 @@ export class FixtureShopify implements ShopifyProvider, ProductProvider {
     handle: string,
     marker: string,
     photos: readonly StagedPhoto[],
+    collectionId?: string,
   ): Promise<ProductMutation> {
     await this.admitted(context);
     const records = this.records(context.shop);
@@ -230,6 +324,10 @@ export class FixtureShopify implements ShopifyProvider, ProductProvider {
       },
     };
     records.set(id, remote);
+    if (collectionId)
+      this.collectionRecords(context.shop)
+        .get(collectionId)
+        ?.products.nodes.push({ id });
     return {
       product: structuredClone(remote),
       rejected: false,
