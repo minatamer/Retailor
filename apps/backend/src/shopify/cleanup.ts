@@ -5,6 +5,7 @@ import type { ShopifyCatalogue } from "./catalogue.js";
 import { deny, OperationFailure } from "../security/errors.js";
 import { ShopifyRateLimit } from "./rate-limit.js";
 import { ShopifyAccessRejected } from "./provider.js";
+import { ShopifyCollection } from "./collection.js";
 
 export const CLEANUP = {
   cadenceMs: 60000,
@@ -49,7 +50,13 @@ export class ShopifyCleanup {
       const now = this.auth.clock(),
         binding = authenticated(data, cookie, proof, workspaceId, now, true),
         installation = installationFor(data, binding);
-      if (!installation) return;
+      if (!installation) {
+        if (!exportId) {
+          binding.pending = null;
+          binding.generation++;
+        }
+        return;
+      }
       if (installation.appId !== this.auth.appId) return deny("FORBIDDEN", 403);
       if (exportId) {
         if (installation.endedAt !== null || binding.expiresAt <= now)
@@ -276,16 +283,33 @@ export class ShopifyCleanup {
                     break;
                 }
               }
+              const removeCollection = await scope.update(
+                (current) =>
+                  current.endedAt !== null &&
+                  current.products.every((item) => item.state === "removed") &&
+                  !!current.collection &&
+                  !current.collection.removed,
+              );
+              if (removeCollection && calls + 3 <= CLEANUP.calls) {
+                await scope.update((current) => {
+                  current.maintenanceAttempts++;
+                  current.maintenanceDue =
+                    clock() + delay(current.maintenanceAttempts);
+                });
+                await new ShopifyCollection(
+                  this.catalogue.provider.collections,
+                ).remove(context, scope);
+              }
               const settled = await scope.update((current) => {
                 if (current.endedAt === null) return false;
-                const complete = current.products.every(
-                  (item) => item.state === "removed",
-                );
+                const complete =
+                  current.products.every((item) => item.state === "removed") &&
+                  (!current.collection || current.collection.removed);
                 current.state = complete
                   ? "disconnecting"
                   : current.products.some(
                         (item) => item.cleanupAttempts >= CLEANUP.attempts,
-                      )
+                      ) || current.maintenanceAttempts >= CLEANUP.attempts
                     ? "needs_attention"
                     : "cleanup_pending";
                 return complete;
@@ -293,7 +317,9 @@ export class ShopifyCleanup {
               if (!settled || calls >= CLEANUP.calls) return;
               await scope.update((current) => {
                 current.uninstallDispatched = true;
-                current.maintenanceAttempts++;
+                // Collection removal and uninstall share this sweep's single
+                // maintenance attempt; never exceed the durable eight-attempt cap.
+                if (!removeCollection) current.maintenanceAttempts++;
                 current.maintenanceDue =
                   clock() + delay(current.maintenanceAttempts);
               });
@@ -348,9 +374,11 @@ export class ShopifyCleanup {
     const bindingId = await scope.update((current) => {
       current.endedAt ??= this.auth.clock();
       current.notice = null;
-      current.state = current.products.every((item) => item.state === "removed")
-        ? "cleaned"
-        : "needs_attention";
+      current.state =
+        current.products.every((item) => item.state === "removed") &&
+        (!current.collection || current.collection.removed)
+          ? "cleaned"
+          : "needs_attention";
       current.tokens = null;
       return current.bindingId;
     });
