@@ -79,8 +79,9 @@ export function composeRuntime(
       environment.FAKE_MODE,
     ),
   }),
+  shopifyFactory: typeof configuredShopify = configuredShopify,
 ): Runtime {
-  const shopifyConfig = configuredShopify(env);
+  const shopifyConfig = shopifyFactory(env);
   const shopify = shopifyConfig
     ? new ShopifyService(
         shopifyConfig.ledger,
