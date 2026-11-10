@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ShopifyStatusSchema } from "@retailor/contracts/shopify";
+import {
+  ShopifyStatusSchema,
+  ShopifyImportResultSchema,
+} from "@retailor/contracts/shopify";
+import { importCandidate } from "./import-model";
 import type { ShopifyExportSummary } from "@retailor/contracts/shopify";
 import { ProductSchema } from "@retailor/contracts/product";
 import { ShopifyController, SHOPIFY_TAB_KEY } from "./controller";
@@ -61,7 +65,7 @@ function requests(now = () => start) {
       return {
         schemaVersion: 1 as const,
         authorizationUrl:
-          "https://retailor-demo.myshopify.com/admin/oauth/authorize?state=private-state",
+          "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dfixture",
       };
     }),
     simulate: vi.fn(async (_workspace: string, approved: boolean) => {
@@ -77,7 +81,7 @@ function requests(now = () => start) {
         returnTo: "onboarding" as const,
       };
     }),
-    products: vi.fn(async () => ({
+    products: vi.fn<ShopifyRequester["products"]>(async () => ({
       schemaVersion: 1 as const,
       products: [],
       nextCursor: null,
@@ -85,6 +89,15 @@ function requests(now = () => start) {
       limited: false,
       currency: "USD",
     })),
+    collections: vi.fn<ShopifyRequester["collections"]>(async () => ({
+      schemaVersion: 1,
+      collections: [],
+      nextCursor: null,
+      page: 1,
+    })),
+    importProduct: vi.fn<ShopifyRequester["importProduct"]>(async () => {
+      throw new Error("No import fixture");
+    }),
     write: vi.fn(async (input: Parameters<ShopifyRequester["write"]>[0]) => {
       const entry: ShopifyExportSummary = {
         id: String(state.exports.length + 1).repeat(64),
@@ -118,7 +131,7 @@ afterEach(() => {
   environments.splice(0).forEach((env) => env.dispose());
   vi.useRealTimers();
 });
-async function childSetup(connected = false) {
+async function childSetup(connected = false, discard = vi.fn()) {
   let now = start,
     revision = 1;
   const storage = new MemoryStorage(),
@@ -145,6 +158,7 @@ async function childSetup(connected = false) {
     storage,
     navigate,
     () => now,
+    discard,
   );
   children.push(child);
   await child.initialize();
@@ -156,6 +170,7 @@ async function childSetup(connected = false) {
     changed,
     navigate,
     context,
+    discard,
     advance: (ms: number) => {
       now += ms;
     },
@@ -185,13 +200,152 @@ const inputFor = async (value = product, revision = 1) => ({
 });
 
 describe("bounded session-owned Shopify child", () => {
+  it("reads once per catalogue visit, deduplicates visibility/status updates, and leaves onboarding read-free", async () => {
+    const h = await childSetup(true);
+    h.child.visible(true);
+    await h.child.refresh();
+    expect(h.port.products).not.toHaveBeenCalled();
+    h.child.visible(true, true);
+    await vi.waitFor(() =>
+      expect(h.child.getSnapshot().catalogue?.page).toBe(1),
+    );
+    h.child.visible(true, true);
+    await h.child.refresh();
+    expect(h.port.products).toHaveBeenCalledTimes(1);
+    h.child.visible(false);
+    expect(h.child.getSnapshot().catalogue).toBeNull();
+    h.child.visible(true, true);
+    await vi.waitFor(() => expect(h.port.products).toHaveBeenCalledTimes(2));
+    expect(h.port.write).not.toHaveBeenCalled();
+    expect(h.port.end).not.toHaveBeenCalled();
+  });
+  it("waits for bootstrap verification when the catalogue is already visible", async () => {
+    const h = await childSetup(true);
+    h.child.dispose();
+    let verified!: (value: typeof h.state) => void;
+    h.port.status.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          verified = resolve;
+        }),
+    );
+    const child = new ShopifyController(
+      h.context,
+      h.port,
+      h.changed,
+      h.storage,
+      h.navigate,
+      () => start,
+    );
+    children.push(child);
+    child.visible(true, true);
+    const opening = child.initialize();
+    await vi.waitFor(() => expect(verified).toBeTypeOf("function"));
+    expect(h.port.products).not.toHaveBeenCalled();
+    verified(structuredClone(h.state));
+    await opening;
+    await vi.waitFor(() => expect(h.port.products).toHaveBeenCalledTimes(1));
+  });
+  it("does not read a disconnected store and starts after visible connection verification", async () => {
+    const h = await childSetup();
+    h.child.visible(true, true);
+    await h.child.refresh();
+    expect(h.port.products).not.toHaveBeenCalled();
+    Object.assign(h.state, {
+      state: "connected",
+      shop: "retailor-demo.myshopify.com",
+      currency: "USD",
+    });
+    await h.child.refresh();
+    await vi.waitFor(() => expect(h.port.products).toHaveBeenCalledTimes(1));
+  });
+  it("deduplicates a rapid mount-cleanup-remount and refuses expired auto reads", async () => {
+    const h = await childSetup(true);
+    h.child.visible(true, true);
+    h.child.visible(false);
+    h.child.visible(true, true);
+    await vi.waitFor(() => expect(h.port.products).toHaveBeenCalledTimes(1));
+    h.child.visible(false);
+    h.advance(7200001);
+    h.child.visible(true, true);
+    await Promise.resolve();
+    expect(h.port.products).toHaveBeenCalledTimes(1);
+  });
+  it("fences a late initial read after navigation and loads a fresh first page on re-entry", async () => {
+    const h = await childSetup(true);
+    let finish!: (
+      value: Awaited<ReturnType<ShopifyRequester["products"]>>,
+    ) => void;
+    h.port.products.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    h.child.visible(true, true);
+    await vi.waitFor(() => expect(h.port.products).toHaveBeenCalledTimes(1));
+    const firstSignal = h.port.products.mock.calls[0]![3];
+    h.child.visible(false);
+    expect(firstSignal.aborted).toBe(true);
+    h.child.visible(true, true);
+    await vi.waitFor(() =>
+      expect(h.child.getSnapshot().catalogue?.currency).toBe("USD"),
+    );
+    finish({
+      schemaVersion: 1,
+      products: [],
+      nextCursor: null,
+      page: 2,
+      limited: false,
+      currency: "EUR",
+    });
+    await Promise.resolve();
+    expect(h.child.getSnapshot().catalogue).toMatchObject({
+      page: 1,
+      currency: "USD",
+    });
+    expect(h.port.products).toHaveBeenCalledTimes(2);
+  });
+  it("does not silently retry a failed initial read on status polls and preserves manual refresh", async () => {
+    const h = await childSetup(true);
+    h.port.products.mockRejectedValueOnce(new Error("Provider unavailable"));
+    vi.useFakeTimers();
+    h.child.visible(true, true);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(h.port.products).toHaveBeenCalledTimes(1);
+    expect(h.child.getSnapshot().notice).toContain("could not be read");
+    await vi.advanceTimersByTimeAsync(90000);
+    expect(h.port.products).toHaveBeenCalledTimes(1);
+    await h.child.browse();
+    expect(h.port.products).toHaveBeenCalledTimes(2);
+  });
+  it("keeps pagination explicit after the automatic first page", async () => {
+    const h = await childSetup(true);
+    h.port.products.mockResolvedValueOnce({
+      schemaVersion: 1,
+      products: [],
+      nextCursor: "next_page",
+      page: 1,
+      limited: false,
+      currency: "USD",
+    });
+    h.child.visible(true, true);
+    await vi.waitFor(() =>
+      expect(h.child.getSnapshot().catalogue?.nextCursor).toBe("next_page"),
+    );
+    expect(h.port.products).toHaveBeenCalledTimes(1);
+    await h.child.browse(true);
+    expect(h.port.products).toHaveBeenLastCalledWith(
+      "workspace",
+      "next_page",
+      proof,
+      expect.any(AbortSignal),
+    );
+    expect(h.port.products).toHaveBeenCalledTimes(2);
+  });
   it("dismisses failed simulated consent so feedback and Skip remain reachable", async () => {
     const h = await childSetup();
-    await h.child.connect(
-      "retailor-demo.myshopify.com",
-      "onboarding",
-      async () => true,
-    );
+    await h.child.connect("onboarding", async () => true);
     h.port.simulate.mockRejectedValueOnce(new ApiRequestError("FORBIDDEN"));
     await h.child.consent(true);
     expect(h.child.getSnapshot().consent).toBe(false);
@@ -231,11 +385,7 @@ describe("bounded session-owned Shopify child", () => {
     children.push(child);
     child.visible(true);
     const initializing = child.initialize();
-    const connecting = child.connect(
-      "retailor-demo.myshopify.com",
-      "onboarding",
-      async () => true,
-    );
+    const connecting = child.connect("onboarding", async () => true);
     child.visible(false);
     available(true);
     await initializing;
@@ -271,20 +421,12 @@ describe("bounded session-owned Shopify child", () => {
     const h = await childSetup();
     expect(JSON.parse(h.storage.getItem(SHOPIFY_TAB_KEY)!).proof).toBe(proof);
     expect(JSON.stringify(h.child.getSnapshot())).not.toContain(proof);
-    await h.child.connect(
-      "retailor-demo.myshopify.com",
-      "onboarding",
-      async () => true,
-    );
+    await h.child.connect("onboarding", async () => true);
     expect(h.child.getSnapshot().consent).toBe(true);
     expect(h.port.write).not.toHaveBeenCalled();
     await h.child.consent(false);
     expect(h.child.getSnapshot().status?.state).toBe("disconnected");
-    await h.child.connect(
-      "retailor-demo.myshopify.com",
-      "onboarding",
-      async () => true,
-    );
+    await h.child.connect("onboarding", async () => true);
     await h.child.consent(true);
     expect(h.child.getSnapshot().status?.state).toBe("connected");
     expect(h.port.write).not.toHaveBeenCalled();
@@ -294,14 +436,27 @@ describe("bounded session-owned Shopify child", () => {
     const h = await childSetup();
     h.state.simulated = false;
     await h.child.refresh();
-    await h.child.connect(
-      "retailor-demo.myshopify.com",
-      "connections",
-      async () => false,
-    );
+    await h.child.connect("connections", async () => false);
     expect(h.port.connect).not.toHaveBeenCalled();
     expect(h.navigate).not.toHaveBeenCalled();
     expect(h.child.getSnapshot().notice).toContain("cannot safely resume");
+  });
+  it("opens Shopify's picker after saving recovery, without sending a store address", async () => {
+    const h = await childSetup();
+    h.state.simulated = false;
+    await h.child.refresh();
+    const save = vi.fn(async () => true);
+    await h.child.connect("connections", save);
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(h.port.connect).toHaveBeenCalledWith(
+      { schemaVersion: 1, workspaceId: "workspace", returnTo: "connections" },
+      proof,
+      expect.any(AbortSignal),
+    );
+    expect(h.navigate).toHaveBeenCalledWith(
+      "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dfixture",
+    );
+    expect(h.port.write).not.toHaveBeenCalled();
   });
   it("freezes review, deduplicates confirmation, and fences a write after navigation", async () => {
     const h = await childSetup(true);
@@ -428,12 +583,18 @@ describe("real session integration", () => {
     c.useCurrentLook();
     c.keepWordmark();
     c.acceptDesign();
-    await c.connectShopify("retailor-demo.myshopify.com");
+    await c.connectShopify();
     await c.simulateShopify(true);
     c.continueFromConnection();
     c.go("dashboard");
     c.ownerNavigate("connections");
     const graph = c.getSnapshot().state.graph;
+    c.shopifyVisible(true, true);
+    await vi.waitFor(() =>
+      expect(c.getSnapshot().shopify.catalogue?.page).toBe(1),
+    );
+    expect(port.products).toHaveBeenCalledTimes(1);
+    expect(c.getSnapshot().state.graph).toBe(graph);
     c.reviewShopify([graph.products[0]!.id]);
     expect(port.write).not.toHaveBeenCalled();
     await c.confirmShopify();
@@ -461,5 +622,244 @@ describe("real session integration", () => {
     );
     expect(port.session).toHaveBeenCalledTimes(1);
     expect(port.write).toHaveBeenCalledTimes(1);
+  });
+});
+
+function importSource(id = "gid://shopify/Product/123") {
+  const bytes = Buffer.from("shopify-import-photo");
+  return ShopifyImportResultSchema.parse({
+    schemaVersion: 1,
+    currency: "USD",
+    product: {
+      id,
+      title: "Imported cotton tee",
+      description: "Cotton from Shopify.",
+      productType: "tees",
+      status: "ACTIVE",
+      owned: false,
+      variantsTruncated: false,
+      mediaTruncated: false,
+      images: [{ url: "https://cdn.shopify.com/test.webp", alt: null }],
+      variants: [
+        {
+          id: "gid://shopify/ProductVariant/456",
+          title: "Ivory / S",
+          price: "29.99",
+          sku: `IMPORTED-${id.split("/").at(-1)}`,
+          options: [
+            { name: "Color", value: "Ivory" },
+            { name: "Size", value: "S" },
+          ],
+        },
+      ],
+    },
+    photos: [
+      {
+        image: {
+          id: "incoming",
+          mime: "image/webp",
+          hash: "c".repeat(64),
+          width: 100,
+          height: 125,
+          bytes: bytes.length,
+        },
+        base64: bytes.toString("base64"),
+      },
+    ],
+  });
+}
+describe("collection import controller", () => {
+  it("aborts a pending commit and releases its review photos on cancellation", async () => {
+    const h = await childSetup(true);
+    h.port.importProduct.mockResolvedValue(importSource());
+    const candidate = importCandidate(importSource().product, "imported", [
+      "photo",
+    ]);
+    await h.child.prepareImport(
+      [importSource().product.id],
+      async () => candidate,
+      5,
+    );
+    let finish!: () => void;
+    let committing: AbortSignal | undefined;
+    const pending = h.child.confirmImport(
+      async (_products, _revision, signal) => {
+        committing = signal;
+        await new Promise<void>((resolve) => {
+          finish = resolve;
+        });
+      },
+    );
+    await vi.waitFor(() => expect(committing).toBeDefined());
+    h.child.cancelImport();
+    expect(committing!.aborted).toBe(true);
+    finish();
+    await pending;
+    expect(h.child.getSnapshot().importReview).toBeNull();
+    expect(h.child.getSnapshot().busy).toBeNull();
+    expect(h.child.getSnapshot().notice).not.toContain("Imported");
+    expect(h.discard).toHaveBeenCalledWith([candidate]);
+  });
+  it("uses the selected collection, loads collection choices once, and separates preparation from explicit commit", async () => {
+    const h = await childSetup(true);
+    await h.child.chooseCollection("gid://shopify/Collection/12");
+    expect(h.port.products.mock.calls[0]![4]).toBe(
+      "gid://shopify/Collection/12",
+    );
+    expect(h.port.collections).toHaveBeenCalledTimes(1);
+    h.port.importProduct.mockResolvedValue(importSource());
+    const candidate = importCandidate(importSource().product, "imported", [
+        "photo",
+      ]),
+      stage = vi.fn(async () => candidate),
+      commit = vi.fn(async () => {});
+    await h.child.prepareImport([importSource().product.id], stage, 5);
+    expect(h.child.getSnapshot().importReview?.products).toEqual([candidate]);
+    expect(h.port.write).not.toHaveBeenCalled();
+    expect(commit).not.toHaveBeenCalled();
+    await h.child.confirmImport(commit);
+    expect(commit).toHaveBeenCalledTimes(1);
+    expect(h.child.getSnapshot().importReview).toBeNull();
+  });
+  it("releases a prepared partial batch after failure and rejects a batch exceeding available capacity before HTTP", async () => {
+    const h = await childSetup(true);
+    h.port.importProduct
+      .mockResolvedValueOnce(importSource())
+      .mockRejectedValueOnce(new Error("private marker"));
+    const candidate = importCandidate(importSource().product, "imported", [
+      "photo",
+    ]);
+    await h.child.prepareImport(
+      [importSource().product.id, "gid://shopify/Product/124"],
+      async () => candidate,
+      5,
+    );
+    expect(h.child.getSnapshot().importReview).toBeNull();
+    expect(h.discard).toHaveBeenCalledWith([candidate]);
+    expect(h.child.getSnapshot().notice).not.toContain("private marker");
+    h.port.importProduct.mockClear();
+    await h.child.prepareImport(
+      [importSource().product.id],
+      async () => candidate,
+      0,
+    );
+    expect(h.port.importProduct).not.toHaveBeenCalled();
+  });
+  it("fences a late preparation after cancellation and a review after expiry", async () => {
+    const h = await childSetup(true);
+    let finish!: (value: ReturnType<typeof importSource>) => void;
+    h.port.importProduct.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const candidate = importCandidate(importSource().product, "imported", [
+        "photo",
+      ]),
+      stage = vi.fn(async () => candidate);
+    const pending = h.child.prepareImport(
+      [importSource().product.id],
+      stage,
+      5,
+    );
+    await vi.waitFor(() => expect(finish).toBeTypeOf("function"));
+    h.child.cancelImport();
+    finish(importSource());
+    await pending;
+    expect(stage).not.toHaveBeenCalled();
+    expect(h.child.getSnapshot().importReview).toBeNull();
+    await h.child.refresh();
+    h.port.importProduct.mockResolvedValue(importSource());
+    await h.child.prepareImport([importSource().product.id], stage, 5);
+    h.advance(7200001);
+    const commit = vi.fn(async () => {});
+    await h.child.confirmImport(commit);
+    expect(commit).not.toHaveBeenCalled();
+  });
+});
+async function importSession() {
+  const env = environment();
+  environments.push(env);
+  const { port, state } = requests(env.clock);
+  Object.assign(state, {
+    state: "connected",
+    shop: "test.myshopify.com",
+    currency: "USD",
+    name: "Test store",
+  });
+  port.importProduct.mockResolvedValue(importSource());
+  const c = await env.open({ shopifyRequest: port });
+  await vi.waitFor(() => expect(c.getSnapshot().shopify.verified).toBe(true));
+  await c.photos.add([file("original")]);
+  await c.draftCatalogue();
+  c.publish();
+  c.useCurrentLook();
+  c.keepWordmark();
+  c.acceptDesign();
+  c.continueFromConnection();
+  c.finishTour();
+  c.go("dashboard");
+  c.ownerNavigate("connections");
+  return { env, port, c };
+}
+describe("atomic import into the actual session", () => {
+  it("rolls back the whole batch when a later product violates commerce rules", async () => {
+    const { c, port } = await importSession(),
+      before = c.getSnapshot().state.graph;
+    const second = importSource("gid://shopify/Product/124");
+    second.product.variants.push({
+      ...second.product.variants[0]!,
+      id: "gid://shopify/ProductVariant/457",
+      sku: "DUPLICATE-OPTIONS",
+    });
+    port.importProduct
+      .mockResolvedValueOnce(importSource())
+      .mockResolvedValueOnce(second);
+    await c.prepareShopifyImport([
+      importSource().product.id,
+      second.product.id,
+    ]);
+    expect(c.getSnapshot().shopify.importReview?.products).toHaveLength(2);
+    await c.confirmShopifyImport(4, true, {});
+    expect(c.getSnapshot().state.graph).toBe(before);
+    expect(c.getSnapshot().shopify.importReview).not.toBeNull();
+    c.cancelShopifyImport();
+  });
+
+  it("preserves current products and activity, imports photos and exact prices, and rejects duplicate imports", async () => {
+    const { c, port } = await importSession(),
+      before = c.getSnapshot().state.graph;
+    await c.prepareShopifyImport([importSource().product.id]);
+    expect(c.getSnapshot().state.graph).toBe(before);
+    expect(c.getSnapshot().shopify.importReview?.products).toHaveLength(1);
+    await c.confirmShopifyImport(4, true, {});
+    const graph = c.getSnapshot().state.graph;
+    expect(graph.products).toHaveLength(before.products.length + 1);
+    const added = graph.products.at(-1)!;
+    expect(added).toMatchObject({
+      title: "Imported cotton tee",
+      description: "Cotton from Shopify.",
+      variants: [{ price: 2999, openingStock: 4, unitCost: 0 }],
+    });
+    expect(c.photos.availableIds().has(added.imageIds[0]!)).toBe(true);
+    expect(graph.orders).toEqual(before.orders);
+    expect(graph.products[0]).toEqual(before.products[0]);
+    expect(port.write).not.toHaveBeenCalled();
+    await c.prepareShopifyImport([importSource().product.id]);
+    expect(c.getSnapshot().shopify.importReview).toBeNull();
+    expect(c.getSnapshot().state.graph).toBe(graph);
+  });
+  it("discards uncommitted photos on Cancel and refuses confirmation without clothing review", async () => {
+    const { c } = await importSession(),
+      before = c.getSnapshot().state.graph,
+      photos = c.photos.availableIds();
+    await c.prepareShopifyImport([importSource().product.id]);
+    expect(c.photos.availableIds().size).toBeGreaterThan(photos.size);
+    await c.confirmShopifyImport(4, false, {});
+    expect(c.getSnapshot().state.graph).toBe(before);
+    c.cancelShopifyImport();
+    await vi.waitFor(() => expect(c.photos.availableIds()).toEqual(photos));
+    expect(c.getSnapshot().state.graph).toBe(before);
   });
 });
