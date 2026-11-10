@@ -13,6 +13,10 @@ import {
   ShopifyExportInputSchema,
   ShopifyExportControlSchema,
   ShopifyExportResultSchema,
+  ShopifyCollectionBrowseSchema,
+  ShopifyCollectionsResultSchema,
+  ShopifyImportInputSchema,
+  ShopifyImportResultSchema,
 } from "@retailor/contracts/shopify";
 import type {
   ShopifySessionInput,
@@ -30,6 +34,8 @@ export function shopifyRequester(fetcher: typeof fetch = fetch) {
     | "connect"
     | "simulate"
     | "products"
+    | "collections"
+    | "import"
     | "export"
     | "update"
     | "check"
@@ -123,12 +129,53 @@ export function shopifyRequester(fetcher: typeof fetch = fetch) {
       cursor: string | null,
       proof: string,
       signal: AbortSignal,
+      collectionId?: string | null,
     ) {
       return ShopifyProductsResultSchema.parse(
         await json(
           "products",
           signal,
-          ShopifyBrowseSchema.parse({ ...control(workspaceId), cursor }),
+          ShopifyBrowseSchema.parse({
+            ...control(workspaceId),
+            cursor,
+            ...(collectionId ? { collectionId } : {}),
+          }),
+          proof,
+        ),
+      );
+    },
+    async collections(
+      workspaceId: string,
+      cursor: string | null,
+      proof: string,
+      signal: AbortSignal,
+    ) {
+      return ShopifyCollectionsResultSchema.parse(
+        await json(
+          "collections",
+          signal,
+          ShopifyCollectionBrowseSchema.parse({
+            ...control(workspaceId),
+            cursor,
+          }),
+          proof,
+        ),
+      );
+    },
+    async importProduct(
+      workspaceId: string,
+      productId: string,
+      proof: string,
+      signal: AbortSignal,
+    ) {
+      return ShopifyImportResultSchema.parse(
+        await json(
+          "import",
+          signal,
+          ShopifyImportInputSchema.parse({
+            ...control(workspaceId),
+            productId,
+          }),
           proof,
         ),
       );
