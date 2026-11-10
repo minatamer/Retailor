@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useId, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import {
   ShopifyShopSchema,
   ShopifyProductIdSchema,
@@ -11,6 +10,10 @@ import { CATEGORY_LABELS } from "@retailor/contracts/product";
 import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
 import { useSession } from "../session/context";
+import { ReviewDialog } from "./review-dialog";
+import { CatalogueBrowser } from "./catalogue-browser";
+import { GarmentPicker } from "./garment-picker";
+import { exportSelection } from "./selection";
 import styles from "./connections.module.css";
 
 const states = {
@@ -45,70 +48,16 @@ function adminLink(shop: string | null, id: string | null) {
     ? `https://${shop}/admin/products/${id!.split("/").at(-1)}`
     : null;
 }
-function ReviewDialog({
-  title,
-  children,
-  onClose,
-}: {
-  title: string;
-  children: ReactNode;
-  onClose(): void;
-}) {
-  const dialog = useRef<HTMLDialogElement>(null),
-    titleId = useId();
-  useEffect(() => {
-    const node = dialog.current,
-      opener = document.activeElement;
-    node?.showModal();
-    return () => {
-      node?.close();
-      if (
-        opener instanceof HTMLElement &&
-        opener.isConnected &&
-        !opener.matches(":disabled")
-      )
-        opener.focus({ preventScroll: true });
-      else
-        document
-          .getElementById("shopify-heading")
-          ?.focus({ preventScroll: true });
-    };
-  }, []);
-  return (
-    <dialog
-      ref={dialog}
-      className={styles.dialog}
-      aria-labelledby={titleId}
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-    >
-      <div className={styles.dialogHeader}>
-        <h2 id={titleId}>{title}</h2>
-        <button
-          className={styles.close}
-          aria-label="Close review"
-          onClick={onClose}
-        >
-          <Icon name="close" />
-        </button>
-      </div>
-      {children}
-    </dialog>
-  );
-}
 export function Connections({ onboarding = false }: { onboarding?: boolean }) {
   const { controller, state, shopify } = useSession();
-  const [shop, setShop] = useState<string | null>(null),
-    [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [confirmation, setConfirmation] = useState<
     { kind: "remove"; id: string } | { kind: "disconnect" } | null
   >(null);
   useEffect(() => {
-    controller.shopifyVisible(true);
+    controller.shopifyVisible(true, !onboarding);
     return () => controller.shopifyVisible(false);
-  }, [controller]);
+  }, [controller, onboarding]);
   const status = shopify.status,
     busy = !!shopify.busy,
     connected = shopify.verified && status?.state === "connected",
@@ -124,12 +73,20 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
       status?.state ?? "",
     );
   const canWrite = connected && status.currency === "USD" && !busy;
-  const storeAddress = shop ?? (simulated ? "retailor-demo.myshopify.com" : "");
+  const onboardingComplete = onboarding && connected;
+  const canRefresh =
+    !!status &&
+    !connected &&
+    (status.state !== "disconnected" || !shopify.verified);
+  const canDisconnect = !!status?.shop && status.state !== "cleaned";
   const remaining = Math.max(0, 10 - (status?.createIntents ?? 0));
-  const selectedIds = selected.filter(
-    (id) =>
-      local.some((product) => product.id === id) &&
-      !active.some((item) => item.sourceProductId === id),
+  const tracked = new Set(active.map((item) => item.sourceProductId));
+  const selectedIds = exportSelection(
+    local,
+    tracked,
+    controller.photos.availableIds(),
+    remaining,
+    selected,
   );
   const finish = async () => {
     if (!confirmation) return;
@@ -138,6 +95,31 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
     else await controller.disconnectShopify();
     setConfirmation(null);
   };
+  const demoDetails = (
+    <details className={styles.disclosure}>
+      <summary>
+        <Icon name="info" size={15} />
+        <span>About this demo</span>
+      </summary>
+      <p>
+        Sign in and approve access through Shopify. Connecting creates no
+        products; exports happen only after your review. Installation depends on
+        test-store eligibility.
+      </p>
+      <p>
+        Shared fields: title, description, category, photos, Colour/Size
+        options, SKUs and USD prices. Existing Shopify products are never
+        edited.
+      </p>
+      <p>
+        Retailor requests removal of its own exports and collection on
+        Disconnect, Reset or the original two-hour demo expiry. Lost access can
+        require manual removal. You can connect later in Owner workspace →
+        Connections.
+      </p>
+      {simulated && <p>Simulated connection data resets with the backend.</p>}
+    </details>
+  );
   return (
     <div
       className={`${styles.connections} ${onboarding ? styles.onboarding : ""}`}
@@ -146,24 +128,28 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
         <div className={styles.welcome}>
           <span className={styles.eyebrow}>One optional step</span>
           <h1>Your storefront is ready.</h1>
-          <p>
-            Try a Shopify test connection, or step straight into{" "}
-            <strong>{state.acceptedDesign.name}</strong>.
-          </p>
+          <p>Connect your test store, or continue without Shopify.</p>
         </div>
       )}
       <section className={styles.card} aria-labelledby="shopify-heading">
-        <div className={styles.header}>
+        <div className={styles.header} data-tailor-target="shopify-connect">
           <div className={styles.identity}>
-            <span className={styles.mark}>
-              <Icon name="connections" size={28} />
-            </span>
-            <div>
-              <h2 id="shopify-heading" tabIndex={-1}>
-                Shopify
-              </h2>
-              <p>Test-store products</p>
-            </div>
+            <h2 id="shopify-heading" tabIndex={-1}>
+              <a
+                href="https://www.shopify.com"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Shopify website (opens in a new tab)"
+              >
+                <Image
+                  src="/integrations/shopify-logo.svg"
+                  alt="Shopify"
+                  width={140}
+                  height={40}
+                  unoptimized
+                />
+              </a>
+            </h2>
           </div>
           <span className={styles.badge} data-ready={connected}>
             {status
@@ -179,28 +165,19 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
         </div>
         {simulated && (
           <p className={styles.simulation}>
-            <strong>Local simulation</strong> · No real Shopify account is
-            contacted. Connection data resets with the backend.
+            <strong>Local simulation</strong> · No Shopify account is contacted.
           </p>
         )}
-        <p>
-          Connect an eligible Shopify test store to read its products and try
-          reviewed draft exports. Sign in and approve access through Shopify.{" "}
-          <strong>Connecting creates no products.</strong>
-        </p>
-        <p className={styles.fine}>
-          Only reviewed garments are shared: title, description, category,
-          photos, Colour/Size options, SKUs and USD prices. Retailor requests
-          removal of its own products on Disconnect, Reset, or the original
-          two-hour demo expiry. Lost access can require manual removal.
-        </p>
+        <p>Import products or export drafts with your Shopify test store.</p>
         {status?.shop && (
           <dl className={styles.details}>
             <div>
               <dt>Store</dt>
               <dd>
                 {status.name || status.shop}
-                <small>{status.shop}</small>
+                {status.name && status.name !== status.shop && (
+                  <small>{status.shop}</small>
+                )}
               </dd>
             </div>
             <div>
@@ -208,7 +185,7 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
               <dd>{status.currency || "Not verified"}</dd>
             </div>
             <div>
-              <dt>Demo products</dt>
+              <dt>Retailor exports</dt>
               <dd>
                 {status.productCount} known · {active.length} active or
                 unresolved exports
@@ -228,152 +205,98 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
             ["disconnected", "authorizing", "needs_attention"].includes(
               status.state,
             )) && (
-            <form
-              className={styles.connectForm}
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (canConnect) void controller.connectShopify(storeAddress);
-              }}
-            >
-              <label>
-                Shopify test-store address
-                <input
-                  type="text"
-                  inputMode="url"
-                  autoCapitalize="none"
-                  autoComplete="off"
-                  spellCheck={false}
-                  maxLength={100}
-                  required
-                  value={storeAddress}
-                  onChange={(event) => setShop(event.target.value)}
-                  placeholder="your-store.myshopify.com"
-                  disabled={busy}
-                />
-              </label>
-              <Button type="submit" disabled={!canConnect}>
+            <div className={styles.connectForm}>
+              <Button
+                disabled={!canConnect}
+                onClick={() => void controller.connectShopify()}
+              >
                 {simulated ? "Try simulated connection" : "Connect Shopify"}
                 <Icon name="arrow" size={17} />
               </Button>
-              <small>
-                Use the store’s myshopify.com address. Installation depends on
-                test-store eligibility.
-              </small>
-            </form>
+            </div>
           )}
-        <div className={styles.actions}>
-          {status && (
-            <Button
-              variant="secondary"
-              disabled={busy}
-              onClick={() => void controller.refreshShopify()}
+        {!onboardingComplete &&
+          (canRefresh || canDisconnect || !onboarding) && (
+            <div
+              className={onboarding ? styles.actions : styles.footer}
+              data-tailor-target={onboarding ? undefined : "shopify-cleanup"}
             >
-              Refresh connection
-            </Button>
+              {canRefresh && (
+                <Button
+                  variant="secondary"
+                  disabled={busy}
+                  onClick={() => void controller.refreshShopify()}
+                >
+                  Refresh connection
+                </Button>
+              )}
+              {canDisconnect && (
+                <Button
+                  variant="primary"
+                  disabled={busy}
+                  onClick={() => setConfirmation({ kind: "disconnect" })}
+                >
+                  Disconnect and remove demo products
+                  <Icon name="arrow" size={17} />
+                </Button>
+              )}
+              {!onboarding && demoDetails}
+            </div>
           )}
-          {status?.shop && status.state !== "cleaned" && (
-            <Button
-              variant="quiet"
-              disabled={busy}
-              onClick={() => setConfirmation({ kind: "disconnect" })}
-            >
-              Disconnect and remove demo products
-            </Button>
-          )}
-        </div>
-        <div role="status" aria-live="polite" className={styles.notice}>
-          {shopify.busy && (
-            <span className={styles.pending}>
-              <span className={styles.spinner} aria-hidden="true" />
-              {shopify.busy}
-            </span>
-          )}
-          {shopify.notice && <p>{shopify.notice}</p>}
-          {shopify.reference && (
-            <small>Request reference: {shopify.reference}</small>
-          )}
-        </div>
+        {!onboardingComplete && (
+          <div role="status" aria-live="polite" className={styles.notice}>
+            {shopify.busy && (
+              <span className={styles.pending}>
+                <span className={styles.spinner} aria-hidden="true" />
+                {shopify.busy}
+              </span>
+            )}
+            {shopify.notice && <p>{shopify.notice}</p>}
+            {shopify.reference && (
+              <small>Request reference: {shopify.reference}</small>
+            )}
+          </div>
+        )}
         {onboarding && (
-          <div className={styles.continue}>
+          <div className={styles.footer}>
             <Button
               variant={connected ? "primary" : "secondary"}
               onClick={() => controller.continueFromConnection()}
             >
-              {connected
-                ? "Continue to storefront"
-                : "Skip · continue without Shopify"}
+              {connected ? "Continue to storefront" : "Skip for now"}
               <Icon name="arrow" size={17} />
             </Button>
-            <small>
-              Manage Shopify later in Owner workspace → Connections.
-            </small>
+            {demoDetails}
           </div>
         )}
       </section>
-      {!onboarding && status && (
+      {!onboarding && (
         <>
           <section className={styles.section} aria-labelledby="shopify-exports">
-            <div className={styles.header}>
+            <div className={styles.header} data-tailor-target="shopify-export">
               <div>
                 <span className={styles.eyebrow}>Explicit sharing</span>
-                <h3 id="shopify-exports">Your demo drafts</h3>
+                <h3 id="shopify-exports">Your Retailor products</h3>
               </div>
               <span className={styles.fine}>
-                {status.createIntents} / 10 lifetime export intents
+                {status?.createIntents ?? 0} / 10 lifetime export intents
               </span>
             </div>
             <p>
-              Local changes stay here until you review an Update. Change
-              exported photos with Remove, then a fresh Export. Removed and
-              uncertain intents count toward the lifetime limit.
+              Choose products to export with their photos to the Retailor
+              collection in Shopify. You will review everything before creating
+              drafts.
             </p>
             {!!local.length && (
               <>
-                <fieldset
-                  className={styles.selection}
-                  disabled={!canWrite || remaining === 0}
-                >
-                  <legend>Select local garments to review</legend>
-                  {local.map((product) => {
-                    const exported = active.some(
-                        (item) => item.sourceProductId === product.id,
-                      ),
-                      photoReady = product.imageIds.every((id) =>
-                        controller.photos.availableIds().has(id),
-                      );
-                    return (
-                      <label key={product.id}>
-                        <input
-                          type="checkbox"
-                          checked={selected.includes(product.id)}
-                          disabled={
-                            exported ||
-                            !photoReady ||
-                            (!selected.includes(product.id) &&
-                              selectedIds.length >= remaining)
-                          }
-                          onChange={(event) =>
-                            setSelected((current) =>
-                              event.target.checked
-                                ? [...current, product.id]
-                                : current.filter((id) => id !== product.id),
-                            )
-                          }
-                        />
-                        <span>
-                          {product.title}
-                          <small>
-                            {exported
-                              ? "Already tracked below"
-                              : !photoReady
-                                ? "Photo repair needed"
-                                : `${product.variants.filter((variant) => !variant.archived).length} variants · USD`}
-                          </small>
-                        </span>
-                      </label>
-                    );
-                  })}
-                </fieldset>
+                <GarmentPicker
+                  products={local}
+                  tracked={tracked}
+                  remaining={remaining}
+                  enabled={canWrite}
+                  selected={selectedIds}
+                  onSelect={setSelected}
+                />
                 <Button
                   disabled={!canWrite || !selectedIds.length || remaining === 0}
                   onClick={() => controller.reviewShopify(selectedIds)}
@@ -382,13 +305,13 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
                 </Button>
               </>
             )}
-            {!status.exports.length && (
+            {!status?.exports.length && (
               <p className={styles.empty}>
                 No products have been exported in this demo.
               </p>
             )}
             <div className={styles.exports}>
-              {status.exports.map((item) => {
+              {status?.exports.map((item) => {
                 const source = local.find(
                     (product) => product.id === item.sourceProductId,
                   ),
@@ -469,7 +392,7 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
                 );
               })}
             </div>
-            {status.state === "needs_attention" && (
+            {status?.state === "needs_attention" && (
               <div className={styles.warning}>
                 <strong>Manual cleanup may be required.</strong>
                 <p>
@@ -487,103 +410,13 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
                   ))}
               </div>
             )}
-            {status.state === "disconnecting" && (
+            {status?.state === "disconnecting" && (
               <p className={styles.fine}>
                 Product cleanup is complete; app access is still being checked.
               </p>
             )}
           </section>
-          <section
-            className={styles.section}
-            aria-labelledby="shopify-catalogue"
-          >
-            <div className={styles.header}>
-              <div>
-                <span className={styles.eyebrow}>Read-only browse</span>
-                <h3 id="shopify-catalogue">Products in Shopify</h3>
-              </div>
-              <Button
-                variant="secondary"
-                disabled={!connected || busy}
-                onClick={() => void controller.readShopify()}
-              >
-                Read / refresh products
-              </Button>
-            </div>
-            <p>
-              Reading keeps your local garments, stock, bag and checkout
-              unchanged.
-            </p>
-            {shopify.catalogue && (
-              <>
-                <div className={styles.catalogue}>
-                  {shopify.catalogue.products.map((product) => (
-                    <article className={styles.product} key={product.id}>
-                      <span className={styles.badge}>
-                        {product.owned
-                          ? "This demo’s product"
-                          : "Existing store product · read only"}
-                      </span>
-                      <h4>{product.title}</h4>
-                      <p>{product.description || "No description"}</p>
-                      <small>
-                        {product.status} · {shopify.catalogue!.currency} ·{" "}
-                        {product.images.length} shown images
-                      </small>
-                      <ul>
-                        {product.variants.map((variant) => (
-                          <li key={variant.id}>
-                            {variant.title} · {variant.price}{" "}
-                            {shopify.catalogue!.currency}
-                            {variant.sku ? ` · ${variant.sku}` : ""}
-                          </li>
-                        ))}
-                      </ul>
-                      {(product.variantsTruncated ||
-                        product.mediaTruncated) && (
-                        <small>
-                          Summary is truncated. Inspect the full product in
-                          Shopify.
-                        </small>
-                      )}
-                      {!!product.images.length && !simulated && (
-                        <a
-                          href={product.images[0]!.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          View Shopify image ↗
-                        </a>
-                      )}
-                    </article>
-                  ))}
-                </div>
-                {!shopify.catalogue.products.length && (
-                  <p className={styles.empty}>
-                    This store’s catalogue is empty.
-                  </p>
-                )}
-                <div className={styles.actions}>
-                  <span className={styles.fine}>
-                    Page {shopify.catalogue.page} · up to five pages per browse
-                  </span>
-                  <Button
-                    variant="secondary"
-                    disabled={busy || !shopify.catalogue.nextCursor}
-                    onClick={() => void controller.readShopify(true)}
-                  >
-                    Next page
-                  </Button>
-                </div>
-                {shopify.catalogue.limited && (
-                  <p className={styles.fine}>
-                    Demo browse limit reached. Read / refresh starts a new
-                    cycle.
-                  </p>
-                )}
-              </>
-            )}
-          </section>
+          <CatalogueBrowser />
         </>
       )}
       {shopify.consent && (
@@ -631,8 +464,9 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
             {status?.shop}.
           </p>
           <p>
-            Draft only. Share these reviewed fields and photos. Cleanup is
-            requested at demo end; lost access can require manual removal.
+            Draft only. Export these fields and photos to the Retailor
+            collection. Cleanup is requested at demo end; lost access can
+            require manual removal.
           </p>
           {shopify.review.products.map((product) => (
             <article className={styles.reviewProduct} key={product.id}>
