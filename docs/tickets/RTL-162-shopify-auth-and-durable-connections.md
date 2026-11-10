@@ -1,0 +1,45 @@
+# RTL-162 — Shopify OAuth and durable session-bound connections
+
+## Status, dependency and authority
+
+**Local auth/storage foundation implemented and validated — 10 November 2026.** The owner authorizes the RTL-162–166 execute/validate loop in AFK mode, leaving the Shopify form/credentials for later. [Actual evidence](../validation/RTL-162.md) records all six gates passing,710 tests/112 files and clean settled read-only review. The complete controller/onboarding consumer is integrated in RTL-165; no native/provider acceptance is inferred. Native Shopify account use, HTTPS/distribution and hosted IAM/logging remain pending. No stage/commit, form submission or irreversible distribution choice.
+
+## Problem and result
+
+Retailor currently has no Shopify connection boundary. Build the standalone authorization-code flow behind fixed server operations, with encrypted expiring offline credentials and server-authenticated workspace binding. Visitors click Connect and approve access on Shopify; they never enter API keys. Connection alone creates no products. Product mutations stay inaccessible in this foundation ticket.
+
+## Read fully before implementation
+
+- [Shopify plan](../engineering/SHOPIFY-DEMO-INTEGRATION-PLAN.md), especially the researched distribution/token constraints, minimal architecture, durable ledger and named limits.
+- [Lifecycle](../engineering/LIFECYCLE.md), [RTL-023 security dispositions](../audits/RTL-023-SECURITY.md), [RTL-143 audit](../audits/RTL-143-SECURITY.md), [checkout storage](../operations/CHECKOUT-STORAGE.md), frontend `AGENTS.md` and the relevant installed Next documentation.
+- Current `apps/frontend/src/features/session/controller.ts`, `projection.ts`, `context.tsx`; `apps/frontend/src/server/bridge.ts` and `origin-guard.server.ts`; backend `http`, `runtime`, `security`, `config`, `checkout` directories and `packages/contracts` public export conventions. Resolve these against the current tree before allocation.
+
+## File allocation and approach
+
+Before edits, create `docs/commit-plans/RTL-162.md` with exact current paths. Allocate narrow `packages/contracts` Shopify schemas/public subpath; backend `shopify/` auth/provider/ledger/local-storage/GCS-storage modules and tests; inert configuration/composition/fixed HTTP routes; fixed server-only Next bridges/callback; `.env.example` and app-local ignored-state rules; minimal session binding hooks; and `docs/operations/SHOPIFY.md` plus `docs/validation/RTL-162.md`. Avoid an app scaffold replacement, generic proxy, shared catch-all utility or SQL stack.
+
+1. Define public safe availability/connection/outcome schemas and server-only token/installation records. Add a cryptographically authenticated HttpOnly connection-session binding plus a server-issued per-tab proof outside the recoverable projection/report; hash proofs server-side and prevent duplicate-tab lease takeover. The client workspace label/owner role is never authority. Bootstrap the original server-bound two-hour deadline when a configured workspace is created, without contacting Shopify, so a late Connect cannot extend it. Older/unsealed restored workspaces remain usable as guests but require a new demo before connecting. Bind generation, app identity and exact return context; reset/new sessions cannot adopt old authority. Bootstrap/configuration failure must preserve Skip.
+2. Implement crash-safe encrypted local persistence with exclusive ownership and an injected CAS/lease interface; provide the private GCS generation-precondition adapter for later hosted operation. Explicitly choose schema/version, key rotation, scoped object paths, bounded enumeration, authenticated encryption context, atomic writes and capacity behavior. No Shopify tokens in checkout's one-day image bucket, sessionStorage, reports, public config or logs. The separate per-tab binding proof may use its own tab-session entry, cleared on reset/expiry and excluded from projection/report export. No in-memory fallback for real provider credentials.
+3. Implement configured supported installation entry, signed install/callback validation, single-use random state/cookie binding, ten-minute expiry, exact shop/app/redirect validation, fixed clean return URLs and denial handling. Reject malformed/duplicate query parameters, arbitrary hosts, redirects, stale generations and replay. Claim the OAuth exchange durably before dispatch; handle an unknown exchange result without reusing the code or silently replacing another session's tokens.
+4. Exchange for expiring offline access plus refresh tokens using the pinned API/auth contract. Atomically protect rotation under a durable app/shop lease; a second active/unresolved workspace cannot connect the same shop or invalidate cleanup access. Verify returned scopes, shop identity/currency/test-store class before making catalogue controls usable. Fail closed for unsupported/unknown store types and changed app credentials.
+5. Keep callback/webhook protocol handling narrow. All public routes retain the existing origin seal; browser writes also retain Origin/CSRF/session checks. Callback GET authentication uses Shopify HMAC/state, not a forged browser Origin. Scrub code/state/token-bearing URLs and use no-store/no-referrer/clean redirects. Preserve backend IAM privacy, content-free diagnostics, existing admission classification and all operator logs.
+6. Configuration defaults expose unavailable/live-unconfigured safely; deliberate local fixtures remain visibly fake. Missing secrets, encryption, durable storage or install eligibility never select a fake provider after a live failure. Keep Shopify separate from the paid-AI master. Health/config/imports dispatch no external requests. Prepare exact blank-secret setup documentation; obtain no secrets and create no cloud resources in independent implementation.
+
+## Acceptance and meaningful tests
+
+| Case                                                                             | Required result                                                                                                                            |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Missing app/storage/encryption; health/import                                    | Skip remains possible; useful safe unavailability; no external HTTP or side effect.                                                        |
+| Successful injected native-shaped flow                                           | Original workspace/store/app/generation bound; minimum scopes checked; encrypted credentials stored; clean return; zero product mutations. |
+| State/HMAC/cookie/shop/timestamp/query/redirect tampering, replay, denial        | No exchange or cross-session attachment as applicable; fixed public outcome; no open redirect or raw error leakage.                        |
+| Late connection/expired workspace, copied projection, forged role/session labels | Cannot create/extend merchant authority; no stale restoration; server expiry is authoritative.                                             |
+| Two tabs/sessions or two backend workers on one shop                             | One installation lease; no credential replacement/race; other visitor can continue without Shopify.                                        |
+| Token rotation, storage failure/crash and stale refresh response                 | Atomic current credential version; no plaintext/unknown token fallback; ambiguity recorded and bounded.                                    |
+| Restart, damaged key/ciphertext, capacity pressure                               | Durable ownership survives; corruption/missing key fails closed; unresolved reservations are not evicted to admit more work.               |
+| Callback logging and origin protection                                           | Sensitive query values absent from application diagnostics; all paths retain the seal; no generic guard exemption.                         |
+
+Prove the plan's concrete record/byte/attempt/rate/deadline/concurrency bounds at their boundary and one beyond. Tests must use injected HTTP/clock/storage with paid-off defaults and external networking denied, including restart/lease contention rather than only round-trip schema assertions.
+
+## Validation and handoff
+
+Run applicable `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm check:boundaries`, `pnpm test:unit`, `pnpm build`; record actual results/environment and settled read-only review in `docs/validation/RTL-162.md`. Preserve pending native consent/token/scopes, real local HTTPS/cookies, separate-organization eligibility and hosted GCS/IAM/origin checks explicitly. Create a tested local setup path for later credentials; do not stop independent code work because the owner has not submitted the form. Stage/commit only with applicable later authority and clean review.
