@@ -57,6 +57,110 @@ afterEach(async () => {
 });
 
 describe("durable Shopify cleanup", () => {
+  it.each(["reset", "expire", "unknown"] as const)(
+    "reclaims only a never-dispatched authorization reservation after %s",
+    async (ending) => {
+      const h = await setup(),
+        shop = "abandoned.myshopify.com";
+      const first = await h.auth.session(undefined, {
+        schemaVersion: 1,
+        workspaceId: "first",
+        createdAt: h.clock(),
+      });
+      await h.auth.connect(first.cookie, first.result.tabProof, {
+        schemaVersion: 1,
+        workspaceId: "first",
+        returnTo: "onboarding",
+      });
+      const selected = await h.auth.install(
+        first.cookie,
+        h.provider.installQuery(shop, h.clock()),
+      );
+      const exchange = vi.spyOn(h.provider, "exchange");
+      if (ending === "unknown") {
+        exchange.mockRejectedValueOnce(new Error("Unknown exchange result"));
+        expect(
+          (
+            await h.auth.callback(
+              first.cookie,
+              h.provider.consent(
+                shop,
+                new URL(selected.authorizationUrl).searchParams.get("state")!,
+                true,
+                h.clock(),
+              ),
+              h.signal(),
+            )
+          ).outcome,
+        ).toBe("needs_attention");
+      }
+      if (ending === "expire") h.advance(600001);
+      else
+        await h.cleanup.request(first.cookie, first.result.tabProof, "first");
+      const second = await h.auth.session(undefined, {
+        schemaVersion: 1,
+        workspaceId: "second",
+        createdAt: h.clock(),
+      });
+      await h.auth.connect(second.cookie, second.result.tabProof, {
+        schemaVersion: 1,
+        workspaceId: "second",
+        returnTo: "connections",
+      });
+      const selecting = h.auth.install(
+        second.cookie,
+        h.provider.installQuery(shop, h.clock()),
+      );
+      if (ending === "unknown") {
+        await expect(selecting).rejects.toMatchObject({ code: "BUSY" });
+        expect(exchange).toHaveBeenCalledTimes(1);
+      } else {
+        expect(new URL((await selecting).authorizationUrl).hostname).toBe(shop);
+        await expect(
+          h.auth.callback(
+            first.cookie,
+            h.provider.consent(
+              shop,
+              new URL(selected.authorizationUrl).searchParams.get("state")!,
+              true,
+              h.clock(),
+            ),
+            h.signal(),
+          ),
+        ).rejects.toMatchObject({ code: "FORBIDDEN" });
+        expect(exchange).not.toHaveBeenCalled();
+      }
+    },
+  );
+  it("cancels an unselected attempt on reset before it can reserve a store", async () => {
+    const h = await setup();
+    const issued = await h.auth.session(h.cookie, {
+      schemaVersion: 1,
+      workspaceId: "unselected",
+      createdAt: h.clock(),
+    });
+    await h.auth.connect(issued.cookie, issued.result.tabProof, {
+      schemaVersion: 1,
+      workspaceId: "unselected",
+      returnTo: "onboarding",
+    });
+    await h.cleanup.request(
+      issued.cookie,
+      issued.result.tabProof,
+      "unselected",
+    );
+    await expect(
+      h.auth.install(
+        issued.cookie,
+        h.provider.installQuery("other.myshopify.com", h.clock()),
+      ),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(
+      await h.ledger.inspect((data) =>
+        data.installations.map((item) => item.shop),
+      ),
+    ).toEqual([h.shop]);
+  });
   it("blocks foreground and cleanup work after native access is rejected", async () => {
     const h = await setup();
     await h.send();
@@ -126,12 +230,7 @@ describe("durable Shopify cleanup", () => {
     await h.ledger.transact((data) => {
       data.installations[0]!.calls = { start: h.clock(), count: 119 };
     });
-    const connect = await h.auth.connect(h.cookie, h.proof, {
-      schemaVersion: 1,
-      workspaceId: "workspace",
-      shop: h.shop,
-      returnTo: "connections",
-    });
+    const connect = await h.begin();
     const exchange = vi.spyOn(h.provider, "exchange");
     await expect(
       h.auth.callback(
@@ -158,12 +257,7 @@ describe("durable Shopify cleanup", () => {
       ...(await identity(...args)),
       id: "gid://shopify/Shop/2",
     }));
-    const connect = await h.auth.connect(h.cookie, h.proof, {
-      schemaVersion: 1,
-      workspaceId: "workspace",
-      shop: h.shop,
-      returnTo: "connections",
-    });
+    const connect = await h.begin();
     const result = await h.auth.callback(
       h.cookie,
       h.provider.consent(
@@ -186,12 +280,7 @@ describe("durable Shopify cleanup", () => {
     }
     await h.end();
     await h.sweep();
-    const connection = await h.auth.connect(h.cookie, h.proof, {
-      schemaVersion: 1,
-      workspaceId: "workspace",
-      shop: h.shop,
-      returnTo: "connections",
-    });
+    const connection = await h.begin();
     await h.auth.callback(
       h.cookie,
       h.provider.consent(
@@ -225,6 +314,9 @@ describe("durable Shopify cleanup", () => {
           ? template.tokens!
           : await h.provider.exchange(shop, "fixture_code", h.signal());
       const installation = structuredClone(template);
+      // Legacy installations isolate the pre-existing forty-call product budget.
+      // Collection lifecycle and its shared admission are covered separately.
+      installation.collection = null;
       installation.shop = shop;
       installation.tokens = tokens;
       installation.bindingId = String(shopIndex + 1).repeat(64);
@@ -557,12 +649,7 @@ describe("signed lifecycle and privacy deliveries", () => {
     );
     await h.webhook();
     await h.sweep();
-    const connect = await h.auth.connect(h.cookie, h.proof, {
-      schemaVersion: 1,
-      workspaceId: "workspace",
-      shop: h.shop,
-      returnTo: "connections",
-    });
+    const connect = await h.begin();
     const params = {
       code: "recovery",
       shop: h.shop,
