@@ -1,0 +1,54 @@
+# RTL-166 — Verify Shopify integration and prepare the portfolio handoff
+
+Subsequent owner instruction,10 November2026: the validated work is authorized for [27 ticket-prefixed commits](../validation/RTL-166-COMMITS.md) before native setup guidance. This changes packaging authority only; external acceptance below remains pending.
+
+## Status, dependency and authority
+
+**Independent local implementation/verification/handoff complete — 10 November2026.** All six gates pass on Windows and actual local Linux (773 tests/118 files,229 boundary modules), exact source/image probes and patched-source browser journeys are recorded, and setup/resources/README/GitHub/portfolio files are prepared. [Actual evidence and outstanding acceptance](../validation/RTL-166.md) retain native Shopify credentials/form/API, outside-organization installs, hosted behavior, scanner login and review/publication as pending. Native tests require owner-authorized app/test-store access; public tunnels, resources, distribution selection, review submission, external profile edits, push/deployment require separate applicable authority. No submission or publication occurred.
+
+## Problem and result
+
+Turn the implemented feature into credible Shopify experience and an honest visitor demo. Separate code/fixture evidence, real own-organization Shopify evidence, unrelated-organization installation, and hosted/review acceptance. Prepare exact setup/recovery instructions and final README/GitHub/portfolio changes tied to what actually passed. Do not close external acceptance with simulations.
+
+## Precision references and allocation
+
+Read the complete [Shopify plan](../engineering/SHOPIFY-DEMO-INTEGRATION-PLAN.md), settled RTL-162–165 validation/diffs, current [release process](../operations/RELEASE.md), [hosted worksheet](../operations/HOSTED-VERIFICATION.md), [RTL-023 security dispositions](../audits/RTL-023-SECURITY.md), [RTL-143 audit](../audits/RTL-143-SECURITY.md) and exact-byte LF proof requirements in [RTL-025](RTL-025-fix-cross-platform-release-proof-check.md). Recheck current official Shopify requirements/API version when executing.
+
+Create `docs/commit-plans/RTL-166.md` first. Allocate meaningful integration/security regressions and necessary fixes, final operator guide/run commands/private scheduler and resource worksheet, release/hosted check updates, current blueprint/overview/docs indexes, evidence-based root/app README updates, a local portfolio/GitHub copy checklist and `docs/validation/RTL-166.md`. Source fixes require a revised file allocation and revalidation. No fabricated scanner/browser/provider report or automatic external publication.
+
+## Independent local acceptance
+
+1. Verify the complete journey and failure matrix in the plan, including unconfigured/Skip; OAuth denial/tampering/replay; test-store/currency eligibility; encrypted durable refresh and restart; forged/cross-session IDs; same-shop conflicts; safe reads; draft variants/media and exact price mapping; explicit update; selected/whole cleanup; duplicate/unknown writes; late effects after reset; provider throttling; browser-closed expiry; two workers; missing key/storage; external uninstall/stale events; redaction and retention cutoff.
+2. Audit the new merchant-account authority boundary. Check no tokens/codes/signed URLs/raw payloads in public config, browser diagnostics, projections/reports, analytics, app logs or test artifacts. Check browser CSRF/session bindings independently of the existing origin seal, signed raw-body webhook verification, fixed return/host/GraphQL operations and SSRF/XSS protections. Preserve existing private operator diagnostics and no generic bypass route.
+3. Confirm all named byte/count/map/record/work/deadline/attempt/concurrency limits, deployment-wide durable claims and useful capacity failure. Inspect no unbounded scheduled scans, arbitrary background exports, automatic live-to-fake fallback or silent scope expansion. Prove storage failure cannot leave live writes enabled without durable cleanup ownership.
+4. Run applicable six gates and actual changed-build responsive/browser journeys; preserve photos, accepted designs, tours/motion, exact commerce, Stripe sandbox return, currency, chat/logo behavior, restore/reset/two-tab isolation and pending RTL-157–160 behavior if present. Record fixture vs real-provider browser steps clearly.
+5. Prepare all exact local operator commands/configuration, blank-secret templates, private runner/ledger/image storage contracts and teardown files. Do not provision resources or block all independent work because native/cloud access is pending. Read-only review the complete settled packet/diff, independently verify findings, fix and repeat until no actionable finding remains.
+
+## Native and external acceptance matrix
+
+| Evidence level                          | Actual checks required before claiming it                                                                                                                                                                                                                                                                                                              |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Native own-organization local Shopify   | Owner-created app/test store; standalone configuration and minimum granted scopes; real Shopify consent/callback; live read/create/read-back/update/remove with images and single/multiple variants; unchanged preexisting sentinel products; disconnect cleans before uninstall. Use fake AI and fictional clothing; do not create real orders/sales. |
+| Native session cleanup                  | Real expiry with browser closed and backend restart, observed runner dispatch, verified products/media absent; provider failure and external uninstall show honest unresolved/manual recovery. Actual signed uninstall/privacy subscription delivery is distinguished from injected/CLI-triggered samples.                                             |
+| Outside-organization visitor connection | Separate organization and eligible test store; permitted install entry point/distribution; ordinary visitor supplies no app/API keys and connects successfully. Record current Shopify support clarification when needed. Own-store success, collaborator access or a copied draft install URL is insufficient.                                        |
+| Hosted behavior                         | Separately authorized private ledger/key/runtime identity, image path and scheduled invocation; native callback/webhooks through the canonical edge; direct-origin/private-backend denial; scale-to-zero/restart recovery; bounded rates/costs/retention and actual normal cleanup. Refresh source/image/Linux/scanner evidence for changed inputs.    |
+| Public distribution/review              | Owner-selected supported distribution, required app metadata/privacy/support assets, mandatory signed privacy endpoints, actual Shopify approval where required and separately authorized publication. A limited-visibility listing still has its applicable review requirements. No App Store/production claim from draft configuration.              |
+
+Record date, source/build identity, store class and organization relationship, app/API version, performed actions and non-secret outcomes. Keep account-private identifiers/screenshots and tokens out of committed artifacts. Failed or unavailable checks stay pending with the precise owner prerequisite, not silently waived or rolled into “integration complete.” Do not require a recurring automation or a scheduled reminder merely to report these pending checks.
+
+## Operator setup and release packet
+
+Finalize `docs/operations/SHOPIFY.md` with locally proven App URL and exact callback, embedding off, minimal scopes, expiring-token configuration, API/webhook version, supported installation entry, signed topics, environment/key placement, dedicated 4310/4311 ownership checks and chosen HTTPS-local/tunnel arrangement. Distinguish configuring/activating an app version from review submission. No visitor pastes developer credentials.
+
+Prepare a small separately reviewable resource worksheet for integration ledger/media storage, retention, encryption key rotation, narrowly scoped identity and private scheduled cleanup invocation. The existing checkout-photo bucket's one-day deletion policy is not a token-store policy. State who must authorize/create each resource and how to verify/rollback it while preserving unresolved cleanup. No credentials, allowance extension, account change, resource purchase or deployment is inferred by this ticket.
+
+## README, GitHub and portfolio handoff — owner reminder
+
+- Update root/app READMEs and the current feature/architecture/limitations documentation to match the verified feature and remaining gates. Include simple local setup, Connect/Skip, read/export/update/remove/disconnect, the test-store limitation and cleanup/access-revocation caveat.
+- Prepare a concise GitHub repository About description/topics and portfolio project description. Update the screenshot/demo-video checklist and reusable Shopify job-proposal wording. Publish to external profiles only with applicable owner instruction; otherwise hand over ready copy in the local completion record.
+- If native test-store evidence passed, suggested wording is: “Built a standalone Shopify integration using OAuth and the GraphQL Admin API, with draft product/variant/image export, read-back, explicit updates and session-owned cleanup, tested on a Shopify development store.” Adapt to actual supported behavior and avoid unsupported experience claims.
+- State local/injected-only status if native access is still absent. Advertise outside-user Connect only after the supported separate-organization test, and reviewed/published status only after actual approval. Do not claim Shopify theme work, production merchant operations, real payments or full inventory/order synchronization from this demo.
+
+## Completion evidence
+
+`docs/validation/RTL-166.md` must separate independent implementation acceptance from native local, outside-user, hosted and review acceptance. Update ticket/index statuses from actual evidence. A local implementation can be reported complete while a named external acceptance remains pending; the overall visitor-ready/public feature cannot be called verified until its applicable matrix rows pass. End the owner handoff with the GitHub/README/portfolio reminder and exact remaining actions. Do not stage/commit or publish without applicable authorization.

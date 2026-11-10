@@ -1,5 +1,38 @@
 # Retailor implementation tickets
 
+<a id="planned-shopify-integration-awaiting-review--10-november-2026"></a>
+
+## Shopify integration locally validated — 10 November2026
+
+**Execution result:** RTL-162–166's independent local implementation and handoff are validated in the owner's AFK execute/validate loop. Latest six gates pass on Windows and actual local Linux:773 tests/118 files,229 boundary modules and both builds. [Integrated evidence and remaining prerequisites](../validation/RTL-166.md) distinguish actual simulation/browser/runtime checks from pending Shopify form/credentials/native tests, outside-user/hosted acceptance and Docker Scout login/scanning. The owner's subsequent instruction authorizes the [27 ticket-prefixed commits and exact file allocation](../validation/RTL-166-COMMITS.md); earlier no-stage/no-commit observations below describe their historical phases. No cloud change or publication.
+
+[RTL-161](RTL-161-plan-shopify-demo-integration.md) records the owner's ticket-planning request. The [complete Shopify plan](../engineering/SHOPIFY-DEMO-INTEGRATION-PLAN.md) includes researched distribution constraints, inspected Choreograph HubSpot lessons, security/lifecycle decisions, finite limits and an evidence-based portfolio checklist. The owner has now authorized independent local execution of the five tickets. Their individual records track actual completion; Shopify form/credentials and native/external acceptance remain pending. No account/cloud mutation, staging/commit or publication is authorized by the local loop.
+
+| Order | Ticket                                                                                                | Dependency and outcome                                                                                                                    |
+| ----- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | [RTL-162 — OAuth and durable connections](RTL-162-shopify-auth-and-durable-connections.md)            | Locally validated; authenticated binding, expiring tokens, encrypted durable state. Native consent pending. |
+| 2     | [RTL-163 — products and owned draft exports](RTL-163-shopify-products-and-owned-exports.md)           | Locally validated; bounded reads, reviewed draft variants/photos/updates, exact ownership and uncertainty handling. Native semantics pending. |
+| 3     | [RTL-164 — cleanup and session lifecycle](RTL-164-shopify-cleanup-and-session-lifecycle.md)           | Locally validated; selected/whole removal, independent runner, signed deliveries, expiry/retention. Native/hosted scheduling pending. |
+| 4     | [RTL-165 — onboarding and Connections](RTL-165-shopify-onboarding-and-connections.md)                 | Locally validated; optional Connect/Skip, dashboard management, actual responsive simulation journeys. |
+| 5     | [RTL-166 — verification and portfolio handoff](RTL-166-shopify-verification-and-portfolio-handoff.md) | Independent local verification/handoff complete; native/outside-user/hosted/scanner acceptance explicitly pending. |
+
+Visitors never supply API keys. Retailor remains a temporary frontend storefront; the new private integration ledger owns only external connection/cleanup state. Same-organization native testing does not prove unrelated visitors can install without review. Missing credentials and external permissions stay pending separately from independent local implementation. This packet does not depend on or authorize executing RTL-157–160; historical queue-selection/commit authorization does not automatically extend to either new packet.
+
+## Planned improvements awaiting review — 19 October 2026
+
+[RTL-156](RTL-156-plan-demo-improvements.md) documents the owner's research-only request and [practical plan/GA4 setup guide](../engineering/DEMO-IMPROVEMENTS-PLAN.md). The four packets below are **planned, not implemented or authorized for automatic execution**. Stop for owner review; existing historical execution/commit permissions do not authorize this new work. No app edit, service startup, account setup, paid request, staging/commit, push or deployment occurs in the planning pass.
+
+| Order | Ticket | Dependency and outcome |
+| --- | --- | --- |
+| 1 | [RTL-157 — production mobile baseline](RTL-157-baseline-production-mobile-performance.md) | Accepted plan/current RTL-155 source; reproducible production-bundle measurements before app edits. |
+| 2 | [RTL-158 — temporary store URLs and public SEO](RTL-158-temporary-store-urls-and-public-seo.md) | RTL-157 baseline; local-session addresses/lifecycle, canonical landing and noindex temporary pages. |
+| 3 | [RTL-159 — consented GA4 ecommerce](RTL-159-consented-ga4-ecommerce.md) | RTL-158 navigation/privacy behavior; free Standard GA4, safe accepted-action events and verified sandbox purchase deduplication. |
+| 4 | [RTL-160 — measured performance improvements](RTL-160-measured-performance-improvements.md) | RTL-157 measurements and RTL-158/159 local behavior; focused fixes with matched before/after evidence. |
+
+Owner login/terms/Measurement ID and real Google/Stripe/hosted checks remain explicit later prerequisites, separate from independent local implementation. The canonical hostname stays `https://tryretailor.com`. No public sharing, application database, authentication requirement, Shopify, A/B testing or paid analytics stack is included in RTL-156–160. The separate November Shopify packet above adds only its named planned scope. Original queue-selection rules below apply only within their applicable authorized scope.
+
+## Existing implementation and release evidence
+
 Verified custom domain: [RTL-155](RTL-155-custom-domain.md) completes trusted HTTPS and matching app-origin traffic cutover to `https://tryretailor.com` after the owner resumes from paused commit `05aafb6`. Frontend `retailor-frontend-00002-xj6` and backend `retailor-backend-00004-22g` each serve100%; images, credentials, paid enablement, limits and private backend IAM are preserved. [Actual evidence](../validation/RTL-155.md) records seven domain delivery/ready/config/origin checks, two ordinary HTTPS GETs and two direct backend denials. No paid model/challenge, DNS/proxy mutation or browser/Cloudflare acceptance is claimed.
 
 First Cloud Run deployment: [RTL-154](RTL-154-first-cloud-run-deployment.md) fixes F20 Docker packaging, selects fresh exact Linux proof, corrects the hosted verifier for unpaid native logos and deploys two immutable images to `retailor-511714`/`europe-west1`. All six settled Linux gates pass,674 tests/106 files; fresh scans retain the prior findings. Initial private HTTPS verification passes49 observations. The owner opens only frontend invocation;36 public page/config/asset checks,4 backend denials and wrong-origin403 pass. Five owner-created secret versions are pinned; Cloud Run$5 cap and project$10 alerts are inspected. The owner subsequently enables paid AI: backend revision `retailor-backend-00003-hlj` serves100%, public readiness/config report vision and Tailor ready, and both backend URLs still deny unauthenticated health access. Frontend is public, backend remains private, and independent domain/Cloudflare/account/connected hosted acceptance remains pending. [Actual record](../validation/RTL-154.md) distinguishes runtime access from verified release acceptance; no paid model call or Git push.

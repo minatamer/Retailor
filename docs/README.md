@@ -1,5 +1,17 @@
 # Retailor documentation
 
+## Locally implemented Shopify integration — 10 November2026
+
+[RTL-162–165](tickets/README.md#planned-shopify-integration-awaiting-review--10-november-2026) implement optional Connect/Skip before storefront/tour, dashboard Connections, product reads, explicit draft product/variant/image exports and updates, and exact-owned deletion on disconnect/reset/expiry. All six gates pass773 tests; [actual browser evidence](validation/RTL-165.md) is clearly simulated. A small encrypted integration ledger supports independent cleanup; the storefront remains a temporary browser-session preview. Choreograph HubSpot supplied interaction lessons, not inherited provider acceptance. [Setup and local simulation](operations/SHOPIFY.md), [resources](operations/SHOPIFY-RESOURCES.md), [portfolio copy](operations/SHOPIFY-PORTFOLIO.md), [integrated handoff](validation/RTL-166.md).
+
+The owner will complete app setup/credentials later. Native own-organization testing, outside-organization visitor installs, hosted cleanup and any Shopify review remain separate unverified gates. README/GitHub/portfolio wording distinguishes locally tested implementation from native experience. The subsequent [owner-authorized commit record](validation/RTL-166-COMMITS.md) packages the validated work without changing app inputs. The older packet below excludes Shopify only within its original scope.
+
+## Planned demo improvements — 19 October 2026
+
+[The practical plan and GA4 setup guide](engineering/DEMO-IMPROVEMENTS-PLAN.md) covers free Standard GA4, temporary non-shareable browser-session store addresses, public-only SEO and measured mobile performance. [RTL-156](tickets/RTL-156-plan-demo-improvements.md) records research only; RTL-157–160 are planned, dependency-ordered packets awaiting owner review and later execution instruction. No new capability is implemented by this packet. No application database, mandatory authentication, Shopify, A/B tests, public store hosting or paid analytics infrastructure is included.
+
+Current implementation/deployment evidence is in the [root README](../README.md), [ticket index](tickets/README.md) and [verified apex-domain record](validation/RTL-155.md). The older 22-ticket progress descriptions below remain historical; they do not supersede later evidence or authorize executing this planning packet.
+
 [RTL-023 post deployment and pre sharing](tickets/RTL-023-post-deployment-and-pre-sharing.md) records the committed quality audit and subsequent owner-approved security remedies. [Quality dispositions](audits/RTL-023-CODE-QUALITY.md), [security dispositions](audits/RTL-023-SECURITY.md), [PM security view](audits/RTL-023-SECURITY-REVIEW.html) and [security validation](validation/RTL-023-SECURITY.md) identify preserved functionality, bounded origin/fairness/release controls, exact refreshed Linux/scanner proof and external/upstream blockers. No paid call or cloud publication is inferred.
 
 Retailor is a planned clothing-only demo built around a beautiful storefront from supplied product photos. Documentation and the 22-ticket implementation queue are prepared; implementation is underway in fake mode and deployment preparation follows the queue.

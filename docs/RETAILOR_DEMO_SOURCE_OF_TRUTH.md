@@ -1,5 +1,11 @@
 # Retailor — product, architecture and delivery blueprint
 
+> **Subsequent commit authorization — 10 November2026:** the owner authorizes packaging the validated pending work into [27 ticket-prefixed commits](validation/RTL-166-COMMITS.md). Earlier no-commit observations remain historical; native Shopify, outside-organization installation and hosted/review acceptance stay pending.
+
+> **Shopify implementation addendum — 10 November2026:** the owner authorized the local AFK execute/validate loop. RTL-162–165 now implement optional Connect/Skip before storefront/tour, dashboard Connections, standalone OAuth, read-only products, reviewed draft garment/variant/image exports/updates and exact-owned cleanup on Disconnect/Reset/original two-hour expiry. All six gates pass773 tests/118 files; [browser evidence](validation/RTL-165.md) uses explicitly labelled simulation. A bounded encrypted integration ledger is the named durable-state exception; the storefront remains a browser-session preview, with no merchant/customer/order backend or theme publication. [Setup](operations/SHOPIFY.md), [resource/native worksheet](operations/SHOPIFY-RESOURCES.md), [integrated handoff](validation/RTL-166.md) and [portfolio copy](operations/SHOPIFY-PORTFOLIO.md) retain pending native credentials/form/API, outside-organization, hosted and review acceptance. Historical Shopify exclusions below apply to their original scopes.
+
+> **Current scope addendum — 19 October 2026:** the application already has guest photo/catalogue/personalization/storefront/owner flows and verified Stripe sandbox return behavior; [RTL-155](validation/RTL-155.md) records the canonical `https://tryretailor.com` deployment. The historical status/decisions below describe their original snapshots. The new [demo improvements plan](engineering/DEMO-IMPROVEMENTS-PLAN.md) and [RTL-156–160 queue](tickets/README.md#planned-improvements-awaiting-review--19-october-2026) are **research/planning only**: free Standard GA4 with opt-in/safe events, readable temporary local-session store URLs, persistent-public-only SEO and measured performance. None of those new capabilities is implemented by this planning pass; later execution needs an owner instruction. No application database, mandatory authentication, public store sharing, Shopify or A/B tests. Preserve existing design/motion/checkout and all current privacy/security/lifecycle controls.
+
 **Status:** accepted documentation baseline and a 22-ticket implementation queue; implementation is underway in fake mode; paid and hosted acceptance remain pending.\
 **Prepared:** 11 October 2026.\
 **Product:** Retailor. **Sample clothing brand:** FORME.\
@@ -196,7 +202,7 @@ These are accepted owner decisions. Visual tokens and implementation limits belo
 
 ### 3.3 Explicit exclusions
 
-No real checkout, shipping, Shopify, tax, bank refund, advertising or analytics integration. No customer emails, real addresses, payment details or external messages are needed. No hosted database, accounts, multitenancy, durable store publishing or custom store domains.
+Original baseline exclusions: no real-money checkout, shipping, Shopify, tax, bank refund or advertising integration. Later RTL-092/097 add verified Stripe **sandbox** checkout and once-only local order settlement. Standard GA4 is now **planned** under RTL-159; fictional dashboard activity remains separate from externally stored consented analytics. No customer emails, real addresses, payment details or external messages are needed in Retailor. No hosted application database, accounts, multitenancy, durable store publishing or merchant-owned custom domains. The platform's canonical hostname is `tryretailor.com`.
 
 No freeform colour picker, uploaded fonts, arbitrary CSS, drag-and-drop page builder, custom checkout layout or unlimited template mixing. Home, listing and detail are selected as one template; palette and typography can vary within the accepted matrix.
 
@@ -206,7 +212,7 @@ A demo financial view is not a bookkeeping product. It displays disclosed synthe
 
 ### 3.4 Later extensions
 
-Real commerce integrations, durable merchant accounts, import/export integrations, analytics connections, localization and richer publishing need separate scope decisions. Dashboard widget rearrangement and arbitrary merchandising experiments may also wait.
+Real-money commerce, durable merchant accounts, import/export integrations, localization and richer publishing need separate scope decisions. The limited Standard GA4 connection, temporary local navigation addresses and technical SEO/performance work have a documented plan awaiting review; they do not authorize execution, public store hosting or analytics infrastructure beyond Google's free dashboard. Dashboard widget rearrangement remains deferred; A/B testing is out of scope.
 
 Multiple storefront templates, curated style presets and broad useful Tailor interactions belong to the first demo. They are core requirements, rather than optional polish after an otherwise complete single-layout store.
 
@@ -341,6 +347,8 @@ Choose the 15 sample photos, watch a live catalogue draft and review it. Use Tai
 | `/demo` | One client-owned staged guest workspace |
 | `/api/retailor/v1/*` | Narrow same-origin frontend bridge |
 | Backend `/v1/*` | Private validated provider API |
+
+**Planned RTL-158 extension:** `/<storeSlug>`, `/<storeSlug>/collection` and `/<storeSlug>/products/<opaque-product-id>` navigate the same eligible local browser session. The name/path never reconstructs a store for another visitor. Accepted rename updates the active binding; reset/clear/fixed expiry retires it. Unmatched sessions see unavailable plus Start your own demo. Show the non-shareable/session-only explanation beside the address; no Share store action. The persistent landing is indexable; temporary workspace/store routes have server-visible noindex and no merchant product/review schema or sitemap entries. Keep fixed Stripe returns at `/demo`; details/acceptance live in [the plan](engineering/DEMO-IMPROVEMENTS-PLAN.md#2-readable-addresses-inside-one-temporary-local-session). No new routing behavior exists yet.
 
 Choose, Process, Catalogue, Style, Storefront and Dashboard are canonical state inside `/demo`. Home, Collection and Product are local storefront surfaces resolved against stable product IDs. They do not require three independent applications or a competing hash/query-state controller.
 
