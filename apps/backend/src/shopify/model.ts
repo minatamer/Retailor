@@ -9,6 +9,7 @@ import {
 } from "@retailor/contracts/shopify";
 
 import { ProductIntentSchema } from "./product-model.js";
+import { CollectionIntentSchema } from "./collection-provider.js";
 const time = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 export const TokensSchema = z.strictObject({
   access: z.string().min(1).max(4096),
@@ -36,7 +37,7 @@ export const BindingSchema = z.strictObject({
     .strictObject({
       stateHash: ShopifyProofSchema,
       stateValue: ShopifyProofSchema.nullable(),
-      shop: ShopifyShopSchema,
+      shop: ShopifyShopSchema.nullable(),
       expiresAt: time,
       returnTo: ShopifyReturnSchema,
       outcome: z.enum(["pending", "unknown", "used", "cancelled"]),
@@ -45,6 +46,14 @@ export const BindingSchema = z.strictObject({
     .nullable(),
   shop: ShopifyShopSchema.nullable(),
   catalogue: z
+    .strictObject({
+      collectionId: z.string().max(100).nullable().default(null),
+      cursor: z.string().max(2048).nullable(),
+      page: z.number().int().min(1).max(5),
+    })
+    .nullable()
+    .default(null),
+  collectionBrowse: z
     .strictObject({
       cursor: z.string().max(2048).nullable(),
       page: z.number().int().min(1).max(5),
@@ -78,6 +87,7 @@ export const InstallationSchema = z.strictObject({
   notice: z.enum(["uninstalled", "redact"]).nullable().default(null),
   noticeVersion: z.number().int().nonnegative().max(1_000_000).default(0),
   calls: RateSchema,
+  collection: CollectionIntentSchema.nullable().default(null),
   products: z
     .array(ProductIntentSchema)
     .max(SHOPIFY_LIMITS.products)
