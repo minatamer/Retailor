@@ -34,6 +34,15 @@ export const PhotoSchema = z
     "Photo identity mismatch",
   );
 export type Photo = z.infer<typeof PhotoSchema>;
+/** Transfer bytes are independently verified by the receiving sanitizer. */
+export const EncodedPhotoSchema = z.strictObject({
+  image: DerivativeSchema,
+  base64: z
+    .string()
+    .min(4)
+    .max(1024 * 1024)
+    .regex(/^[A-Za-z0-9+/]+={0,2}$/u),
+});
 export const RecognitionManifestSchema = z
   .array(DerivativeSchema)
   .min(1)

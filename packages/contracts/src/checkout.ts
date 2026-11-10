@@ -6,7 +6,7 @@ import {
   CurrencyScopeSchema,
   DisplayMinorSchema,
 } from "./currency.js";
-import { DerivativeSchema } from "./photos.js";
+import { EncodedPhotoSchema } from "./photos.js";
 import { ThemeSchema } from "./design.js";
 
 export const CHECKOUT_LIMITS = Object.freeze({
@@ -41,19 +41,7 @@ export const CheckoutStartSchema = z.strictObject({
     name: z.string().trim().min(1).max(80),
     theme: ThemeSchema,
   }),
-  photos: z
-    .array(
-      z.strictObject({
-        image: DerivativeSchema,
-        base64: z
-          .string()
-          .min(4)
-          .max(1024 * 1024)
-          .regex(/^[A-Za-z0-9+/]+={0,2}$/u),
-      }),
-    )
-    .min(1)
-    .max(CHECKOUT_LIMITS.photos),
+  photos: z.array(EncodedPhotoSchema).min(1).max(CHECKOUT_LIMITS.photos),
 });
 export type CheckoutStart = z.infer<typeof CheckoutStartSchema>;
 export const CheckoutControlSchema = z.strictObject({

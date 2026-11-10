@@ -7,6 +7,10 @@
     "dist"
   ],
   "exports": {
+    "./shopify": {
+      "types": "./dist/shopify.d.ts",
+      "import": "./dist/shopify.js"
+    },
     "./core": {
       "types": "./dist/core.d.ts",
       "import": "./dist/core.js"
@@ -81,6 +85,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "4.6.5"
+    "zod": "4.6.6"
   }
 }
