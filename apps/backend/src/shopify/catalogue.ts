@@ -1,7 +1,9 @@
+import { ShopifyCollection } from "./collection.js";
 import { createHash, randomBytes } from "node:crypto";
 import {
   SHOPIFY_LIMITS,
   ShopifyExportSummarySchema,
+  ShopifyImportResultSchema,
   ShopifyProductSummarySchema,
 } from "@retailor/contracts/shopify";
 import type {
@@ -219,6 +221,48 @@ function intentFor(installation: { products: ProductIntent[] }, id: string) {
   );
 }
 
+function productSummary(product: RemoteProduct, installation: Installation) {
+  return ShopifyProductSummarySchema.parse({
+    productType: product.productType,
+    giftCard: product.isGiftCard ?? false,
+    ...(product.priceRangeV2
+      ? {
+          priceRange: {
+            min: product.priceRangeV2.minVariantPrice.amount,
+            max: product.priceRangeV2.maxVariantPrice.amount,
+          },
+        }
+      : {}),
+    id: product.id,
+    title: product.title,
+    description: product.description,
+    status: product.status,
+    variants: product.variants.nodes.slice(0, 64).map((v) => ({
+      id: v.id,
+      title: v.title,
+      sku: v.sku,
+      price: v.price,
+      options: v.selectedOptions,
+    })),
+    variantsTruncated:
+      product.variants.pageInfo.hasNextPage ||
+      product.variants.nodes.length > 64,
+    images: product.media.nodes
+      .filter((media) => media.mediaContentType === "IMAGE" && media.image?.url)
+      .slice(0, 8)
+      .map((media) => ({ url: media.image!.url, alt: media.alt })),
+    mediaTruncated:
+      product.media.pageInfo.hasNextPage ||
+      product.media.nodes.filter((item) => item.mediaContentType === "IMAGE")
+        .length > 8,
+    owned: installation.products.some(
+      (intent) =>
+        intent.remoteId === product.id &&
+        intent.state !== "removed" &&
+        owns(product, intent),
+    ),
+  });
+}
 export class ShopifyCatalogue {
   constructor(
     readonly auth: ShopifyService,
@@ -276,6 +320,7 @@ export class ShopifyCatalogue {
     workspaceId: string,
     cursor: string | null,
     signal: AbortSignal,
+    collectionId: string | null = null,
   ) {
     return this.auth.withConnection(
       cookie,
@@ -292,6 +337,7 @@ export class ShopifyCatalogue {
           if (
             !binding.catalogue ||
             binding.catalogue.cursor !== cursor ||
+            binding.catalogue.collectionId !== collectionId ||
             binding.catalogue.page >= 5
           )
             return deny("STALE", 409);
@@ -306,10 +352,11 @@ export class ShopifyCatalogue {
         const result = await this.provider.list(
           this.context(installation.shop, tokens.access, signal, scope),
           cursor,
+          collectionId,
         );
         const next = page < 5 ? result.next : null;
         await scope.update((_shop, binding) => {
-          binding.catalogue = { cursor: next, page };
+          binding.catalogue = { cursor: next, page, collectionId };
         });
         return {
           schemaVersion: 1 as const,
@@ -318,40 +365,105 @@ export class ShopifyCatalogue {
           limited: page === 5 && result.next !== null,
           currency: identity.currency,
           products: result.products.map((product) =>
-            ShopifyProductSummarySchema.parse({
-              id: product.id,
-              title: product.title,
-              description: product.description,
-              status: product.status,
-              variants: product.variants.nodes.slice(0, 64).map((v) => ({
-                id: v.id,
-                title: v.title,
-                sku: v.sku,
-                price: v.price,
-                options: v.selectedOptions,
-              })),
-              variantsTruncated:
-                product.variants.pageInfo.hasNextPage ||
-                product.variants.nodes.length > 64,
-              images: product.media.nodes
-                .filter(
-                  (media) =>
-                    media.mediaContentType === "IMAGE" && media.image?.url,
-                )
-                .slice(0, 8)
-                .map((media) => ({ url: media.image!.url, alt: media.alt })),
-              mediaTruncated:
-                product.media.pageInfo.hasNextPage ||
-                product.media.nodes.length > 8,
-              owned: installation.products.some(
-                (intent) =>
-                  intent.remoteId === product.id &&
-                  intent.state !== "removed" &&
-                  owns(product, intent),
-              ),
-            }),
+            productSummary(product, installation),
           ),
         };
+      },
+    );
+  }
+  async collections(
+    cookie: string | undefined,
+    proof: string | undefined,
+    workspaceId: string,
+    cursor: string | null,
+    signal: AbortSignal,
+  ) {
+    return this.auth.withConnection(
+      cookie,
+      proof,
+      workspaceId,
+      signal,
+      async (installation, tokens, scope) => {
+        const page = await scope.update((_shop, binding) => {
+          const now = this.auth.clock();
+          if (now - binding.reads.start >= 3600000)
+            binding.reads = { start: now, count: 0 };
+          if (++binding.reads.count > 60) return deny("BUSY", 429);
+          if (!cursor) return 1;
+          if (
+            !binding.collectionBrowse ||
+            binding.collectionBrowse.cursor !== cursor ||
+            binding.collectionBrowse.page >= 5
+          )
+            return deny("STALE", 409);
+          return binding.collectionBrowse.page + 1;
+        });
+        await this.identity(installation, tokens.access, scope, signal);
+        const result = await this.provider.collectionList(
+          this.context(installation.shop, tokens.access, signal, scope),
+          cursor,
+        );
+        const nextCursor = page < 5 ? result.next : null;
+        await scope.update((_shop, binding) => {
+          binding.collectionBrowse = { cursor: nextCursor, page };
+        });
+        return {
+          schemaVersion: 1 as const,
+          collections: result.collections,
+          nextCursor,
+          page,
+        };
+      },
+    );
+  }
+  async importProduct(
+    cookie: string | undefined,
+    proof: string | undefined,
+    workspaceId: string,
+    productId: string,
+    signal: AbortSignal,
+  ) {
+    return this.auth.withConnection(
+      cookie,
+      proof,
+      workspaceId,
+      signal,
+      async (installation, tokens, scope) => {
+        await scope.update((_shop, binding) => {
+          const now = this.auth.clock();
+          if (now - binding.reads.start >= 3600000)
+            binding.reads = { start: now, count: 0 };
+          if (++binding.reads.count > 60) return deny("BUSY", 429);
+        });
+        const identity = await this.identity(
+          installation,
+          tokens.access,
+          scope,
+          signal,
+        );
+        if (identity.currency !== "USD") return deny("INVALID_INPUT", 400);
+        const context = this.context(
+          installation.shop,
+          tokens.access,
+          signal,
+          scope,
+        );
+        const product = await this.provider.read(context, { id: productId });
+        if (!product) return deny("NOT_FOUND", 404);
+        if (
+          product.isGiftCard ||
+          /gift\s*card/iu.test(product.productType) ||
+          product.variants.nodes.length > 24 ||
+          product.variants.pageInfo.hasNextPage
+        )
+          return deny("INVALID_INPUT", 400);
+        const photos = await this.provider.importPhotos(context, product);
+        return ShopifyImportResultSchema.parse({
+          schemaVersion: 1,
+          product: productSummary(product, installation),
+          photos,
+          currency: "USD",
+        });
       },
     );
   }
@@ -527,8 +639,10 @@ export class ShopifyCatalogue {
                 (!update ||
                   (prepared.intent.digest === source &&
                     current.state !== "needs_attention"))
-              )
+              ) {
+                await this.verifyCollection(context, scope, id);
                 return this.result(scope, id);
+              }
               await scope.update((shop) => {
                 const intent = intentFor(shop, id);
                 intent.digest = source;
@@ -553,6 +667,9 @@ export class ShopifyCatalogue {
             }
           }
           if (!prepared.existing) {
+            const collectionId = await new ShopifyCollection(
+              this.provider.collections,
+            ).ensure(context, scope);
             const staged = await this.provider.stage(
               context,
               photos.map((photo) => {
@@ -578,6 +695,7 @@ export class ShopifyCatalogue {
               prepared.intent.handle,
               prepared.intent.marker,
               staged,
+              collectionId,
             );
             await scope.update((shop) => {
               const intent = intentFor(shop, id);
@@ -624,6 +742,7 @@ export class ShopifyCatalogue {
             await scope.update((shop) =>
               reconcile(intentFor(shop, id), readback, this.auth.clock()),
             );
+          await this.verifyCollection(context, scope, id);
           return this.result(scope, id);
         } catch (error) {
           await scope.update((shop) => {
@@ -651,6 +770,25 @@ export class ShopifyCatalogue {
         }
       },
     );
+  }
+  private async verifyCollection(
+    context: ProductContext,
+    scope: ShopifyScope,
+    id: string,
+  ) {
+    const intent = await scope.update((shop) =>
+      structuredClone(intentFor(shop, id)),
+    );
+    if (intent.state !== "ready" || !intent.remoteId) return;
+    await scope.update((shop) => {
+      intentFor(shop, id).state = "checking_outcome";
+    });
+    const contains = await new ShopifyCollection(
+      this.provider.collections,
+    ).contains(context, scope, intent.remoteId);
+    await scope.update((shop) => {
+      intentFor(shop, id).state = contains ? "ready" : "needs_attention";
+    });
   }
   private result(scope: ShopifyScope, id: string) {
     return scope.update((shop) => ({
@@ -690,6 +828,11 @@ export class ShopifyCatalogue {
               ? "needs_attention"
               : "checking_outcome";
           });
+        await this.verifyCollection(
+          this.context(installation.shop, tokens.access, signal, scope),
+          scope,
+          id,
+        );
         return this.result(scope, id);
       },
     );
