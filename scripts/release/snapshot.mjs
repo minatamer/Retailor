@@ -21,6 +21,7 @@ const identityAssets = new Set([
   "apps/frontend/public/favicon.ico",
   "apps/frontend/public/favicon-96.png",
   "apps/frontend/public/apple-touch-icon.png",
+  "apps/frontend/public/integrations/shopify-logo.svg",
 ]);
 const logoAssets = new Set([
   "apps/backend/scripts/copy-logo-fonts.mjs",
