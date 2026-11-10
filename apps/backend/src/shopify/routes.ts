@@ -7,6 +7,8 @@ import {
   ShopifyExportInputSchema,
   ShopifyExportControlSchema,
   ShopifySimulationSchema,
+  ShopifyImportInputSchema,
+  ShopifyCollectionBrowseSchema,
 } from "@retailor/contracts/shopify";
 import { deny } from "../security/errors.js";
 import { shopifyCookie, SHOPIFY_COOKIE } from "./service.js";
@@ -82,7 +84,14 @@ export function shopifyRoutes(
       },
     );
   }
-  for (const operation of ["products", "export", "update", "check"] as const) {
+  for (const operation of [
+    "products",
+    "collections",
+    "import",
+    "export",
+    "update",
+    "check",
+  ] as const) {
     app.post(
       `/v1/shopify/${operation}`,
       express.json({
@@ -103,7 +112,11 @@ export function shopifyRoutes(
         const owner = new AbortController(),
           timer = setTimeout(
             () => owner.abort(),
-            operation === "export" || operation === "update" ? 120000 : 25000,
+            operation === "export" ||
+              operation === "update" ||
+              operation === "import"
+              ? 120000
+              : 25000,
           );
         const abort = () => owner.abort();
         res.once("close", abort);
@@ -117,6 +130,27 @@ export function shopifyRoutes(
               proof,
               input.data.workspaceId,
               input.data.cursor,
+              owner.signal,
+              input.data.collectionId ?? null,
+            );
+          } else if (operation === "collections") {
+            const input = ShopifyCollectionBrowseSchema.safeParse(req.body);
+            if (!input.success) return deny("INVALID_INPUT", 400);
+            result = await catalogue.collections(
+              cookie,
+              proof,
+              input.data.workspaceId,
+              input.data.cursor,
+              owner.signal,
+            );
+          } else if (operation === "import") {
+            const input = ShopifyImportInputSchema.safeParse(req.body);
+            if (!input.success) return deny("INVALID_INPUT", 400);
+            result = await catalogue.importProduct(
+              cookie,
+              proof,
+              input.data.workspaceId,
+              input.data.productId,
               owner.signal,
             );
           } else if (operation === "check") {
