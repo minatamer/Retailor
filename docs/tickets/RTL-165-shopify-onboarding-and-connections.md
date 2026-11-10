@@ -1,0 +1,45 @@
+# RTL-165 — Optional Shopify onboarding and dashboard Connections
+
+## Status, dependency and authority
+
+**Independent local implementation validated — 10 November 2026.** All six gates pass (772 tests/118 files,229 boundary modules), complete-ticket read-only review is clean, and actual desktop/tablet/phone simulation journeys verify onboarding, dashboard management, explicit exports/update/removal and cleanup feedback. [Actual progress/evidence](../validation/RTL-165.md) separates simulation from pending native Shopify, physical-device and hosted acceptance. RTL-166 completes integrated verification and the local handoff; unsupported outside-user installs remain unverified.
+
+## Problem and result
+
+There is currently no Connections tab. Accepting the first design immediately enters the storefront. Add the owner's optional Connect/Skip step **after accepting the first look and before showing the storefront**, and a permanent owner-dashboard Connections view for connecting later, inspecting Shopify products, managing explicit draft exports and disconnecting with cleanup. Keep the existing complete guest experience.
+
+## Precision references and allocation
+
+Read the complete [Shopify plan](../engineering/SHOPIFY-DEMO-INTEGRATION-PLAN.md), settled RTL-162–164 contracts/statuses, [lifecycle](../engineering/LIFECYCLE.md), current dashboard/tour/focus conventions and frontend `AGENTS.md`/installed Next docs. Inspect current `apps/frontend/src/features/session/controller.ts`, `projection.ts`, `context.tsx`; `features/dashboard/owner-navigation.tsx`, `owner-workspace.tsx`; `features/operations/state.ts`; and the actual demo/style render entry points. Choreograph `apps/frontend/components/crm-controls.tsx` and demo entry are interaction inspiration, not a UI asset source.
+
+Create `docs/commit-plans/RTL-165.md` with exact paths before changes. Allocate a bounded Shopify UI/request child under frontend features, session-controller/state/projection compatibility, dashboard view union/navigation/content, onboarding stage/rendering, targeted styles/tour adjustments, useful behavioral tests, operations/design notes and `docs/validation/RTL-165.md`. All business/session state remains owned by the one controller; do not build a parallel product graph.
+
+## Implementation contract
+
+1. Route the first successful `acceptDesign()` through the optional connection step. Preserve the accepted look/photos and design confirmation. Connect and Skip/Continue without Shopify are equally clear keyboard/touch actions. The storefront tour starts only after leaving this step; dashboard Personalize edits do not reinsert onboarding or restart tours.
+2. Explain this is a Shopify **test store** connection for draft demo products, separate from Retailor's temporary preview. Native Shopify login/consent requires no visitor API keys. Disclose what is read/shared, that connection creates nothing, two-hour/session cleanup and access-loss limitations. Keep technical provider setup out of the visitor's ordinary flow.
+3. Handle unconfigured, unsupported audience, authorizing, denial/cancelled, callback return, expired/stale attempt, interrupted navigation and success. A failed connection never destroys the catalogue or blocks Skip. Preserve the pre-redirect tab projection/photos using the existing recovery model; if storage cannot safely resume, prevent departure and offer Skip. Same-tab return resumes the original unexpired session with server revalidation of cookie/tab proof; another tab or missing session cannot adopt authority. Older/unsealed restored sessions keep the guest flow and explain that connecting needs a new demo. Use fixed internal return context, not arbitrary return URLs.
+4. Add Connections after Personalize in desktop/mobile owner navigation and all required view schemas/renderers. One Shopify card offers Connect later, verified shop name, safe status, session-created product counts and useful request references. It must not imply other unavailable integrations exist. Dashboard navigation/view state survives eligible refresh without reviving pending consent or a write.
+5. Provide catalogue Read/Refresh with bounded pagination and distinct existing-vs-session-created products. Show safe currency/status/image/variant summaries and empty/loading/error/retry states. Existing products have no update/delete controls. Reading does not import products, trigger AI, change the local bag/ledger or create a Shopify-powered checkout.
+6. Provide an explicit selection/review for exporting local garments, field/photo/variant/price preview and draft-only confirmation. Read back each result with exact safe Shopify admin link. Update only recorded session drafts after a fresh review; selected Remove and whole Disconnect each explain which owned items will be removed. Existing merchant products never become mutation targets. No auto-sync on local edits/refresh, duplicate button dispatch or implicit initial export.
+7. Render per-item partial/unknown/media-processing and cleanup outcomes accurately. Disconnect disables new writes immediately, shows removal pending and reports uninstall separately when necessary. A revoked connection offers manual cleanup of known demo IDs and safe reconnect within retention; do not say “all removed” without confirmation. Keep local reset usable with RTL-164's durable/backstop behavior.
+8. Keep a bounded polling schedule only while the relevant screen/operation is active, respecting the plan's read/dispatch limits and Retry-After. Abort/fence on reset/navigation/dispose; no hidden export/retry loops or stale replies attaching to a replacement workspace. Restored labels are provisional until status is verified. Exported local reports contain no credentials, OAuth state or external authority.
+9. Preserve designed motion, mobile fit, focus restoration, pending button feedback, live-region status, dialogs/confirmation and accessible external links. No animation-off/OS suppression. Keep photo requirements, exact commerce, Stripe sandbox/return, currency, owner/customer views, chat, logos and existing tours intact. If RTL-158/159 land first, reconcile actual temporary routes/analytics consent and never track shop IDs, URLs, products or OAuth query data.
+
+## Acceptance and meaningful tests
+
+| Journey                                                                                | Expected behavior                                                                                                                       |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| New guest with no app configured; configured guest chooses Skip                        | Accepted storefront opens normally; tour starts once; no Shopify HTTP or writes from Skip.                                              |
+| Connect succeeds/denied/blocked, callback refresh, lost storage/expired workspace      | Original state safely resumes or useful Continue without Shopify; no phantom connection, regenerated catalogue or cross-tab attachment. |
+| Skip then dashboard Connect, switch views/roles, edit Personalize                      | Connections reachable on small/large screens; onboarding does not repeat; no shopper authority to merchant operations.                  |
+| Read empty/existing catalogue; export multiple variants/photos; update/remove          | Correct destination and explicit reviews; bounded pagination; owned-only actions and honest per-item outcomes.                          |
+| Double submit, stale response, reset mid-write, provider 429, disconnected/uninstalled | Server lifecycle respected; no duplicate export, false cleanup, broken local reset or stale session updates.                            |
+| Restore older projection, storage-degraded mode, Stripe checkout return                | Backward-compatible existing guest flow; connection authority is revalidated; no unrelated return-route regression.                     |
+| Keyboard/touch/focus/narrow width and status changes                                   | Operable controls and confirmation; readable feedback; actual changed-build responsive/motion evidence.                                 |
+
+Use focused controller/request/route tests for meaningful transitions and fences, then all six repository gates. Perform actual browser checks on the changed local build at representative phone/tablet/desktop sizes with explicit fixtures as needed; record what was simulated. Do not claim native Shopify consent/API success from a fixture screen.
+
+## Validation and handoff
+
+Record commands, environment/build identity, actual responsive journeys and complete-ticket settled read-only review in `docs/validation/RTL-165.md`. Update design/operator docs only to describe implemented behavior and pending native/distribution checks. No hosted publication or public Shopify marketing claim belongs to this UI ticket alone.
