@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-11-10T14:42:26.788Z",
+  "source": {
+    "baseRevision": "436f15b3605335538b1c535f795871e254ed12dc",
+    "dirtyWhenVerified": true,
+    "fingerprint": "6a5206b380a8af0f604ad7d300e10726733954c447e74337ec4b8aa43604a7f8",
+    "appInputFiles": 328,
+    "qualityInputFilesCompared": 481,
+    "exactHostContextBytes": true,
+    "normalization": false,
+    "nonLFBuildInputs": []
+  },
+  "image": {
+    "id": "sha256:e89973b2a389d8701d58d8f8089d71f89a0dce5c86cf3b8e5c77dd955c2802e0",
+    "os": "linux",
+    "architecture": "amd64"
+  },
+  "observed": {
+    "platform": "linux",
+    "node": "v24.19.0",
+    "pnpm": "11.25.0",
+    "temporaryGitRevision": "0ed1b04f16c25a73e9914ab513290c512df1d1bf",
+    "fingerprint": "6a5206b380a8af0f604ad7d300e10726733954c447e74337ec4b8aa43604a7f8",
+    "matchesLocalLinuxEvidence": true,
+    "paidRequests": 0,
+    "networkRequests": 0,
+    "publicReleaseAccepted": false,
+    "publicationAuthorized": false
+  },
+  "commands": [
+    "pnpm install --frozen-lockfile",
+    "pnpm check",
+    "node scripts/release/preflight.mjs"
+  ],
+  "gates": {
+    "format": true,
+    "lint": true,
+    "typecheck": true,
+    "boundaries": {
+      "passed": true,
+      "modules": 229
+    },
+    "unit": {
+      "passed": true,
+      "tests": 773,
+      "files": 118,
+      "seconds": 154.21
+    },
+    "productionBuild": true
+  },
+  "network": {
+    "install": "Official registry during image preparation",
+    "gates": "none",
+    "verification": "none"
+  },
+  "originalGitMetadata": false,
+  "localEnvironment": false,
+  "copiedFiles": 1481,
+  "rawBuildLogSha256": "945369847c0d757a9d014fc7d3c116310ea140242656afb3342c121e90c66960",
+  "verificationDockerfileSha256": "228f9d47c4ebe8cdace261d017565785275b9bc56aaf8b282a401f53ccd79f01",
+  "limitations": [
+    "Actual local Linux, not a GitHub job or hosted/native Shopify acceptance",
+    "Initial full run had two five-second timeouts; both pass isolated with unchanged limits, then complete unchanged full rerun passes",
+    "Build warning names explicitly blank OPENAI_API_KEY test ENV; no secret supplied",
+    "OS scanner requires owner Docker login; npm dependency findings are separate"
+  ]
+}

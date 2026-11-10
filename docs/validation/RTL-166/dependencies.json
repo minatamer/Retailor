@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-11-10T14:21:16.989772+00:00",
+  "scope": "Public npm dependency metadata; no account/provider request, OS scan or suppression",
+  "reports": {
+    "production": {
+      "command": "pnpm audit --prod --json",
+      "rawSha256": "cb5b7b633d16be7a6a5090e4b0b175fff15c2ebdbc50ab044614db5d6f3ab265",
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 1,
+          "high": 2,
+          "critical": 0
+        },
+        "dependencies": 141,
+        "devDependencies": 0,
+        "optionalDependencies": 71,
+        "totalDependencies": 212
+      },
+      "advisories": [
+        {
+          "module": "zod",
+          "severity": "high",
+          "url": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+          "vulnerableVersions": "<4.6.6",
+          "patchedVersions": ">=4.6.6"
+        },
+        {
+          "module": "body-parser",
+          "severity": "high",
+          "url": "https://github.com/advisories/GHSA-27r3-jxmh-p828",
+          "vulnerableVersions": ">=2.0.0 <2.4.0",
+          "patchedVersions": ">=2.4.0"
+        },
+        {
+          "module": "qs",
+          "severity": "moderate",
+          "url": "https://github.com/advisories/GHSA-6pq8-jhm2-2vcw",
+          "vulnerableVersions": ">=6.7.0 <=6.16.0",
+          "patchedVersions": ">=6.16.1"
+        }
+      ]
+    },
+    "production-after": {
+      "command": "pnpm audit --prod --json",
+      "rawSha256": "58342ca551b270573050b73bc7d75ade3687e4bf9ce1b5b6c17fb0a90238e648",
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 1,
+          "high": 1,
+          "critical": 0
+        },
+        "dependencies": 141,
+        "devDependencies": 0,
+        "optionalDependencies": 71,
+        "totalDependencies": 212
+      },
+      "advisories": [
+        {
+          "module": "body-parser",
+          "severity": "high",
+          "url": "https://github.com/advisories/GHSA-27r3-jxmh-p828",
+          "vulnerableVersions": ">=2.0.0 <2.4.0",
+          "patchedVersions": ">=2.4.0"
+        },
+        {
+          "module": "qs",
+          "severity": "moderate",
+          "url": "https://github.com/advisories/GHSA-6pq8-jhm2-2vcw",
+          "vulnerableVersions": ">=6.7.0 <=6.16.0",
+          "patchedVersions": ">=6.16.1"
+        }
+      ]
+    },
+    "all-after": {
+      "command": "pnpm audit --json",
+      "rawSha256": "13463dce85ae2cc0a0aff90e61b37c6df5a8481d6ecb62b7a5151ecea0b14ee4",
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 2,
+          "high": 1,
+          "critical": 0
+        },
+        "dependencies": 177,
+        "devDependencies": 230,
+        "optionalDependencies": 88,
+        "totalDependencies": 442
+      },
+      "advisories": [
+        {
+          "module": "body-parser",
+          "severity": "high",
+          "url": "https://github.com/advisories/GHSA-27r3-jxmh-p828",
+          "vulnerableVersions": ">=2.0.0 <2.4.0",
+          "patchedVersions": ">=2.4.0"
+        },
+        {
+          "module": "qs",
+          "severity": "moderate",
+          "url": "https://github.com/advisories/GHSA-6pq8-jhm2-2vcw",
+          "vulnerableVersions": ">=6.7.0 <=6.16.0",
+          "patchedVersions": ">=6.16.1"
+        },
+        {
+          "module": "minimatch",
+          "severity": "moderate",
+          "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+          "vulnerableVersions": ">=7.0.0 <11.0.1",
+          "patchedVersions": ">=11.0.1"
+        }
+      ]
+    }
+  },
+  "dispositions": {
+    "zod": "Reproduced 1025 validation issues for 1024 invalid Shopify variants, fixed by exact 4.6.6; regression now passes.",
+    "body-parser": "Remaining High match; vendor inflate:false workaround is already enforced by Shopify parsers plus encoded-body ingress rejection. Not declared patched.",
+    "qs": "Remaining Moderate; no caller-controlled comma-format stringify operation in integration. Not declared patched.",
+    "minimatch": "Remaining Moderate development tool match; fixed trusted lint/build patterns, no new visitor-supplied pattern path. Not declared patched."
+  },
+  "osScanner": {
+    "tool": "Docker Scout 1.24.0",
+    "result": "Login required, exit 1 before report",
+    "freshScanPassed": false,
+    "ownerPrerequisite": "Owner Docker login/authorized scan; no automatic login or account change attempted"
+  }
+}
