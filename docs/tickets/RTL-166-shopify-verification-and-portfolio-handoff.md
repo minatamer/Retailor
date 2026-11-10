@@ -1,5 +1,7 @@
 # RTL-166 — Verify Shopify integration and prepare the portfolio handoff
 
+Later owner instruction: use ordinary local HTTP, source-controlled non-secret Shopify settings and blank backend secret fields. [Complete setup guide](../operations/SHOPIFY-LOCAL-SETUP.md) and [current follow-up validation](../validation/RTL-166-SETUP.md) supersede earlier environment-selection instructions and keep changed-source Linux/image/native acceptance pending.
+
 Subsequent owner instruction,10 November2026: the validated work is authorized for [27 ticket-prefixed commits](../validation/RTL-166-COMMITS.md) before native setup guidance. This changes packaging authority only; external acceptance below remains pending.
 
 ## Status, dependency and authority
