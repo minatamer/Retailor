@@ -3,7 +3,12 @@ import sharp from "sharp";
 import { PHOTO_LIMITS } from "@retailor/contracts/photos";
 sharp.cache(false);
 sharp.concurrency(1);
-const task = workerData as { bytes: Uint8Array; width: number; height: number };
+const task = workerData as {
+  bytes: Uint8Array;
+  width: number;
+  height: number;
+  stripMetadata?: boolean;
+};
 try {
   const worker = sharp(task.bytes, {
     limitInputPixels: PHOTO_LIMITS.derivativeSide ** 2,
@@ -15,9 +20,7 @@ try {
     metadata.width !== task.width ||
     metadata.height !== task.height ||
     (metadata.pages ?? 1) !== 1 ||
-    metadata.exif ||
-    metadata.xmp ||
-    metadata.iptc
+    (!task.stripMetadata && (metadata.exif || metadata.xmp || metadata.iptc))
   )
     throw new Error("Invalid raster");
   let buffer = await worker.clone().rotate().webp({ quality: 85 }).toBuffer();
