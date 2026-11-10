@@ -51,6 +51,7 @@ it("keeps ordered hero choices, hidden Studio slot, dirty protection and restore
   controller.useCurrentLook();
   controller.keepWordmark();
   controller.acceptDesign();
+  controller.continueFromConnection();
   const restored = await env.open();
   expect(heroPhotoIds(restored.getSnapshot().state.acceptedDesign)).toEqual(
     expected,

@@ -150,6 +150,7 @@ describe("automatic grouping within the existing session and commerce authority"
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     const product = controller.getSnapshot().state.graph.products[0]!;
     const black = product.variants.find(
       (variant) => variant.colour === "Black" && variant.size === "30/30",

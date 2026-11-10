@@ -88,6 +88,9 @@ import type { Photo } from "@retailor/contracts/photos";
 import { CommandSchema } from "@retailor/contracts/commands";
 import type { CommerceCommand } from "@retailor/contracts/commands";
 import type { ProductInput } from "@retailor/contracts/product";
+import { ShopifyController, emptyShopifyView } from "../shopify/controller";
+import type { ShopifyView } from "../shopify/controller";
+import type { ShopifyRequester } from "../shopify/request";
 import { ProductInputSchema } from "@retailor/contracts/product";
 import {
   canRemoveSizeOption,
@@ -188,6 +191,8 @@ export interface CatalogueProcessor {
   }): Promise<CatalogueDraft>;
 }
 interface SessionOptions {
+  shopifyRequest?: ShopifyRequester;
+  shopifyNavigate?: (url: string) => void;
   checkoutRequest?: CheckoutRequester;
   checkoutNavigate?: (url: string) => void;
   download?: DownloadPort;
@@ -216,6 +221,7 @@ export type ScenarioReview = ReturnType<typeof generateScenario> & {
   photoWitness: string;
 };
 export interface SessionSnapshot {
+  shopify: ShopifyView;
   checkoutBusy: boolean;
   checkoutAvailable: boolean | null;
   checkoutNotice: string;
@@ -266,6 +272,7 @@ export interface SessionSnapshot {
 }
 /** The single owner of workflow/domain/presentation; photo resources remain its owned child. */
 export class SessionController {
+  private shopify: ShopifyController | undefined;
   private readonly clock: () => number;
   private readonly id: () => string;
   private readonly owner: string;
@@ -299,6 +306,7 @@ export class SessionController {
     this.download = new ReportDownload(options.download);
     options.signal?.addEventListener("abort", this.aborted, { once: true });
     this.snapshot = {
+      shopify: emptyShopifyView(),
       checkoutBusy: false,
       checkoutAvailable: null,
       checkoutNotice: "",
@@ -364,6 +372,7 @@ export class SessionController {
       browse: structuredClone(INITIAL_BROWSE),
       setup: structuredClone(INITIAL_SETUP),
       hasAcceptedLook: false,
+      shopifyChoice: "pending",
       tourSeen: { preview: false, storefront: false },
       designEditing: false,
       currency: structuredClone(INITIAL_CURRENCY),
@@ -463,6 +472,7 @@ export class SessionController {
         .filter((photo) => !this.photos?.availableIds().has(photo.id))
         .map((photo) => photo.id),
     };
+    this.shopify?.invalidate();
     if (persist && this.snapshot.ready) this.persist();
     for (const listener of this.listeners) listener();
   }
@@ -558,6 +568,150 @@ export class SessionController {
         : "",
     });
     this.timer = setInterval(() => this.checkExpiry(), 5000);
+    this.startShopify();
+  }
+  private startShopify() {
+    if (!this.options.shopifyRequest || !this.active) return;
+    const graph = this.snapshot.state.graph;
+    this.shopify = new ShopifyController(
+      {
+        workspaceId: graph.workspaceId,
+        createdAt: Date.parse(graph.createdAt),
+        expiresAt: Date.parse(graph.expiresAt),
+        revision: () => this.snapshot.state.graph.revision,
+      },
+      this.options.shopifyRequest,
+      (shopify) => this.update({ shopify }, false),
+      this.options.storage,
+      this.options.shopifyNavigate,
+      this.clock,
+    );
+    void this.shopify.initialize();
+  }
+  private canManageShopify() {
+    return (
+      this.valid() &&
+      (this.snapshot.state.stage === "connect" ||
+        (this.snapshot.state.stage === "dashboard" &&
+          this.snapshot.state.ownerView === "connections"))
+    );
+  }
+  shopifyVisible(visible: boolean) {
+    this.shopify?.visible(visible && this.canManageShopify());
+  }
+  refreshShopify() {
+    if (this.canManageShopify()) return this.shopify?.refresh();
+  }
+  readShopify(next = false) {
+    if (this.canManageShopify()) return this.shopify?.browse(next);
+  }
+  simulateShopify(approved: boolean) {
+    if (this.canManageShopify()) return this.shopify?.consent(approved);
+  }
+  connectShopify(shop: string) {
+    if (!this.canManageShopify()) return;
+    const returnTo =
+      this.snapshot.state.stage === "connect" ? "onboarding" : "connections";
+    return this.shopify?.connect(shop, returnTo, async (signal) => {
+      const state = this.snapshot.state;
+      if (
+        !this.options.storage ||
+        !(await this.photos.checkpoint(
+          state.photos.map((photo) => photo.id),
+          signal,
+        )) ||
+        !this.canManageShopify() ||
+        state !== this.snapshot.state
+      )
+        return false;
+      try {
+        const encoded = serializeProjection(state, this.clock());
+        this.options.storage.setItem(SESSION_KEY, encoded);
+        return this.options.storage.getItem(SESSION_KEY) === encoded;
+      } catch {
+        return false;
+      }
+    });
+  }
+  reviewShopify(ids: string[], update = false) {
+    if (
+      !this.canManageShopify() ||
+      !ids.length ||
+      ids.length > 10 ||
+      new Set(ids).size !== ids.length
+    )
+      return;
+    const products = ids.map((id) =>
+      this.snapshot.state.graph.products.find(
+        (product) => product.id === id && !product.archived,
+      ),
+    );
+    if (
+      products.some(
+        (product) =>
+          !product ||
+          product.imageIds.some((id) => !this.photos.availableIds().has(id)),
+      )
+    ) {
+      this.shopify?.missingPhotos();
+      return;
+    }
+    this.shopify?.prepare(
+      products.filter((product) => !!product),
+      update,
+    );
+  }
+  cancelShopifyReview() {
+    this.shopify?.cancelReview();
+  }
+  confirmShopify() {
+    if (!this.canManageShopify()) return;
+    return this.shopify?.confirm(async (product, revision, signal) => {
+      if (
+        !this.canManageShopify() ||
+        this.snapshot.state.graph.revision !== revision
+      )
+        throw new ApiRequestError("STALE");
+      const photos = [];
+      for (const id of product.imageIds) {
+        const photo = this.photos.get(id);
+        if (!photo || !this.photos.availableIds().has(id))
+          throw new ApiRequestError("STALE");
+        photos.push({
+          image: photo.photo.derivative,
+          base64: await checkoutBase64(photo.derivative, signal),
+        });
+      }
+      return {
+        schemaVersion: 1,
+        workspaceId: this.snapshot.state.graph.workspaceId,
+        revision,
+        product,
+        photos,
+      };
+    });
+  }
+  checkShopify(exportId: string) {
+    if (this.canManageShopify()) return this.shopify?.check(exportId);
+  }
+  removeShopify(exportId: string) {
+    if (this.canManageShopify()) return this.shopify?.remove(exportId);
+  }
+  disconnectShopify() {
+    if (this.canManageShopify()) return this.shopify?.disconnect();
+  }
+  async resumeShopify(
+    outcome: "connected" | "cancelled" | "needs_attention",
+    returnTo: "onboarding" | "connections",
+  ) {
+    if (!this.valid()) return;
+    if (
+      returnTo === "connections" &&
+      this.snapshot.state.hasAcceptedLook &&
+      this.snapshot.state.stage !== "connect"
+    )
+      this.state({ stage: "dashboard", ownerView: "connections" });
+    await this.shopify?.resume(outcome);
   }
   private async attachPhotos(): Promise<void> {
     if (!this.active) return;
@@ -2918,6 +3072,7 @@ export class SessionController {
       process: [],
       catalogue: ["choose"],
       style: ["catalogue", "storefront"],
+      connect: [],
       storefront: ["style", "dashboard", "catalogue"],
       dashboard: ["storefront", "style", "catalogue"],
     };
@@ -3104,16 +3259,35 @@ export class SessionController {
       return;
     this.cancelOperation();
     this.photos.cancel();
+    const firstLook = !this.snapshot.state.hasAcceptedLook;
     this.state({
       acceptedDesign: this.snapshot.state.previewDesign,
       presentationRevision: this.snapshot.state.presentationRevision + 1,
-      stage: "storefront",
+      stage: firstLook ? "connect" : "storefront",
       hasAcceptedLook: true,
       setup: { ...this.snapshot.state.setup, expanded: false },
       designEditing: false,
     });
     this.protectDesignPhotos();
     this.update({ preparedLogo: null, heroBusy: false }, false);
+    if (!firstLook && !this.snapshot.state.tourSeen.storefront) {
+      this.state({
+        tourSeen: { ...this.snapshot.state.tourSeen, storefront: true },
+      });
+      this.startTour(4);
+    }
+  }
+  continueFromConnection() {
+    if (!this.valid() || this.snapshot.state.stage !== "connect") return;
+    this.shopify?.visible(false);
+    this.state({
+      stage: "storefront",
+      shopifyChoice:
+        this.snapshot.shopify.verified &&
+        this.snapshot.shopify.status?.state === "connected"
+          ? "connected"
+          : "skipped",
+    });
     if (!this.snapshot.state.tourSeen.storefront) {
       this.state({
         tourSeen: { ...this.snapshot.state.tourSeen, storefront: true },
@@ -4264,6 +4438,8 @@ export class SessionController {
   async reset(notice = "") {
     if (!this.active || this.resetting) return;
     this.resetting = true;
+    const endingShopify = this.shopify?.endAndDetach();
+    this.shopify = undefined;
     this.cancelOperation();
     const generation = this.generation;
     this.download.clear();
@@ -4271,6 +4447,7 @@ export class SessionController {
     this.unlistenPhotos?.();
     this.unlistenPhotos = undefined;
     this.update({
+      shopify: emptyShopifyView(),
       logoBusy: false,
       checkoutBusy: false,
       checkoutAvailable: null,
@@ -4320,8 +4497,13 @@ export class SessionController {
         "This demo was cleared from memory. Earlier cached bytes could not be removed and retain their original fixed expiry.",
       );
     previous.dispose();
+    if (endingShopify && !(await endingShopify))
+      cleanupNotices.push(
+        "Shopify cleanup could not be confirmed. Its original server expiry remains the backstop; manual removal may be needed if access is lost.",
+      );
     this.snapshot.state = this.fresh();
     await this.attachPhotos();
+    this.startShopify();
     this.resetting = false;
     if (this.active) {
       const recoveryNotice = [...cleanupNotices, this.snapshot.recoveryNotice]
@@ -4349,6 +4531,7 @@ export class SessionController {
     }
   }
   dispose() {
+    this.shopify?.dispose();
     this.checkoutOperation?.abort();
     this.checkoutCapability?.abort();
     this.active = false;

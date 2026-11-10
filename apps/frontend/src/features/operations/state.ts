@@ -26,6 +26,7 @@ export const OwnerViewSchema = z.enum([
   "traffic",
   "feedback",
   "design",
+  "connections",
 ]);
 export type OwnerView = z.infer<typeof OwnerViewSchema>;
 export const OWNER_OPERATION_TYPES = [

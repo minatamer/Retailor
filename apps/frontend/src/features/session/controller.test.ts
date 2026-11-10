@@ -89,6 +89,7 @@ describe("single workspace ownership and safe recovery", () => {
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     controller.go("dashboard");
     const graph = controller.getSnapshot().state.graph;
     controller.go("catalogue");
@@ -131,6 +132,7 @@ describe("single workspace ownership and safe recovery", () => {
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     controller.go("dashboard");
     controller.go("storefront");
     const restored = await env.open();
@@ -221,6 +223,7 @@ describe("single workspace ownership and safe recovery", () => {
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     controller.go("dashboard");
     controller.go("storefront");
     expect(controller.getSnapshot().state.graph).toBe(graph);

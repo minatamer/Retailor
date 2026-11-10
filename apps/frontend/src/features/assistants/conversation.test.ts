@@ -102,6 +102,7 @@ describe("one session owns scoped Tailor conversation", () => {
     c.useCurrentLook();
     c.keepWordmark();
     c.acceptDesign();
+    c.continueFromConnection();
     c.assistantInput("Show matching clothing");
     await c.sendAssistant();
     expect(c.getSnapshot().state.browse).toMatchObject({
@@ -147,6 +148,7 @@ describe("one session owns scoped Tailor conversation", () => {
     c.useCurrentLook();
     c.keepWordmark();
     c.acceptDesign();
+    c.continueFromConnection();
     c.go("dashboard");
     c.assistantInput("Summarize this period");
     const first = c.sendAssistant();
@@ -200,6 +202,7 @@ describe("one session owns scoped Tailor conversation", () => {
     c.useCurrentLook();
     c.keepWordmark();
     c.acceptDesign();
+    c.continueFromConnection();
     c.go("dashboard");
     c.assistantInput("Prepare a product");
     await c.sendAssistant();

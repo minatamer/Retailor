@@ -11,6 +11,7 @@ import { SessionController } from "./controller";
 import type { CatalogueProcessor } from "./controller";
 import type { AssistantRequester } from "../assistants/request";
 import type { LogoRequester } from "../logos/request";
+import { shopifyRequester } from "../shopify/request";
 import { Brand } from "../../components/ui/brand";
 import styles from "./context.module.css";
 const SessionContext = createContext<SessionController | null>(null);
@@ -44,6 +45,7 @@ export function SessionProvider({
       opening = new AbortController();
       void SessionController.open({
         fixtureAllowed,
+        shopifyRequest: shopifyRequester(),
         signal: opening.signal,
         ...(processor ? { processor } : {}),
         ...(assistantRequest ? { assistantRequest } : {}),
@@ -57,6 +59,28 @@ export function SessionProvider({
         owned = value;
         setController(value);
         const checkoutReturn = new URL(window.location.href);
+        const shopifyOutcome = checkoutReturn.searchParams.get("shopify");
+        const shopifyReturn = checkoutReturn.searchParams.get("shopifyReturn");
+        if (
+          (shopifyOutcome === "connected" ||
+            shopifyOutcome === "cancelled" ||
+            shopifyOutcome === "needs_attention") &&
+          (shopifyReturn === "onboarding" || shopifyReturn === "connections")
+        ) {
+          void value
+            .resumeShopify(shopifyOutcome, shopifyReturn)
+            .finally(() => {
+              if (disposed || current !== generation) return;
+              const clean = new URL(window.location.href);
+              clean.searchParams.delete("shopify");
+              clean.searchParams.delete("shopifyReturn");
+              window.history.replaceState(
+                window.history.state,
+                "",
+                `${clean.pathname}${clean.search}${clean.hash}`,
+              );
+            });
+        }
         const outcome = checkoutReturn.searchParams.get("checkout");
         const attempt = checkoutReturn.searchParams.get("attempt");
         if (attempt && (outcome === "success" || outcome === "cancel")) {
@@ -64,12 +88,13 @@ export function SessionProvider({
             .resumeStripeCheckout(attempt, outcome === "cancel")
             .finally(() => {
               if (disposed || current !== generation) return;
-              checkoutReturn.searchParams.delete("checkout");
-              checkoutReturn.searchParams.delete("attempt");
+              const clean = new URL(window.location.href);
+              clean.searchParams.delete("checkout");
+              clean.searchParams.delete("attempt");
               window.history.replaceState(
                 window.history.state,
                 "",
-                `${checkoutReturn.pathname}${checkoutReturn.search}${checkoutReturn.hash}`,
+                `${clean.pathname}${clean.search}${clean.hash}`,
               );
             });
         }

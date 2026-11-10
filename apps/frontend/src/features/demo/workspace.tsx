@@ -20,6 +20,7 @@ import { BagDialog } from "../bag/bag-dialog";
 import { selectedScope } from "../currency/display";
 import { OwnerWorkspace } from "../dashboard/owner-workspace";
 import { OwnerDesign } from "../store-design/owner-design";
+import { Connections } from "../shopify/connections";
 import { merchantStyle } from "../store-design/presets";
 import styles from "./workspace.module.css";
 export function Workspace({
@@ -116,7 +117,7 @@ function WorkspaceFlow() {
           state.stage === "style" && state.setup.expanded ? "true" : undefined
         }
       >
-        {!["storefront", "dashboard"].includes(state.stage) && (
+        {!["storefront", "dashboard", "connect"].includes(state.stage) && (
           <ol className={styles.steps} aria-label="Store creation progress">
             {["Photos", "Draft", "Review", "Personalize"].map(
               (label, index) => (
@@ -206,6 +207,7 @@ function WorkspaceFlow() {
           )}
           {state.stage === "process" && <Processing step={processStep} />}
           {state.stage === "catalogue" && <CatalogueReview />}
+          {state.stage === "connect" && <Connections onboarding />}
           {(state.stage === "style" || state.stage === "storefront") && (
             <div className={styles.styleLayout}>
               <CollectionCanvas />
@@ -291,7 +293,7 @@ function WorkspaceFlow() {
           </nav>
         )}
       </footer>
-      <Tailor />
+      {state.stage !== "connect" && <Tailor />}
       <BagDialog />
       <WorkspaceDialog />
     </main>

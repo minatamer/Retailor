@@ -43,6 +43,7 @@ export const StageSchema = z.enum([
   "process",
   "catalogue",
   "style",
+  "connect",
   "storefront",
   "dashboard",
 ]);
@@ -70,6 +71,7 @@ export const ProjectionSchema = z.strictObject({
   browse: BrowseSchema.default(INITIAL_BROWSE),
   setup: SetupSchema.default(INITIAL_SETUP),
   hasAcceptedLook: z.boolean().default(false),
+  shopifyChoice: z.enum(["pending", "skipped", "connected"]).default("skipped"),
   tourSeen: z
     .strictObject({ preview: z.boolean(), storefront: z.boolean() })
     .default({ preview: false, storefront: false }),
@@ -187,11 +189,13 @@ export function restoreProjection(
   if (state.stage === "catalogue" && !state.draft)
     throw new Error("The saved catalogue draft is missing.");
   if (
-    ["style", "storefront", "dashboard"].includes(state.stage) &&
+    ["style", "connect", "storefront", "dashboard"].includes(state.stage) &&
     !state.hasAcceptedLook &&
     !graph.products.some((product) => !product.archived)
   )
     throw new Error("The saved storefront has no usable catalogue.");
+  if (state.stage === "connect" && !state.hasAcceptedLook)
+    throw new Error("The saved connection step has no accepted look.");
   if (
     new Set(state.orderDisplays.map((item) => item.orderId)).size !==
       state.orderDisplays.length ||

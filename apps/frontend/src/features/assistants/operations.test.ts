@@ -43,6 +43,7 @@ async function setup(proposal: AssistantProposal) {
   controller.useCurrentLook();
   controller.keepWordmark();
   controller.acceptDesign();
+  controller.continueFromConnection();
   controller.go("dashboard");
   controller.assistantInput("Prepare this operation");
   await controller.sendAssistant();

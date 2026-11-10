@@ -5,7 +5,7 @@ import { selectedScope } from "../currency/display";
 import { USD_SCOPE } from "@retailor/contracts/currency";
 import { designConfirmed } from "./setup";
 export const roleOf = (state: Projection) =>
-  state.stage === "style"
+  state.stage === "style" || state.stage === "connect"
     ? ("creator" as const)
     : state.stage === "dashboard"
       ? ("owner" as const)

@@ -19,6 +19,7 @@ async function setup(realScenario = false) {
   controller.useCurrentLook();
   controller.keepWordmark();
   controller.acceptDesign();
+  controller.continueFromConnection();
   controller.go("dashboard");
   return { env, controller };
 }

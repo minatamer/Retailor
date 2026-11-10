@@ -36,6 +36,7 @@ async function setup(count = 2) {
   controller.useCurrentLook();
   controller.keepWordmark();
   controller.acceptDesign();
+  controller.continueFromConnection();
   return {
     env,
     controller,
@@ -403,6 +404,7 @@ describe("owned shopping, exact review and once-only placement", () => {
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     expect(controller.getSnapshot().state.shopping.visitId).toBeNull();
     expect(controller.getSnapshot().bagOpen).toBe(false);
     expect(controller.placeReviewed(review)).toBeUndefined();

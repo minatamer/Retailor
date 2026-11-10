@@ -1,4 +1,6 @@
 const paths = {
+  connections:
+    "M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-2 2 M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l2-2",
   arrow: "M5 12h14m-5-5 5 5-5 5",
   down: "M12 5v14m-5-5 5 5 5-5",
   expand: "M14 3h7v7 M21 3l-7 7 M10 21H3v-7 M3 21l7-7",

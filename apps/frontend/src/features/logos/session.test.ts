@@ -88,6 +88,7 @@ it("keeps local logo generation independent of AI operator attention and restore
   expect(logoRequest).toHaveBeenCalledOnce();
   controller.keepWordmark();
   controller.acceptDesign();
+  controller.continueFromConnection();
   expect(controller.getSnapshot().state.stage).toBe("storefront");
   expect(JSON.stringify(controller.getSnapshot().state.graph.products)).toBe(
     products,
@@ -234,6 +235,7 @@ it("blocks blank, whitespace, control and oversized names from every logo/procee
     controller.keepWordmark();
     controller.keepNamedWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     expect(controller.getSnapshot().state.stage).toBe("style");
     expect(controller.getSnapshot().state.setup.wordmarkKept).toBe(false);
     expect(controller.getSnapshot().preparedLogo).toBeNull();
@@ -245,6 +247,7 @@ it("blocks blank, whitespace, control and oversized names from every logo/procee
   controller.logoNameInput("Étude & Co");
   controller.keepNamedWordmark();
   controller.acceptDesign();
+  controller.continueFromConnection();
   expect(controller.getSnapshot().state.acceptedDesign.name).toBe("Étude & Co");
   expect(controller.getSnapshot().state.stage).toBe("storefront");
 });
@@ -285,6 +288,7 @@ it("renames the working image to its new wordmark while owner Cancel preserves a
   controller.previewLogo(candidate);
   controller.useLogo(candidate);
   controller.acceptDesign();
+  controller.continueFromConnection();
   controller.go("dashboard");
   controller.beginOwnerDesign();
   const accepted = controller.getSnapshot().state.acceptedDesign;
@@ -326,6 +330,7 @@ it("offers preparation only after explicit type and colour, requires human revie
   controller.reviewLogo(id, true);
   controller.useLogo(id);
   controller.acceptDesign();
+  controller.continueFromConnection();
   expect(controller.getSnapshot().state.acceptedDesign.logoId).toBe(id);
   controller.go("dashboard");
   controller.beginOwnerDesign();

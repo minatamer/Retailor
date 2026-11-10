@@ -37,6 +37,7 @@ describe("Tailor finite styling and owner authority", () => {
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     expect(controller.getSnapshot().state.acceptedDesign.theme).toBe("pine");
     controller.go("dashboard");
     controller.beginOwnerDesign();
@@ -112,12 +113,15 @@ describe("Tailor finite styling and owner authority", () => {
   it("finishes without typing using explicit default approval, wordmark and final acceptance", async () => {
     const { controller, graph } = await openStore();
     controller.acceptDesign();
+    controller.continueFromConnection();
     expect(controller.getSnapshot().state.stage).toBe("style");
     controller.useCurrentLook();
     controller.acceptDesign();
+    controller.continueFromConnection();
     expect(controller.getSnapshot().state.stage).toBe("style");
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     expect(controller.getSnapshot().state.stage).toBe("storefront");
     expect(controller.getSnapshot().state.hasAcceptedLook).toBe(true);
     expect(controller.getSnapshot().state.graph).toBe(graph);
@@ -174,6 +178,7 @@ describe("Tailor finite styling and owner authority", () => {
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     controller.go("dashboard");
     controller.beginOwnerDesign();
     controller.brandInput({ name: "FORME", headline: "Your next chapter." });

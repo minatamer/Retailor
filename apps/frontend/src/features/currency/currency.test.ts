@@ -38,6 +38,7 @@ async function openStore(
   controller.useCurrentLook();
   controller.keepWordmark();
   controller.acceptDesign();
+  controller.continueFromConnection();
   return {
     env,
     controller,
@@ -99,6 +100,7 @@ async function storeWithPlacedOrder(advance = 0, rateDate = "2026-10-05") {
   controller.useCurrentLook();
   controller.keepWordmark();
   controller.acceptDesign();
+  controller.continueFromConnection();
   await controller.selectCurrency("EUR");
   return { env, controller };
 }
@@ -369,6 +371,7 @@ describe("one accepted currency display snapshot", () => {
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     await controller.selectCurrency("EUR");
     const scope = selectedScope(controller.getSnapshot().state.currency);
     expect(displayMinor(1, scope)).toBe(1);

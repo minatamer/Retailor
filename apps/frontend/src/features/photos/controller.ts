@@ -296,6 +296,29 @@ export class PhotoController {
   get(id: string): StoredPhoto | undefined {
     return this.entries.get(id);
   }
+  async checkpoint(ids: readonly string[], signal: AbortSignal) {
+    const generation = this.generation;
+    signal.throwIfAborted();
+    await this.cache.heartbeat();
+    const cached = await this.cache.read();
+    signal.throwIfAborted();
+    return (
+      this.active &&
+      generation === this.generation &&
+      ids.every((id) => {
+        const current = this.entries.get(id),
+          saved = cached.photos.find((row) => row.photo.id === id);
+        return (
+          current &&
+          saved &&
+          !this.failedIds.has(id) &&
+          JSON.stringify(current.photo) === JSON.stringify(saved.photo) &&
+          saved.original.size === saved.photo.source.bytes &&
+          saved.derivative.size === saved.photo.derivative.bytes
+        );
+      })
+    );
+  }
   view(id: string): PhotoView | undefined {
     if (this.failedIds.has(id)) return undefined;
     const item = this.entries.get(id);

@@ -53,6 +53,7 @@ async function setup() {
   controller.useCurrentLook();
   controller.keepWordmark();
   controller.acceptDesign();
+  controller.continueFromConnection();
   const product = controller.getSnapshot().state.graph.products[0]!;
   controller.addToBag(product.id, product.variants[0]!.id, 2);
   return { env, port, navigate, controller, product };

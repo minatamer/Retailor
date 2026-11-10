@@ -21,6 +21,7 @@ async function collection() {
   controller.useCurrentLook();
   controller.keepWordmark();
   controller.acceptDesign();
+  controller.continueFromConnection();
   return { env, controller };
 }
 it("exports all accepted hero metadata with the legacy first photo and no preview or image bytes", async () => {

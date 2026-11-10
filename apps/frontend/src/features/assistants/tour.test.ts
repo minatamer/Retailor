@@ -39,6 +39,7 @@ describe("session-owned demo orientation", () => {
     c.useCurrentLook();
     c.keepWordmark();
     c.acceptDesign();
+    c.continueFromConnection();
     c.finishTour();
     c.go("dashboard");
     c.ownerNavigate("expenses");
@@ -83,6 +84,7 @@ describe("session-owned demo orientation", () => {
     c.useCurrentLook();
     c.keepWordmark();
     c.acceptDesign();
+    c.continueFromConnection();
     expect(c.getSnapshot().tour).toEqual({
       role: "shopper",
       index: 4,
@@ -102,6 +104,7 @@ describe("session-owned demo orientation", () => {
     expect(c.getSnapshot().tour).toBeNull();
     c.go("style");
     c.acceptDesign();
+    c.continueFromConnection();
     expect(c.getSnapshot().tour).toBeNull();
     c.askReset();
     c.closeDialog();

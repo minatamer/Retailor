@@ -69,10 +69,12 @@ describe("one persistent accepted and preview page assignment", () => {
       ),
     ).toBe(false);
     controller.acceptDesign();
+    controller.continueFromConnection();
     expect(controller.getSnapshot().state.stage).toBe("style");
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     expect(controller.getSnapshot().state.acceptedDesign.pageTemplates).toEqual(
       mixed,
     );
@@ -95,6 +97,7 @@ describe("one persistent accepted and preview page assignment", () => {
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     const product = controller.getSnapshot().state.graph.products[0]!;
     controller.addToBag(product.id, product.variants[0]!.id, 1);
     controller.closeBag();

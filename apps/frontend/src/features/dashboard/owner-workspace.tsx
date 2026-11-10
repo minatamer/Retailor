@@ -24,6 +24,7 @@ import { RecordPhoto, MetricStrip } from "./record-photo";
 import { inventorySummary } from "./register-model";
 import { StarRating } from "../storefront/reviews";
 import { CurrencyPicker } from "../currency/picker";
+import { Connections } from "../shopify/connections";
 import styles from "./owner-workspace.module.css";
 export const utc = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
@@ -157,7 +158,7 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
                 </Button>
               ) : null}
             </div>
-            {!["overview", "design"].includes(view) && (
+            {!["overview", "design", "connections"].includes(view) && (
               <p className={styles.intro}>
                 {
                   (
@@ -278,7 +279,14 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
               />
             )}
             {view === "overview" ? <DashboardOverview /> : null}
-            {!["overview", "design", "returns", "expenses"].includes(view) && (
+            {view === "connections" && <Connections />}
+            {![
+              "overview",
+              "design",
+              "connections",
+              "returns",
+              "expenses",
+            ].includes(view) && (
               <label className={styles.search}>
                 <span>Find a current record</span>
                 <input

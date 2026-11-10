@@ -85,6 +85,7 @@ describe("bounded current dashboard observations", () => {
       controller.useCurrentLook();
       controller.keepWordmark();
       controller.acceptDesign();
+      controller.continueFromConnection();
       controller.go("dashboard");
       controller.setDashboardPeriod("7days");
       controller.setDashboardSeries("operating_result");
@@ -137,6 +138,7 @@ describe("bounded current dashboard observations", () => {
       controller.useCurrentLook();
       controller.keepWordmark();
       controller.acceptDesign();
+      controller.continueFromConnection();
       controller.go("dashboard");
       controller.setDashboardPeriod("all");
       const target = { kind: "metric", factId: "operating_result" } as const;

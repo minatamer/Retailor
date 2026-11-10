@@ -40,6 +40,7 @@ describe("older seeded demo review recovery", () => {
     controller.useCurrentLook();
     controller.keepWordmark();
     controller.acceptDesign();
+    controller.continueFromConnection();
     controller.finishTour();
     const product = controller.getSnapshot().state.graph.products[0]!;
     controller.addToBag(product.id, product.variants[0]!.id, 1);
