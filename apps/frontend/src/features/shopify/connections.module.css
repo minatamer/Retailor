@@ -53,23 +53,18 @@
   min-width: 0;
 }
 .identity h2 {
-  margin: 0 0 4px;
-  font-size: 25px;
-  letter-spacing: -0.04em;
-}
-.identity p {
   margin: 0;
-  color: var(--platform-muted);
-  font-size: 13px;
 }
-.mark {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: var(--platform-lime);
-  flex-shrink: 0;
+.identity a {
+  display: inline-flex;
+}
+.identity img {
+  display: block;
+  width: 140px;
+  height: auto;
+}
+.card > .header {
+  margin-bottom: 14px;
 }
 .badge {
   display: inline-flex;
@@ -90,6 +85,53 @@
 .dialog > p {
   font-size: 14px;
   line-height: 1.8;
+}
+.card > p {
+  margin: 0;
+}
+.disclosure {
+  margin-top: 14px;
+  color: var(--platform-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.disclosure summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  min-height: 36px;
+  padding: 8px 10px;
+  margin-left: -10px;
+  border-radius: 8px;
+  font-weight: 500;
+  list-style: none;
+  width: fit-content;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+.disclosure summary::-webkit-details-marker {
+  display: none;
+}
+.disclosure summary::marker {
+  content: "";
+}
+.disclosure summary:hover,
+.disclosure[open] summary {
+  background: var(--platform-canvas);
+  color: var(--platform-text);
+}
+.disclosure summary:focus-visible {
+  outline: 2px solid var(--platform-text);
+  outline-offset: 3px;
+}
+.disclosure summary svg {
+  flex-shrink: 0;
+}
+.disclosure p {
+  max-width: 70ch;
+  margin: 8px 0 0;
 }
 .fine {
   color: var(--platform-muted);
@@ -140,30 +182,6 @@
   flex-wrap: wrap;
   margin-top: 24px;
 }
-.connectForm label {
-  flex: 1 1 240px;
-  display: grid;
-  gap: 9px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.connectForm input {
-  width: 100%;
-  min-width: 0;
-  border: 1px solid var(--platform-line);
-  background: var(--platform-canvas);
-  color: var(--platform-text);
-  padding: 14px;
-  border-radius: 12px;
-  font: inherit;
-  min-height: 46px;
-}
-.connectForm small {
-  flex-basis: 100%;
-  font-size: 11px;
-  color: var(--platform-muted);
-  line-height: 1.6;
-}
 .actions {
   display: flex;
   align-items: center;
@@ -173,7 +191,7 @@
 }
 .actions button,
 .connectForm button,
-.continue button {
+.footer button {
   max-width: 100%;
   white-space: normal;
   text-align: center;
@@ -189,19 +207,17 @@
 .notice small {
   color: var(--platform-muted);
 }
-.continue {
+.footer {
   display: flex;
   align-items: start;
   flex-direction: column;
-  gap: 14px;
-  border-top: 1px solid var(--platform-line);
-  padding-top: 24px;
+  gap: 8px;
   margin-top: 24px;
 }
-.continue small {
-  font-size: 11px;
-  color: var(--platform-muted);
-  line-height: 1.65;
+.footer .disclosure {
+  width: 100%;
+  min-width: 0;
+  margin-top: 0;
 }
 .pending {
   display: flex;
@@ -223,53 +239,432 @@
   letter-spacing: -0.035em;
   margin: 8px 0 0;
 }
-.selection {
-  border: 0;
-  padding: 0;
+.selectionToolbar,
+.selectionTools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.selectionToolbar {
+  margin: 24px 0 18px;
+}
+.garmentGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.garmentCard {
+  min-width: 0;
+  border: 1px solid var(--platform-line);
+  border-radius: 16px;
+  overflow: hidden;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+.garmentCard[data-selected="true"] {
+  border-color: var(--platform-text);
+  box-shadow: 0 0 0 1px var(--platform-text);
+}
+.garmentPhoto {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--platform-canvas);
+  display: grid;
+  place-items: center;
+}
+.garmentPhoto > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 16px;
+}
+.garmentPhoto > span {
+  font-size: 12px;
+  color: var(--platform-muted);
+}
+.garmentSelect {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 9px;
+  display: flex;
+  background: var(--platform-surface);
+  border: 1px solid var(--platform-line);
+  border-radius: 10px;
+}
+.garmentSelect input {
+  width: 19px;
+  height: 19px;
+  margin: 0;
+  accent-color: var(--platform-text);
+  cursor: pointer;
+}
+.garmentSelect input:disabled {
+  cursor: default;
+}
+.garmentSelect:focus-within {
+  outline: 2px solid var(--platform-text);
+  outline-offset: 3px;
+}
+.garmentInfo {
+  padding: 16px;
+  overflow-wrap: anywhere;
+}
+.garmentInfo h4 {
+  margin: 5px 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.garmentInfo p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.garmentInfo p > span {
+  display: block;
+  color: var(--platform-muted);
+}
+.garmentBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.garmentBottom button {
+  padding: 6px 0 6px 10px;
+  min-height: 36px;
+}
+.previewDescription {
   margin: 24px 0;
+}
+.previewGallery {
+  --store-image: var(--platform-canvas);
+  --store-surface: var(--platform-surface);
+  --store-muted: var(--platform-muted);
+  --store-control-border: var(--platform-line);
+  --store-action: var(--platform-text);
+  --store-text: var(--platform-text);
+  container-type: inline-size;
+}
+.previewGallery button {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.previewGallery button:has(> img):not([aria-pressed]) {
+  border: 0;
+}
+.previewGallery button:focus-visible {
+  outline: 2px solid var(--platform-text);
+  outline-offset: 4px;
+}
+.attributes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-.selection legend {
+  gap: 14px;
   font-size: 12px;
+}
+.attributes dt {
+  text-transform: capitalize;
+  color: var(--platform-muted);
+  margin-bottom: 5px;
+}
+.attributes dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.previewDescription p {
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.variantTable {
+  overflow-x: auto;
+}
+.variantTable table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+.variantTable caption {
+  text-align: left;
   font-weight: 600;
   margin-bottom: 12px;
 }
-.selection label {
-  display: flex;
-  align-items: start;
-  gap: 10px;
-  border: 1px solid var(--platform-line);
-  border-radius: 12px;
-  padding: 13px;
-  min-width: 0;
-  font-size: 13px;
+.variantTable th,
+.variantTable td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--platform-line);
   overflow-wrap: anywhere;
 }
-.selection input {
-  accent-color: var(--platform-text);
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  margin: 0;
+.variantTable th:first-child,
+.variantTable td:first-child {
+  padding-left: 0;
 }
-.selection small,
-.product small {
-  display: block;
-  font-size: 11px;
+.variantTable th {
   color: var(--platform-muted);
-  line-height: 1.65;
-  margin-top: 5px;
+  font-weight: 500;
 }
-.selection:disabled {
-  opacity: 0.62;
+@media (max-width: 900px) {
+  .garmentGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 .exports,
 .catalogue {
   display: grid;
   gap: 12px;
   margin-top: 22px;
+}
+.importToolbar {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(180px, 1.5fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+.importToolbar label,
+.importStock,
+.importCategory {
+  display: grid;
+  gap: 9px;
+  font-size: 12px;
+  font-weight: 550;
+  min-width: 0;
+}
+.importToolbar input,
+.importToolbar select,
+.importStock input,
+.importCategory select {
+  min-height: 46px;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--platform-line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--platform-surface);
+  color: var(--platform-text);
+  font: inherit;
+}
+.importCount {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+.importGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.importCard {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.8fr) minmax(0, 1.3fr);
+  min-width: 0;
+  border: 1px solid var(--platform-line);
+  border-radius: 16px;
+  overflow: hidden;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+.importCard[data-selected="true"] {
+  border-color: var(--platform-text);
+  box-shadow: 0 0 0 1px var(--platform-text);
+}
+.importPhoto {
+  position: relative;
+  min-height: 220px;
+  background: var(--platform-canvas);
+}
+.importPhoto > img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  object-fit: contain;
+  padding: 10px;
+}
+.importInfo {
+  padding: 18px 16px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+.importStatus {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--platform-canvas);
+  font-size: 10px;
+  line-height: 1.5;
+  text-transform: capitalize;
+}
+.importInfo h4 {
+  margin: 12px 0 9px;
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.importPrice {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.importDescription {
+  font-size: 12px;
+  color: var(--platform-muted);
+  line-height: 1.7;
+  margin: 9px 0 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.importInfo .garmentBottom {
+  width: 100%;
+  margin-top: auto;
+  padding-top: 12px;
+}
+.importInfo .garmentBottom button {
+  white-space: normal;
+  text-align: right;
+}
+.photoFallback {
+  height: 100%;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  font-size: 11px;
+  color: var(--platform-muted);
+  text-align: center;
+}
+.importFooter {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-top: 24px;
+}
+.remoteGallery {
+  height: clamp(220px, 45vw, 400px);
+  display: grid;
+  place-items: center;
+  background: var(--platform-canvas);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.remoteGallery img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  min-height: 0;
+}
+.remoteThumbnails {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0 20px;
+  flex-wrap: wrap;
+}
+.remoteThumbnails button {
+  width: 60px;
+  height: 72px;
+  padding: 3px;
+  border: 1px solid var(--platform-line);
+  border-radius: 8px;
+  background: var(--platform-canvas);
+  cursor: pointer;
+}
+.remoteThumbnails button[aria-pressed="true"] {
+  outline: 2px solid var(--platform-text);
+  outline-offset: 2px;
+}
+.remoteThumbnails img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 5px;
+}
+.fullDescription {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.adminLink {
+  color: inherit;
+  font-size: 13px;
+  text-underline-offset: 4px;
+}
+.importStock {
+  max-width: 220px;
+  margin-top: 20px;
+}
+.clothingConfirm {
+  display: flex;
+  gap: 10px;
+  align-items: start;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.clothingConfirm input {
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: var(--platform-text);
+  flex-shrink: 0;
+}
+.importToolbar :is(input, select):focus-visible,
+.importStock input:focus-visible,
+.importCategory select:focus-visible,
+.clothingConfirm input:focus-visible {
+  outline: 2px solid var(--platform-text);
+  outline-offset: 3px;
+}
+@media (max-width: 1100px) {
+  .importGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .importPhoto {
+    min-height: 240px;
+  }
+}
+@media (max-width: 600px) {
+  .importToolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .importCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .importPhoto {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+  .importInfo {
+    padding: 18px;
+  }
+  .importFooter {
+    align-items: stretch;
+  }
+  .importFooter > button,
+  .importFooter > div {
+    width: 100%;
+  }
 }
 .product {
   min-width: 0;
@@ -372,16 +767,25 @@
   margin: 15px 0;
 }
 .photos img {
-  object-fit: cover;
+  width: 80px;
+  height: 100px;
+  object-fit: contain;
   border-radius: 9px;
   background: var(--platform-canvas);
+}
+.remoteThumbnails .photoFallback {
+  min-height: 0;
+  padding: 2px;
+}
+.remoteThumbnails .photoFallback span {
+  display: none;
 }
 @media (max-width: 600px) {
   .details {
     grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
-  .selection {
+  .garmentGrid {
     grid-template-columns: minmax(0, 1fr);
   }
   .connectForm button {
