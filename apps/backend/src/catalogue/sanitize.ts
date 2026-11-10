@@ -14,6 +14,7 @@ export type ImageDecoder = (
   signal: AbortSignal,
 ) => Promise<Uint8Array>;
 export interface SanitizerPorts {
+  stripMetadata?: boolean;
   capacity?: ImageCapacity;
   decode?: ImageDecoder;
   rss?: () => number;
@@ -25,6 +26,7 @@ function decode(
   width: number,
   height: number,
   signal: AbortSignal,
+  stripMetadata = false,
 ): Promise<Uint8Array> {
   signal.throwIfAborted();
   const url = new URL(
@@ -33,7 +35,7 @@ function decode(
   );
   return new Promise((resolve, reject) => {
     const worker = new Worker(url, {
-      workerData: { bytes, width, height },
+      workerData: { bytes, width, height, stripMetadata },
       resourceLimits: { maxOldGenerationSizeMb: 64 },
     });
     let settled = false;
@@ -100,14 +102,17 @@ export async function prepareProviderImages(
       header.mime !== image.mime ||
       header.width !== image.width ||
       header.height !== image.height ||
-      header.privateMetadata
+      (header.privateMetadata && !ports.stripMetadata)
     )
       throw new Error("Image manifest mismatch");
   }
   const owner = new AbortController(),
     owned = AbortSignal.any([signal, owner.signal]);
   const capacity = ports.capacity ?? processCapacity,
-    decoder = ports.decode ?? decode,
+    decoder =
+      ports.decode ??
+      ((bytes, width, height, signal) =>
+        decode(bytes, width, height, signal, ports.stripMetadata === true)),
     rss = ports.rss ?? (() => process.memoryUsage.rss());
   const completions = manifest.map(() => {
     let resolve!: () => void;
