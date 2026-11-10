@@ -10,6 +10,7 @@ const paths = {
   close: "m6 6 12 12M6 18 18 6",
   upload: "M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5",
   check: "m5 12 4 4L19 6",
+  info: "M12 16v-4 M12 8h.01 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z",
   search: "M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z",
   dashboard: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
   garment: "m8 3-5 3-2 5 4 2 1-3v11h12V10l1 3 4-2-2-5-5-3a4 4 0 0 1-8 0Z",
