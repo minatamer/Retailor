@@ -26,20 +26,10 @@ const EnvironmentSchema = z
     TURNSTILE_SECRET_KEY: z.string().default(""),
     TURNSTILE_SITE_KEY: z.string().max(256).default(""),
     GRANT_SIGNING_SECRET: z.string().default(""),
-    SHOPIFY_CLIENT_ID: z.string().max(200).default(""),
-    SHOPIFY_PROVIDER: z.enum(["live", "fixture"]).default("live"),
     SHOPIFY_CLIENT_SECRET: z.string().max(4096).default(""),
     SHOPIFY_ENCRYPTION_KEY: z.string().max(64).default(""),
-    SHOPIFY_STORAGE_PROJECT: z.string().max(100).default(""),
-    SHOPIFY_STORAGE_BUCKET: z.string().max(200).default(""),
   })
   .superRefine((env, ctx) => {
-    if (env.APP_ENV === "production" && env.SHOPIFY_PROVIDER === "fixture")
-      ctx.addIssue({
-        code: "custom",
-        path: ["SHOPIFY_PROVIDER"],
-        message: "Shopify simulation is development-only",
-      });
     if (
       env.STRIPE_API_KEY &&
       !/^(?:sk|rk)_test_[A-Za-z0-9]+$/u.test(env.STRIPE_API_KEY)
