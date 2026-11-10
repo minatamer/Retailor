@@ -19,6 +19,11 @@ import { openAiAssistant } from "../providers/assistant.js";
 import type { LogoRuntime } from "../brand/routes.js";
 import type { LogoProvider } from "../brand/provider.js";
 import { localLogos } from "../brand/local.js";
+import { configuredShopify } from "../config/shopify.js";
+import { ShopifyService } from "../shopify/service.js";
+import { ShopifyCatalogue } from "../shopify/catalogue.js";
+import { ShopifyCleanup } from "../shopify/cleanup.js";
+import { ShopifyWebhooks } from "../shopify/webhooks.js";
 export interface Runtime {
   capabilities: Capabilities;
   ready: boolean;
@@ -29,6 +34,10 @@ export interface Runtime {
   assistant?: AssistantRuntime;
   logos?: LogoRuntime;
   checkout?: CheckoutRuntime;
+  shopify?: ShopifyService;
+  shopifyCatalogue?: ShopifyCatalogue;
+  shopifyCleanup?: ShopifyCleanup;
+  shopifyWebhooks?: ShopifyWebhooks;
 }
 export function composeRuntime(
   env: Environment,
@@ -71,7 +80,24 @@ export function composeRuntime(
     ),
   }),
 ): Runtime {
+  const shopifyConfig = configuredShopify(env);
+  const shopify = shopifyConfig
+    ? new ShopifyService(
+        shopifyConfig.ledger,
+        shopifyConfig.provider,
+        shopifyConfig.appId,
+      )
+    : undefined;
   const mode = env.FAKE_MODE ? "fake" : "live";
+  let shopifyCleanup: ShopifyCleanup | undefined;
+  const shopifyCatalogue =
+    shopify && shopifyConfig
+      ? new ShopifyCatalogue(shopify, shopifyConfig.products, {
+          beforeWrite: (signal) => shopifyCleanup!.beforeWrite(signal),
+        })
+      : undefined;
+  if (shopify && shopifyCatalogue)
+    shopifyCleanup = new ShopifyCleanup(shopify, shopifyCatalogue);
   const unavailable = {
     available: false,
     reason: env.FAKE_MODE
@@ -130,6 +156,14 @@ export function composeRuntime(
       ? checkoutFactory(env, admission)
       : undefined;
   return {
+    ...(shopify && shopifyConfig && shopifyCatalogue && shopifyCleanup
+      ? {
+          shopify,
+          shopifyCatalogue,
+          shopifyCleanup,
+          shopifyWebhooks: new ShopifyWebhooks(shopify, shopifyConfig.secret),
+        }
+      : {}),
     ...(checkout ? { checkout } : {}),
     ready: env.FAKE_MODE || enabled,
     frontendOrigin: env.FRONTEND_ORIGIN,
@@ -163,6 +197,10 @@ export function composeRuntime(
       checkout: {
         available: !!checkout,
         reason: checkout ? "ready" : "not-implemented",
+      },
+      shopify: {
+        available: !!shopify,
+        reason: shopify ? "ready" : "missing-prerequisites",
       },
     },
   };

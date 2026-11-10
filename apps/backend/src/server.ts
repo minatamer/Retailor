@@ -5,6 +5,7 @@ import { parseEnvironment } from "./config/environment.js";
 import { composeRuntime } from "./runtime/compose.js";
 import { createApp } from "./http/app.js";
 import { backendDiagnostics } from "./http/diagnostics.js";
+import { startShopifyCleanup } from "./shopify/runner.js";
 const appRoot = fileURLToPath(new URL("../", import.meta.url));
 try {
   process.loadEnvFile(resolve(appRoot, ".env.local"));
@@ -14,6 +15,10 @@ try {
 }
 const env = parseEnvironment(process.env);
 const runtime = composeRuntime(env, () => `req_${randomUUID()}`);
+const stopShopify =
+  env.APP_ENV !== "production" && runtime.shopifyCleanup
+    ? startShopifyCleanup(runtime.shopifyCleanup)
+    : undefined;
 const server = createApp(runtime, backendDiagnostics()).listen(
   env.PORT,
   env.APP_ENV === "production" ? "0.0.0.0" : "127.0.0.1",
@@ -34,7 +39,11 @@ server.on("error", () => {
 });
 function stop() {
   server.close(() => {
-    process.exitCode = 0;
+    void (async () => {
+      await stopShopify?.();
+      await runtime.shopify?.close();
+      process.exitCode = 0;
+    })();
   });
   server.closeIdleConnections();
   setTimeout(() => {

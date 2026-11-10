@@ -9,6 +9,12 @@ process.env.STRIPE_API_KEY = "";
 process.env.OPENAI_API_KEY = "";
 process.env.TURNSTILE_SECRET_KEY = "";
 process.env.GRANT_SIGNING_SECRET = "";
+process.env.SHOPIFY_CLIENT_ID = "";
+process.env.SHOPIFY_PROVIDER = "live";
+process.env.SHOPIFY_CLIENT_SECRET = "";
+process.env.SHOPIFY_ENCRYPTION_KEY = "";
+process.env.SHOPIFY_STORAGE_PROJECT = "";
+process.env.SHOPIFY_STORAGE_BUCKET = "";
 const original = http.request;
 const originalConnect = net.Socket.prototype.connect;
 function installNetworkGuard() {

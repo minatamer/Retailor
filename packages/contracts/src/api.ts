@@ -46,6 +46,10 @@ export const CapabilitiesSchema = z.strictObject({
     available: false,
     reason: "not-implemented",
   }),
+  shopify: CapabilitySchema.default({
+    available: false,
+    reason: "missing-prerequisites",
+  }),
 });
 export type Capabilities = z.infer<typeof CapabilitiesSchema>;
 export const HealthSchema = z.strictObject({
@@ -59,6 +63,90 @@ export const ReadinessSchema = z.strictObject({
   mode: ModeSchema,
 });
 export const API_ROUTES = {
+  "shopify/simulate": {
+    method: "POST",
+    bodyLimit: 2048,
+    responseLimit: 8192,
+    timeoutMs: 10000,
+  },
+  "shopify/remove": {
+    method: "POST",
+    bodyLimit: 2048,
+    responseLimit: 8192,
+    timeoutMs: 10000,
+  },
+  "shopify/disconnect": {
+    method: "POST",
+    bodyLimit: 2048,
+    responseLimit: 8192,
+    timeoutMs: 10000,
+  },
+  "shopify/end": {
+    method: "POST",
+    bodyLimit: 2048,
+    responseLimit: 8192,
+    timeoutMs: 10000,
+  },
+  "shopify/webhook": {
+    method: "POST",
+    bodyLimit: 65536,
+    responseLimit: 8192,
+    timeoutMs: 4500,
+  },
+  "shopify/products": {
+    method: "POST",
+    bodyLimit: 4096,
+    responseLimit: 1024 * 1024,
+    timeoutMs: 30000,
+  },
+  "shopify/export": {
+    method: "POST",
+    bodyLimit: 10 * 1024 * 1024,
+    responseLimit: 8192,
+    timeoutMs: 125000,
+  },
+  "shopify/update": {
+    method: "POST",
+    bodyLimit: 10 * 1024 * 1024,
+    responseLimit: 8192,
+    timeoutMs: 125000,
+  },
+  "shopify/check": {
+    method: "POST",
+    bodyLimit: 2048,
+    responseLimit: 8192,
+    timeoutMs: 30000,
+  },
+  "shopify/session": {
+    method: "POST",
+    bodyLimit: 2048,
+    responseLimit: 8192,
+    timeoutMs: 10000,
+  },
+  "shopify/status": {
+    method: "POST",
+    bodyLimit: 2048,
+    responseLimit: 8192,
+    timeoutMs: 10000,
+  },
+  "shopify/connect": {
+    method: "POST",
+    bodyLimit: 2048,
+    responseLimit: 8192,
+    timeoutMs: 10000,
+  },
+  "shopify/callback": {
+    method: "GET",
+    bodyLimit: 0,
+    responseLimit: 8192,
+    timeoutMs: 30000,
+  },
+  "shopify/install": {
+    method: "GET",
+    bodyLimit: 0,
+    responseLimit: 8192,
+    timeoutMs: 10000,
+  },
   "checkout/identity": {
     method: "POST",
     bodyLimit: 1024,

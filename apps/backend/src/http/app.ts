@@ -12,6 +12,7 @@ import { OperationFailure } from "../security/errors.js";
 import { ingress } from "./ingress.js";
 import { failureDiagnostic, reportDiagnostic } from "./diagnostics.js";
 import type { DiagnosticSink } from "./diagnostics.js";
+import { shopifyRoutes } from "../shopify/routes.js";
 export function createApp(
   runtime: Runtime,
   diagnostics?: DiagnosticSink,
@@ -72,6 +73,14 @@ export function createApp(
   logoRoutes(app, runtime.logos);
   currencyRoutes(app, runtime.currency);
   checkoutRoutes(app, runtime.checkout, runtime.frontendOrigin);
+  shopifyRoutes(
+    app,
+    runtime.shopify,
+    runtime.frontendOrigin,
+    runtime.shopifyCatalogue,
+    runtime.shopifyCleanup,
+    runtime.shopifyWebhooks,
+  );
   app.use((_req, res) => {
     res.status(404).json(publicError("NOT_FOUND", res.locals.requestId));
   });
