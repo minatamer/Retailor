@@ -6,6 +6,13 @@ const nextConfig = {
   outputFileTracingRoot: fileURLToPath(new URL("../../", import.meta.url)),
   poweredByHeader: false,
   devIndicators: false,
+  // New OAuth endpoints carry one-use codes/state in their query strings.
+  // backend.server emits fixed, query-free diagnostics for these routes only.
+  logging: {
+    incomingRequests: {
+      ignore: [/^\/api\/retailor\/v1\/shopify\/(?:callback|install)(?:\?|$)/u],
+    },
+  },
   // Fixed API uploads bypass Proxy; other routes have no body-driven actions.
   experimental: { proxyClientMaxBodySize: 16384 },
   async headers() {

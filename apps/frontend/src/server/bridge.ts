@@ -19,6 +19,15 @@ import { FxSnapshotSchema } from "@retailor/contracts/currency";
 import { AssistantResultSchema } from "@retailor/contracts/assistant";
 import { LogoResultSchema } from "@retailor/contracts/brand";
 import { z } from "zod";
+import {
+  ShopifySessionResultSchema,
+  ShopifyStatusSchema,
+  ShopifyAuthorizeSchema,
+  ShopifyCallbackSchema,
+  ShopifyProductsResultSchema,
+  ShopifyExportResultSchema,
+  ShopifyWebhookResultSchema,
+} from "@retailor/contracts/shopify";
 const origin = z
   .string()
   .url()
@@ -131,11 +140,23 @@ export async function forward(
     });
   if (!isApiRoute(path)) return fail("NOT_FOUND", 404);
   const policy = API_ROUTES[path];
+  const shopify = path.startsWith("shopify/");
+  const shopifyWebhook = path === "shopify/webhook";
+  const shopifyCallback =
+    path === "shopify/callback" || path === "shopify/install";
+  const query = new URL(request.url).search;
+  if (
+    shopify &&
+    ((shopifyCallback && new TextEncoder().encode(query).byteLength > 8192) ||
+      (!shopifyCallback && query))
+  )
+    return fail("INVALID_INPUT", 400);
   if (path === "currency/usd-eur" && new URL(request.url).search)
     return fail("INVALID_INPUT", 400);
   if (request.method !== policy.method) return fail("NOT_FOUND", 405);
   if (
     request.method !== "GET" &&
+    !shopifyWebhook &&
     request.headers.get("origin") !== config.FRONTEND_ORIGIN
   )
     return fail("FORBIDDEN", 403);
@@ -165,7 +186,7 @@ export async function forward(
     const headers = new Headers({ Accept: "application/json" });
     if (type) headers.set("Content-Type", type);
     if (request.method !== "GET") headers.set("Origin", config.FRONTEND_ORIGIN);
-    if (request.method === "POST") {
+    if (request.method === "POST" && !shopifyWebhook) {
       const cookie = request.headers.get("cookie") ?? "";
       const values =
         cookie.length <= 4096
@@ -181,6 +202,37 @@ export async function forward(
         )
       )
         headers.set("Cookie", values[0]!);
+    }
+    if (shopify && !shopifyWebhook) {
+      const raw = request.headers.get("cookie") ?? "";
+      const cookies =
+        raw.length <= 4096
+          ? raw
+              .split(";")
+              .map((value) => value.trim())
+              .filter((value) => value.startsWith("retailor_shopify="))
+          : [];
+      if (
+        cookies.length === 1 &&
+        /^retailor_shopify=[a-f0-9]{64}$/u.test(cookies[0]!)
+      )
+        headers.set(
+          "Cookie",
+          [headers.get("Cookie"), cookies[0]!].filter(Boolean).join("; "),
+        );
+      const proof = request.headers.get("x-retailor-shopify-tab");
+      if (proof && /^[a-f0-9]{64}$/u.test(proof))
+        headers.set("x-retailor-shopify-tab", proof);
+    }
+    if (shopifyWebhook) {
+      for (const name of [
+        "x-shopify-hmac-sha256",
+        "x-shopify-topic",
+        "x-shopify-webhook-id",
+      ]) {
+        const value = request.headers.get(name);
+        if (value && value.length <= 128) headers.set(name, value);
+      }
     }
     if (config.APP_ENV === "production")
       headers.set(
@@ -201,7 +253,7 @@ export async function forward(
       init.duplex = "half";
     }
     const response = await ports.fetch(
-      `${config.BACKEND_ORIGIN}/v1/${path}`,
+      `${config.BACKEND_ORIGIN}/v1/${path}${shopifyCallback ? query : ""}`,
       init,
     );
     if (
@@ -222,33 +274,77 @@ export async function forward(
       return fail(error.data.error.code, response.status);
     }
     const schema =
-      path === "checkout/identity"
-        ? CheckoutIdentityResultSchema
-        : path.startsWith("checkout/")
-          ? CheckoutResultSchema
-          : path === "health"
-            ? HealthSchema
-            : path === "ready"
-              ? ReadinessSchema
-              : path === "config"
-                ? CapabilitiesSchema
-                : path === "currency/usd-eur"
-                  ? FxSnapshotSchema
-                  : path === "admission"
-                    ? AdmissionResultSchema
-                    : path === "catalogue/interpret"
-                      ? RecognitionResultSchema
-                      : path.startsWith("assistant/")
-                        ? AssistantResultSchema
-                        : path === "brand/logos"
-                          ? LogoResultSchema
-                          : null;
+      path === "shopify/simulate"
+        ? ShopifyCallbackSchema
+        : shopifyWebhook
+          ? ShopifyWebhookResultSchema
+          : path === "shopify/session"
+            ? ShopifySessionResultSchema
+            : path === "shopify/products"
+              ? ShopifyProductsResultSchema
+              : path === "shopify/export" ||
+                  path === "shopify/update" ||
+                  path === "shopify/check"
+                ? ShopifyExportResultSchema
+                : path === "shopify/status" ||
+                    path === "shopify/remove" ||
+                    path === "shopify/disconnect" ||
+                    path === "shopify/end"
+                  ? ShopifyStatusSchema
+                  : path === "shopify/connect" || path === "shopify/install"
+                    ? ShopifyAuthorizeSchema
+                    : shopifyCallback
+                      ? ShopifyCallbackSchema
+                      : path === "checkout/identity"
+                        ? CheckoutIdentityResultSchema
+                        : path.startsWith("checkout/")
+                          ? CheckoutResultSchema
+                          : path === "health"
+                            ? HealthSchema
+                            : path === "ready"
+                              ? ReadinessSchema
+                              : path === "config"
+                                ? CapabilitiesSchema
+                                : path === "currency/usd-eur"
+                                  ? FxSnapshotSchema
+                                  : path === "admission"
+                                    ? AdmissionResultSchema
+                                    : path === "catalogue/interpret"
+                                      ? RecognitionResultSchema
+                                      : path.startsWith("assistant/")
+                                        ? AssistantResultSchema
+                                        : path === "brand/logos"
+                                          ? LogoResultSchema
+                                          : null;
     const validated = schema?.safeParse(parsed);
     if (validated && !validated.success) return fail("UPSTREAM_FAILED", 502);
     const outputHeaders = new Headers({
       "Cache-Control": "no-store",
       "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "no-referrer",
     });
+    if (path === "shopify/session") {
+      const cookie = response.headers.get("set-cookie")?.split(";")[0];
+      if (!cookie || !/^retailor_shopify=[a-f0-9]{64}$/u.test(cookie))
+        return fail("UPSTREAM_FAILED", 502);
+      outputHeaders.set(
+        "Set-Cookie",
+        `${cookie}; Path=/api/retailor/v1; HttpOnly; SameSite=Lax; Max-Age=7200${config.FRONTEND_ORIGIN.startsWith("https:") ? "; Secure" : ""}`,
+      );
+    }
+    if (shopifyCallback) {
+      if (path === "shopify/install") {
+        const install = ShopifyAuthorizeSchema.parse(parsed);
+        outputHeaders.set("Location", install.authorizationUrl);
+        return new Response(null, { status: 303, headers: outputHeaders });
+      }
+      const callback = ShopifyCallbackSchema.parse(parsed);
+      outputHeaders.set(
+        "Location",
+        `/demo?shopify=${callback.outcome}&shopifyReturn=${callback.returnTo}`,
+      );
+      return new Response(null, { status: 303, headers: outputHeaders });
+    }
     if (path === "admission" || path === "checkout/identity") {
       const cookie = response.headers.get("set-cookie")?.split(";")[0];
       if (cookie) {

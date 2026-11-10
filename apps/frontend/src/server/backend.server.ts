@@ -28,19 +28,55 @@ export async function backendRequest(
   request: Request,
   path: string,
 ): Promise<Response> {
+  const requestId = `req_${randomUUID()}`;
+  const callback = path === "shopify/callback" || path === "shopify/install";
+  const finish = (response: Response) => {
+    if (callback) {
+      try {
+        process.stderr.write(
+          `${JSON.stringify({
+            schemaVersion: 1,
+            event: "shopify_callback",
+            operation: path,
+            code: response.status,
+            requestId,
+            source: "server/backend.server.ts",
+          })}\n`,
+        );
+      } catch {
+        /* Diagnostic output failure cannot alter the response. */
+      }
+    }
+    return response;
+  };
   const denied = originGuard(request);
-  if (denied) return denied;
+  if (denied) return finish(denied);
   try {
     const config = parseBridgeConfig(process.env);
-    return await forward(request, path, config, {
+    const result = await forward(request, path, config, {
       fetch,
-      requestId: () => `req_${randomUUID()}`,
+      requestId: () => requestId,
       authorization,
     });
+    if (callback && result.status !== 303)
+      return finish(shopifyFailureRedirect());
+    return finish(result);
   } catch {
-    return Response.json(publicError("UNAVAILABLE", `req_${randomUUID()}`), {
+    if (callback) return finish(shopifyFailureRedirect());
+    return Response.json(publicError("UNAVAILABLE", requestId), {
       status: 503,
       headers: { "Cache-Control": "no-store" },
     });
   }
+}
+function shopifyFailureRedirect() {
+  return new Response(null, {
+    status: 303,
+    headers: {
+      Location: "/demo?shopify=needs_attention&shopifyReturn=onboarding",
+      "Cache-Control": "no-store",
+      "Referrer-Policy": "no-referrer",
+      "X-Content-Type-Options": "nosniff",
+    },
+  });
 }
