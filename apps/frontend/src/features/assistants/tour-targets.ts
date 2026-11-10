@@ -2,15 +2,52 @@ import type { AssistantRole } from "@retailor/contracts/assistant";
 import type { StorePage } from "@retailor/contracts/design";
 import { TourTargetSchema } from "@retailor/contracts/assistant";
 export type TourTarget = typeof TourTargetSchema._output;
-export const TOUR_STEPS: Record<
-  AssistantRole,
-  readonly {
-    target: TourTarget;
-    title: string;
-    text: string;
-    page?: StorePage;
-  }[]
-> = {
+interface TourStep {
+  target: TourTarget;
+  title: string;
+  text: string;
+  page?: StorePage;
+  ownerView?: "connections";
+}
+const SHOPIFY_STEPS: readonly TourStep[] = [
+  {
+    target: "shopify-connect",
+    ownerView: "connections",
+    title: "Your Shopify connection",
+    text: "Connections is where Shopify lives. Connect Shopify opens Shopify to sign in, choose an eligible test store and approve access. No API keys to enter, and connecting creates no products. You can skip it during setup and connect here later. This tour only explains the controls.",
+  },
+  {
+    target: "shopify-import",
+    ownerView: "connections",
+    title: "Choose what to bring in",
+    text: "Import from Shopify loads your products automatically after connecting. Choose All products or a collection, search, and inspect photos, descriptions, prices and variants with View details. Select individual clothing products or Select all shown; Load more reveals the next page.",
+  },
+  {
+    target: "shopify-import",
+    ownerView: "connections",
+    title: "Review, then import",
+    text: "Review import fetches the full details and photos. Confirm clothing categories and local demo stock before importing. USD products with supported Colour/Size options are added to this demo; Shopify inventory stays unchanged. Available space and photo limits apply. Cancel keeps your existing products.",
+  },
+  {
+    target: "shopify-export",
+    ownerView: "connections",
+    title: "Send Retailor drafts to Shopify",
+    text: "Your Retailor products go the other way. View the garment, select products or Select all, then Review draft export and confirm. Names, descriptions, photos, Colour/Size variants, SKUs and USD prices go into draft products in a Retailor collection. Nothing is published. This demo allows ten lifetime exports, including removed drafts.",
+  },
+  {
+    target: "shopify-export",
+    ownerView: "connections",
+    title: "Check, update or remove a draft",
+    text: "Each export shows its result and a Shopify link. Check result verifies processing; Ready confirms the fields and photos. Local edits need Review update and confirmation. To replace exported photos, Remove draft, then make a fresh export. Retailor only manages its own demo drafts.",
+  },
+  {
+    target: "shopify-cleanup",
+    ownerView: "connections",
+    title: "Keep your test store tidy",
+    text: "Disconnect and remove demo products asks to remove Retailor's exports and its owned empty collection, then disconnects. Reset and the original two-hour expiry also request cleanup. Existing Shopify products stay untouched. Lost access or an uncertain result can need manual removal; About this demo explains the details.",
+  },
+];
+export const TOUR_STEPS: Record<AssistantRole, readonly TourStep[]> = {
   creator: [
     {
       target: "store-pages",
@@ -45,7 +82,7 @@ export const TOUR_STEPS: Record<
     {
       target: "store-owner",
       title: "The dashboard comes next",
-      text: "This is still your setup preview, so this link returns to garment review. After you finish Tailor and choose Enter my store, it becomes Owner workspace. That is how you reach products, orders, returns, inventory, expenses and feedback. We’ll point it out when your store opens.",
+      text: "This preview link returns to garment review. After you finish Tailor and choose Enter my store, it becomes Owner workspace: products, orders, inventory, expenses, feedback and Connections. Before the storefront opens, you can connect an eligible Shopify test store or skip. The next guide covers Shopify imports and draft exports.",
     },
     {
       target: "demo-reset",
@@ -93,6 +130,7 @@ export const TOUR_STEPS: Record<
       title: "Your dashboard is right here",
       text: "Owner workspace opens the dashboard for this same collection: garments, orders, returns, inventory and costs, expenses and feedback. The dashboard’s View storefront link brings you back. No separate login or second collection is needed in this demo.",
     },
+    ...SHOPIFY_STEPS,
     {
       target: "demo-personalize",
       title: "Keep shaping your store",
@@ -125,6 +163,7 @@ export const TOUR_STEPS: Record<
       title: "Keep products and activity connected",
       text: "These registers own editable products, orders, returns, inventory and expenses. Changes need a review before confirmation.",
     },
+    ...SHOPIFY_STEPS,
   ],
 };
 /** Only registered, mounted, visible authored targets; provider strings never become selectors. */
