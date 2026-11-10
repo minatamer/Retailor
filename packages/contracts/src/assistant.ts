@@ -98,6 +98,10 @@ export const TourTargetSchema = z.enum([
   "owner-kpis",
   "owner-trend",
   "owner-records",
+  "shopify-connect",
+  "shopify-import",
+  "shopify-export",
+  "shopify-cleanup",
 ]);
 export const ChatInputSchema = z
   .strictObject({
