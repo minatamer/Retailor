@@ -27,12 +27,15 @@ export async function shopifyFixture() {
     workspaceId: "workspace",
     createdAt: clock(),
   });
-  const consent = await auth.connect(session.cookie, session.result.tabProof, {
-    schemaVersion: 1,
-    workspaceId: "workspace",
-    shop,
-    returnTo: "connections",
-  });
+  async function begin() {
+    await auth.connect(session.cookie, session.result.tabProof, {
+      schemaVersion: 1,
+      workspaceId: "workspace",
+      returnTo: "connections",
+    });
+    return auth.install(session.cookie, provider.installQuery(shop, clock()));
+  }
+  const consent = await begin();
   const params = {
     code: "fixture_code",
     shop,
@@ -106,6 +109,7 @@ export async function shopifyFixture() {
   });
   return {
     directory,
+    begin,
     auth,
     ledger,
     provider,
