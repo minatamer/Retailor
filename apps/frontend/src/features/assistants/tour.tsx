@@ -73,6 +73,7 @@ function TourGuide({
       currentView = viewport();
     if (
       next &&
+      next.ownerView === step?.ownerView &&
       (!next.page || next.page === page) &&
       bounds &&
       tourTargetVisible(bounds, currentView)
@@ -119,7 +120,7 @@ function TourGuide({
       controller.tourStep(pending);
     }, TOUR_FADE_MS);
     return () => window.clearTimeout(timer);
-  }, [pending, controller, layout, page, steps, tour.role]);
+  }, [pending, controller, layout, page, steps, step, tour.role]);
   useLayoutEffect(() => {
     if (!started || !step) return;
     transitioning.current = false;
@@ -444,9 +445,9 @@ function TourGuide({
             </h2>
             <p id="tour-description">
               {tour.role === "owner"
-                ? "Let’s take a quick look at your numbers, products and activity. You can explore at your own pace."
+                ? "Let’s explore your numbers, products, activity and Shopify connections. This guide explains imports, draft exports and cleanup without changing your store."
                 : from > 0
-                  ? "Your store is ready. Let’s find your bag, dashboard and the controls to make it yours."
+                  ? "Your store is ready. Let’s find your bag, dashboard, Shopify imports and exports, and the controls to make it yours."
                   : "Your clothes have a new home. Let’s explore your three pages, personalization and dashboard. You can skip or leave the tour whenever you like."}
             </p>
             <div className={`${styles.actions} ${styles.welcomeActions}`}>
