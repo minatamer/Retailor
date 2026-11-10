@@ -4,25 +4,45 @@ import { parseEnvironment } from "./environment.js";
 import { composeRuntime } from "../runtime/compose.js";
 import { createApp } from "../http/app.js";
 import { GcsShopifyStore, LocalShopifyStore } from "../shopify/storage.js";
+import { configuredShopify } from "./shopify.js";
+import { SHOPIFY_APP } from "./shopify-app.js";
+import type { Environment } from "./environment.js";
 
 const credentials = {
-  SHOPIFY_CLIENT_ID: "test-app",
   SHOPIFY_CLIENT_SECRET: "test-only-secret",
   SHOPIFY_ENCRYPTION_KEY: "a".repeat(64),
 };
+const appConfig = {
+  ...SHOPIFY_APP,
+  clientId: "test-app",
+  developmentInstallUrl:
+    "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dtest-app",
+};
+const runtimeWith = (env: Environment, app = appConfig) =>
+  composeRuntime(
+    env,
+    () => "req_config",
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    (environment) => configuredShopify(environment, app),
+  );
 describe("inert Shopify runtime configuration", () => {
   it("allows explicit keyless simulation, exercises consent without Shopify HTTP, and rejects it in production", async () => {
-    expect(() =>
-      parseEnvironment({
-        APP_ENV: "production",
-        SHOPIFY_PROVIDER: "fixture",
-        FRONTEND_ORIGIN: "https://retailor.example",
-      }),
-    ).toThrow();
-    const runtime = composeRuntime(
-      parseEnvironment({ SHOPIFY_PROVIDER: "fixture" }),
-      () => "req_fixture",
-    );
+    const fixtureConfig = { ...appConfig, provider: "fixture" as const };
+    expect(
+      configuredShopify(
+        parseEnvironment({
+          APP_ENV: "production",
+          FAKE_MODE: "false",
+          FRONTEND_ORIGIN: "https://retailor.example",
+        }),
+        fixtureConfig,
+      ),
+    ).toBeUndefined();
+    const runtime = runtimeWith(parseEnvironment({}), fixtureConfig);
     const app = createApp(runtime, () => {});
     const post = (operation: string, body: object, cookie = "", proof = "") =>
       request(app)
@@ -47,7 +67,6 @@ describe("inert Shopify runtime configuration", () => {
           "connect",
           {
             ...control,
-            shop: "retailor-demo.myshopify.com",
             returnTo: "connections",
           },
           cookie,
@@ -88,21 +107,54 @@ describe("inert Shopify runtime configuration", () => {
       await runtime.shopify?.close();
     }
   });
+  it("ignores obsolete environment selection and never simulates a keyless normal runtime", () => {
+    const runtime = composeRuntime(
+      parseEnvironment({
+        SHOPIFY_PROVIDER: "fixture",
+        SHOPIFY_CLIENT_ID: "old-app",
+      }),
+      () => "req_default",
+    );
+    expect(runtime.shopify).toBeUndefined();
+    expect(runtime.capabilities.shopify.available).toBe(false);
+    expect(fetch).not.toHaveBeenCalled();
+  });
   it.each([
-    {},
-    { ...credentials, SHOPIFY_STORAGE_PROJECT: "incomplete-project" },
-    { ...credentials, SHOPIFY_STORAGE_BUCKET: "incomplete-bucket" },
-    { SHOPIFY_CLIENT_ID: "partial" },
-    { ...credentials, SHOPIFY_ENCRYPTION_KEY: "bad" },
+    { env: {}, app: appConfig },
     {
-      ...credentials,
-      SHOPIFY_STORAGE_PROJECT: "test-project",
-      SHOPIFY_STORAGE_BUCKET: "retailor-511714-checkout-photos",
+      env: credentials,
+      app: { ...appConfig, storageProject: "incomplete-project" },
     },
+    {
+      env: credentials,
+      app: { ...appConfig, storageBucket: "incomplete-bucket" },
+    },
+    { env: credentials, app: { ...appConfig, clientId: "" } },
+    { env: credentials, app: { ...appConfig, developmentInstallUrl: "" } },
+    {
+      env: credentials,
+      app: { ...appConfig, developmentInstallUrl: "https://evil.example" },
+    },
+    { env: credentials, app: { ...appConfig, clientId: "different-app" } },
+    { env: { ...credentials, SHOPIFY_ENCRYPTION_KEY: "bad" }, app: appConfig },
+    {
+      env: credentials,
+      app: {
+        ...appConfig,
+        storageProject: "test-project",
+        storageBucket: "retailor-511714-checkout-photos",
+      },
+    },
+    { env: credentials, app: { ...appConfig, clientId: "a".repeat(201) } },
+    {
+      env: credentials,
+      app: { ...appConfig, storageProject: "a".repeat(101) },
+    },
+    { env: credentials, app: { ...appConfig, storageBucket: "a".repeat(201) } },
   ])(
     "keeps missing or unsafe prerequisites unavailable without changing fake/paid defaults",
-    (env) => {
-      const runtime = composeRuntime(parseEnvironment(env), () => "req_config");
+    ({ env, app }) => {
+      const runtime = runtimeWith(parseEnvironment(env), app);
       expect(runtime.shopify).toBeUndefined();
       expect(runtime.capabilities.shopify.available).toBe(false);
       expect(runtime.capabilities.paidEnabled).toBe(false);
@@ -112,18 +164,18 @@ describe("inert Shopify runtime configuration", () => {
   it("constructs configured local/hosted adapters without opening state, resolving credentials or calling providers from health/config", async () => {
     const local = vi.spyOn(LocalShopifyStore.prototype, "read"),
       gcs = vi.spyOn(GcsShopifyStore.prototype, "read");
-    for (const env of [
-      credentials,
-      {
-        ...credentials,
-        APP_ENV: "production",
-        FAKE_MODE: "false",
-        FRONTEND_ORIGIN: "https://retailor.example",
-        SHOPIFY_STORAGE_PROJECT: "test-project",
-        SHOPIFY_STORAGE_BUCKET: "test-integration-bucket",
-      },
-    ]) {
-      const runtime = composeRuntime(parseEnvironment(env), () => "req_config");
+    for (const [env, configuredApp] of [
+      [credentials, appConfig],
+      [
+        credentials,
+        {
+          ...appConfig,
+          storageProject: "test-project",
+          storageBucket: "test-integration-bucket",
+        },
+      ],
+    ] as const) {
+      const runtime = runtimeWith(parseEnvironment(env), configuredApp);
       expect(runtime.shopify).toBeDefined();
       expect(runtime.capabilities.shopify.available).toBe(true);
       const app = createApp(runtime);
@@ -138,16 +190,33 @@ describe("inert Shopify runtime configuration", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
   it("does not accept process-local persistence in production", () => {
-    const runtime = composeRuntime(
+    const runtime = runtimeWith(
       parseEnvironment({
         ...credentials,
         APP_ENV: "production",
         FAKE_MODE: "false",
         FRONTEND_ORIGIN: "https://retailor.example",
       }),
-      () => "req_config",
     );
     expect(runtime.shopify).toBeUndefined();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+  it("never exposes the organization-bound development entry in production, even with durable hosted storage", () => {
+    expect(
+      configuredShopify(
+        parseEnvironment({
+          ...credentials,
+          APP_ENV: "production",
+          FAKE_MODE: "false",
+          FRONTEND_ORIGIN: "https://retailor.example",
+        }),
+        {
+          ...appConfig,
+          storageProject: "test-project",
+          storageBucket: "test-integration-bucket",
+        },
+      ),
+    ).toBeUndefined();
     expect(fetch).not.toHaveBeenCalled();
   });
 });
