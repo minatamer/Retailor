@@ -22,6 +22,8 @@ function provider(http: typeof fetch) {
   return new LiveShopifyProvider(
     {
       clientId: "test-app",
+      developmentInstallUrl:
+        "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dtest-app",
       secret: "test-only-secret",
       redirectUri: "https://retailor.example/api/retailor/v1/shopify/callback",
     },
