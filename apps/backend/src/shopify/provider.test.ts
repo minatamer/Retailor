@@ -22,8 +22,6 @@ function provider(http: typeof fetch) {
   return new LiveShopifyProvider(
     {
       clientId: "test-app",
-      developmentInstallUrl:
-        "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dtest-app",
       secret: "test-only-secret",
       redirectUri: "https://retailor.example/api/retailor/v1/shopify/callback",
     },
@@ -32,6 +30,13 @@ function provider(http: typeof fetch) {
   );
 }
 describe("fixed standalone Shopify provider", () => {
+  it("opens Shopify's install entry with only the shared app identity", () => {
+    const http = vi.fn<typeof fetch>();
+    expect(provider(http).installationUrl()).toBe(
+      "https://admin.shopify.com/oauth/install?client_id=test-app",
+    );
+    expect(http).not.toHaveBeenCalled();
+  });
   it("classifies rejected credentials without reading or exposing provider text", async () => {
     for (const status of [401, 403]) {
       const http = vi.fn<typeof fetch>(
