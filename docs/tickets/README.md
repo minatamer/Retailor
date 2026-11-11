@@ -1,5 +1,7 @@
 # Retailor implementation tickets
 
+Hosted Shopify release: [RTL-191](RTL-191-enable-hosted-shopify.md) is active under resumed deployment authority and the shared-app choice. Both secret version1 values are owner-confirmed; production/auth/cleanup/preservation implementation passes all six local gates,924/924 tests. [Current guide](../operations/SHOPIFY-HOSTED-RELEASE.md), [actual evidence](../validation/RTL-191.md). Linux/hosted phases remain pending, Shopify sign-in/URL changes deferred and public traffic unchanged.
+
 Shopify reset banner removal: [RTL-194](RTL-194-remove-global-shopify-cleanup-warning.md) removes the pictured global warning while retaining the bounded end request and other recovery messages. The failed-acknowledgement session regression, normal in-app reset and all six current-source gates pass,896/896 tests. [Actual validation](../validation/RTL-194.md) records evidence and the one-reload requirement for old in-memory controller instances. Deployment remains held.
 
 Visible confirmation footer: [RTL-193](RTL-193-sticky-order-confirmation-footer.md) separates receipt scrolling from a pinned action/footer block, so both CTAs stay reachable without scrolling. Native Codex checks cover desktop, short phone,320px and landscape overflow, keyboard access, both actions and reopen. All six current-source gates pass,895/895 tests; [actual validation](../validation/RTL-193.md) records the completed sandbox receipt used and explicit limits. Deployment remains held.
