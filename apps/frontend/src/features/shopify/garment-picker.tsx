@@ -6,6 +6,7 @@ import { formatUsd } from "@retailor/commerce/money";
 import { Button } from "../../components/ui/button";
 import { useSession } from "../session/context";
 import { GarmentGallery, GarmentImage } from "../storefront/gallery";
+import { PhotoPlaceholder } from "../../components/ui/loading-state";
 import { exportSelection } from "./selection";
 import { ReviewDialog } from "./review-dialog";
 import styles from "./connections.module.css";
@@ -88,7 +89,7 @@ export function GarmentPicker({
                     onFailure={failure}
                   />
                 ) : (
-                  <span>Photo unavailable</span>
+                  <PhotoPlaceholder label="Photo unavailable" />
                 )}
                 <label className={styles.garmentSelect}>
                   <input
