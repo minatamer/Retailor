@@ -8,7 +8,7 @@ describe("fixed Shopify browser requests", () => {
       Response.json({
         schemaVersion: 1,
         authorizationUrl:
-          "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dfixture",
+          "https://admin.shopify.com/oauth/install?client_id=fixture",
       }),
     );
     const port = shopifyRequester(fetcher),
