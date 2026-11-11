@@ -1,0 +1,14 @@
+# RTL-195 — Manual security audit of the current release
+
+11 November 2026. Owner explicitly chooses a manual security audit instead of Docker Scout after the approved current-image scans cannot run without Docker login. Do not request Docker login again for this audit or claim an automated scan completed. Continue the parent deployment after the audit and required dispositions; preserve its project/configuration and pending Shopify account step.
+
+## Scope and acceptance
+
+1. Review the exact RTL-191 release candidate, including Shopify OAuth/identity/tenant binding, token encryption/storage/retention, owned-only writes/cleanup, private maintenance authentication/admission, public request guards, secrets/logging and the planned cloud permissions/configuration. Preserve approved RTL-023/024 dispositions rather than silently weakening them or reclassifying accepted tradeoffs as new defects.
+2. Inspect actual current immutable Linux runtime images and locally compare installed npm/OS versions against current public advisory data. Download public data only; send no image/package inventory or secrets to an external scanning service. Record precise provenance, actual comparisons and reachability limits, including bundled native libraries and Node runtime coverage.
+3. Report actionable findings with severity, path/evidence, realistic prerequisite/impact and concrete disposition; distinguish coding defects, missing hosted release gates and unverified platform acceptance. Never claim independent certification, a complete penetration test, zero vulnerabilities or automated scanner acceptance from this manual audit.
+4. Preserve app bytes/index during read-only review, then independently verify any finding before an authorised fix under RTL-191. Document actual checks and current rollout verdict. No cloud deployment, paid-model request, secret read, new scanner installation or application mutation as part of this audit itself.
+
+Parent: RTL-191. Review base is its24-file accepted implementation at `5de9fa81f6f0f6490c77891847e9f259a35c918c`, plus the explicitly pending release-probe/allocation changes. App fingerprint `d5d1cd892150a29c53c4cc7b9fcb6838857aaec3be9b9793b6f82511c7b2b66d`,348 inputs. Frontend image `sha256:758d069ee0d65a5dde3d4d648b516bffe55d43ca8f483623a115c69acda2e1d1`; backend `sha256:bc8e5c105eefb2d63120a0b51b462c262dcd75a898e71c43dd3e916bebf2993c`.
+
+Status: manual audit completed; security maintenance and actual hosted gates remain before cutover. [Report](../audits/RTL-195-MANUAL-SECURITY.md), [evidence](../audits/RTL-195/security-evidence.json), [validation](../validation/RTL-195.md).100 focused security tests pass. Two maintenance findings: current Node24.21.0 misses published security updates, and APT2.6.1 is below a newly available Bookworm fix. No new cross-visitor OAuth/token/owned-cleanup bypass established; no automated-scan or hosted acceptance claimed. Live traffic unchanged.
