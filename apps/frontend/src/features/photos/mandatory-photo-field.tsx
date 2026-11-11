@@ -2,6 +2,7 @@
 import { useId, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { Button } from "../../components/ui/button";
+import { LoadingState } from "../../components/ui/loading-state";
 import type { PhotoController } from "./controller";
 import { namedFiles } from "./photo-picker";
 import styles from "./photos.module.css";
@@ -67,6 +68,7 @@ export function MandatoryPhotoField({
           Remove this photo
         </Button>
       )}
+      {state.busy && <LoadingState compact title="Checking your photo" />}
       <p>
         {available
           ? "Photo validated and available. Keep at least one photo on this product."
