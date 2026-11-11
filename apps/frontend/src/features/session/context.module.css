@@ -13,6 +13,7 @@
   align-items: center;
   gap: 32px;
   animation: arrive 0.3s var(--ease-out) both;
+  width: min(400px, 100%);
 }
 .brand {
   font-size: clamp(52px, 9vw, 84px);
