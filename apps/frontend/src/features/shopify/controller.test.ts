@@ -65,7 +65,7 @@ function requests(now = () => start) {
       return {
         schemaVersion: 1 as const,
         authorizationUrl:
-          "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dfixture",
+          "https://admin.shopify.com/oauth/install?client_id=fixture",
       };
     }),
     simulate: vi.fn(async (_workspace: string, approved: boolean) => {
@@ -119,6 +119,7 @@ function requests(now = () => start) {
     remove: vi.fn(async () => structuredClone(state)),
     end: vi.fn(async () => {
       state.state = "cleanup_pending";
+      state.ended = true;
       return structuredClone(state);
     }),
   } satisfies ShopifyRequester;
@@ -454,7 +455,7 @@ describe("bounded session-owned Shopify child", () => {
       expect.any(AbortSignal),
     );
     expect(h.navigate).toHaveBeenCalledWith(
-      "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dfixture",
+      "https://admin.shopify.com/oauth/install?client_id=fixture",
     );
     expect(h.port.write).not.toHaveBeenCalled();
   });
@@ -522,6 +523,90 @@ describe("bounded session-owned Shopify child", () => {
     h.child.visible(false);
     await vi.advanceTimersByTimeAsync(90000);
     expect(h.port.status).toHaveBeenCalledTimes(13);
+  });
+  it("shows the acknowledged ended state, checks removal promptly and stops after confirmed cleanup", async () => {
+    const h = await childSetup(true);
+    vi.useFakeTimers();
+    h.child.visible(true);
+    await h.child.disconnect();
+    expect(h.child.getSnapshot()).toMatchObject({
+      verified: true,
+      status: { ended: true, state: "cleanup_pending" },
+      notice: "",
+    });
+    await vi.advanceTimersByTimeAsync(4999);
+    expect(h.port.status).toHaveBeenCalledTimes(1);
+    h.state.state = "cleaned";
+    await vi.advanceTimersByTimeAsync(1);
+    expect(h.child.getSnapshot()).toMatchObject({
+      verified: true,
+      status: { ended: true, state: "cleaned" },
+      notice: "",
+    });
+    expect(h.port.status).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(90000 * 20);
+    expect(h.port.status).toHaveBeenCalledTimes(2);
+  });
+  it("keeps removal polling bounded, slows after six initial checks and cancels when hidden", async () => {
+    const h = await childSetup(true);
+    vi.useFakeTimers();
+    h.child.visible(true);
+    await h.child.disconnect();
+    await vi.advanceTimersByTimeAsync(30000);
+    expect(h.port.status).toHaveBeenCalledTimes(7);
+    await vi.advanceTimersByTimeAsync(89999);
+    expect(h.port.status).toHaveBeenCalledTimes(7);
+    await vi.advanceTimersByTimeAsync(1 + 90000 * 20);
+    expect(h.port.status).toHaveBeenCalledTimes(13);
+    h.child.visible(false);
+    await vi.advanceTimersByTimeAsync(90000);
+    expect(h.port.status).toHaveBeenCalledTimes(13);
+  });
+  it("does not claim an acknowledged disconnect when the request fails, and can verify the real outcome", async () => {
+    const h = await childSetup(true);
+    h.port.end.mockRejectedValueOnce(new Error("lost disconnect response"));
+    await h.child.disconnect();
+    expect(h.child.getSnapshot()).toMatchObject({
+      verified: false,
+      status: { ended: false, state: "checking_outcome" },
+      notice: expect.stringContaining("not confirmed"),
+    });
+    await h.child.refresh();
+    expect(h.child.getSnapshot()).toMatchObject({
+      verified: true,
+      status: { ended: false, state: "connected" },
+    });
+  });
+  it("honors Retry-After during removal and never turns a failed check into cleanup completion", async () => {
+    const h = await childSetup(true);
+    vi.useFakeTimers();
+    h.child.visible(true);
+    await h.child.disconnect();
+    h.port.status.mockRejectedValueOnce(
+      new ApiRequestError("BUSY", "req_check", 20000),
+    );
+    h.advance(5000);
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(h.child.getSnapshot()).toMatchObject({
+      verified: false,
+      status: { ended: true, state: "cleanup_pending" },
+      notice: expect.stringContaining("could not be checked"),
+    });
+    expect(h.port.status).toHaveBeenCalledTimes(2);
+    h.advance(19999);
+    await vi.advanceTimersByTimeAsync(19999);
+    expect(h.port.status).toHaveBeenCalledTimes(2);
+    h.advance(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(h.port.status).toHaveBeenCalledTimes(3);
+    expect(h.child.getSnapshot()).toMatchObject({
+      verified: true,
+      status: { ended: true, state: "cleanup_pending" },
+      notice: "",
+    });
+    h.child.visible(false);
+    await vi.advanceTimersByTimeAsync(90000);
+    expect(h.port.status).toHaveBeenCalledTimes(3);
   });
   it("does not mint a new seal for an older or copied unsealed workspace", async () => {
     const h = await childSetup();
@@ -669,6 +754,102 @@ function importSource(id = "gid://shopify/Product/123") {
   });
 }
 describe("collection import controller", () => {
+  it("excludes gift cards from mixed and gift-only browse pages, refresh and collection changes without hidden requests", async () => {
+    const h = await childSetup(true),
+      clothing = {
+        ...importSource().product,
+        title: "Gift Cardigan",
+        giftCard: false,
+      },
+      legacy = importSource("gid://shopify/Product/124").product,
+      gift = {
+        ...importSource("gid://shopify/Product/900").product,
+        title: "Gift Card",
+        giftCard: true,
+      };
+    h.port.products
+      .mockResolvedValueOnce({
+        schemaVersion: 1,
+        products: [gift, clothing, legacy],
+        nextCursor: "second_page",
+        page: 1,
+        limited: false,
+        currency: "USD",
+      })
+      .mockResolvedValueOnce({
+        schemaVersion: 1,
+        products: [gift],
+        nextCursor: "third_page",
+        page: 2,
+        limited: false,
+        currency: "USD",
+      })
+      .mockResolvedValueOnce({
+        schemaVersion: 1,
+        products: [{ ...clothing, giftCard: true }],
+        nextCursor: null,
+        page: 3,
+        limited: true,
+        currency: "USD",
+      });
+    await h.child.browse();
+    expect(h.child.getSnapshot().catalogue?.products).toEqual([
+      clothing,
+      legacy,
+    ]);
+    expect(h.port.products).toHaveBeenCalledTimes(1);
+    await h.child.browse(true);
+    expect(h.child.getSnapshot().catalogue).toMatchObject({
+      products: [clothing, legacy],
+      page: 2,
+      nextCursor: "third_page",
+      limited: false,
+    });
+    expect(h.port.products).toHaveBeenCalledTimes(2);
+    await h.child.browse(true);
+    expect(h.child.getSnapshot().catalogue).toMatchObject({
+      products: [legacy],
+      page: 3,
+      nextCursor: null,
+      limited: true,
+    });
+    expect(h.port.products).toHaveBeenCalledTimes(3);
+    h.port.products.mockResolvedValueOnce({
+      schemaVersion: 1,
+      products: [gift],
+      nextCursor: "gift_only_next",
+      page: 1,
+      limited: false,
+      currency: "USD",
+    });
+    await h.child.browse();
+    expect(h.child.getSnapshot().catalogue).toMatchObject({
+      products: [],
+      nextCursor: "gift_only_next",
+      page: 1,
+    });
+    expect(h.port.products).toHaveBeenCalledTimes(4);
+    h.port.products.mockResolvedValueOnce({
+      schemaVersion: 1,
+      products: [gift, clothing],
+      nextCursor: null,
+      page: 1,
+      limited: false,
+      currency: "USD",
+    });
+    await h.child.chooseCollection("gid://shopify/Collection/12");
+    expect(h.child.getSnapshot().catalogue?.products).toEqual([clothing]);
+    expect(h.port.products).toHaveBeenLastCalledWith(
+      "workspace",
+      null,
+      proof,
+      expect.any(AbortSignal),
+      "gid://shopify/Collection/12",
+    );
+    expect(h.port.products).toHaveBeenCalledTimes(5);
+    expect(h.port.importProduct).not.toHaveBeenCalled();
+    expect(h.port.write).not.toHaveBeenCalled();
+  });
   it("aborts a pending commit and releases its review photos on cancellation", async () => {
     const h = await childSetup(true);
     h.port.importProduct.mockResolvedValue(importSource());
