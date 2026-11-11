@@ -634,6 +634,11 @@ export class ShopifyCatalogue {
               const current = await scope.update((shop) =>
                 structuredClone(intentFor(shop, id)),
               );
+              if (installation.collection)
+                await new ShopifyCollection(this.provider.collections).ensure(
+                  context,
+                  scope,
+                );
               if (
                 current.configured &&
                 (!update ||
@@ -666,10 +671,13 @@ export class ShopifyCatalogue {
               });
             }
           }
+          const collectionId = !prepared.existing
+            ? await new ShopifyCollection(this.provider.collections).ensure(
+                context,
+                scope,
+              )
+            : undefined;
           if (!prepared.existing) {
-            const collectionId = await new ShopifyCollection(
-              this.provider.collections,
-            ).ensure(context, scope);
             const staged = await this.provider.stage(
               context,
               photos.map((photo) => {
