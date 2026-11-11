@@ -7,6 +7,7 @@ import { SalesTrend, RankedBars } from "./charts";
 import type { ChartMark } from "./charts";
 import { GarmentImage } from "../storefront/gallery";
 import { EvidenceDrawer } from "./evidence-drawer";
+import { AnimatedFact } from "./animated-fact";
 import styles from "./dashboard.module.css";
 export function DashboardOverview() {
   const { state, controller } = useSession(),
@@ -92,25 +93,8 @@ export function DashboardOverview() {
             </button>
           ))}
         </div>
+        <span>Simulated data</span>
       </div>
-      {model.comparison.registry && (
-        <button
-          type="button"
-          className={styles.sourceLink}
-          onClick={() =>
-            controller.openDashboardEvidence({
-              kind: "comparison",
-              factId: "net_sales",
-            })
-          }
-        >
-          Previous period net sales:{" "}
-          {factDisplay(
-            model.comparison.registry.find((f) => f.factId === "net_sales")!,
-          )}{" "}
-          · Inspect basis ↗
-        </button>
-      )}
       <div className={styles.kpis} data-tailor-target="owner-kpis">
         {headlines.map((fact) => (
           <button
@@ -126,7 +110,9 @@ export function DashboardOverview() {
             <span>
               {labelOf(fact)} <i aria-hidden="true">↗</i>
             </span>
-            <strong>{factDisplay(fact)}</strong>
+            <strong>
+              <AnimatedFact fact={fact} />
+            </strong>
             <small>
               {fact.reason ??
                 (fact.factId === "aov"
@@ -164,7 +150,9 @@ export function DashboardOverview() {
                 })
               }
             >
-              <strong>{factDisplay(fact)}</strong>
+              <strong>
+                <AnimatedFact fact={fact} />
+              </strong>
               <span>{labelOf(fact)}</span>
               <small>
                 {fact.factId === "refund_value"
@@ -302,7 +290,9 @@ export function DashboardOverview() {
                 }
               >
                 <span>{labelOf(fact)}</span>
-                <strong>{factDisplay(fact)}</strong>
+                <strong>
+                  <AnimatedFact fact={fact} />
+                </strong>
                 <small>
                   {fact.reason ??
                     `${fact.numerator} / ${fact.denominator} registered basis`}
