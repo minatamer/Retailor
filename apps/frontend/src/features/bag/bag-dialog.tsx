@@ -420,71 +420,83 @@ export function BagDialog() {
       <div className={styles.screen} key={mode}>
         {order ? (
           <div className={styles.receipt}>
-            <div className={styles.success} aria-hidden="true">
-              <Icon name="check" size={32} />
+            <div
+              className={styles.receiptContent}
+              role="region"
+              aria-label="Order receipt"
+              tabIndex={0}
+            >
+              <div className={styles.success} aria-hidden="true">
+                <Icon name="check" size={32} />
+              </div>
+              <p className={styles.intro}>
+                All set. Your demo order is in your dashboard.
+              </p>
+              <p className={styles.reference}>
+                Demo order <strong>{order.id}</strong>
+              </p>
+              <ul className={styles.receiptLines} aria-label="Ordered garments">
+                {order.lines.map((line, index) => {
+                  const photo = controller.photos.view(line.photoId);
+                  return (
+                    <li key={line.id}>
+                      <div className={`${styles.photo} ${styles.receiptPhoto}`}>
+                        {photo ? (
+                          <GarmentImage
+                            photo={{ ...photo, id: line.photoId }}
+                            title={line.title}
+                            onFailure={(id) =>
+                              controller.photos.reportUnavailable(id)
+                            }
+                          />
+                        ) : (
+                          <PhotoPlaceholder label="Photo unavailable" small />
+                        )}
+                      </div>
+                      <div className={styles.itemCopy}>
+                        <strong>{line.title}</strong>
+                        <span>
+                          {knownColour(line.colour) ? `${line.colour} · ` : ""}
+                          {line.size} · Quantity {line.quantity}
+                        </span>
+                        <span>
+                          {formatDisplay(line.unitPrice, scope)} each ·{" "}
+                          {stockOf(state.graph, line.variantId)} currently in
+                          stock
+                        </span>
+                      </div>
+                      <strong>
+                        {formatMinor(
+                          totals!.rows[index]!.amount,
+                          scope.currency,
+                        )}
+                      </strong>
+                    </li>
+                  );
+                })}
+              </ul>
+              <OrderTotals totals={totals!} scope={scope} />
+              <p className={styles.note}>
+                Receipt in {scope.currency}
+                {scope.snapshot
+                  ? ` · Reference dated ${scope.snapshot.rateDate}`
+                  : ""}
+                . Saved at placement.
+              </p>
             </div>
-            <p className={styles.intro}>
-              All set. Your demo order is in your dashboard.
-            </p>
-            <p className={styles.reference}>
-              Demo order <strong>{order.id}</strong>
-            </p>
-            <ul className={styles.receiptLines} aria-label="Ordered garments">
-              {order.lines.map((line, index) => {
-                const photo = controller.photos.view(line.photoId);
-                return (
-                  <li key={line.id}>
-                    <div className={`${styles.photo} ${styles.receiptPhoto}`}>
-                      {photo ? (
-                        <GarmentImage
-                          photo={{ ...photo, id: line.photoId }}
-                          title={line.title}
-                          onFailure={(id) =>
-                            controller.photos.reportUnavailable(id)
-                          }
-                        />
-                      ) : (
-                        <PhotoPlaceholder label="Photo unavailable" small />
-                      )}
-                    </div>
-                    <div className={styles.itemCopy}>
-                      <strong>{line.title}</strong>
-                      <span>
-                        {knownColour(line.colour) ? `${line.colour} · ` : ""}
-                        {line.size} · Quantity {line.quantity}
-                      </span>
-                      <span>
-                        {formatDisplay(line.unitPrice, scope)} each ·{" "}
-                        {stockOf(state.graph, line.variantId)} currently in
-                        stock
-                      </span>
-                    </div>
-                    <strong>
-                      {formatMinor(totals!.rows[index]!.amount, scope.currency)}
-                    </strong>
-                  </li>
-                );
-              })}
-            </ul>
-            <OrderTotals totals={totals!} scope={scope} />
-            <p className={styles.note}>
-              Receipt in {scope.currency}
-              {scope.snapshot
-                ? ` · Reference dated ${scope.snapshot.rateDate}`
-                : ""}
-              . Saved at placement.
-            </p>
-            <div className={styles.actions}>
-              <Button variant="quiet" onClick={() => controller.closeBag()}>
-                Keep exploring
-              </Button>
-              <Button onClick={() => controller.showBagOrderInOwner()}>
-                See it in the dashboard <Icon name="arrow" />
-              </Button>
-            </div>
-            <p className={styles.demoNote}>
-              Demo order. No real charge or shipment.
-            </p>
+            <footer className={styles.receiptFooter}>
+              <div className={styles.actions}>
+                <Button variant="quiet" onClick={() => controller.closeBag()}>
+                  Keep exploring
+                </Button>
+                <Button onClick={() => controller.showBagOrderInOwner()}>
+                  See it in the dashboard <Icon name="arrow" />
+                </Button>
+              </div>
+              <p className={styles.demoNote}>
+                Demo order. No real charge or shipment.
+              </p>
+            </footer>
           </div>
         ) : checkoutReview ? (
           <div className={styles.checkout}>
