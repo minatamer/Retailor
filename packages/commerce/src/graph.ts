@@ -10,6 +10,10 @@ import {
   exactProduct,
 } from "./allocation.js";
 
+// Only outputs of the complete validator enter this weak, immutable registry.
+// A frozen/raw lookalike is still an unknown input and must pass every check.
+const validatedGraphs = new WeakMap<object, CommerceGraph>();
+
 export function utf8Bytes(value: string) {
   let bytes = 0;
   for (const char of value) {
@@ -74,6 +78,10 @@ export function emptyGraph(input: {
 }
 /** Shape, relationships, exact snapshots and full ledger coherence, independent of UI. */
 export function parseGraph(input: unknown): CommerceGraph {
+  if (input !== null && typeof input === "object") {
+    const validated = validatedGraphs.get(input);
+    if (validated) return validated;
+  }
   const parsed = GraphSchema.safeParse(input);
   if (!parsed.success)
     throw new CommerceError(
@@ -701,7 +709,9 @@ export function parseGraph(input: unknown): CommerceGraph {
       "relation",
       "Latest command receipt is missing.",
     );
-  return freeze(graph);
+  const validated = freeze(graph);
+  validatedGraphs.set(validated, validated);
+  return validated;
 }
 export function invalidGraph(error: unknown): CommerceError {
   return error instanceof CommerceError
