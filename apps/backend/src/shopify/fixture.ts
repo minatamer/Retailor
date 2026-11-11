@@ -51,9 +51,17 @@ export class FixtureShopify implements ShopifyProvider, ProductProvider {
         id: `gid://shopify/Collection/${this.next++}`,
         handle: intent.handle,
         metafield: { value: intent.marker },
+        image: { id: `gid://shopify/CollectionImage/${this.next - 1}` },
         products: { nodes: [], pageInfo: { hasNextPage: false } },
       };
       this.collectionRecords(context.shop).set(row.id, row);
+      return structuredClone(row);
+    },
+    setImage: async (context, id) => {
+      await this.admitted(context);
+      const row = this.collectionRecords(context.shop).get(id);
+      if (!row) return null;
+      row.image = { id: `gid://shopify/CollectionImage/${this.next++}` };
       return structuredClone(row);
     },
     remove: async (context, id) => {
@@ -70,7 +78,7 @@ export class FixtureShopify implements ShopifyProvider, ProductProvider {
     readonly clock: () => number = Date.now,
   ) {}
   installationUrl() {
-    return "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dfixture";
+    return "https://admin.shopify.com/oauth/install?client_id=fixture";
   }
   authorizationUrl(shop: string, state: string) {
     return `https://${shop}/admin/oauth/authorize?state=${state}`;
@@ -191,6 +199,12 @@ export class FixtureShopify implements ShopifyProvider, ProductProvider {
     if (records.size >= 256 && !records.has(product.id))
       return deny("BUSY", 429);
     records.set(product.id, structuredClone(product));
+  }
+  /** Development merchant edits only; never exposed by a browser operation. */
+  seedCollection(shop: string, collection: RemoteCollection) {
+    const rows = this.collectionRecords(shop);
+    if (rows.size >= 100 && !rows.has(collection.id)) return deny("BUSY", 429);
+    rows.set(collection.id, structuredClone(collection));
   }
   private async admitted(context: ProductContext) {
     context.signal.throwIfAborted();
