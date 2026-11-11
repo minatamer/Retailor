@@ -258,25 +258,6 @@
   opacity: 0.55;
   cursor: default;
 }
-.thinking {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 12px;
-}
-.thinking span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--platform-action);
-  animation: breathe 1.8s ease-in-out infinite;
-}
-@keyframes breathe {
-  50% {
-    opacity: 0.4;
-    transform: scale(0.75);
-  }
-}
 .panel {
   --tailor-size-progress: 0;
   --tailor-normal-height: min(
