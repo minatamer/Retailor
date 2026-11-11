@@ -5,7 +5,7 @@ import { composeRuntime } from "../runtime/compose.js";
 import { createApp } from "../http/app.js";
 import { GcsShopifyStore, LocalShopifyStore } from "../shopify/storage.js";
 import { configuredShopify } from "./shopify.js";
-import { SHOPIFY_APP } from "./shopify-app.js";
+import { SHOPIFY_APP, SHOPIFY_HOSTED } from "./shopify-app.js";
 import type { Environment } from "./environment.js";
 
 const credentials = {
@@ -198,7 +198,7 @@ describe("inert Shopify runtime configuration", () => {
     expect(runtime.shopify).toBeUndefined();
     expect(fetch).not.toHaveBeenCalled();
   });
-  it("keeps production unavailable pending native distribution acceptance, even with durable hosted storage", () => {
+  it("rejects foreign production identity, origin and storage even when credentials are present", () => {
     const gcs = vi.spyOn(GcsShopifyStore.prototype, "read");
     const configured = configuredShopify(
       parseEnvironment({
@@ -215,6 +215,49 @@ describe("inert Shopify runtime configuration", () => {
     );
     expect(configured).toBeUndefined();
     expect(gcs).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+  it("constructs the owner-selected shared production app with only the dedicated cloud ledger and inert maintenance", async () => {
+    const local = vi.spyOn(LocalShopifyStore.prototype, "read"),
+      gcs = vi.spyOn(GcsShopifyStore.prototype, "read"),
+      env = parseEnvironment({
+        ...credentials,
+        APP_ENV: "production",
+        FAKE_MODE: "false",
+        FRONTEND_ORIGIN: SHOPIFY_HOSTED.origin,
+      }),
+      configured = configuredShopify(env),
+      runtime = runtimeWith(env, SHOPIFY_HOSTED);
+    expect(configured?.appId).toBe(SHOPIFY_APP.clientId);
+    expect(runtime.shopify).toBeDefined();
+    expect(runtime.shopifyMaintenance).toBeDefined();
+    const app = createApp(runtime);
+    expect((await request(app).get("/v1/health")).status).toBe(200);
+    expect((await request(app).get("/v1/config")).body.shopify.available).toBe(
+      true,
+    );
+    expect(local).not.toHaveBeenCalled();
+    expect(gcs).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
+    await configured?.ledger.close();
+    await runtime.shopify?.close();
+  });
+  it.each([
+    { SHOPIFY_CLIENT_SECRET: "" },
+    { SHOPIFY_ENCRYPTION_KEY: "" },
+    { FRONTEND_ORIGIN: "https://foreign.example" },
+  ])("keeps incomplete production unavailable: %j", (override) => {
+    expect(
+      configuredShopify(
+        parseEnvironment({
+          ...credentials,
+          APP_ENV: "production",
+          FAKE_MODE: "false",
+          FRONTEND_ORIGIN: SHOPIFY_HOSTED.origin,
+          ...override,
+        }),
+      ),
+    ).toBeUndefined();
     expect(fetch).not.toHaveBeenCalled();
   });
 });
