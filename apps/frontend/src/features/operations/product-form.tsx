@@ -4,6 +4,10 @@ import { useRef } from "react";
 import { canRemoveSizeOption } from "../catalogue/size-options";
 import { CategorySchema } from "@retailor/contracts/product";
 import { Button } from "../../components/ui/button";
+import {
+  LoadingState,
+  PhotoPlaceholder,
+} from "../../components/ui/loading-state";
 import { useSession } from "../session/context";
 import { namedFiles } from "../photos/photo-picker";
 import { GarmentImage } from "../storefront/gallery";
@@ -54,9 +58,15 @@ export function ProductForm() {
             if (file) void controller.uploadOwnerPhoto(file);
           }}
         />
-        {ownerPhotoBusy && <span role="status">Checking your photograph…</span>}
         <FieldFeedback form={form} issues={issues} field="photoIds" />
       </label>
+      {ownerPhotoBusy && (
+        <LoadingState
+          compact
+          title="Checking your photograph"
+          detail="Preparing a clear, validated product preview."
+        />
+      )}
       <div className={styles.photos}>
         {form.photoIds.map((id) => {
           const photo = controller.photos.view(id);
@@ -69,7 +79,7 @@ export function ProductForm() {
                   onFailure={(id) => controller.photos.reportUnavailable(id)}
                 />
               ) : (
-                <p>Photo unavailable</p>
+                <PhotoPlaceholder label="Photo unavailable" />
               )}
               <button
                 type="button"
