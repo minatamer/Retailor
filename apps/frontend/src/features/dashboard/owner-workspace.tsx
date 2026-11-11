@@ -12,6 +12,7 @@ import { exactSum } from "@retailor/commerce/allocation";
 import { SCENARIO_LABELS } from "@retailor/commerce/scenarios";
 import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
+import { PhotoPlaceholder } from "../../components/ui/loading-state";
 import { useSession } from "../session/context";
 import { FormShell } from "../operations/form-shell";
 import { DashboardOverview } from "./overview";
@@ -325,7 +326,7 @@ export function OwnerWorkspace({ design }: { design: ReactNode }) {
                           />
                         ) : (
                           <div className={styles.missing}>
-                            Photo needs repair
+                            <PhotoPlaceholder />
                           </div>
                         )}
                         <span className={styles.source}>
