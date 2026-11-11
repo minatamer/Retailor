@@ -3,7 +3,7 @@ import type { Product } from "@retailor/contracts/product";
 import { colourImageIds } from "@retailor/contracts/product";
 import { useSession } from "../session/context";
 import { GarmentImage } from "../storefront/gallery";
-import { Icon } from "../../components/ui/icon";
+import { PhotoPlaceholder } from "../../components/ui/loading-state";
 import styles from "./registers.module.css";
 export function RecordPhoto({
   product,
@@ -28,9 +28,7 @@ export function RecordPhoto({
           onFailure={(missing) => controller.photos.reportUnavailable(missing)}
         />
       ) : (
-        <span role="img" aria-label="Photo unavailable">
-          <Icon name="garment" />
-        </span>
+        <PhotoPlaceholder label="Photo unavailable" small />
       )}
     </div>
   );
