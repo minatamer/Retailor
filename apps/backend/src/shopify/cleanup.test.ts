@@ -15,6 +15,7 @@ import { ShopifyLedger } from "./ledger.js";
 import { LocalShopifyStore } from "./storage.js";
 import { ShopifyAccessRejected } from "./provider.js";
 import { startShopifyCleanup } from "./runner.js";
+import { ShopifyMaintenance } from "./maintenance.js";
 
 const open: Awaited<ReturnType<typeof shopifyFixture>>[] = [];
 async function setup() {
@@ -120,6 +121,81 @@ afterEach(async () => {
 });
 
 describe("durable Shopify cleanup", () => {
+  it.each(["disconnect", "end"] as const)(
+    "runs a request-owned hosted first pass only for explicit disconnect, not %s reset semantics",
+    async (operation) => {
+      const h = await setup();
+      await h.send();
+      const sweep = vi.spyOn(h.cleanup, "sweep"),
+        app = createApp({
+          ...composeRuntime(parseEnvironment({}), () => "req_hosted_cleanup"),
+          shopify: h.auth,
+          shopifyCatalogue: h.catalogue,
+          shopifyCleanup: h.cleanup,
+          shopifyMaintenance: new ShopifyMaintenance(
+            h.cleanup,
+            async () => true,
+            vi.fn(),
+          ),
+        });
+      const response = await request(app)
+        .post(`/v1/shopify/${operation}`)
+        .set("Origin", "http://127.0.0.1:4310")
+        .set("Cookie", `retailor_shopify=${h.cookie}`)
+        .set("x-retailor-shopify-tab", h.proof)
+        .send({ schemaVersion: 1, workspaceId: "workspace" });
+      expect(response.status).toBe(200);
+      expect(response.body.ended).toBe(true);
+      expect(response.body.state).toBe(
+        operation === "disconnect" ? "cleaned" : "cleanup_pending",
+      );
+      expect(sweep).toHaveBeenCalledTimes(operation === "disconnect" ? 1 : 0);
+      const installation = await h.current();
+      expect(installation.products[0]?.state).toBe(
+        operation === "disconnect" ? "removed" : "ready",
+      );
+    },
+  );
+  it("retains truthful disconnected progress if the hosted first pass fails", async () => {
+    const h = await setup();
+    await h.send();
+    vi.spyOn(h.cleanup, "sweep").mockRejectedValueOnce(
+      new Error("PRIVATE_STORAGE_FAILURE"),
+    );
+    const app = createApp({
+      ...composeRuntime(parseEnvironment({}), () => "req_hosted_pending"),
+      shopify: h.auth,
+      shopifyCatalogue: h.catalogue,
+      shopifyCleanup: h.cleanup,
+      shopifyMaintenance: new ShopifyMaintenance(
+        h.cleanup,
+        async () => true,
+        vi.fn(),
+      ),
+    });
+    const response = await request(app)
+      .post("/v1/shopify/disconnect")
+      .set("Origin", "http://127.0.0.1:4310")
+      .set("Cookie", `retailor_shopify=${h.cookie}`)
+      .set("x-retailor-shopify-tab", h.proof)
+      .send({ schemaVersion: 1, workspaceId: "workspace" });
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      ended: true,
+      state: "cleanup_pending",
+    });
+    expect(JSON.stringify(response.body)).not.toContain(
+      "PRIVATE_STORAGE_FAILURE",
+    );
+    expect((await h.current()).products[0]?.state).toBe("ready");
+  });
+  it("never acquires durable maintenance authority for an already cancelled sweep", async () => {
+    const h = await setup(),
+      owner = new AbortController();
+    owner.abort();
+    await expect(h.cleanup.sweep(owner.signal)).rejects.toThrow();
+    expect(await h.ledger.inspect((data) => data.maintenance)).toBeNull();
+  });
   it.each(["reset", "expire", "unknown"] as const)(
     "reclaims only a never-dispatched authorization reservation after %s",
     async (ending) => {
