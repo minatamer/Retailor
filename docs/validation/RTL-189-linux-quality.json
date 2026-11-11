@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "observedDate": "2026-11-11",
+  "purpose": "Local isolated Linux quality verification, not a deployment/runtime image",
+  "hostBaseRevision": "e44423059932d7c6b9584381e529fa36aa92e78e",
+  "source": {
+    "fingerprint": "c6e7e982c6f0511c2641af691beea94dd2b68ae32bae6c47cf0d578c551a81fa",
+    "appInputs": 347,
+    "copiedFiles": 1589,
+    "exactHostBytes": true,
+    "normalization": false,
+    "originalGitMetadata": false,
+    "appLocalEnvironment": false
+  },
+  "image": {
+    "id": "sha256:36ca5894d8deaf7372d785fcea3d44bf4e0449167051c59263b282562ccbf747",
+    "os": "linux",
+    "architecture": "amd64",
+    "bytes": 1852414456,
+    "published": false
+  },
+  "observed": {
+    "node": "v24.19.0",
+    "pnpm": "11.25.0",
+    "verificationGitRevision": "29a4395cbbdb09dba700f12b550d92a703629521",
+    "verificationWorktreeDirty": false,
+    "qualityCommand": "pnpm check",
+    "qualityNetwork": "none",
+    "sixGatesPassed": true,
+    "testFilesPassed": 127,
+    "testsPassed": 895,
+    "unitDurationSeconds": 133.24,
+    "boundaryModules": 245,
+    "nextCompileSeconds": 7.4,
+    "nextTypeScriptSeconds": 14.7
+  },
+  "releasePreflight": {
+    "cliExitCode": 1,
+    "localVerdict": "source-mismatch",
+    "matchesLocalLinuxRuntimeImageEvidence": false,
+    "paidRequests": 0,
+    "networkRequests": 0,
+    "publicReleaseAccepted": false,
+    "publicationAuthorized": false,
+    "meaning": "Current production runtime images/scans still need rebuilding and verification before any deployment"
+  }
+}
