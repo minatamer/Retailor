@@ -1,5 +1,7 @@
 # Connect Shopify locally: complete owner setup
 
+**RTL-191 shared registration:** the owner reuses this app for hosting. Once its single App URL points at tryretailor.com, the generic local store-picker flow is affected even with the loopback callback retained. Local configuration/keys remain intact; switching App URL is an explicit account-setting step. See [current hosted guide](SHOPIFY-HOSTED-RELEASE.md). No second app or cross-origin session bridge is created. The production refusal described in the older RTL-174 note below is superseded by current production prerequisites.
+
 **Updated 11 November 2026, RTL-174.** Retailor is a standalone web app. Ordinary HTTP loopback remains the owner-selected setup: no tunnel, certificate or trust-store changes. The old own-organization preview entry is replaced with a **local candidate** using Shopify's managed installer. Newer Shopify staff guidance contradicts earlier external-dev-store reports; universal no-review access is not established and production remains refused. The owner deferred Dev Dashboard sign-in; **the new authenticated entry and unrelated-organization install are not yet verified**. [Research and evidence](../research/SHOPIFY-EXTERNAL-DEV-STORES.md).
 
 ## Every required item
