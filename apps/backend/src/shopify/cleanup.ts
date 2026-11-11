@@ -96,6 +96,7 @@ export class ShopifyCleanup {
   }
 
   async sweep(parent: AbortSignal) {
+    parent.throwIfAborted();
     const owner = randomBytes(32).toString("hex"),
       clock = this.auth.clock;
     const claimed = await this.auth.ledger.transact((data) => {
