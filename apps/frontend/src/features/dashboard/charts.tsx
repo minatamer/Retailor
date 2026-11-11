@@ -8,6 +8,8 @@ import type { DashboardTarget } from "./state";
 import { factDisplay, METRIC_LABELS } from "./model";
 import type { DashboardModel } from "./model";
 import { evidenceDate } from "./evidence-presentation";
+import { AnimatedFact } from "./animated-fact";
+import { curvePath } from "./curve";
 import styles from "./dashboard.module.css";
 export interface ChartMark {
   key: string;
@@ -23,20 +25,29 @@ export function ChartPanel({
   note,
   children,
   marks,
+  showHeading = true,
 }: {
   title: string;
-  note: string;
+  note?: string;
   children: ReactNode;
   marks: ChartMark[];
+  showHeading?: boolean;
 }) {
   const { controller } = useSession();
   return (
-    <section className={styles.panel}>
-      <div className={styles.panelHeading}>
-        <h3>{title}</h3>
-        <span aria-hidden="true">↗</span>
-      </div>
-      <p className={styles.caption}>{note}</p>
+    <section
+      className={styles.panel}
+      aria-label={showHeading ? undefined : title}
+    >
+      {showHeading && (
+        <>
+          <div className={styles.panelHeading}>
+            <h3>{title}</h3>
+            <span aria-hidden="true">↗</span>
+          </div>
+          {note && <p className={styles.caption}>{note}</p>}
+        </>
+      )}
       {children}
       <details className={styles.data}>
         <summary>Exact data table · {title}</summary>
@@ -82,10 +93,7 @@ export function ChartPanel({
     </section>
   );
 }
-function pathOf(points: readonly number[][]) {
-  return points.map((p, i) => `${i ? "L" : "M"}${p[0]},${p[1]}`).join(" ");
-}
-function MotionLine({ points, zero }: { points: number[][]; zero: number }) {
+function MotionCurve({ points, zero }: { points: number[][]; zero: number }) {
   const line = useRef<SVGPathElement>(null),
     area = useRef<SVGPathElement>(null),
     current = useRef<number[][] | null>(null);
@@ -94,16 +102,21 @@ function MotionLine({ points, zero }: { points: number[][]; zero: number }) {
       duration = current.current ? 400 : 550;
     let frame = 0,
       started: number | undefined;
+    let cancelled = false;
     const draw = (time: number) => {
+      if (cancelled) return;
       started ??= time;
       const progress = Math.min(1, (time - started) / duration),
         eased = 1 - (1 - progress) ** 3;
-      const positions = points.map((p, i) => [
-        initial[i]![0]! + (p[0]! - initial[i]![0]!) * eased,
-        initial[i]![1]! + (p[1]! - initial[i]![1]!) * eased,
-      ]);
+      const positions =
+        eased === 1
+          ? points
+          : points.map((p, i) => [
+              initial[i]![0]! + (p[0]! - initial[i]![0]!) * eased,
+              initial[i]![1]! + (p[1]! - initial[i]![1]!) * eased,
+            ]);
       current.current = positions;
-      const d = pathOf(positions);
+      const d = curvePath(positions);
       line.current?.setAttribute("d", d);
       area.current?.setAttribute(
         "d",
@@ -112,19 +125,22 @@ function MotionLine({ points, zero }: { points: number[][]; zero: number }) {
       if (progress < 1) frame = requestAnimationFrame(draw);
     };
     frame = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
   }, [points, zero]);
   return (
     <>
       <path
         ref={area}
-        d={`${pathOf(points)} L${points.at(-1)![0]},${zero} L${points[0]![0]},${zero} Z`}
+        d={`${curvePath(points)} L${points.at(-1)![0]},${zero} L${points[0]![0]},${zero} Z`}
         fill="var(--platform-selected)"
         opacity=".65"
       />
       <path
         ref={line}
-        d={pathOf(points)}
+        d={curvePath(points)}
         fill="none"
         stroke="var(--platform-action)"
         strokeWidth="3"
@@ -157,7 +173,6 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
   const selectedDay =
     marks.find((m) => pinned?.kind === "day" && m.key === pinned.day) ??
     marks.at(-1);
-  const active = marks.find((m) => m.key === hovered) ?? selectedDay;
   const geometry = useMemo(() => {
     const values = model.days.map(
         (d) => (series === "net_sales" ? d.sales : d.result).value,
@@ -180,10 +195,15 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
   const hoveredIndex = marks.findIndex((mark) => mark.key === hovered),
     hoveredMark = marks[hoveredIndex],
     hoveredPoint = geometry.actual[hoveredIndex];
+  const markedPoint =
+    hoveredPoint ??
+    (pinned?.kind === "day"
+      ? geometry.actual[marks.findIndex((mark) => mark.key === pinned.day)]
+      : undefined);
   return (
     <ChartPanel
-      title="How is the story changing?"
-      note="Daily event observations, connected by straight segments. Refunds can make sales negative; costs and adjustments follow their own event dates."
+      title="Sales and operating profit"
+      showHeading={false}
       marks={marks}
     >
       <div className={styles.segmented} role="group" aria-label="Trend series">
@@ -212,14 +232,14 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
             <svg
               viewBox="0 0 640 230"
               role="img"
-              aria-label={`${METRIC_LABELS[series]} across ${marks.length} recorded UTC days. Hover the graph or use the day controls for exact values.`}
+              aria-label={`${METRIC_LABELS[series]} across ${marks.length} recorded UTC ${model.bucketDays > 1 ? "intervals" : "days"}. Hover the graph or use the observation controls for exact values.`}
             >
               <path
                 d={`M24 ${geometry.zero} H616`}
                 stroke="var(--platform-control-line)"
                 strokeDasharray="4 5"
               />
-              <MotionLine points={geometry.points} zero={geometry.zero} />
+              <MotionCurve points={geometry.points} zero={geometry.zero} />
               {hoveredPoint && (
                 <line
                   className={styles.pointGuide}
@@ -230,23 +250,21 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
                   aria-hidden="true"
                 />
               )}
-              {geometry.actual.map((point, i) => (
+              {markedPoint && (
                 <circle
-                  key={marks[i]!.key}
-                  cx={point[0]}
-                  cy={point[1]}
-                  r={active?.key === marks[i]!.key ? 6 : 3}
+                  cx={markedPoint[0]}
+                  cy={markedPoint[1]}
+                  r="5"
                   fill={
-                    hovered === marks[i]!.key
+                    hoveredPoint
                       ? "var(--platform-lime)"
-                      : active?.key === marks[i]!.key
-                        ? "var(--platform-action)"
-                        : "var(--platform-surface)"
+                      : "var(--platform-action)"
                   }
                   stroke="var(--platform-action)"
                   strokeWidth="2"
+                  aria-hidden="true"
                 />
-              ))}
+              )}
               <g aria-hidden="true">
                 {geometry.actual.map((point, i) => {
                   const left = i
@@ -291,6 +309,7 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
                 }
               >
                 <time dateTime={hoveredMark.label}>
+                  {model.bucketDays > 1 ? "Period starting " : ""}
                   {evidenceDate(hoveredMark.label, false)} · UTC
                 </time>
                 <span>{METRIC_LABELS[series]}</span>
@@ -301,21 +320,21 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
         </div>
       ) : (
         <p className={styles.empty}>
-          This period includes days without recorded history. Choose All
-          activity to inspect the supplied history; unavailable days remain
-          explicit in the exact table.
+          This period includes days without recorded history. Choose All time to
+          inspect the supplied history; unavailable days remain explicit in the
+          exact table.
         </p>
       )}
-      {model.timelineLimited && (
+      {model.bucketDays > 1 && (
         <p className={styles.caption}>
-          Daily chart covers the latest 31 days within this period; headline
-          facts cover all selected activity.
+          Full period shown in intervals of up to {model.bucketDays} days. Open
+          an observation for its exact dates and records.
         </p>
       )}
       <div
         className={styles.dayStrip}
         role="group"
-        aria-label="Pin an exact daily observation"
+        aria-label={`Pin an exact ${model.bucketDays > 1 ? "period" : "daily"} observation`}
         onPointerLeave={() => setHovered(null)}
       >
         {marks.map((mark) => (
@@ -334,7 +353,9 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
             onClick={() => controller.pinDashboard(mark.target)}
           >
             <span>{mark.label.slice(5)}</span>
-            <strong>{factDisplay(mark.fact)}</strong>
+            <strong>
+              <AnimatedFact fact={mark.fact} />
+            </strong>
           </button>
         ))}
       </div>
@@ -342,10 +363,11 @@ export function SalesTrend({ model }: { model: DashboardModel }) {
         <div className={styles.trendActions}>
           <button
             type="button"
-            aria-label={`View day details for ${evidenceDate(selectedDay.label, false)} UTC`}
+            aria-label={`View ${model.bucketDays > 1 ? "period" : "day"} details for ${evidenceDate(selectedDay.label, false)} UTC`}
             onClick={() => controller.openDashboardEvidence(selectedDay.target)}
           >
-            View {evidenceDate(selectedDay.label, false)} details ↗
+            View {model.bucketDays > 1 ? "period starting " : ""}
+            {evidenceDate(selectedDay.label, false)} details ↗
           </button>
         </div>
       )}
@@ -412,7 +434,7 @@ export function RankedBars({
                 {mark.extra}
                 {mark.label}
                 <strong>
-                  {factDisplay(mark.fact)}
+                  <AnimatedFact fact={mark.fact} />
                   {mark.magnitude !== undefined &&
                   mark.fact.unit === "basis-points"
                     ? ` · ${mark.magnitude} ${mark.magnitudeLabel ?? "observations"}`
