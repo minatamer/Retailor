@@ -1,5 +1,7 @@
 # Paid and Shopify deployment preparation
 
+**Superseded operating selection:** [current RTL-191 release guide](SHOPIFY-HOSTED-RELEASE.md). The owner has resumed the existing-project release, chosen reuse of the current Shopify app and confirmed both secret values are filled. The RTL-190 hold/separate-registration recommendation below is historical preparation; do not treat it as the latest instruction.
+
 11 November 2026. **Deployment is on hold at the owner's request.** No service, DNS record, Shopify setting, secret, IAM grant, bucket or schedule was changed. [Remaining implementation](../tickets/RTL-191-enable-hosted-shopify.md).
 
 ## Current baseline
