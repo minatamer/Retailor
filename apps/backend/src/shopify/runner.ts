@@ -20,6 +20,7 @@ export function startShopifyCleanup(
 ) {
   const owner = new AbortController();
   let pending: Promise<void> | undefined;
+  let requested = false;
   const run = () => {
     if (owner.signal.aborted || pending) return;
     pending = cleanup
@@ -40,12 +41,22 @@ export function startShopifyCleanup(
       )
       .finally(() => {
         pending = undefined;
+        if (requested && !owner.signal.aborted) {
+          requested = false;
+          run();
+        }
       });
   };
+  const detach = cleanup.onRequested(() => {
+    if (owner.signal.aborted) return;
+    if (pending) requested = true;
+    else run();
+  });
   run();
   const timer = setInterval(run, CLEANUP.cadenceMs);
   timer.unref();
   return async () => {
+    detach();
     clearInterval(timer);
     owner.abort();
     await pending;
