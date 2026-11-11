@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MouseEvent, ReactNode } from "react";
+import { useAnimatedScroll } from "../../components/ui/animated-scroll";
 
 const SECTIONS = [
   ["how-it-works", "How it works"],
@@ -19,11 +20,7 @@ export function LandingNavigation({
 }) {
   const root = useRef<HTMLDivElement>(null);
   const [pastHero, setPastHero] = useState(false);
-  const frame = useRef<number | null>(null);
-  const cancel = useCallback(() => {
-    if (frame.current !== null) cancelAnimationFrame(frame.current);
-    frame.current = null;
-  }, []);
+  const { scrollTo, cancel } = useAnimatedScroll();
 
   useEffect(() => {
     const hero = root.current?.querySelector("[data-landing-hero]");
@@ -55,22 +52,6 @@ export function LandingNavigation({
       window.removeEventListener("pageshow", schedule);
     };
   }, []);
-
-  useEffect(() => {
-    const events = [
-      "wheel",
-      "touchstart",
-      "pointerdown",
-      "keydown",
-      "popstate",
-    ] as const;
-    for (const event of events)
-      window.addEventListener(event, cancel, { passive: true });
-    return () => {
-      cancel();
-      for (const event of events) window.removeEventListener(event, cancel);
-    };
-  }, [cancel]);
 
   function navigate(event: MouseEvent<HTMLDivElement>) {
     if (
@@ -121,19 +102,7 @@ export function LandingNavigation({
           );
     const distance = end - start;
     const duration = Math.min(900, Math.max(450, Math.abs(distance) * 0.24));
-    let started: number | undefined;
-    const step = (now: number) => {
-      started ??= now;
-      const progress = Math.min(1, Math.max(0, (now - started) / duration));
-      const eased = 1 - (1 - progress) ** 3;
-      window.scrollTo({ top: start + distance * eased, behavior: "instant" });
-      if (progress < 1) frame.current = requestAnimationFrame(step);
-      else {
-        frame.current = null;
-        target.focus({ preventScroll: true });
-      }
-    };
-    frame.current = requestAnimationFrame(step);
+    scrollTo(end, duration, () => target.focus({ preventScroll: true }));
   }
 
   return (
