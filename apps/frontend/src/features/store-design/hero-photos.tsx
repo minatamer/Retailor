@@ -11,6 +11,7 @@ import { namedFiles } from "../photos/photo-picker";
 import { campaignPhotos } from "../storefront/campaign";
 import { storeItems } from "../storefront/browse";
 import { GarmentImage } from "../storefront/gallery";
+import { LoadingState } from "../../components/ui/loading-state";
 import type { StorePhoto } from "../storefront/photo";
 import { TEMPLATES } from "./presets";
 import styles from "./hero-photos.module.css";
@@ -128,7 +129,13 @@ export function HeroPhotos() {
           </fieldset>
         );
       })}
-      {heroBusy && <p role="status">Checking your hero photo…</p>}
+      {heroBusy && (
+        <LoadingState
+          compact
+          title="Checking your hero photo"
+          detail="Preparing your storefront preview."
+        />
+      )}
       <p>
         Optional static JPEG, PNG or WebP · up to 4 MiB each. Hero uploads stay
         separate from product recognition.
