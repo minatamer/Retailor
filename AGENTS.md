@@ -16,6 +16,8 @@ RTL-025 fixes the supplied Linux CI source-proof mismatch with repository-owned 
 - Backend factory imports are inert; explicit startup alone loads app-local environment and listens. Providers are injected and live failure never selects a fake provider.
 - Clothing only. Every product needs a validated available photo. Public sample photos require fresh live recognition; fixture output is development-only.
 - Preserve designed motion. No animation-off/render-off setting or OS-based suppression. Keep keyboard/touch/focus use clear and avoid flashing.
+- When authored scrolling must visibly animate, use the shared bounded frame animator. Native `behavior: "smooth"` alone is not proof of animation; verify intermediate positions as well as the destination. Do not add a motion-disable preference or zero-duration shortcut.
+- Loading states and placeholders are first-class design work and must always match the quality of the finished screen. Follow [the loading design standard](docs/design/LOADING-STATES.md): immediate honest feedback, shared branded components, stable space, real progress, clear recovery and responsive transition checks. Do not defer them as polish, invent completion or leave permanent errors/empty states looking busy.
 
 ## Execution and validation
 
@@ -24,6 +26,8 @@ Implement one ticket at a time. Create a file-level allocation in `docs/commit-p
 Use focused meaningful tests during iteration; run applicable settled gates: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm check:boundaries`, `pnpm test:unit`, `pnpm build`. Record actual commands, environment and read-only validation pass results in `docs/validation/RTL-###.md`. Never claim browser quality, live provider results, Linux images or hosted checks from simulations alone. Update ticket/index status from actual evidence. Do not delegate or create other chats without explicit authorization.
 
 ## Local operation and privacy
+
+Latest owner direction, 11 November 2026: prepare the paid release with hosted Shopify, but **do not deploy now**. File-level staging/commits/push were authorized separately; cloud, Shopify configuration, secret/resource/IAM/DNS/schedule mutations and traffic changes remain held until the owner resumes them. See `docs/operations/SHOPIFY-HOSTED-READINESS.md` and RTL-190/191.
 
 Use dedicated Retailor ports: frontend 4310, backend 4311. Check ownership/listeners first; never stop an unrelated service, take its port, modify sibling files or kill processes by executable name. Normal app `.env.local` files are ignored; `.env.example` contains fake/paid-off defaults and blank secrets. Do not read sibling secrets. Health/config must dispatch no paid requests. Tests force paid-off and deny external networking. Frontend dev output `.next-dev` is separate from production `.next`.
 
