@@ -6,6 +6,7 @@ import { formatUsd } from "@retailor/commerce/money";
 import { bagTotals } from "../bag/quote";
 import { SIZING_LABELS } from "../storefront/browse";
 import { GarmentImage } from "../storefront/gallery";
+import { PhotoPlaceholder } from "../../components/ui/loading-state";
 import styles from "./operations.module.css";
 export function ReviewSummary() {
   const { ownerReview, state, controller } = useSession();
@@ -35,7 +36,11 @@ export function ReviewSummary() {
                   onFailure={(id) => controller.photos.reportUnavailable(id)}
                 />
               ) : (
-                <p key={id}>Photo unavailable — repair before confirming.</p>
+                <PhotoPlaceholder
+                  key={id}
+                  label="Photo unavailable"
+                  detail="Repair before confirming."
+                />
               );
             })}
           </div>
