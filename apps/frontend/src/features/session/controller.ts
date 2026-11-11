@@ -2464,7 +2464,10 @@ export class SessionController {
           state: freeze({ ...this.snapshot.state, stripeCheckout: null }),
           checkoutNotice:
             error instanceof ApiRequestError && error.code === "STALE"
-              ? "Your bag changed or this session is nearly over. Review it before trying Stripe again."
+              ? Date.parse(this.snapshot.state.graph.expiresAt) - this.clock() <
+                CHECKOUT_LIMITS.sessionMs + 5000
+                ? "This demo is too close to ending to start Stripe checkout. Start a fresh demo and try again."
+                : "Your checkout changed. Review your bag before trying Stripe again."
               : phase === "save"
                 ? "Allow browser storage to keep your order when you return."
                 : phase === "photos"
