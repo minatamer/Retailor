@@ -14,6 +14,7 @@ import { ShopifyService } from "./service.js";
 import { ShopifyLedger } from "./ledger.js";
 import { LocalShopifyStore } from "./storage.js";
 import { ShopifyAccessRejected } from "./provider.js";
+import { startShopifyCleanup } from "./runner.js";
 
 const open: Awaited<ReturnType<typeof shopifyFixture>>[] = [];
 async function setup() {
@@ -52,6 +53,68 @@ async function setup() {
     webhook,
   };
 }
+
+it("wakes only after a valid durable request, leaves repeated cleaned requests idle, and reports ended cleanup states", async () => {
+  const h = await setup();
+  let observed: Promise<unknown> | undefined;
+  const wake = vi.fn(() => {
+    observed = h.current();
+  });
+  const detach = h.cleanup.onRequested(wake);
+  expect(() => h.cleanup.onRequested(() => {})).toThrow();
+  await expect(
+    h.cleanup.request(h.cookie, "b".repeat(64), "workspace"),
+  ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  await expect(
+    h.cleanup.request(h.cookie, h.proof, "foreign"),
+  ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  expect(wake).not.toHaveBeenCalled();
+  expect((await h.auth.status(h.cookie, h.proof, "workspace")).ended).toBe(
+    false,
+  );
+  const ended = await h.end();
+  expect(ended.ended).toBe(true);
+  expect(ended.state).toBe("cleanup_pending");
+  expect(await observed).toMatchObject({
+    state: "cleanup_pending",
+    endedAt: h.clock(),
+  });
+  expect(wake).toHaveBeenCalledTimes(1);
+  await h.ledger.transact((data) => {
+    data.installations[0]!.state = "needs_attention";
+  });
+  expect(await h.auth.status(h.cookie, h.proof, "workspace")).toMatchObject({
+    ended: true,
+    state: "needs_attention",
+  });
+  await h.sweep();
+  const cleaned = await h.auth.status(h.cookie, h.proof, "workspace");
+  expect(cleaned).toMatchObject({ ended: true, state: "cleaned" });
+  await h.end();
+  expect(wake).toHaveBeenCalledTimes(1);
+  detach();
+  const replacement = h.cleanup.onRequested(() => {});
+  replacement();
+});
+
+it("starts local cleanup on Disconnect without advancing the minute timer or keeping the browser open", async () => {
+  const h = await setup();
+  const completed: (() => void)[] = [];
+  const initial = new Promise<void>((resolve) => completed.push(resolve));
+  const settled = new Promise<void>((resolve) => completed.push(resolve));
+  const diagnostic = vi.fn(() => completed.shift()?.());
+  const stop = startShopifyCleanup(h.cleanup, diagnostic);
+  try {
+    await initial;
+    await h.end();
+    // request() acknowledges the fence, not a remote result. Wait for worker
+    // completion through its existing diagnostic port, with no extra sweep.
+    await settled;
+  } finally {
+    await stop();
+  }
+  expect((await h.current()).state).toBe("cleaned");
+});
 afterEach(async () => {
   await Promise.all(open.splice(0).map((h) => h.close()));
 });
