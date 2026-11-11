@@ -1765,6 +1765,8 @@ Do not implement separate phone/desktop versions of domain interactions. Recompo
 
 ### 24.4 Motion contract
 
+**Standing owner requirement — 11 November 2026:** loading states and placeholders are part of the designed product and feature acceptance. Use the [maintained loading design standard](design/LOADING-STATES.md): consistent branded feedback from action start, reserved content space, genuine progress, progressive content arrival, usable recovery/cancellation and distinct permanent empty/error/repair states. Review actual pending-to-loaded transitions on desktop and phone; do not defer this work as polish or fabricate progress/delays. The sample action starts its authored smooth scroll while photos are still loading.
+
 Use motion to explain photo grouping, processing completion, alternate views, bag addition, perspective continuity, chart changes and proposal preparation. Animate opacity/transform where possible; values and controls remain immediately readable.
 
 Proposed timings are 150–250 ms for small feedback, 250–400 ms for drawers/view changes and up to 500 ms for a meaningful chart/collection entrance. Do not delay an available action to finish decorative motion.
