@@ -12,12 +12,14 @@ export const CollectionIntentSchema = z.strictObject({
   remoteId: id.nullable(),
   dispatched: z.boolean(),
   removed: z.boolean(),
+  imageDispatched: z.boolean().default(false),
 });
 export type CollectionIntent = z.infer<typeof CollectionIntentSchema>;
 const RemoteCollectionSchema = z.object({
   id,
   handle: z.string().max(255),
   metafield: z.object({ value: z.string().max(64) }).nullable(),
+  image: z.object({ id: z.string().max(100).nullable() }).nullable(),
   products: z.object({
     nodes: z.array(z.object({ id: z.string().max(100) })).max(11),
     pageInfo: z.object({ hasNextPage: z.boolean() }),
@@ -33,11 +35,19 @@ export interface CollectionProvider {
     context: ProductContext,
     intent: CollectionIntent,
   ): Promise<RemoteCollection | null>;
+  setImage(
+    context: ProductContext,
+    id: string,
+  ): Promise<RemoteCollection | null>;
   remove(context: ProductContext, id: string): Promise<boolean>;
 }
-const fields = `id handle metafield(namespace:"$app:retailor_demo",key:"session_collection") { value }
+const fields = `id handle image { id } metafield(namespace:"$app:retailor_demo",key:"session_collection") { value }
   products(first:11) { nodes { id } pageInfo { hasNextPage } }`;
 const errors = z.array(z.object({ message: z.string().max(2000) })).max(64);
+const collectionLogo = Object.freeze({
+  src: "https://tryretailor.com/apple-touch-icon.png",
+  altText: "Retailor logo",
+});
 
 export class LiveCollectionProvider implements CollectionProvider {
   constructor(private readonly graphql: GraphqlPort) {}
@@ -86,6 +96,7 @@ export class LiveCollectionProvider implements CollectionProvider {
         collection: {
           title: "Retailor",
           handle: intent.handle,
+          image: collectionLogo,
           descriptionHtml:
             "<p>Temporary Retailor demo drafts. Removed when the demo ends.</p>",
           metafields: [
@@ -117,6 +128,32 @@ export class LiveCollectionProvider implements CollectionProvider {
     const outcome = parsed.data.data.collectionCreate;
     // Null is a definite rejection only with Shopify userErrors. An empty or
     // malformed success remains uncertain and must never enable a duplicate.
+    if (!outcome.collection && !outcome.userErrors.length)
+      return deny("UPSTREAM_FAILED", 502);
+    return outcome.collection;
+  }
+  async setImage(context: ProductContext, collectionId: string) {
+    const result = await this.query(
+      context,
+      `mutation RetailorCollectionImage($collection:CollectionUpdateInput!) { collectionUpdate(collection:$collection) { collection { ${fields} } userErrors { message } } }`,
+      { collection: { id: collectionId, image: collectionLogo } },
+    );
+    const parsed = z
+      .object({
+        data: z.object({
+          collectionUpdate: z.object({
+            collection: RemoteCollectionSchema.nullable(),
+            userErrors: errors,
+          }),
+        }),
+      })
+      .safeParse(result);
+    if (
+      !parsed.success ||
+      (result && typeof result === "object" && "errors" in result)
+    )
+      return deny("UPSTREAM_FAILED", 502);
+    const outcome = parsed.data.data.collectionUpdate;
     if (!outcome.collection && !outcome.userErrors.length)
       return deny("UPSTREAM_FAILED", 502);
     return outcome.collection;
