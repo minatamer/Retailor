@@ -2,6 +2,7 @@
 import { useId } from "react";
 import Image from "next/image";
 import { Button } from "../../components/ui/button";
+import { LoadingState, SkeletonCards } from "../../components/ui/loading-state";
 import { useSession } from "../session/context";
 import { logoEligible, logoNameReady } from "./setup";
 import { PALETTES, TYPOGRAPHIES } from "../store-design/presets";
@@ -113,12 +114,17 @@ export function LogoPanel({
         )}
       </div>
       {logoBusy && (
-        <div className={styles.processing} role="status">
-          <span />
-          Three directions, coming together…
-          <Button variant="quiet" onClick={() => controller.cancelLogos()}>
-            Cancel logo request
-          </Button>
+        <div>
+          <LoadingState
+            title="Three directions, coming together"
+            detail="Working with your store name, type and colours."
+            action={
+              <Button variant="quiet" onClick={() => controller.cancelLogos()}>
+                Cancel logo request
+              </Button>
+            }
+          />
+          <SkeletonCards logo />
         </div>
       )}
       {logoNotice && <p role="status">{logoNotice}</p>}
