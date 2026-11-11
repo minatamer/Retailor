@@ -4,6 +4,8 @@ import type { FactScope, MetricFact } from "@retailor/contracts/facts";
 import { facts, allActivityScope } from "@retailor/commerce/facts";
 import { dashboardFacts } from "@retailor/commerce/dashboard";
 import { formatUsd } from "@retailor/commerce/money";
+import { parseGraph, freeze } from "@retailor/commerce/graph";
+import { DashboardPeriodSchema } from "./state";
 import type {
   DashboardPeriod,
   DashboardSeries,
@@ -13,7 +15,7 @@ const DAY = 86_400_000;
 export const PERIOD_LABELS: Record<DashboardPeriod, string> = {
   "7days": "Last 7 days",
   "28days": "Last 28 days",
-  all: "All activity",
+  all: "All time",
 };
 export const METRIC_LABELS: Partial<Record<MetricFact["factId"], string>> = {
   net_sales: "Net sales",
@@ -42,7 +44,7 @@ export const METRIC_LABELS: Partial<Record<MetricFact["factId"], string>> = {
 };
 export const labelOf = (fact: MetricFact) =>
   METRIC_LABELS[fact.factId] ?? fact.factId.replaceAll("_", " ");
-export function factDisplay(fact: MetricFact) {
+export function factDisplay(fact: Pick<MetricFact, "value" | "unit">) {
   if (fact.value === null) return "Unavailable";
   if (fact.unit === "usd-cents") return formatUsd(fact.value);
   if (fact.unit === "basis-points") return `${(fact.value / 100).toFixed(2)}%`;
@@ -62,7 +64,7 @@ export function dashboardScope(
     asOf: graph.asOf,
   };
 }
-export function dashboardModel(graph: CommerceGraph, period: DashboardPeriod) {
+function buildDashboardModel(graph: CommerceGraph, period: DashboardPeriod) {
   const scope = dashboardScope(graph, period),
     groups = dashboardFacts(graph, scope);
   const previousFrom =
@@ -82,22 +84,21 @@ export function dashboardModel(graph: CommerceGraph, period: DashboardPeriod) {
           reason:
             "Comparison unavailable: no complete previous period is supplied.",
         };
-  // Ordinary scenarios have 28 days; bound an unexpectedly old recovered history too.
-  const first = Math.max(
-      Date.parse(scope.from),
-      Date.parse(scope.to) - 31 * DAY,
-    ),
-    end = Date.parse(scope.to);
+  // Cover the complete scope without increasing the bounded observation count.
+  const first = Date.parse(scope.from),
+    end = Date.parse(scope.to),
+    start = Math.floor(first / DAY) * DAY,
+    bucketDays = Math.max(1, Math.ceil((end - start) / (31 * DAY)));
   const days: {
     day: string;
     sales: MetricFact;
     result: MetricFact;
     registry: MetricFact[];
   }[] = [];
-  for (let at = Math.floor(first / DAY) * DAY; at < end; at += DAY) {
+  for (let at = start; at < end; at += bucketDays * DAY) {
     const dailyScope = {
       from: new Date(Math.max(at, first)).toISOString(),
-      to: new Date(Math.min(at + DAY, end)).toISOString(),
+      to: new Date(Math.min(at + bucketDays * DAY, end)).toISOString(),
       asOf: scope.asOf,
     };
     const daily = facts(graph, dailyScope);
@@ -112,11 +113,34 @@ export function dashboardModel(graph: CommerceGraph, period: DashboardPeriod) {
     scope,
     ...groups,
     days,
-    timelineLimited: first > Date.parse(scope.from),
+    bucketDays,
     comparison,
   };
 }
-export type DashboardModel = ReturnType<typeof dashboardModel>;
+export type DashboardModel = ReturnType<typeof buildDashboardModel>;
+const models = new WeakMap<
+  CommerceGraph,
+  Map<DashboardPeriod, DashboardModel>
+>();
+
+/** At most three views per validator-owned snapshot; graph changes get new keys. */
+export function dashboardModel(
+  input: CommerceGraph,
+  rawPeriod: DashboardPeriod,
+) {
+  const graph = parseGraph(input),
+    period = DashboardPeriodSchema.parse(rawPeriod);
+  let periods = models.get(graph);
+  const cached = periods?.get(period);
+  if (cached) return cached;
+  const model = freeze(buildDashboardModel(graph, period));
+  if (!periods) {
+    periods = new Map();
+    models.set(graph, periods);
+  }
+  periods.set(period, model);
+  return model;
+}
 export function resolveDashboardTarget(
   model: DashboardModel,
   target: DashboardTarget,
@@ -142,7 +166,7 @@ export function resolveDashboardTarget(
       );
       return fact && day
         ? {
-            label: `${day.day} · ${labelOf(fact)}`,
+            label: `${model.bucketDays > 1 ? "Period starting " : ""}${day.day} · ${labelOf(fact)}`,
             fact,
           }
         : null;
