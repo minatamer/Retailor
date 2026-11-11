@@ -4,7 +4,11 @@ export const ScenarioPresetSchema = z.enum(["healthy", "breakeven", "loss"]);
 export type ScenarioPreset = z.infer<typeof ScenarioPresetSchema>;
 export const ScenarioInfoSchema = z.strictObject({
   preset: ScenarioPresetSchema,
-  seed: z.enum(["retailor-history-v1", "retailor-history-v2"]),
+  seed: z.enum([
+    "retailor-history-v1",
+    "retailor-history-v2",
+    "retailor-history-v3",
+  ]),
   anchorAt: TimestampSchema,
   openingUnitsPerActiveVariant: z.literal(20),
 });
