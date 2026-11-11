@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
 import { Brand } from "../../components/ui/brand";
 import { Choice } from "../../components/ui/button";
+import { useAnimatedScroll } from "../../components/ui/animated-scroll";
 import type { Design } from "@retailor/contracts/design";
 import { PALETTES, merchantStyle } from "../store-design/presets";
 import { BrowserPhotoCache } from "./cache";
@@ -25,9 +26,19 @@ export function PhotoLab() {
     });
   });
   const sampleRequest = useRef<AbortController | undefined>(undefined);
+  const selection = useRef<HTMLDivElement>(null);
+  const scrollRequested = useRef(false);
+  const { scrollTo, cancel: cancelScroll } = useAnimatedScroll();
   const [loading, setLoading] = useState(false),
     [notice, setNotice] = useState("");
   const [fieldIds, setFieldIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (!loading || !scrollRequested.current || !selection.current) return;
+    scrollRequested.current = false;
+    scrollTo(
+      window.scrollY + selection.current.getBoundingClientRect().top - 24,
+    );
+  }, [loading, scrollTo]);
   const [photoTheme, setPhotoTheme] = useState<Design["theme"]>("ink");
   const state = useSyncExternalStore(
     controller.subscribe,
@@ -44,6 +55,7 @@ export function PhotoLab() {
   async function chooseSample() {
     const request = new AbortController();
     sampleRequest.current = request;
+    scrollRequested.current = true;
     setLoading(true);
     try {
       const files = await loadSample(request.signal);
@@ -80,13 +92,22 @@ export function PhotoLab() {
           <em>We’ll bring the canvas.</em>
         </h1>
         <p>
-          Eighteen original studio photos, or something entirely yours. A calm
-          place to start.
+          {SAMPLE.assets.length} sample photos, or something entirely yours. A
+          calm place to start.
         </p>
       </section>
       <div className={styles.layout}>
         <PhotoPicker
           controller={controller}
+          selectionRef={selection}
+          sampleLoading={loading}
+          onCancelSample={() => {
+            scrollRequested.current = false;
+            cancelScroll();
+            sampleRequest.current?.abort();
+            controller.cancel();
+            setLoading(false);
+          }}
           onProcess={() =>
             setNotice(
               "Photos are ready. Open the demo to create a product draft; this design reference only checks and previews files.",
@@ -127,18 +148,6 @@ export function PhotoLab() {
               : `Use the ${SAMPLE.assets.length}-photo sample`}
             <Icon name="arrow" />
           </Button>
-          {loading && (
-            <Button
-              variant="quiet"
-              onClick={() => {
-                sampleRequest.current?.abort();
-                controller.cancel();
-                setLoading(false);
-              }}
-            >
-              Cancel sample loading
-            </Button>
-          )}
           <details className={styles.contactSheet}>
             <summary>Look through all {SAMPLE.assets.length} photos</summary>
             <div>
@@ -215,6 +224,8 @@ export function PhotoLab() {
           variant="secondary"
           onClick={() => {
             sampleRequest.current?.abort();
+            scrollRequested.current = false;
+            cancelScroll();
             setLoading(false);
             setFieldIds([]);
             void controller.reset();
