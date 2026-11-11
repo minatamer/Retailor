@@ -1,6 +1,7 @@
 import type { Design } from "@retailor/contracts/design";
 import { heroPhotoCount, heroPhotoIds } from "@retailor/contracts/design";
 import { Icon } from "../../components/ui/icon";
+import { PhotoPlaceholder } from "../../components/ui/loading-state";
 import type { StoreItem } from "./browse";
 import { GarmentImage } from "./gallery";
 import type { StorePhoto } from "./gallery";
@@ -91,11 +92,10 @@ export function HomeCampaign({
         </div>
       ) : (
         <div className={styles.noPhoto}>
-          <span>Your clothing photographs need repair.</span>
-          <p>
-            Reselect them in the owner workspace to bring this collection into
-            view.
-          </p>
+          <PhotoPlaceholder
+            label="Your clothing photographs need repair"
+            detail="Reselect them in the owner workspace to bring this collection into view."
+          />
         </div>
       )}
     </section>
