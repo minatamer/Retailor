@@ -82,26 +82,6 @@
 .actions > * {
   min-width: 0;
 }
-.processing {
-  display: grid;
-  gap: 0.8rem;
-  padding: 1rem;
-  background: var(--platform-surface);
-  border-radius: 1rem;
-  font-size: 0.85rem;
-}
-.processing span {
-  height: 3px;
-  width: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--platform-lime),
-    var(--platform-action),
-    var(--platform-lime)
-  );
-  background-size: 200%;
-  animation: sweep 1.8s ease-in-out infinite;
-}
 .candidates {
   display: grid;
   gap: 1rem;
@@ -169,11 +149,6 @@
   width: 18px;
   height: 18px;
   accent-color: var(--platform-action);
-}
-@keyframes sweep {
-  to {
-    background-position: -200% 0;
-  }
 }
 @keyframes enter {
   from {
