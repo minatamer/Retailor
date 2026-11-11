@@ -1,5 +1,6 @@
 "use client";
-import Image from "next/image";
+import { PhotoImage } from "./photo-image";
+import { PhotoPlaceholder } from "./loading-state";
 import { Button } from "./button";
 import styles from "./photo-dialog.module.css";
 
@@ -48,7 +49,7 @@ export function PhotoCarousel({
       <div className={styles.viewer} tabIndex={0} aria-label="Photo viewer">
         <figure key={active.id} className={styles.slide}>
           {active.image ? (
-            <Image
+            <PhotoImage
               src={active.image.url}
               alt={`${label}, ${coverPhoto && index === 0 ? "cover" : `photo ${index + 1}`}`}
               width={active.image.width}
@@ -56,7 +57,7 @@ export function PhotoCarousel({
               unoptimized
             />
           ) : (
-            <p>Photo needs repair</p>
+            <PhotoPlaceholder />
           )}
           <figcaption>
             {coverPhoto && index === 0 ? "Cover photo" : `Photo ${index + 1}`}
@@ -101,7 +102,7 @@ export function PhotoCarousel({
               onClick={() => onSelect(photo.id)}
             >
               {photo.image ? (
-                <Image
+                <PhotoImage
                   src={photo.image.url}
                   alt=""
                   width={photo.image.width}
@@ -109,7 +110,7 @@ export function PhotoCarousel({
                   unoptimized
                 />
               ) : (
-                <span>Repair</span>
+                <PhotoPlaceholder small />
               )}
               <span>{position + 1}</span>
             </button>
