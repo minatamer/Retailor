@@ -6,6 +6,7 @@ import {
 } from "../../components/ui/photo-dialog";
 import { PhotoCarousel } from "../../components/ui/photo-carousel";
 import { Button } from "../../components/ui/button";
+import { LoadingState } from "../../components/ui/loading-state";
 import type { PhotoController } from "./controller";
 import { namedFiles } from "./named-files";
 import styles from "../../components/ui/photo-dialog.module.css";
@@ -98,6 +99,13 @@ export function PhotoEditor({
             <p className={styles.intro}>
               No photos remain. Close the preview to choose more photos.
             </p>
+          )}
+          {state.busy && (
+            <LoadingState
+              compact
+              title="Checking your replacement photo"
+              detail="Your current photo stays until the new one is ready."
+            />
           )}
           <p role="status" className={styles.intro}>
             {state.notice}
