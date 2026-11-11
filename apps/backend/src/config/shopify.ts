@@ -10,11 +10,9 @@ import { FixtureShopifyStore } from "../shopify/storage.js";
 import { LiveProductProvider } from "../shopify/product-provider.js";
 import { SHOPIFY_APP } from "./shopify-app.js";
 import { z } from "zod";
-import { ShopifyDevInstallUrlSchema } from "@retailor/contracts/shopify";
 
 const appSchema = z.object({
-  clientId: z.string().max(200),
-  developmentInstallUrl: ShopifyDevInstallUrlSchema,
+  clientId: z.string().regex(/^[a-zA-Z0-9_-]{1,200}$/u),
   provider: z.enum(["live", "fixture"]),
   storageProject: z.string().max(100),
   storageBucket: z.string().max(200),
@@ -39,14 +37,9 @@ export function configuredShopify(env: Environment, app = SHOPIFY_APP) {
       ),
     };
   }
-  // This app currently has only a development installation entry. A public
-  // listing and distribution acceptance must be configured separately later.
-  const selectedApp = new URL(
-    new URL(app.developmentInstallUrl).searchParams.get("redirect")!,
-    "https://admin.shopify.com",
-  ).searchParams.get("client_id");
-  if (env.APP_ENV === "production" || selectedApp !== app.clientId)
-    return undefined;
+  // External dev-store eligibility has conflicting Shopify guidance. Keep the
+  // candidate install entry local until native distribution acceptance exists.
+  if (env.APP_ENV === "production") return undefined;
   const required =
     !!app.clientId &&
     !!env.SHOPIFY_CLIENT_SECRET &&
@@ -60,7 +53,6 @@ export function configuredShopify(env: Environment, app = SHOPIFY_APP) {
     clientId: app.clientId,
     secret: env.SHOPIFY_CLIENT_SECRET,
     redirectUri,
-    developmentInstallUrl: app.developmentInstallUrl,
   });
   return {
     appId: app.clientId,
