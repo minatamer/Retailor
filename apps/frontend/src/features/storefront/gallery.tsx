@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { PhotoImage } from "../../components/ui/photo-image";
+import { PhotoPlaceholder } from "../../components/ui/loading-state";
 import type { StorePhoto } from "./photo";
 export type { StorePhoto } from "./photo";
 import styles from "./storefront.module.css";
@@ -16,7 +17,7 @@ export function GarmentImage({
   onFailure(id: string): void;
 }) {
   return (
-    <Image
+    <PhotoImage
       src={photo.url}
       width={photo.photo.derivative.width}
       height={photo.photo.derivative.height}
@@ -57,8 +58,10 @@ export function GarmentGallery({
     return (
       <div className={styles.gallery}>
         <div className={styles.noPhoto}>
-          <span>Photo unavailable</span>
-          <p>Reselect the original in the owner workspace.</p>
+          <PhotoPlaceholder
+            label="Photo unavailable"
+            detail="Reselect the original in the owner workspace."
+          />
         </div>
       </div>
     );
