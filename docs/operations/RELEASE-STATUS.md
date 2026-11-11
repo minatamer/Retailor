@@ -1,5 +1,11 @@
 # Retailor release status
 
+## Hosted Shopify release resumed —11November2026
+
+The owner resumes the existing-project/domain release, reuses the current Shopify app and confirms both secret values filled; metadata shows enabled version1 for each. [Current RTL-191 guide](SHOPIFY-HOSTED-RELEASE.md), [actual progress](../validation/RTL-191.md). Hosted production configuration, verified private maintenance, request-owned Disconnect and deployment-preservation checks pass all six local gates,924/924 tests. Current Linux images are building; earlier images/scans do not accept this source.
+
+Only the two initially empty secret containers have been created at this stage. Existing services, domain, paid mode, secret bindings and traffic remain unchanged. Shopify sign-in/URL changes are deferred while preparation continues. Actual resource/IAM/scheduling, images/security/hosted verification and public cutover remain pending. The historical RTL-190 hold below is superseded by later owner confirmation.
+
 ## Deployment held; current preparation —11November2026
 
 The owner wants hosted Shopify in the eventual paid release but explicitly says **do not deploy now**. [Readiness guide](SHOPIFY-HOSTED-READINESS.md), [remaining RTL-191 work](../tickets/RTL-191-enable-hosted-shopify.md). Current source includes the verified Stripe spinner/session explanation and photo-bearing centered order confirmation; [RTL-189](../validation/RTL-189.md) records895 passing Linux tests and all six quality gates. This is quality evidence, not fresh production-runtime image/scanner acceptance; the unchanged preflight correctly blocks stale image proof.
