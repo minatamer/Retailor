@@ -9,11 +9,13 @@ const intent = {
   remoteId: null,
   dispatched: true,
   removed: false,
+  imageDispatched: false,
 };
 const remote = {
   id: "gid://shopify/Collection/12",
   handle: intent.handle,
   metafield: { value: intent.marker },
+  image: null,
   products: { nodes: [], pageInfo: { hasNextPage: false } },
 };
 const context = (): ProductContext => ({
@@ -48,6 +50,10 @@ describe("fixed collection and photo transport", () => {
       collection: {
         title: "Retailor",
         handle: intent.handle,
+        image: {
+          src: "https://tryretailor.com/apple-touch-icon.png",
+          altText: "Retailor logo",
+        },
         metafields: [
           {
             namespace: "$app:retailor_demo",
@@ -97,6 +103,63 @@ describe("fixed collection and photo transport", () => {
       code: "UPSTREAM_FAILED",
     });
     expect(await provider.remove(ctx, remote.id)).toBe(false);
+  });
+  it("sets only the fixed logo and collection id, and requires explicit image-presence metadata", async () => {
+    const changed = { ...remote, image: { id: null } };
+    const graphql = vi.fn().mockResolvedValueOnce({
+      data: { collectionUpdate: { collection: changed, userErrors: [] } },
+    });
+    const provider = new LiveCollectionProvider(graphql),
+      ctx = context();
+    expect(await provider.setImage(ctx, remote.id)).toEqual(changed);
+    expect(ctx.admit).toHaveBeenCalledTimes(1);
+    expect(graphql.mock.calls[0]![2]).toContain(
+      "collectionUpdate(collection:$collection)",
+    );
+    expect(graphql.mock.calls[0]![3]).toEqual({
+      collection: {
+        id: remote.id,
+        image: {
+          src: "https://tryretailor.com/apple-touch-icon.png",
+          altText: "Retailor logo",
+        },
+      },
+    });
+    const missingImage: Partial<typeof remote> = { ...remote };
+    delete missingImage.image;
+    graphql.mockResolvedValueOnce({
+      data: { collectionByIdentifier: missingImage },
+    });
+    await expect(provider.read(ctx, { id: remote.id })).rejects.toMatchObject({
+      code: "UPSTREAM_FAILED",
+    });
+  });
+  it("distinguishes definite image rejection from unknown or malformed mutation outcomes", async () => {
+    const graphql = vi
+      .fn()
+      .mockResolvedValueOnce({
+        data: {
+          collectionUpdate: {
+            collection: null,
+            userErrors: [{ message: "denied" }],
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        data: { collectionUpdate: { collection: null, userErrors: [] } },
+      })
+      .mockResolvedValueOnce({
+        errors: [{ message: "failure" }],
+        data: { collectionUpdate: { collection: remote, userErrors: [] } },
+      });
+    const provider = new LiveCollectionProvider(graphql);
+    expect(await provider.setImage(context(), remote.id)).toBeNull();
+    await expect(provider.setImage(context(), remote.id)).rejects.toMatchObject(
+      { code: "UPSTREAM_FAILED" },
+    );
+    await expect(provider.setImage(context(), remote.id)).rejects.toMatchObject(
+      { code: "UPSTREAM_FAILED" },
+    );
   });
   it("attaches staged photos and the owned collection in the same DRAFT create", async () => {
     const graphql = vi.fn(async () => ({
