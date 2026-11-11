@@ -36,7 +36,7 @@ export function generateScenario(
 ) {
   ScenarioPresetSchema.parse(preset);
   const dailyShop = preset === "healthy",
-    seed = dailyShop ? "retailor-history-v2" : "retailor-history-v1",
+    seed = dailyShop ? "retailor-history-v3" : "retailor-history-v1",
     orderDays = [0, 1, 3, 5, 7, 9, 12, 14, 17, 19, 22, 24, 26, 27],
     shopperNames = [
       "Alex Morgan",
@@ -54,7 +54,7 @@ export function generateScenario(
     ];
   const source = parseGraph(input),
     anchor = Date.parse(source.createdAt),
-    historyStart = new Date(anchor - 28 * DAY).toISOString();
+    historyStart = new Date(anchor - (dailyShop ? 90 : 28) * DAY).toISOString();
   let graph = parseGraph({
     ...emptyGraph({
       workspaceId: source.workspaceId,
@@ -117,7 +117,7 @@ export function generateScenario(
   };
   const time = (day: number, minute: number) =>
     anchor - (27 - day) * DAY - 60 * 60_000 + minute * 60_000;
-  event(anchor - 28 * DAY, "addBuyers", {
+  event(Date.parse(historyStart), "addBuyers", {
     buyers: Array.from({ length: 12 }, (_, index) => ({
       id: id("buyer", index),
       label: dailyShop
@@ -127,6 +127,81 @@ export function generateScenario(
       fictional: true,
     })),
   });
+  if (dailyShop) {
+    const replenishment = new Map<string, number>();
+    for (const [index, [daysAgo, requestedQuantity]] of (
+      [
+        [82, 2],
+        [61, 3],
+        [38, 4],
+      ] as const
+    ).entries()) {
+      const target = variants.length ? targetForOrder(index) : undefined;
+      const at = anchor - daysAgo * DAY - 60 * 60_000;
+      const trafficId = id("history_visit", index * 6);
+      event(at + 12 * 60_000, "addTraffic", {
+        sessions: Array.from({ length: 6 }, (_, visit) => {
+          const startedAt = new Date(at + visit * 60_000).toISOString();
+          const lastAt = new Date(at + (visit + 6) * 60_000).toISOString();
+          return {
+            id: id("history_visit", index * 6 + visit),
+            actor: "shopper",
+            origin: "seeded_scenario",
+            startedAt,
+            lastAt,
+            ...(target && visit < 5 ? { engagedAt: startedAt } : {}),
+            ...(target && visit < 3 ? { bagAt: startedAt } : {}),
+            ...(target && visit < 2 ? { checkoutAt: lastAt } : {}),
+            productIds: target && visit < 5 ? [target.product.id] : [],
+          };
+        }),
+      });
+      if (!target) continue;
+      const quantity =
+        target.variant.price * requestedQuantity <= MAX_MINOR_AMOUNT - 600
+          ? requestedQuantity
+          : 1;
+      const draftId = id("history_draft", index);
+      const orderId = id("history_order", index);
+      event(at + 14 * 60_000, "saveOrderDraft", {
+        id: draftId,
+        actor: "shopper",
+        buyerId: id("buyer", index),
+        trafficId,
+        lines: [{ variantId: target.variant.id, quantity }],
+        discount: 0,
+        delivery: 0,
+        tax: 0,
+      });
+      event(at + 15 * 60_000, "placeOrder", { draftId, orderId });
+      event(at + DAY, "advanceOrder", { orderId, state: "shipped" });
+      event(at + 2 * DAY, "advanceOrder", { orderId, state: "fulfilled" });
+      replenishment.set(
+        target.variant.id,
+        (replenishment.get(target.variant.id) ?? 0) + quantity,
+      );
+    }
+    // Replace only historically sold units before the recent window starts.
+    // Recent activity and current stock keep the original recipe's authority.
+    for (const [index, [variantId, units]] of [...replenishment].entries())
+      event(anchor - 29 * DAY + index * 60_000, "adjustStock", {
+        variantId,
+        units,
+        kind: "inbound",
+        reason: "Earlier collection replenishment",
+      });
+    for (const [index, [daysAgo, category, amount, note]] of (
+      [
+        [75, "marketing", 1200, "Earlier collection promotion"],
+        [45, "platform", 900, "Earlier storefront tools"],
+      ] as const
+    ).entries()) {
+      const at = anchor - daysAgo * DAY;
+      const draftId = id("history_expense", index);
+      event(at, "saveExpenseDraft", { id: draftId, category, amount, note });
+      event(at + 60_000, "postExpense", { draftId });
+    }
+  }
   let visits = 0;
   const orderVisits = new Map<number, string>();
   for (let day = 0; day < 28; day++) {
@@ -471,7 +546,6 @@ export function generateScenario(
       })),
     ),
     bagChanged: JSON.stringify(source.bag) !== JSON.stringify(graph.bag),
-    assumptions:
-      "Synthetic 28-day activity. Active variants start with 20 demo units; current prices and future unit costs are preserved. Expenses are authored patterns, so edited inputs can change the story’s result.",
+    assumptions: `Synthetic ${dailyShop ? 90 : 28}-day activity. Active variants start with 20 demo units; current prices and future unit costs are preserved. Expenses are authored patterns, so edited inputs can change the story’s result.`,
   });
 }
