@@ -183,7 +183,7 @@ export function EvidenceDrawer({ model }: { model: DashboardModel }) {
               {day && (
                 <div
                   className={styles.evidenceRelated}
-                  aria-label="Other figures for this day"
+                  aria-label="Other figures for this observation"
                 >
                   {(
                     [
