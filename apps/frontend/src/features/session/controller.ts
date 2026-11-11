@@ -4673,10 +4673,7 @@ export class SessionController {
         "This demo was cleared from memory. Earlier cached bytes could not be removed and retain their original fixed expiry.",
       );
     previous.dispose();
-    if (endingShopify && !(await endingShopify))
-      cleanupNotices.push(
-        "Shopify cleanup could not be confirmed. Its original server expiry remains the backstop; manual removal may be needed if access is lost.",
-      );
+    await endingShopify;
     this.snapshot.state = this.fresh();
     await this.attachPhotos();
     this.startShopify();
