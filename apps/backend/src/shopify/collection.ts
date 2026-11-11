@@ -28,6 +28,7 @@ export class ShopifyCollection {
           remoteId: null,
           dispatched: false,
           removed: false,
+          imageDispatched: false,
         };
       }
       return structuredClone(current.collection);
@@ -37,20 +38,47 @@ export class ShopifyCollection {
       context,
       intent.remoteId ? { id: intent.remoteId } : { handle: intent.handle },
     );
+    let created = false;
     if (!remote && !intent.dispatched) {
       await scope.update((current) => {
         current.collection!.dispatched = true;
+        current.collection!.imageDispatched = true;
       });
+      created = true;
       remote = await this.provider.create(context, intent);
       if (!remote)
         await scope.update((current) => {
           current.collection!.dispatched = false;
+          current.collection!.imageDispatched = false;
         });
     }
     if (!remote) return deny("UPSTREAM_FAILED", 502);
     if (!owned(remote, intent)) return deny("FORBIDDEN", 403);
+    if (!remote.image && !created && !intent.imageDispatched) {
+      // Check again before dispatch. Shopify has no atomic empty-image
+      // condition, so never describe this fresh read as a remote CAS guarantee.
+      remote = await this.provider.read(context, { id: remote.id });
+      if (!remote) return deny("UPSTREAM_FAILED", 502);
+      if (!owned(remote, intent)) return deny("FORBIDDEN", 403);
+      if (!remote.image) {
+        await scope.update((current) => {
+          current.collection!.imageDispatched = true;
+        });
+        const changed = await this.provider.setImage(context, remote.id);
+        if (!changed) {
+          await scope.update((current) => {
+            current.collection!.imageDispatched = false;
+          });
+          return deny("UPSTREAM_FAILED", 502);
+        }
+        if (!owned(changed, intent) || changed.id !== remote.id)
+          return deny("FORBIDDEN", 403);
+        remote = changed;
+      }
+    }
     await scope.update((current) => {
       current.collection!.remoteId = remote.id;
+      if (remote.image) current.collection!.imageDispatched = false;
     });
     return remote.id;
   }
