@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { environment, file } from "../../../test/workspace";
 import type { CheckoutRequester } from "./request";
 import type { CheckoutResult } from "@retailor/contracts/checkout";
+import { CHECKOUT_LIMITS } from "@retailor/contracts/checkout";
 import { checkoutQuote } from "@retailor/commerce/checkout";
 import { stockOf } from "@retailor/commerce/selectors";
 import { bagEntries, bagPromoDiscount, displayedOrder } from "../bag/quote";
@@ -59,6 +60,37 @@ async function setup() {
   return { env, port, navigate, controller, product };
 }
 describe("controller-owned hosted checkout recovery", () => {
+  it("explains insufficient checkout time without saving an attempt or contacting Stripe", async () => {
+    const x = await setup();
+    const graph = x.controller.getSnapshot().state.graph;
+    x.env.advance(
+      Date.parse(graph.expiresAt) -
+        x.env.clock() -
+        (CHECKOUT_LIMITS.sessionMs + 4999),
+    );
+    await x.controller.startStripeCheckout();
+    const snapshot = x.controller.getSnapshot();
+    expect(x.port.start).not.toHaveBeenCalled();
+    expect(x.navigate).not.toHaveBeenCalled();
+    expect(snapshot.state.graph).toBe(graph);
+    expect(snapshot.state.stripeCheckout).toBeNull();
+    expect(snapshot.checkoutBusy).toBe(false);
+    expect(snapshot.checkoutNotice).toBe(
+      "This demo is too close to ending to start Stripe checkout. Start a fresh demo and try again.",
+    );
+  });
+  it("still opens checkout at the existing sufficient-time boundary", async () => {
+    const x = await setup();
+    x.env.advance(
+      Date.parse(x.controller.getSnapshot().state.graph.expiresAt) -
+        x.env.clock() -
+        (CHECKOUT_LIMITS.sessionMs + 5000),
+    );
+    await x.controller.startStripeCheckout();
+    expect(x.port.start).toHaveBeenCalledTimes(1);
+    expect(x.navigate).toHaveBeenCalledOnce();
+    expect(x.controller.getSnapshot().checkoutNotice).toBe("");
+  });
   it("persists uploaded bytes and order identity, then places exactly one order on a verified return and reload", async () => {
     const x = await setup();
     await x.controller.startStripeCheckout();
