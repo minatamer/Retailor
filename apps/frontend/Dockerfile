@@ -1,7 +1,6 @@
-# Official Node 24.21.0 Debian slim manifest, verified 2026-10-13.
-FROM node:24.21.0-bookworm-slim@sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20 AS base
-# Vendor security fix released after the base snapshot; exact supported package.
-RUN apt-get update && apt-get install --no-install-recommends --only-upgrade -y perl-base=5.36.0-7+deb12u4 && rm -rf /var/lib/apt/lists/*
+# Official Node 24.22.3 Debian slim manifest, verified 2026-11-11.
+# Includes patched APT 2.6.2, Perl deb12u4 and PCRE2 deb12u2.
+FROM node:24.22.3-bookworm-slim@sha256:4d897dfbf2bed5e4e09128f8b8da96a2bdf36e3cace084a32c9c4e637ec0ff81 AS base
 FROM base AS build
 WORKDIR /workspace
 RUN npm install --global pnpm@11.25.0
