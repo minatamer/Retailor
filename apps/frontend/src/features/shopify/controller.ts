@@ -277,14 +277,25 @@ export class ShopifyController {
       this.update({
         status: ShopifyStatusSchema.parse(status),
         verified: true,
+        ...(status.ended
+          ? { notice: "", reference: "", review: null, catalogue: null }
+          : {}),
       });
   }
   refresh() {
-    return this.run("Checking connection…", async (signal, proof) =>
-      this.setStatus(
-        await this.port.status(this.context.workspaceId, proof, signal),
-        signal,
-      ),
+    return this.run(
+      this.view.status?.ended
+        ? "Checking product removal…"
+        : "Checking connection…",
+      async (signal, proof) =>
+        this.setStatus(
+          await this.port.status(this.context.workspaceId, proof, signal),
+          signal,
+        ),
+      this.view.status?.ended
+        ? "Removal status could not be checked. Cleanup continues in the background."
+        : "Connection status could not be checked. Try again shortly.",
+      true,
     );
   }
   connect(
@@ -384,7 +395,7 @@ export class ShopifyController {
           this.update({
             catalogue: {
               ...catalogue,
-              products: next
+              products: (next
                 ? [
                     ...new Map(
                       [
@@ -393,7 +404,8 @@ export class ShopifyController {
                       ].map((product) => [product.id, product]),
                     ).values(),
                   ].slice(0, 100)
-                : catalogue.products,
+                : catalogue.products
+              ).filter((product) => !product.giftCard),
             },
             status: this.view.status
               ? { ...this.view.status, currency: catalogue.currency }
@@ -691,7 +703,7 @@ export class ShopifyController {
       if (!signal.aborted)
         this.update({
           notice:
-            "Removal requested. The cleanup worker will verify it; refresh to check.",
+            "Draft removal requested. Its result updates automatically while Connections is open.",
         });
     });
   }
@@ -701,18 +713,18 @@ export class ShopifyController {
       async (signal, proof) => {
         if (this.view.status)
           this.update({
-            status: { ...this.view.status, state: "cleanup_pending" },
+            status: { ...this.view.status, state: "checking_outcome" },
             verified: false,
           });
         this.setStatus(
           await this.port.end(this.context.workspaceId, true, proof, signal),
           signal,
         );
-        if (!signal.aborted)
+        if (!signal.aborted && !this.view.status?.ended)
           this.update({
-            notice:
-              "Cleanup requested. Owned products are removed before the app is uninstalled. Your local storefront is kept.",
+            notice: "Shopify is disconnected. Your local storefront is kept.",
           });
+        this.polls = 0;
       },
       "Disconnect is not confirmed. Check status or retry Disconnect. Original session expiry remains the cleanup backstop.",
     );
@@ -786,6 +798,7 @@ export class ShopifyController {
       this.view.review ||
       this.view.consent ||
       this.view.importReview ||
+      (this.view.verified && this.view.status?.state === "cleaned") ||
       this.polls >= 12
     )
       return;
@@ -796,7 +809,10 @@ export class ShopifyController {
         this.polls++;
         void this.refresh();
       },
-      Math.max(90000, this.blockedUntil - this.clock()),
+      Math.max(
+        this.view.status?.ended && this.polls < 6 ? 5000 : 90000,
+        this.blockedUntil - this.clock(),
+      ),
     );
   }
   private cancel() {
