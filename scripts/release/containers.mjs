@@ -46,7 +46,7 @@ export async function verifyContainers(frontendImage, backendImage) {
     assert.equal(record.user, "node");
     assert.ok(
       !record.environment.some((value) =>
-        /^(?:OPENAI_API_KEY|TURNSTILE_SECRET_KEY|GRANT_SIGNING_SECRET|RETAILOR_ORIGIN_SECRET)=/u.test(
+        /^(?:OPENAI_API_KEY|TURNSTILE_SECRET_KEY|GRANT_SIGNING_SECRET|RETAILOR_ORIGIN_SECRET|SHOPIFY_CLIENT_SECRET|SHOPIFY_ENCRYPTION_KEY)=/u.test(
           value,
         ),
       ),
@@ -205,7 +205,8 @@ export async function verifyContainers(frontendImage, backendImage) {
       const base='/app/apps/frontend/public';const manifest=JSON.parse(await fs.readFile(base+'/sample/forme/manifest.json','utf8'));const photos=[];
       for(const asset of manifest.assets){const bytes=await fs.readFile(base+'/sample/forme/'+asset.id+'.webp');const hash=crypto.createHash('sha256').update(bytes).digest('hex');if(hash!==asset.image.hash||bytes.length!==asset.image.bytes)throw new Error('Photo mismatch');const r=await fetch('http://127.0.0.1:8080/sample/forme/'+asset.id+'.webp');if(r.status!==200||crypto.createHash('sha256').update(new Uint8Array(await r.arrayBuffer())).digest('hex')!==hash)throw new Error('Photo delivery mismatch');photos.push({id:asset.id,bytes:bytes.length,sha256:hash})}
       const fonts=[];for(const name of(await fs.readdir(base+'/fonts')).sort()){const bytes=await fs.readFile(base+'/fonts/'+name);const r=await fetch('http://127.0.0.1:8080/fonts/'+name);if(r.status!==200||crypto.createHash('sha256').update(new Uint8Array(await r.arrayBuffer())).digest('hex')!==crypto.createHash('sha256').update(bytes).digest('hex'))throw new Error('Font delivery mismatch');fonts.push({name,bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')})}
-      const html=await(await fetch('http://127.0.0.1:8080/')).text();const chunk=html.match(/src="([^"]+\.js[^\"]*)"/);if(!chunk)throw new Error('No static script');const staticResponse=await fetch('http://127.0.0.1:8080'+chunk[1].replaceAll('&amp;','&'));if(staticResponse.status!==200)throw new Error('Static delivery failed');console.log(JSON.stringify({photos,fonts,staticStatus:staticResponse.status}));
+      const identity=[];for(const path of ['integrations/shopify-logo.svg']){const bytes=await fs.readFile(base+'/'+path);const r=await fetch('http://127.0.0.1:8080/'+path);const sha256=crypto.createHash('sha256').update(bytes).digest('hex');if(r.status!==200||crypto.createHash('sha256').update(new Uint8Array(await r.arrayBuffer())).digest('hex')!==sha256)throw new Error('Shopify logo delivery mismatch');identity.push({path,bytes:bytes.length,sha256,status:r.status})}
+      const html=await(await fetch('http://127.0.0.1:8080/')).text();const chunk=html.match(/src="([^"]+\.js[^\"]*)"/);if(!chunk)throw new Error('No static script');const staticResponse=await fetch('http://127.0.0.1:8080'+chunk[1].replaceAll('&amp;','&'));if(staticResponse.status!==200)throw new Error('Static delivery failed');console.log(JSON.stringify({photos,fonts,identity,staticStatus:staticResponse.status}));
     `,
     );
     assert.equal(assetRecord.photos.length, 20);
