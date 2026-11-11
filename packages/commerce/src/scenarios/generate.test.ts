@@ -6,6 +6,8 @@ import { stockOf } from "../selectors.js";
 import { generateScenario } from "./generate.js";
 import { applyCommand } from "../commands.js";
 import { ScenarioInfoSchema } from "@retailor/contracts/scenarios";
+import { COMMERCE_LIMITS } from "@retailor/contracts/commerce";
+import { facts, allActivityScope } from "../facts.js";
 function catalogue() {
   const h = new Harness();
   h.step("updateProduct", product("shirt", 6000, 2400));
@@ -24,9 +26,8 @@ describe("real record scenarios over a captured clothing catalogue", () => {
     const healthy = generate(h, "healthy"),
       near = generate(h, "breakeven"),
       loss = generate(h, "loss");
-    // 22 ordered units, one cancellation and one restocked/refunded unit;
-    // $42 discounts, $90 dated operating expenses and one $24 stock writeoff.
-    expect(healthy.result).toBe(20 * (6000 - 2400) - 4200 - 9000 - 2400);
+    // Original recent recipe plus nine earlier units and $21 earlier expenses.
+    expect(healthy.result).toBe(29 * (6000 - 2400) - 4200 - 11100 - 2400);
     expect(near.result).toBe(8 * (6000 - 2400) - 27000);
     expect(loss.result).toBe(6 * 4800 - 4800 - 6 * 2400 - 90000 - 2400);
     expect(healthy.result).toBeGreaterThan(0);
@@ -37,10 +38,12 @@ describe("real record scenarios over a captured clothing catalogue", () => {
       expect(parseGraph(result.graph)).toEqual(result.graph);
       expect(result.graph.orders.length).toBeLessThanOrEqual(20);
       expect(result.graph.traffic).toHaveLength(
-        result.info.preset === "healthy" ? 204 : 168,
+        result.info.preset === "healthy" ? 222 : 168,
       );
       expect(result.graph.buyers).toHaveLength(12);
-      expect(result.graph.receipts.length).toBeLessThan(110);
+      expect(result.graph.receipts.length).toBeLessThan(
+        COMMERCE_LIMITS.receipts - 20,
+      );
       expect(result.graph.orderDrafts).toEqual([]);
       expect(result.graph.expenseDrafts).toEqual([]);
       expect(
@@ -74,19 +77,63 @@ describe("real record scenarios over a captured clothing catalogue", () => {
     expect(loss.graph.returns[0]!.restockedAt).toBeUndefined();
     expect(loss.graph.writeoffs).toHaveLength(1);
   });
+  it("adds older linked history without changing recent sales or reconstructed stock", () => {
+    const h = catalogue();
+    const { graph } = generate(h, "healthy");
+    const cutoff = new Date(
+      Date.parse(graph.createdAt) - 28 * 86_400_000,
+    ).toISOString();
+    const recent = facts(graph, {
+      from: cutoff,
+      to: new Date(Date.parse(graph.asOf) + 1).toISOString(),
+      asOf: graph.asOf,
+    });
+    const all = facts(graph, allActivityScope(graph));
+    expect(Date.parse(graph.createdAt) - Date.parse(graph.anchorAt)).toBe(
+      90 * 86_400_000,
+    );
+    expect(recent.find((f) => f.factId === "net_sales")!.value).toBe(115800);
+    expect(recent.find((f) => f.factId === "included_orders")!.value).toBe(13);
+    expect(all.find((f) => f.factId === "net_sales")!.value).toBe(169800);
+    expect(all.find((f) => f.factId === "included_orders")!.value).toBe(16);
+    const older = graph.orders.filter((order) => order.placedAt < cutoff);
+    expect(older).toHaveLength(3);
+    expect(
+      older.every(
+        (order) =>
+          order.state === "fulfilled" && order.trafficId && order.buyerId,
+      ),
+    ).toBe(true);
+    for (const product of graph.products)
+      for (const variant of product.variants) {
+        const historyUnits = graph.movements
+          .filter((m) => m.variantId === variant.id && m.at < cutoff)
+          .reduce((sum, m) => sum + m.units, 0);
+        expect(historyUnits).toBe(0);
+      }
+    expect(graph.traffic.length).toBeLessThanOrEqual(
+      COMMERCE_LIMITS.seededTraffic,
+    );
+    expect(graph.orders.length).toBeLessThanOrEqual(
+      COMMERCE_LIMITS.seededOrders,
+    );
+  });
   it("defaults to varied linked shop activity with real lifecycle, provenance and reconciled daily facts", () => {
     const h = catalogue(),
       before = h.graph,
       { graph, info } = generate(h, "healthy");
     expect(h.graph).toBe(before);
-    expect(info.seed).toBe("retailor-history-v2");
+    expect(info.seed).toBe("retailor-history-v3");
     expect(
       ScenarioInfoSchema.parse({ ...info, seed: "retailor-history-v1" }).seed,
     ).toBe("retailor-history-v1");
     expect(
+      ScenarioInfoSchema.parse({ ...info, seed: "retailor-history-v2" }).seed,
+    ).toBe("retailor-history-v2");
+    expect(
       ScenarioInfoSchema.safeParse({ ...info, seed: "unknown" }).success,
     ).toBe(false);
-    expect(graph.orders).toHaveLength(14);
+    expect(graph.orders).toHaveLength(17);
     expect(new Set(graph.orders.map((o) => o.state))).toEqual(
       new Set(["fulfilled", "shipped", "placed", "cancelled"]),
     );
@@ -116,7 +163,7 @@ describe("real record scenarios over a captured clothing catalogue", () => {
           trafficId: visit.id,
         });
     }
-    expect(days.size).toBe(28);
+    expect(days.size).toBe(31);
     expect(new Set(days.values()).size).toBeGreaterThan(3);
     expect(graph.returns).toHaveLength(2);
     expect(graph.returns.some((r) => r.state === "requested")).toBe(true);
@@ -124,8 +171,8 @@ describe("real record scenarios over a captured clothing catalogue", () => {
     expect(restocked.state).toBe("closed");
     expect(graph.refunds).toHaveLength(1);
     expect(graph.refunds[0]!.orderId).toBe(restocked.orderId);
-    expect(graph.expenses).toHaveLength(4);
-    expect(new Set(graph.expenses.map((e) => e.at.slice(0, 10))).size).toBe(4);
+    expect(graph.expenses).toHaveLength(6);
+    expect(new Set(graph.expenses.map((e) => e.at.slice(0, 10))).size).toBe(6);
     expect(
       graph.movements.some((m) => m.kind === "inbound" && m.units === 4),
     ).toBe(true);
@@ -159,8 +206,8 @@ describe("real record scenarios over a captured clothing catalogue", () => {
         0,
       ),
       factsResult = generate(h, "healthy").result;
-    expect(merchandise).toBe(115800);
-    expect(costs).toBe(48000);
+    expect(merchandise).toBe(169800);
+    expect(costs).toBe(69600);
     expect(factsResult).toBe(merchandise - costs - expenses - loss);
     expect(
       graph.orders.every((o) => Date.parse(o.placedAt) <= Date.parse(NOW)),
@@ -188,11 +235,13 @@ describe("real record scenarios over a captured clothing catalogue", () => {
       single.step("updateProduct", product("shirt", price, 2400));
       const result = generate(single, "healthy");
       expect(parseGraph(result.graph)).toEqual(result.graph);
-      expect(result.graph.orders).toHaveLength(14);
+      expect(result.graph.orders).toHaveLength(17);
       expect(result.graph.orders.every((o) => o.lines.length === 1)).toBe(true);
       expect(stockOf(result.graph, "shirt_m")).toBeGreaterThanOrEqual(0);
       if (price === 0) expect(result.graph.refunds).toEqual([]);
-      expect(result.graph.receipts.length).toBeLessThan(110);
+      expect(result.graph.receipts.length).toBeLessThan(
+        COMMERCE_LIMITS.receipts - 20,
+      );
     }
   });
   it("uses radically different IDs/options/prices and never rewrites the source to hit the label", () => {
