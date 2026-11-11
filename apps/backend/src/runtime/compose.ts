@@ -24,6 +24,10 @@ import { ShopifyService } from "../shopify/service.js";
 import { ShopifyCatalogue } from "../shopify/catalogue.js";
 import { ShopifyCleanup } from "../shopify/cleanup.js";
 import { ShopifyWebhooks } from "../shopify/webhooks.js";
+import {
+  ShopifyMaintenance,
+  googleCleanupVerifier,
+} from "../shopify/maintenance.js";
 export interface Runtime {
   capabilities: Capabilities;
   ready: boolean;
@@ -38,6 +42,7 @@ export interface Runtime {
   shopifyCatalogue?: ShopifyCatalogue;
   shopifyCleanup?: ShopifyCleanup;
   shopifyWebhooks?: ShopifyWebhooks;
+  shopifyMaintenance?: ShopifyMaintenance;
 }
 export function composeRuntime(
   env: Environment,
@@ -163,6 +168,14 @@ export function composeRuntime(
           shopifyCatalogue,
           shopifyCleanup,
           shopifyWebhooks: new ShopifyWebhooks(shopify, shopifyConfig.secret),
+          ...(env.APP_ENV === "production"
+            ? {
+                shopifyMaintenance: new ShopifyMaintenance(
+                  shopifyCleanup,
+                  googleCleanupVerifier(),
+                ),
+              }
+            : {}),
         }
       : {}),
     ...(checkout ? { checkout } : {}),
