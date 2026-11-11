@@ -13,6 +13,7 @@ import { knownColour } from "../storefront/browse";
 import { Button } from "../../components/ui/button";
 import { Brand } from "../../components/ui/brand";
 import { Icon } from "../../components/ui/icon";
+import { PhotoPlaceholder } from "../../components/ui/loading-state";
 import {
   bagEntries,
   tryDisplayedBag,
@@ -275,7 +276,7 @@ export function BagDialog() {
                   onFailure={(id) => controller.photos.reportUnavailable(id)}
                 />
               ) : (
-                <span>Photo unavailable</span>
+                <PhotoPlaceholder label="Photo unavailable" small />
               )}
             </div>
             <div className={styles.itemCopy}>
@@ -429,24 +430,41 @@ export function BagDialog() {
               Demo order <strong>{order.id}</strong>
             </p>
             <ul className={styles.receiptLines} aria-label="Ordered garments">
-              {order.lines.map((line, index) => (
-                <li key={line.id}>
-                  <div className={styles.itemCopy}>
-                    <strong>{line.title}</strong>
-                    <span>
-                      {knownColour(line.colour) ? `${line.colour} · ` : ""}
-                      {line.size} · Quantity {line.quantity}
-                    </span>
-                    <span>
-                      {formatDisplay(line.unitPrice, scope)} each ·{" "}
-                      {stockOf(state.graph, line.variantId)} currently in stock
-                    </span>
-                  </div>
-                  <strong>
-                    {formatMinor(totals!.rows[index]!.amount, scope.currency)}
-                  </strong>
-                </li>
-              ))}
+              {order.lines.map((line, index) => {
+                const photo = controller.photos.view(line.photoId);
+                return (
+                  <li key={line.id}>
+                    <div className={`${styles.photo} ${styles.receiptPhoto}`}>
+                      {photo ? (
+                        <GarmentImage
+                          photo={{ ...photo, id: line.photoId }}
+                          title={line.title}
+                          onFailure={(id) =>
+                            controller.photos.reportUnavailable(id)
+                          }
+                        />
+                      ) : (
+                        <PhotoPlaceholder label="Photo unavailable" small />
+                      )}
+                    </div>
+                    <div className={styles.itemCopy}>
+                      <strong>{line.title}</strong>
+                      <span>
+                        {knownColour(line.colour) ? `${line.colour} · ` : ""}
+                        {line.size} · Quantity {line.quantity}
+                      </span>
+                      <span>
+                        {formatDisplay(line.unitPrice, scope)} each ·{" "}
+                        {stockOf(state.graph, line.variantId)} currently in
+                        stock
+                      </span>
+                    </div>
+                    <strong>
+                      {formatMinor(totals!.rows[index]!.amount, scope.currency)}
+                    </strong>
+                  </li>
+                );
+              })}
             </ul>
             <OrderTotals totals={totals!} scope={scope} />
             <p className={styles.note}>
