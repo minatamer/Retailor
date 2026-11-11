@@ -40,6 +40,8 @@ Every command explicitly targets `retailor-511714`; do not change the shared gcl
 
 ## Enable locally
 
+If local checkout reports that the demo is too close to ending, start a fresh demo. The existing two-hour workspace must still contain the full31-minute checkout window plus its five-second preparation margin; configured checkout availability does not override that per-session guard. RTL-188 verified actual Stripe opening/photo delivery and cancel/return from fresh desktop/phone demos, while an older demo was correctly refused. This is distinct from a missing Stripe key or expired Google ADC credentials.
+
 RTL-103 fixes sandbox enablement to `true`, project to `retailor-511714` and bucket to `retailor-511714-checkout-photos` in backend-only `apps/backend/src/config/checkout.ts`. They are not secrets or environment options. The owner-requested three old entries were removed from backend `.env.local`; obsolete inherited overrides are ignored.
 
 Set only the secret in the backend's ignored `apps/backend/.env.local`:
