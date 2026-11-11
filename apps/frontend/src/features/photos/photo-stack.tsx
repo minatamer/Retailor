@@ -1,5 +1,6 @@
-import Image from "next/image";
+import { PhotoImage } from "../../components/ui/photo-image";
 import type { PhotoView } from "./controller";
+import { PhotoPlaceholder } from "../../components/ui/loading-state";
 import styles from "./photo-stack.module.css";
 
 export function PhotoStack({
@@ -20,7 +21,7 @@ export function PhotoStack({
       {photos.length ? (
         photos.slice(0, 3).map((item, index) => (
           <span key={item.photo.id} className={styles.layer} data-layer={index}>
-            <Image
+            <PhotoImage
               src={item.url}
               alt={index === 0 ? label : ""}
               width={item.photo.derivative.width}
@@ -31,7 +32,9 @@ export function PhotoStack({
           </span>
         ))
       ) : (
-        <span className={styles.missing}>Photo needs repair</span>
+        <span className={styles.missing}>
+          <PhotoPlaceholder />
+        </span>
       )}
       {showCount && (
         <span className={styles.count}>
