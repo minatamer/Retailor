@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Storefront } from "../storefront/storefront";
 import { INITIAL_BROWSE } from "../storefront/browse";
 import { GarmentImage } from "../storefront/gallery";
+import { PhotoPlaceholder } from "../../components/ui/loading-state";
 import type { Design } from "@retailor/contracts/design";
 import {
   ILLUSTRATED_CLOTHES,
@@ -145,7 +146,7 @@ export function Runway() {
                 {ILLUSTRATED_CLOTHES.map((clothing) => (
                   <div key={clothing.id}>
                     {failedPhotos.has(clothing.id) ? (
-                      <span>Photo unavailable</span>
+                      <PhotoPlaceholder label="Photo unavailable" small />
                     ) : (
                       <GarmentImage
                         photo={ILLUSTRATED_PHOTOS.get(clothing.id)!}
