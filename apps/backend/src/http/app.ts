@@ -13,6 +13,7 @@ import { ingress } from "./ingress.js";
 import { failureDiagnostic, reportDiagnostic } from "./diagnostics.js";
 import type { DiagnosticSink } from "./diagnostics.js";
 import { shopifyRoutes } from "../shopify/routes.js";
+import { shopifyMaintenanceRoutes } from "../shopify/maintenance.js";
 export function createApp(
   runtime: Runtime,
   diagnostics?: DiagnosticSink,
@@ -29,6 +30,10 @@ export function createApp(
       "X-Frame-Options": "DENY",
       "Referrer-Policy": "no-referrer",
     });
+    next();
+  });
+  shopifyMaintenanceRoutes(app, runtime.shopifyMaintenance);
+  app.use((req, res, next) => {
     if (req.method !== "GET" && req.headers.origin !== runtime.frontendOrigin) {
       res.status(403).json(publicError("FORBIDDEN", res.locals.requestId));
       return;
@@ -80,6 +85,7 @@ export function createApp(
     runtime.shopifyCatalogue,
     runtime.shopifyCleanup,
     runtime.shopifyWebhooks,
+    !!runtime.shopifyMaintenance,
   );
   app.use((_req, res) => {
     res.status(404).json(publicError("NOT_FOUND", res.locals.requestId));
