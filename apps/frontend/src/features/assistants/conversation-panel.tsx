@@ -7,6 +7,7 @@ import { FormShell } from "../operations/form-shell";
 import { OperationResult } from "./operation-result";
 import { dashboardModel } from "../dashboard/model";
 import { Icon } from "../../components/ui/icon";
+import { LoadingState } from "../../components/ui/loading-state";
 import styles from "./tailor.module.css";
 export function ConversationPanel() {
   const {
@@ -71,10 +72,11 @@ export function ConversationPanel() {
         ))}
       </div>
       {assistantBusy && (
-        <p role="status" className={styles.thinking}>
-          <span />
-          Checking this view and its sources…
-        </p>
+        <LoadingState
+          compact
+          title="Tailor is working on your reply"
+          detail="Checking this view and its sources."
+        />
       )}
       {assistantNotice && (
         <p role="status" className={styles.chatNotice}>
