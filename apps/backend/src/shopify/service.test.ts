@@ -23,7 +23,7 @@ async function setup() {
   let now = 1_794_305_000_000;
   const directory = await mkdtemp(join(tmpdir(), "retailor-shopify-"));
   roots.push(directory);
-  const exchange = vi.fn(async (): Promise<Tokens> => ({
+  const exchange = vi.fn(async (_domain: string): Promise<Tokens> => ({
     access: "test_access",
     refresh: "test_refresh",
     expiresAt: now + 3600000,
@@ -47,7 +47,7 @@ async function setup() {
   const provider: ShopifyProvider = {
     simulated: true,
     installationUrl: () =>
-      "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dtest-app",
+      "https://admin.shopify.com/oauth/install?client_id=test-app",
     authorizationUrl: (domain, state) =>
       `https://${domain}/admin/oauth/authorize?state=${state}`,
     verifyQuery: (query, time) => verifyShopifyQuery(query, secret, time),
@@ -152,6 +152,94 @@ afterEach(async () => {
   }
 });
 describe("session-bound standalone Shopify authorization", () => {
+  it("connects two independently selected dev shops through one app while isolating their cookies, proofs and tokens", async () => {
+    const h = await setup();
+    const secondShop = "unrelated-partner-dev.myshopify.com";
+    const second = await h.service.session(undefined, {
+      schemaVersion: 1,
+      workspaceId: "outside_workspace",
+      createdAt: h.clock(),
+    });
+    const firstState = await h.begin();
+    const entry = await h.service.connect(
+      second.cookie,
+      second.result.tabProof,
+      {
+        schemaVersion: 1,
+        workspaceId: "outside_workspace",
+        returnTo: "connections",
+      },
+    );
+    expect(entry.authorizationUrl).toBe(h.provider.installationUrl());
+    const selected = await h.service.install(
+      second.cookie,
+      h.installQuery(secondShop),
+    );
+    const secondState = new URL(selected.authorizationUrl).searchParams.get(
+      "state",
+    )!;
+    const firstTokens = await h.exchange.getMockImplementation()!(shop);
+    h.exchange.mockResolvedValueOnce(firstTokens).mockResolvedValueOnce({
+      ...firstTokens,
+      access: "second_access",
+      refresh: "second_refresh",
+    });
+    const firstIdentity = await h.identity.getMockImplementation()!();
+    h.identity.mockResolvedValueOnce(firstIdentity).mockResolvedValueOnce({
+      ...firstIdentity,
+      id: "gid://shopify/Shop/2",
+      shop: secondShop,
+      name: "Other dev store",
+    });
+    for (const [cookie, query] of [
+      [h.issued.cookie, h.signed(firstState)],
+      [second.cookie, h.signed(secondState, { shop: secondShop })],
+    ] as const) {
+      expect(
+        (await h.service.callback(cookie, query, new AbortController().signal))
+          .outcome,
+      ).toBe("connected");
+    }
+    expect(h.exchange.mock.calls.map((args) => args[0])).toEqual([
+      shop,
+      secondShop,
+    ]);
+    const firstStatus = await h.service.status(
+      h.issued.cookie,
+      h.issued.result.tabProof,
+      "workspace",
+    );
+    const secondStatus = await h.service.status(
+      second.cookie,
+      second.result.tabProof,
+      "outside_workspace",
+    );
+    expect(firstStatus.shop).toBe(shop);
+    expect(secondStatus.shop).toBe(secondShop);
+    expect(
+      await h.service.ledger.inspect((data) =>
+        data.installations.map((item) => [item.shop, item.tokens?.access]),
+      ),
+    ).toEqual([
+      [shop, "test_access"],
+      [secondShop, "second_access"],
+    ]);
+    for (const [cookie, proof, workspaceId] of [
+      [h.issued.cookie, h.issued.result.tabProof, "outside_workspace"],
+      [second.cookie, h.issued.result.tabProof, "outside_workspace"],
+      [h.issued.cookie, second.result.tabProof, "workspace"],
+    ] as const) {
+      await expect(
+        h.service.status(cookie, proof, workspaceId),
+      ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    }
+    expect(JSON.stringify([firstStatus, secondStatus])).not.toContain(
+      "test_access",
+    );
+    expect(JSON.stringify([firstStatus, secondStatus])).not.toContain(
+      "second_access",
+    );
+  });
   it("starts without reserving a shop and binds only the signed Shopify selection", async () => {
     const h = await setup();
     const result = await h.service.connect(
