@@ -5,10 +5,27 @@ import { ShopifyCleanup } from "./cleanup.js";
 import { InstallationSchema } from "./model.js";
 
 const open: Awaited<ReturnType<typeof shopifyFixture>>[] = [];
-async function setup() {
+async function setup(isolateImages = false) {
   const h = await shopifyFixture();
   open.push(h);
-  const catalogue = new ShopifyCatalogue(h.auth, h.provider),
+  const catalogue = new ShopifyCatalogue(
+      h.auth,
+      h.provider,
+      undefined,
+      // Logo tests exercise real ledger/provider coordination, not the native
+      // decoder. Restrict this injected port to the fixed valid fixture bytes.
+      isolateImages
+        ? async (_manifest, files, signal) => {
+            signal.throwIfAborted();
+            if (
+              files.size !== 1 ||
+              !Buffer.from([...files.values()][0]!).equals(h.bytes)
+            )
+              throw new Error("Unexpected collection image fixture");
+            return new Map(files);
+          }
+        : undefined,
+    ),
     cleanup = new ShopifyCleanup(h.auth, catalogue);
   const send = (input = h.input) =>
     catalogue.export(h.cookie, h.proof, input, false, h.signal());
@@ -22,13 +39,232 @@ async function setup() {
       h.signal(),
     );
   const end = () => cleanup.request(h.cookie, h.proof, "workspace");
-  return { ...h, catalogue, cleanup, send, current, check, end };
+  const update = () =>
+    catalogue.export(
+      h.cookie,
+      h.proof,
+      {
+        ...h.input,
+        revision: 2,
+        product: { ...h.input.product, description: "Updated cotton" },
+      },
+      true,
+      h.signal(),
+    );
+  const collection = async () => {
+    const installation = await current();
+    const ctx = {
+      shop: h.shop,
+      access: installation.tokens!.access,
+      signal: h.signal(),
+      admit: async () => {},
+    };
+    const remote = await h.provider.collections.read(ctx, {
+      id: installation.collection!.remoteId!,
+    });
+    return { ctx, remote: remote! };
+  };
+  return {
+    ...h,
+    catalogue,
+    cleanup,
+    send,
+    current,
+    check,
+    end,
+    update,
+    collection,
+  };
 }
 afterEach(async () => {
   await Promise.all(open.splice(0).map((h) => h.close()));
 });
 
 describe("Retailor collection ownership and lifecycle", () => {
+  it("does not resend an asynchronously processing image from collection creation", async () => {
+    const h = await setup(true),
+      actual = h.provider.collections.create.bind(h.provider.collections);
+    vi.spyOn(h.provider.collections, "create").mockImplementationOnce(
+      async (...args) => {
+        const remote = await actual(...args);
+        if (!remote) return remote;
+        const processing = { ...remote, image: null };
+        h.provider.seedCollection(h.shop, processing);
+        return processing;
+      },
+    );
+    const setImage = vi.spyOn(h.provider.collections, "setImage");
+    expect((await h.send()).export.state).toBe("ready");
+    expect((await h.current()).collection!.imageDispatched).toBe(true);
+    const second = structuredClone(h.input);
+    second.product.id = "second_tee";
+    expect((await h.send(second)).export.state).toBe("ready");
+    expect(setImage).not.toHaveBeenCalled();
+    const { remote } = await h.collection();
+    h.provider.seedCollection(h.shop, {
+      ...remote,
+      image: { id: "processed-image" },
+    });
+    await h.update();
+    expect((await h.current()).collection!.imageDispatched).toBe(false);
+    expect(setImage).not.toHaveBeenCalled();
+  });
+  it.each(["export", "update"])(
+    "fills an existing empty collection image during reviewed %s and skips later non-null images",
+    async (operation) => {
+      const h = await setup(true);
+      await h.send();
+      const { remote } = await h.collection();
+      expect(remote.image).not.toBeNull();
+      h.provider.seedCollection(h.shop, { ...remote, image: null });
+      const setImage = vi.spyOn(h.provider.collections, "setImage");
+      const second = structuredClone(h.input);
+      second.product.id = "second_tee";
+      expect(
+        (await (operation === "update" ? h.update() : h.send(second))).export
+          .state,
+      ).toBe("ready");
+      expect(setImage).toHaveBeenCalledTimes(1);
+      expect((await h.collection()).remote.image).not.toBeNull();
+      expect((await h.current()).collection!.imageDispatched).toBe(false);
+      const latest = (await h.collection()).remote;
+      h.provider.seedCollection(h.shop, { ...latest, image: { id: null } });
+      await h.update();
+      expect(setImage).toHaveBeenCalledTimes(1);
+      expect((await h.collection()).remote.image).toEqual({ id: null });
+    },
+  );
+  it("preserves an image added between the initial lookup and the final pre-write check", async () => {
+    const h = await setup(true);
+    await h.send();
+    const { remote } = await h.collection();
+    h.provider.seedCollection(h.shop, { ...remote, image: null });
+    const actual = h.provider.collections.read.bind(h.provider.collections);
+    let reads = 0;
+    vi.spyOn(h.provider.collections, "read").mockImplementation(
+      async (...args) => {
+        const result = await actual(...args);
+        if (reads++ === 0)
+          h.provider.seedCollection(h.shop, {
+            ...remote,
+            image: { id: "merchant-image" },
+          });
+        return result;
+      },
+    );
+    const setImage = vi.spyOn(h.provider.collections, "setImage");
+    expect((await h.update()).export.state).toBe("ready");
+    expect(setImage).not.toHaveBeenCalled();
+    expect((await h.collection()).remote.image).toEqual({
+      id: "merchant-image",
+    });
+  });
+  it("rechecks ownership before filling a blank collection image", async () => {
+    const h = await setup(true);
+    await h.send();
+    const { remote } = await h.collection();
+    h.provider.seedCollection(h.shop, { ...remote, image: null });
+    const actual = h.provider.collections.read.bind(h.provider.collections);
+    let reads = 0;
+    vi.spyOn(h.provider.collections, "read").mockImplementation(
+      async (...args) => {
+        const result = await actual(...args);
+        if (reads++ === 0)
+          h.provider.seedCollection(h.shop, {
+            ...remote,
+            image: null,
+            metafield: { value: "b".repeat(64) },
+          });
+        return result;
+      },
+    );
+    const setImage = vi.spyOn(h.provider.collections, "setImage");
+    await expect(h.update()).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(setImage).not.toHaveBeenCalled();
+  });
+  it("reads an applied image after a lost response without repeating or replacing it", async () => {
+    const h = await setup(true);
+    await h.send();
+    const { remote } = await h.collection();
+    h.provider.seedCollection(h.shop, { ...remote, image: null });
+    const actual = h.provider.collections.setImage.bind(h.provider.collections);
+    const setImage = vi
+      .spyOn(h.provider.collections, "setImage")
+      .mockImplementationOnce(async (...args) => {
+        await actual(...args);
+        throw new Error("lost image response");
+      });
+    await expect(h.update()).rejects.toThrow("lost image response");
+    expect((await h.current()).collection!.imageDispatched).toBe(true);
+    h.provider.seedCollection(h.shop, {
+      ...remote,
+      image: { id: "merchant-image" },
+    });
+    expect((await h.update()).export.state).toBe("ready");
+    expect(setImage).toHaveBeenCalledTimes(1);
+    expect((await h.current()).collection!.imageDispatched).toBe(false);
+    expect((await h.collection()).remote.image).toEqual({
+      id: "merchant-image",
+    });
+  });
+  it("does not blindly repeat an unknown image write while the image is still empty", async () => {
+    const h = await setup(true);
+    await h.send();
+    const { remote } = await h.collection();
+    h.provider.seedCollection(h.shop, { ...remote, image: null });
+    const setImage = vi
+      .spyOn(h.provider.collections, "setImage")
+      .mockRejectedValueOnce(new Error("unknown image write"));
+    await expect(h.update()).rejects.toThrow("unknown image write");
+    expect((await h.current()).collection!.imageDispatched).toBe(true);
+    expect((await h.update()).export.state).toBe("ready");
+    expect(setImage).toHaveBeenCalledTimes(1);
+    expect((await h.current()).collection!.imageDispatched).toBe(true);
+  });
+  it("allows a new explicit attempt after a definite image rejection", async () => {
+    const h = await setup(true);
+    await h.send();
+    const { remote } = await h.collection();
+    h.provider.seedCollection(h.shop, { ...remote, image: null });
+    const setImage = vi
+      .spyOn(h.provider.collections, "setImage")
+      .mockResolvedValueOnce(null);
+    await expect(h.update()).rejects.toMatchObject({ code: "UPSTREAM_FAILED" });
+    expect((await h.current()).collection!.imageDispatched).toBe(false);
+    expect((await h.update()).export.state).toBe("ready");
+    expect(setImage).toHaveBeenCalledTimes(2);
+  });
+  it("can fill a later confirmed-empty image after a known successful write", async () => {
+    const h = await setup(true);
+    await h.send();
+    const { remote } = await h.collection();
+    h.provider.seedCollection(h.shop, { ...remote, image: null });
+    const setImage = vi.spyOn(h.provider.collections, "setImage");
+    expect((await h.update()).export.state).toBe("ready");
+    expect((await h.current()).collection!.imageDispatched).toBe(false);
+    const latest = (await h.collection()).remote;
+    h.provider.seedCollection(h.shop, { ...latest, image: null });
+    expect((await h.update()).export.state).toBe("ready");
+    expect(setImage).toHaveBeenCalledTimes(2);
+  });
+  it("loads older collection state and keeps updates of exports without a collection compatible", async () => {
+    const h = await setup(true);
+    await h.send();
+    const legacy = structuredClone(await h.current());
+    delete (legacy.collection as Partial<NonNullable<typeof legacy.collection>>)
+      .imageDispatched;
+    expect(InstallationSchema.parse(legacy).collection!.imageDispatched).toBe(
+      false,
+    );
+    await h.ledger.transact((data) => {
+      data.installations[0]!.collection = null;
+    });
+    const create = vi.spyOn(h.provider.collections, "create"),
+      setImage = vi.spyOn(h.provider.collections, "setImage");
+    expect((await h.update()).export.state).toBe("ready");
+    expect(create).not.toHaveBeenCalled();
+    expect(setImage).not.toHaveBeenCalled();
+  });
   it("joins multiple photo-bearing drafts to one collection and removes it before app access", async () => {
     const h = await setup(),
       create = vi.spyOn(h.provider.collections, "create");
@@ -102,7 +338,7 @@ describe("Retailor collection ownership and lifecycle", () => {
     expect((await h.current()).collection!.removed).toBe(false);
     expect((await h.current()).tokens).not.toBeNull();
   });
-  it("allows a fresh explicit retry after a definite rejection and cleans a rejected-only attempt", async () => {
+  it("allows a fresh explicit retry after a definite collection rejection", async () => {
     const h = await setup(),
       create = vi
         .spyOn(h.provider.collections, "create")
@@ -111,6 +347,8 @@ describe("Retailor collection ownership and lifecycle", () => {
     expect((await h.current()).collection!.dispatched).toBe(false);
     expect((await h.send()).export.state).toBe("ready");
     expect(create).toHaveBeenCalledTimes(2);
+  });
+  it("cleans a rejected-only collection attempt", async () => {
     const rejected = await setup();
     vi.spyOn(rejected.provider.collections, "create").mockResolvedValue(null);
     await expect(rejected.send()).rejects.toMatchObject({
