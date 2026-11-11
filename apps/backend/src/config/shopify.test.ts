@@ -15,8 +15,6 @@ const credentials = {
 const appConfig = {
   ...SHOPIFY_APP,
   clientId: "test-app",
-  developmentInstallUrl:
-    "https://admin.shopify.com/?organization_id=1&no_redirect=true&redirect=/oauth/redirect_from_developer_dashboard?client_id%3Dtest-app",
 };
 const runtimeWith = (env: Environment, app = appConfig) =>
   composeRuntime(
@@ -130,12 +128,11 @@ describe("inert Shopify runtime configuration", () => {
       app: { ...appConfig, storageBucket: "incomplete-bucket" },
     },
     { env: credentials, app: { ...appConfig, clientId: "" } },
-    { env: credentials, app: { ...appConfig, developmentInstallUrl: "" } },
+    { env: credentials, app: { ...appConfig, clientId: "app&redirect=evil" } },
     {
       env: credentials,
-      app: { ...appConfig, developmentInstallUrl: "https://evil.example" },
+      app: { ...appConfig, clientId: "https://evil.example" },
     },
-    { env: credentials, app: { ...appConfig, clientId: "different-app" } },
     { env: { ...credentials, SHOPIFY_ENCRYPTION_KEY: "bad" }, app: appConfig },
     {
       env: credentials,
@@ -201,22 +198,23 @@ describe("inert Shopify runtime configuration", () => {
     expect(runtime.shopify).toBeUndefined();
     expect(fetch).not.toHaveBeenCalled();
   });
-  it("never exposes the organization-bound development entry in production, even with durable hosted storage", () => {
-    expect(
-      configuredShopify(
-        parseEnvironment({
-          ...credentials,
-          APP_ENV: "production",
-          FAKE_MODE: "false",
-          FRONTEND_ORIGIN: "https://retailor.example",
-        }),
-        {
-          ...appConfig,
-          storageProject: "test-project",
-          storageBucket: "test-integration-bucket",
-        },
-      ),
-    ).toBeUndefined();
+  it("keeps production unavailable pending native distribution acceptance, even with durable hosted storage", () => {
+    const gcs = vi.spyOn(GcsShopifyStore.prototype, "read");
+    const configured = configuredShopify(
+      parseEnvironment({
+        ...credentials,
+        APP_ENV: "production",
+        FAKE_MODE: "false",
+        FRONTEND_ORIGIN: "https://retailor.example",
+      }),
+      {
+        ...appConfig,
+        storageProject: "test-project",
+        storageBucket: "test-integration-bucket",
+      },
+    );
+    expect(configured).toBeUndefined();
+    expect(gcs).not.toHaveBeenCalled();
     expect(fetch).not.toHaveBeenCalled();
   });
 });
