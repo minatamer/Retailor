@@ -4,6 +4,8 @@
 
 ## Decisions and primary research
 
+**Standing loading/placeholder requirement — 11 November 2026:** every pending state and placeholder receives the same deliberate design quality as the loaded interface. Follow [Loading states and placeholders](LOADING-STATES.md) for the current shared components, immediate feedback, honest progress, static repair states and actual responsive transition checks. This remains a requirement for future features, not only the RTL-184 revision.
+
 Retailor uses warm paper, deep ink, confident cobalt and a small lime signature. Merchant identities are scoped independently. Platform controls use Inter; editorial accents use DM Serif Display. Spacing follows 4/8/12/16/24/32/48, moderate platform radii and largely square fashion photography. One original stroke icon vocabulary keeps action meanings consistent. Product photography is the central object, not decoration around a chatbot.
 
 | Direction | Three-page relationship                                                                | Reason                                                      |
