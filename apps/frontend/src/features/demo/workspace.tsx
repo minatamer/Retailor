@@ -5,6 +5,12 @@ import Link from "next/link";
 import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
 import { Brand } from "../../components/ui/brand";
+import {
+  LoadingState,
+  LoadingMark,
+  SkeletonCards,
+} from "../../components/ui/loading-state";
+import { useAnimatedScroll } from "../../components/ui/animated-scroll";
 import { PhotoPicker, namedFiles } from "../photos/photo-picker";
 import { SAMPLE } from "../photos/sample";
 import { SessionProvider, useSession } from "../session/context";
@@ -57,6 +63,24 @@ function WorkspaceFlow() {
     missingPhotoIds,
   } = useSession();
   const heading = useRef<HTMLDivElement>(null);
+  const selectedPhotos = useRef<HTMLDivElement>(null);
+  const sampleScrollRequested = useRef(false);
+  const { scrollTo, cancel: cancelScroll } = useAnimatedScroll();
+  useEffect(() => {
+    if (state.stage !== "choose") {
+      sampleScrollRequested.current = false;
+      cancelScroll();
+      return;
+    }
+    if (!sampleBusy || !sampleScrollRequested.current) return;
+    sampleScrollRequested.current = false;
+    const target = selectedPhotos.current;
+    if (target) {
+      const margin =
+        Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+      scrollTo(window.scrollY + target.getBoundingClientRect().top - margin);
+    }
+  }, [sampleBusy, state.stage, scrollTo, cancelScroll]);
   useEffect(() => {
     heading.current?.focus({ preventScroll: true });
     if (state.stage === "style")
@@ -75,8 +99,11 @@ function WorkspaceFlow() {
   if (!ready)
     return (
       <main className={styles.opening}>
-        <span className={styles.spinner} />
-        <p role="status">Preparing a fresh workspace…</p>
+        <Brand />
+        <LoadingState
+          title="Preparing your workspace"
+          detail="A fresh canvas for your collection."
+        />
       </main>
     );
   return (
@@ -153,6 +180,13 @@ function WorkspaceFlow() {
               )}
               <PhotoPicker
                 headingLevel={1}
+                selectionRef={selectedPhotos}
+                sampleLoading={sampleBusy}
+                onCancelSample={() => {
+                  sampleScrollRequested.current = false;
+                  cancelScroll();
+                  controller.cancel();
+                }}
                 controller={controller.photos}
                 onProcess={() => void controller.draftCatalogue()}
                 canProcess={controller.canAttemptAi()}
@@ -182,21 +216,17 @@ function WorkspaceFlow() {
                     </div>
                     <Button
                       disabled={sampleBusy}
-                      onClick={() => void controller.sample()}
+                      onClick={() => {
+                        if (controller.photos.getSnapshot().busy) return;
+                        sampleScrollRequested.current = true;
+                        void controller.sample();
+                      }}
                     >
                       {sampleBusy
                         ? "Loading photos…"
                         : `Use the ${SAMPLE.assets.length}-photo sample`}
                       <Icon name="arrow" />
                     </Button>
-                    {sampleBusy && (
-                      <Button
-                        variant="quiet"
-                        onClick={() => controller.cancel()}
-                      >
-                        Cancel sample loading
-                      </Button>
-                    )}
                     <p className={styles.finePrint}>
                       Use these sample photos to try the demo right away.
                     </p>
@@ -315,8 +345,17 @@ function Processing({ step }: { step: ProcessStep }) {
         <Icon name="sparkle" size={48} />
       </div>
       <span className={styles.eyebrow}>Your collection, taking shape</span>
-      <p role="status">{step}…</p>
-      <ul>
+      <h1>A little detail. A whole collection.</h1>
+      <LoadingState
+        title={step}
+        detail="Turning your checked photos into a product draft you can review."
+        action={
+          <Button variant="quiet" onClick={() => controller.cancel()}>
+            Cancel and keep my photos
+          </Button>
+        }
+      />
+      <ul aria-label="Product draft progress">
         {PROCESS_STEPS.map((label, index) => (
           <li
             key={label}
@@ -325,10 +364,10 @@ function Processing({ step }: { step: ProcessStep }) {
           >
             {index < current ? (
               <Icon name="check" />
+            ) : index === current ? (
+              <LoadingMark />
             ) : (
-              <span
-                className={index === current ? styles.spinner : styles.dot}
-              />
+              <span className={styles.dot} />
             )}
             {label}
           </li>
@@ -339,9 +378,7 @@ function Processing({ step }: { step: ProcessStep }) {
           Local authored fixture processing; no AI request is made.
         </p>
       )}
-      <Button variant="secondary" onClick={() => controller.cancel()}>
-        Cancel and keep my photos
-      </Button>
+      <SkeletonCards />
     </section>
   );
 }
