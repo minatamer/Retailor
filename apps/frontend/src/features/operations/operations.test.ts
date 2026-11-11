@@ -538,7 +538,7 @@ describe("reviewed owner forms and atomic scenario identity", () => {
     const { controller } = await setup(true);
     const state = controller.getSnapshot().state;
     expect(state.scenario?.preset).toBe("healthy");
-    expect(state.graph.orders).toHaveLength(14);
+    expect(state.graph.orders).toHaveLength(17);
     controller.prepareScenario("loss");
     const preview = controller.getSnapshot().scenarioReview!;
     expect(controller.getSnapshot().state).toBe(state);
