@@ -1,6 +1,7 @@
 "use client";
 import { useId } from "react";
 import { useSession } from "../session/context";
+import { LoadingMark, LoadingState } from "../../components/ui/loading-state";
 import styles from "./picker.module.css";
 
 /** Store pricing is an owner setting; shopper surfaces consume its scope only. */
@@ -46,14 +47,19 @@ export function CurrencyPicker() {
               disabled={currency === "EUR" && currencyBusy}
               onClick={() => void controller.selectCurrency(currency)}
             >
-              {currency === "EUR" && currencyBusy && (
-                <span className={styles.spinner} aria-hidden="true" />
-              )}
+              {currency === "EUR" && currencyBusy && <LoadingMark />}
               {currency}
             </button>
           ))}
         </div>
       </div>
+      {currencyBusy && (
+        <LoadingState
+          compact
+          title="Updating your store currency"
+          detail="Checking the current reference rate."
+        />
+      )}
       {currencyNotice && (
         <p id={noticeId} className={styles.status} role="status">
           {currencyNotice}
