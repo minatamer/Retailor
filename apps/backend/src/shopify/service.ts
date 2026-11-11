@@ -180,6 +180,7 @@ export class ShopifyService {
         schemaVersion: 1,
         available: true,
         simulated: this.provider.simulated,
+        ended: !!installation && installation.endedAt !== null,
         state:
           installation?.state ??
           (binding.pending?.outcome === "pending" &&
