@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import { PhotoImage } from "../../components/ui/photo-image";
 import { useState } from "react";
 import type { ShopifyProductSummary } from "@retailor/contracts/shopify";
 import { COMMERCE_LIMITS } from "@retailor/contracts/commerce";
@@ -7,6 +7,11 @@ import { CATEGORY_LABELS, CategorySchema } from "@retailor/contracts/product";
 import type { ProductInput } from "@retailor/contracts/product";
 import { formatUsd } from "@retailor/commerce/money";
 import { Button } from "../../components/ui/button";
+import {
+  LoadingState,
+  SkeletonCards,
+  PhotoPlaceholder,
+} from "../../components/ui/loading-state";
 import { useSession } from "../session/context";
 import { GarmentImage } from "../storefront/gallery";
 import { ReviewDialog } from "./review-dialog";
@@ -23,7 +28,7 @@ function ShopifyPhoto({
 }) {
   const [failed, setFailed] = useState(false);
   return image && !failed ? (
-    <Image
+    <PhotoImage
       src={image.url}
       alt={image.alt || title}
       width={640}
@@ -34,19 +39,9 @@ function ShopifyPhoto({
     />
   ) : (
     <div className={styles.photoFallback}>
-      <svg
-        width="34"
-        height="34"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        aria-hidden="true"
-      >
-        <rect x="3" y="3" width="18" height="18" rx="3" />
-        <path d="m4 17 5-5 4 4 3-3 5 5" />
-        <circle cx="15" cy="8" r="1" />
-      </svg>
-      <span>{image ? "Photo unavailable" : "No photo preview"}</span>
+      <PhotoPlaceholder
+        label={image ? "Photo unavailable" : "No photo preview"}
+      />
     </div>
   );
 }
@@ -154,6 +149,7 @@ function ImportReview({ onImported }: { onImported(): void }) {
           {shopify.notice}
         </p>
       )}
+      {shopify.busy && <LoadingState compact title={shopify.busy} />}
       <div className={styles.actions}>
         <Button
           disabled={!clothing || !validStock || !!shopify.busy}
@@ -218,9 +214,7 @@ export function CatalogueBrowser() {
     ),
   );
   const eligible = visible.filter(
-    (product) =>
-      !product.giftCard &&
-      (product.images.length > 0 || product.mediaTruncated),
+    (product) => product.images.length > 0 || product.mediaTruncated,
   );
   const selectAllIds = [
     ...new Set([...chosen, ...eligible.map((product) => product.id)]),
@@ -305,13 +299,21 @@ export function CatalogueBrowser() {
           Connect Shopify to choose a collection and preview its products.
         </p>
       )}
-      {connected && !catalogue && (
-        <p role="status" className={styles.empty}>
-          {busy
-            ? "Loading your Shopify products…"
-            : "Your products could not be loaded. Use Refresh to try again."}
-        </p>
-      )}
+      {connected &&
+        !catalogue &&
+        (busy ? (
+          <>
+            <LoadingState
+              title="Bringing in your Shopify collection"
+              detail="Loading product details, prices and photos."
+            />
+            <SkeletonCards />
+          </>
+        ) : (
+          <p role="status" className={styles.empty}>
+            Your products could not be loaded. Use Refresh to try again.
+          </p>
+        ))}
       {catalogue && (
         <>
           <div className={styles.selectionToolbar}>
@@ -354,8 +356,7 @@ export function CatalogueBrowser() {
             {visible.map((product) => {
               const checked = chosen.includes(product.id),
                 cannotSelect =
-                  product.giftCard ||
-                  (!product.images.length && !product.mediaTruncated);
+                  !product.images.length && !product.mediaTruncated;
               return (
                 <article
                   className={styles.importCard}
@@ -417,11 +418,9 @@ export function CatalogueBrowser() {
                     </span>
                     <div className={styles.garmentBottom}>
                       <span className={styles.fine}>
-                        {product.giftCard
-                          ? "Gift cards cannot be imported"
-                          : !product.images.length && !product.mediaTruncated
-                            ? "Photo required"
-                            : ""}
+                        {!product.images.length && !product.mediaTruncated
+                          ? "Photo required"
+                          : ""}
                       </span>
                       <Button
                         variant="quiet"
@@ -443,7 +442,9 @@ export function CatalogueBrowser() {
             <p className={styles.empty}>
               {products.length
                 ? "No products match your search."
-                : "No products in this collection."}
+                : catalogue.nextCursor
+                  ? "No products available to import on this page. Load more to continue."
+                  : "No products available to import in this collection."}
             </p>
           )}
           <div className={styles.importFooter}>
