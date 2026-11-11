@@ -13,6 +13,7 @@ import { pageTemplate } from "@retailor/contracts/design";
 import type { Variant } from "@retailor/contracts/product";
 import { colourImageIds } from "@retailor/contracts/product";
 import { Icon } from "../../components/ui/icon";
+import { PhotoPlaceholder } from "../../components/ui/loading-state";
 import { merchantStyle } from "../store-design/presets";
 import {
   collection,
@@ -489,7 +490,9 @@ function ProductCard({
               onFailure={onFailure}
             />
           ) : (
-            <span className={styles.noPhoto}>Photo needs repair</span>
+            <span className={styles.noPhoto}>
+              <PhotoPlaceholder />
+            </span>
           )}
         </button>
         {!item.available && (
