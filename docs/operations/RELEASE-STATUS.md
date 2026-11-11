@@ -2,7 +2,9 @@
 
 ## Hosted Shopify release resumed —11November2026
 
-The owner resumes the existing-project/domain release, reuses the current Shopify app and confirms both secret values filled; metadata shows enabled version1 for each. [Current RTL-191 guide](SHOPIFY-HOSTED-RELEASE.md), [actual progress](../validation/RTL-191.md). Hosted production configuration, verified private maintenance, request-owned Disconnect and deployment-preservation checks pass all six local gates,924/924 tests. Current Linux images are building; earlier images/scans do not accept this source.
+Subsequent owner-requested [manual security audit](../audits/RTL-195-MANUAL-SECURITY.md) replaces the unavailable current Scout invocation, without claiming scanner acceptance. Actual current Linux image/runtime/asset probes completed.100 focused security tests pass; image maintenance is required for Node24.21.0 and APT2.6.1 before cutover. [Exact evidence and limits](../validation/RTL-195.md). Hosted IAM/scheduler/logging/native consent and the deferred Shopify URLs remain pending; public traffic is unchanged.
+
+The owner resumes the existing-project/domain release, reuses the current Shopify app and confirms both secret values filled; metadata shows enabled version1 for each. [Current RTL-191 guide](SHOPIFY-HOSTED-RELEASE.md), [actual progress](../validation/RTL-191.md). Hosted production configuration, verified private maintenance, request-owned Disconnect and deployment-preservation checks pass all six local gates,924/924 tests. Current Linux images were built/probed; the manual audit above records required security maintenance rather than accepting the old runtime for release.
 
 Only the two initially empty secret containers have been created at this stage. Existing services, domain, paid mode, secret bindings and traffic remain unchanged. Shopify sign-in/URL changes are deferred while preparation continues. Actual resource/IAM/scheduling, images/security/hosted verification and public cutover remain pending. The historical RTL-190 hold below is superseded by later owner confirmation.
 
