@@ -5,12 +5,12 @@ import {
   ShopifyShopSchema,
   ShopifyProductIdSchema,
 } from "@retailor/contracts/shopify";
-import { formatUsd } from "@retailor/commerce/money";
-import { CATEGORY_LABELS } from "@retailor/contracts/product";
 import { Button } from "../../components/ui/button";
 import { Icon } from "../../components/ui/icon";
+import { LoadingState, LoadingMark } from "../../components/ui/loading-state";
 import { useSession } from "../session/context";
 import { ReviewDialog } from "./review-dialog";
+import { DraftReview } from "./draft-review";
 import { CatalogueBrowser } from "./catalogue-browser";
 import { GarmentPicker } from "./garment-picker";
 import { exportSelection } from "./selection";
@@ -25,7 +25,7 @@ const states = {
   checking_outcome: "Checking outcome",
   cleanup_pending: "Removal pending",
   cleaning: "Removing owned products",
-  cleaned: "Cleanup confirmed · connection closed",
+  cleaned: "Disconnected",
   disconnecting: "Closing app access",
   needs_attention: "Needs attention",
 };
@@ -68,6 +68,7 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
     shopify.available &&
     shopify.verified &&
     !busy &&
+    !status?.ended &&
     status?.state !== "connected" &&
     !["cleanup_pending", "cleaning", "disconnecting", "cleaned"].includes(
       status?.state ?? "",
@@ -76,9 +77,13 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
   const onboardingComplete = onboarding && connected;
   const canRefresh =
     !!status &&
+    !status.ended &&
     !connected &&
     (status.state !== "disconnected" || !shopify.verified);
-  const canDisconnect = !!status?.shop && status.state !== "cleaned";
+  const canDisconnect =
+    !!status?.shop &&
+    !status.ended &&
+    ["connected", "needs_attention"].includes(status.state);
   const remaining = Math.max(0, 10 - (status?.createIntents ?? 0));
   const tracked = new Set(active.map((item) => item.sourceProductId));
   const selectedIds = exportSelection(
@@ -153,9 +158,11 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
           </div>
           <span className={styles.badge} data-ready={connected}>
             {status
-              ? !shopify.verified && status.state === "connected"
-                ? "Needs verification"
-                : states[status.state]
+              ? status.ended
+                ? "Disconnected"
+                : !shopify.verified && status.state === "connected"
+                  ? "Needs verification"
+                  : states[status.state]
               : busy
                 ? "Checking availability"
                 : shopify.available === true
@@ -168,7 +175,11 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
             <strong>Local simulation</strong> · No Shopify account is contacted.
           </p>
         )}
-        <p>Import products or export drafts with your Shopify test store.</p>
+        <p>
+          {status?.ended
+            ? "Your local storefront is kept."
+            : "Import products or export drafts with your Shopify test store."}
+        </p>
         {status?.shop && (
           <dl className={styles.details}>
             <div>
@@ -185,22 +196,31 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
               <dd>{status.currency || "Not verified"}</dd>
             </div>
             <div>
-              <dt>Retailor exports</dt>
+              <dt>
+                {status.ended ? "Products to remove" : "Retailor exports"}
+              </dt>
               <dd>
-                {status.productCount} known · {active.length} active or
-                unresolved exports
+                {status.ended ? (
+                  active.length
+                ) : (
+                  <>
+                    {status.productCount} known · {active.length} active or
+                    unresolved exports
+                  </>
+                )}
               </dd>
             </div>
           </dl>
         )}
-        {status?.currency && status.currency !== "USD" && (
+        {status?.currency && status.currency !== "USD" && !status.ended && (
           <p className={styles.warning}>
             This store uses {status.currency}. Reading is available; export
             requires a USD test store. EUR display settings do not convert
             export prices.
           </p>
         )}
-        {!connected &&
+        {!status?.ended &&
+          !connected &&
           (!status ||
             ["disconnected", "authorizing", "needs_attention"].includes(
               status.state,
@@ -215,6 +235,50 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
               </Button>
             </div>
           )}
+        {status?.ended && (
+          <div className={styles.removal} role="status" aria-live="polite">
+            <span className={styles.removalIcon}>
+              <Icon
+                name={status.state === "cleaned" ? "check" : "info"}
+                size={20}
+              />
+            </span>
+            <div>
+              <strong>
+                {status.state === "cleaned"
+                  ? status.exports.length
+                    ? "Demo products removed"
+                    : "Shopify disconnected"
+                  : status.state === "needs_attention"
+                    ? "Cleanup needs attention"
+                    : active.length
+                      ? `Removing ${active.length} demo ${active.length === 1 ? "product" : "products"}`
+                      : status.exports.length
+                        ? "Finishing removal"
+                        : "Closing Shopify app access"}
+              </strong>
+              <p>
+                {status.state === "cleaned"
+                  ? status.exports.length
+                    ? "Your Retailor exports and collection were removed, and app access is closed."
+                    : "No demo products were created. Shopify app access is closed."
+                  : status.state === "needs_attention"
+                    ? active.length
+                      ? "Some exports could not be removed. Check the product links below in Shopify."
+                      : "No demo products remain to remove. Closing Shopify app access still needs attention."
+                    : active.length
+                      ? "You’re disconnected from Retailor. We’re removing its exports before closing Shopify app access."
+                      : "Finishing cleanup before closing Shopify app access."}
+              </p>
+              {!shopify.verified && !busy && (
+                <p>
+                  Removal status is temporarily unavailable. Cleanup continues
+                  in the background.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
         {!onboardingComplete &&
           (canRefresh || canDisconnect || !onboarding) && (
             <div
@@ -244,14 +308,11 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
             </div>
           )}
         {!onboardingComplete && (
-          <div role="status" aria-live="polite" className={styles.notice}>
-            {shopify.busy && (
-              <span className={styles.pending}>
-                <span className={styles.spinner} aria-hidden="true" />
-                {shopify.busy}
-              </span>
+          <div className={styles.notice}>
+            {shopify.busy && <LoadingState compact title={shopify.busy} />}
+            {shopify.notice && !status?.ended && (
+              <p role="status">{shopify.notice}</p>
             )}
-            {shopify.notice && <p>{shopify.notice}</p>}
             {shopify.reference && (
               <small>Request reference: {shopify.reference}</small>
             )}
@@ -270,155 +331,201 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
           </div>
         )}
       </section>
-      {!onboarding && (
-        <>
-          <section className={styles.section} aria-labelledby="shopify-exports">
-            <div className={styles.header} data-tailor-target="shopify-export">
-              <div>
-                <span className={styles.eyebrow}>Explicit sharing</span>
-                <h3 id="shopify-exports">Your Retailor products</h3>
+      {!onboarding &&
+        (!status?.ended || status.state === "needs_attention") && (
+          <>
+            <section
+              className={styles.section}
+              aria-labelledby="shopify-exports"
+            >
+              <div
+                className={styles.header}
+                data-tailor-target="shopify-export"
+              >
+                <div>
+                  <span className={styles.eyebrow}>
+                    {status?.ended ? "Removal recovery" : "Explicit sharing"}
+                  </span>
+                  <h3 id="shopify-exports">
+                    {status?.ended
+                      ? active.length
+                        ? "Products still to remove"
+                        : "Cleanup recovery"
+                      : "Your Retailor products"}
+                  </h3>
+                </div>
+                {!status?.ended && (
+                  <span className={styles.fine}>
+                    {status?.createIntents ?? 0} / 10 lifetime export intents
+                  </span>
+                )}
               </div>
-              <span className={styles.fine}>
-                {status?.createIntents ?? 0} / 10 lifetime export intents
-              </span>
-            </div>
-            <p>
-              Choose products to export with their photos to the Retailor
-              collection in Shopify. You will review everything before creating
-              drafts.
-            </p>
-            {!!local.length && (
-              <>
-                <GarmentPicker
-                  products={local}
-                  tracked={tracked}
-                  remaining={remaining}
-                  enabled={canWrite}
-                  selected={selectedIds}
-                  onSelect={setSelected}
-                />
-                <Button
-                  disabled={!canWrite || !selectedIds.length || remaining === 0}
-                  onClick={() => controller.reviewShopify(selectedIds)}
-                >
-                  Review draft export
-                </Button>
-              </>
-            )}
-            {!status?.exports.length && (
-              <p className={styles.empty}>
-                No products have been exported in this demo.
-              </p>
-            )}
-            <div className={styles.exports}>
-              {status?.exports.map((item) => {
-                const source = local.find(
-                    (product) => product.id === item.sourceProductId,
-                  ),
-                  href = adminLink(status.shop, item.remoteId);
-                return (
-                  <article className={styles.product} key={item.id}>
-                    <strong>
-                      {source?.title ??
-                        "Garment removed from the local collection"}
-                    </strong>
-                    <p>{outcomes[item.state]}</p>
-                    {item.state !== "removed" &&
-                      item.revision !== state.graph.revision && (
-                        <small>
-                          The local collection changed after this export. This
-                          draft keeps its last reviewed fields until an explicit
-                          Update.
-                        </small>
-                      )}
-                    {href && !simulated ? (
-                      <a href={href} target="_blank" rel="noopener noreferrer">
-                        Open owned product in Shopify ↗
-                      </a>
-                    ) : item.remoteId ? (
-                      <small>
-                        Simulated product · {item.remoteId.split("/").at(-1)}
-                      </small>
-                    ) : (
-                      <small>
-                        Uncertain exports remain tracked by their owned handle.
-                      </small>
-                    )}
-                    {item.state !== "removed" && (
-                      <div className={styles.actions}>
-                        <Button
-                          variant="secondary"
-                          disabled={busy || !connected}
-                          onClick={() => void controller.checkShopify(item.id)}
-                        >
-                          Check result
-                        </Button>
-                        {source && (
-                          <Button
-                            variant="secondary"
-                            disabled={
-                              !canWrite ||
-                              [
-                                "removal_pending",
-                                "preparing",
-                                "creating",
-                              ].includes(item.state)
-                            }
-                            onClick={() =>
-                              controller.reviewShopify([source.id], true)
-                            }
-                          >
-                            Review update
-                          </Button>
-                        )}
-                        <Button
-                          variant="quiet"
-                          disabled={busy || !connected}
-                          onClick={() =>
-                            setConfirmation({ kind: "remove", id: item.id })
-                          }
-                        >
-                          Remove draft
-                        </Button>
-                      </div>
-                    )}
-                    {!source && item.state !== "removed" && (
-                      <p className={styles.fine}>
-                        Remove this exported draft explicitly, or keep it
-                        tracked for end-of-session cleanup.
-                      </p>
-                    )}
-                  </article>
-                );
-              })}
-            </div>
-            {status?.state === "needs_attention" && (
-              <div className={styles.warning}>
-                <strong>Manual cleanup may be required.</strong>
+              {!status?.ended && (
                 <p>
-                  Inspect the exact owned product links above in Shopify. If
-                  access was revoked, remove those demo products manually.
-                  Reconnecting this same unexpired demo may restore cleanup
-                  access; an ended session cannot export new products.
+                  Choose products to export with their photos to the Retailor
+                  collection in Shopify. You will review everything before
+                  creating drafts.
                 </p>
-                {status.exports
-                  .filter((item) => !item.remoteId && item.state !== "removed")
-                  .map((item) => (
-                    <p key={item.id}>
-                      Inspect demo handle: <code>{item.handle}</code>
-                    </p>
-                  ))}
+              )}
+              {!!local.length && !status?.ended && (
+                <>
+                  <GarmentPicker
+                    products={local}
+                    tracked={tracked}
+                    remaining={remaining}
+                    enabled={canWrite}
+                    selected={selectedIds}
+                    onSelect={setSelected}
+                  />
+                  <Button
+                    disabled={
+                      !canWrite || !selectedIds.length || remaining === 0
+                    }
+                    onClick={() => controller.reviewShopify(selectedIds)}
+                  >
+                    Review draft export
+                  </Button>
+                </>
+              )}
+              {!status?.exports.length && (
+                <p className={styles.empty}>
+                  No products have been exported in this demo.
+                </p>
+              )}
+              <div className={styles.exports}>
+                {status?.exports
+                  .filter((item) => !status.ended || item.state !== "removed")
+                  .map((item) => {
+                    const source = local.find(
+                        (product) => product.id === item.sourceProductId,
+                      ),
+                      href = adminLink(status.shop, item.remoteId);
+                    return (
+                      <article className={styles.product} key={item.id}>
+                        <strong>
+                          {source?.title ??
+                            "Garment removed from the local collection"}
+                        </strong>
+                        <p>{outcomes[item.state]}</p>
+                        {item.state !== "removed" &&
+                          item.revision !== state.graph.revision && (
+                            <small>
+                              The local collection changed after this export.
+                              This draft keeps its last reviewed fields until an
+                              explicit Update.
+                            </small>
+                          )}
+                        {href && !simulated ? (
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Open owned product in Shopify ↗
+                          </a>
+                        ) : item.remoteId ? (
+                          <small>
+                            Simulated product ·{" "}
+                            {item.remoteId.split("/").at(-1)}
+                          </small>
+                        ) : (
+                          <small>
+                            Uncertain exports remain tracked by their owned
+                            handle.
+                          </small>
+                        )}
+                        {item.state !== "removed" && !status.ended && (
+                          <div className={styles.actions}>
+                            <Button
+                              variant="secondary"
+                              disabled={busy || !connected}
+                              onClick={() =>
+                                void controller.checkShopify(item.id)
+                              }
+                            >
+                              Check result
+                            </Button>
+                            {source && (
+                              <Button
+                                variant="secondary"
+                                disabled={
+                                  !canWrite ||
+                                  [
+                                    "removal_pending",
+                                    "preparing",
+                                    "creating",
+                                  ].includes(item.state)
+                                }
+                                onClick={() =>
+                                  controller.reviewShopify([source.id], true)
+                                }
+                              >
+                                Review update
+                              </Button>
+                            )}
+                            <Button
+                              variant="quiet"
+                              disabled={busy || !connected}
+                              onClick={() =>
+                                setConfirmation({ kind: "remove", id: item.id })
+                              }
+                            >
+                              Remove draft
+                            </Button>
+                          </div>
+                        )}
+                        {!source &&
+                          item.state !== "removed" &&
+                          !status.ended && (
+                            <p className={styles.fine}>
+                              Remove this exported draft explicitly, or keep it
+                              tracked for end-of-session cleanup.
+                            </p>
+                          )}
+                      </article>
+                    );
+                  })}
               </div>
-            )}
-            {status?.state === "disconnecting" && (
-              <p className={styles.fine}>
-                Product cleanup is complete; app access is still being checked.
-              </p>
-            )}
-          </section>
-          <CatalogueBrowser />
-        </>
-      )}
+              {status?.state === "needs_attention" && (
+                <div className={styles.warning}>
+                  <strong>Manual cleanup may be required.</strong>
+                  <p>
+                    {status.ended && !active.length ? (
+                      "No demo products remain to remove. Check the Retailor app in Shopify Settings → Apps. App removal is not yet confirmed."
+                    ) : (
+                      <>
+                        Inspect the exact owned product links above in Shopify.
+                        If access was revoked, remove those demo products
+                        manually. Reconnecting this same unexpired demo may
+                        restore cleanup access; an ended session cannot export
+                        new products.
+                      </>
+                    )}
+                  </p>
+                  {status.ended && (
+                    <Button
+                      variant="secondary"
+                      disabled={!shopify.available || !shopify.verified || busy}
+                      onClick={() => void controller.connectShopify()}
+                    >
+                      Restore removal access
+                    </Button>
+                  )}
+                  {status.exports
+                    .filter(
+                      (item) => !item.remoteId && item.state !== "removed",
+                    )
+                    .map((item) => (
+                      <p key={item.id}>
+                        Inspect demo handle: <code>{item.handle}</code>
+                      </p>
+                    ))}
+                </div>
+              )}
+            </section>
+            {!status?.ended && <CatalogueBrowser />}
+          </>
+        )}
       {shopify.consent && (
         <ReviewDialog
           title="Simulated Shopify consent"
@@ -451,90 +558,21 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
         </ReviewDialog>
       )}
       {shopify.review && (
-        <ReviewDialog
-          title={
-            shopify.review.update
-              ? "Review Shopify draft update"
-              : "Review Shopify draft export"
-          }
+        <DraftReview
+          review={shopify.review}
+          destination={status}
+          busy={busy}
+          verified={shopify.verified}
+          notice={shopify.notice}
+          reference={shopify.reference}
+          photo={(id) => {
+            const value = controller.photos.view(id);
+            return value ? { ...value, id } : undefined;
+          }}
+          onPhotoFailure={(id) => controller.photos.reportUnavailable(id)}
           onClose={() => controller.cancelShopifyReview()}
-        >
-          <p>
-            Destination: <strong>{status?.name ?? status?.shop}</strong> ·{" "}
-            {status?.shop}.
-          </p>
-          <p>
-            Draft only. Export these fields and photos to the Retailor
-            collection. Cleanup is requested at demo end; lost access can
-            require manual removal.
-          </p>
-          {shopify.review.products.map((product) => (
-            <article className={styles.reviewProduct} key={product.id}>
-              <h3>Retailor demo — {product.title}</h3>
-              <p>{product.description}</p>
-              <small>
-                {CATEGORY_LABELS[product.category]} · Colour / Size · USD
-              </small>
-              <div className={styles.photos}>
-                {product.imageIds.map((id) => {
-                  const photo = controller.photos.view(id);
-                  return photo ? (
-                    <Image
-                      key={id}
-                      src={photo.url}
-                      unoptimized
-                      width={80}
-                      height={96}
-                      alt="Reviewed garment photo"
-                    />
-                  ) : (
-                    <span key={id}>Photo unavailable</span>
-                  );
-                })}
-              </div>
-              <ul>
-                {product.variants
-                  .filter((variant) => !variant.archived)
-                  .map((variant) => (
-                    <li key={variant.id}>
-                      {variant.colour} / {variant.size} · {variant.sku} ·{" "}
-                      {formatUsd(variant.price)}
-                    </li>
-                  ))}
-              </ul>
-            </article>
-          ))}
-          <p className={styles.fine}>
-            Stock, costs, tax, discounts and checkout are not exported. Update
-            keeps the current exported photos.
-          </p>
-          {!busy && shopify.notice && (
-            <p role="alert">
-              {shopify.notice}
-              {shopify.reference
-                ? ` Request reference: ${shopify.reference}`
-                : ""}
-            </p>
-          )}
-          <div className={styles.actions}>
-            <Button
-              disabled={busy || !shopify.verified}
-              onClick={() => void controller.confirmShopify()}
-            >
-              {busy
-                ? "Writing reviewed drafts…"
-                : shopify.review.update
-                  ? "Update owned draft"
-                  : "Export as drafts"}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => controller.cancelShopifyReview()}
-            >
-              {busy ? "Close and check outcome later" : "Cancel review"}
-            </Button>
-          </div>
-        </ReviewDialog>
+          onConfirm={() => void controller.confirmShopify()}
+        />
       )}
       {confirmation && (
         <ReviewDialog
@@ -555,12 +593,17 @@ export function Connections({ onboarding = false }: { onboarding?: boolean }) {
             removal.
           </p>
           <div className={styles.actions}>
-            <Button disabled={busy} onClick={() => void finish()}>
+            <Button
+              disabled={busy}
+              aria-busy={busy}
+              onClick={() => void finish()}
+            >
               {busy
                 ? "Requesting cleanup…"
                 : confirmation.kind === "remove"
                   ? "Remove owned draft"
                   : "Remove drafts and disconnect"}
+              {busy && <LoadingMark />}
             </Button>
             <Button variant="secondary" onClick={() => setConfirmation(null)}>
               Close
