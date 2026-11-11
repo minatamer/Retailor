@@ -631,6 +631,26 @@ describe("bounded session-owned Shopify child", () => {
 });
 
 describe("real session integration", () => {
+  it("still ends the old workspace on reset without a global banner when Shopify acknowledgement fails", async () => {
+    const env = environment();
+    environments.push(env);
+    const { port } = requests(env.clock),
+      c = await env.open({ shopifyRequest: port });
+    await vi.waitFor(() => expect(c.getSnapshot().shopify.verified).toBe(true));
+    const oldWorkspace = c.getSnapshot().state.graph.workspaceId;
+    port.end.mockRejectedValueOnce(new Error("PRIVATE_END_MARKER"));
+    await c.reset();
+    expect(port.end).toHaveBeenCalledTimes(1);
+    expect(port.end).toHaveBeenCalledWith(
+      oldWorkspace,
+      false,
+      proof,
+      expect.any(AbortSignal),
+    );
+    expect(c.getSnapshot().ready).toBe(true);
+    expect(c.getSnapshot().state.graph.workspaceId).not.toBe(oldWorkspace);
+    expect(c.getSnapshot().recoveryNotice).toBe("");
+  });
   it("shows the optional step before tour, keeps Skip free of integration actions, and does not repeat on Personalize", async () => {
     const env = environment();
     environments.push(env);
