@@ -137,13 +137,12 @@ export class LiveShopifyProvider implements ShopifyProvider {
       clientId: string;
       secret: string;
       redirectUri: string;
-      developmentInstallUrl: string;
     },
     private readonly http: typeof fetch = fetch,
     private readonly clock: () => number = Date.now,
   ) {}
   installationUrl() {
-    return this.config.developmentInstallUrl;
+    return `https://admin.shopify.com/oauth/install?client_id=${encodeURIComponent(this.config.clientId)}`;
   }
   authorizationUrl(shop: string, state: string) {
     ShopifyShopSchema.parse(shop);
