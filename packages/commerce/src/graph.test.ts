@@ -1,10 +1,47 @@
 import { it, expect } from "vitest";
-import { parseGraph, serializedBytes } from "./graph.js";
+import { parseGraph, serializedBytes, freeze } from "./graph.js";
 import { facts } from "./facts.js";
 import { maximumGraph } from "../test/maximum.js";
 import { Harness, NOW, DAY1, SCOPE, product } from "../test/fixtures.js";
 import { applyCommand } from "./commands.js";
 import { AttributeSchema } from "@retailor/contracts/product";
+it("reuses only its fully validated immutable output and isolates caller-owned data", () => {
+  const h = new Harness();
+  h.place();
+  const input = structuredClone(h.graph),
+    validated = parseGraph(input);
+  expect(validated).not.toBe(input);
+  expect(parseGraph(validated)).toBe(validated);
+  expect(Object.isFrozen(validated)).toBe(true);
+  expect(Object.isFrozen(validated.orders)).toBe(true);
+  expect(Object.isFrozen(validated.orders[0]!.lines[0]!.unitNet)).toBe(true);
+  const amount = validated.orders[0]!.gross;
+  expect(() => {
+    validated.orders[0]!.gross++;
+  }).toThrow();
+  input.orders[0]!.gross++;
+  expect(validated.orders[0]!.gross).toBe(amount);
+  expect(() => parseGraph(input)).toThrow();
+});
+it("does not trust a shallow-frozen caller object after its nested records change", () => {
+  const h = new Harness();
+  h.place();
+  const input = Object.freeze(structuredClone(h.graph)),
+    validated = parseGraph(input);
+  expect(validated).not.toBe(input);
+  input.orders[0]!.gross++;
+  expect(() => parseGraph(input)).toThrow();
+  expect(parseGraph(validated)).toBe(validated);
+});
+it("fully checks deep-frozen restored or forged lookalikes with identical identities", () => {
+  const h = new Harness();
+  h.place();
+  const restored = freeze(structuredClone(h.graph));
+  expect(parseGraph(restored)).not.toBe(restored);
+  const corrupt = structuredClone(h.graph);
+  corrupt.orders[0]!.gross++;
+  expect(() => parseGraph(freeze(corrupt))).toThrow();
+});
 it("fits all declared record-count caps without truncating ledger history", () => {
   const graph = parseGraph(maximumGraph()),
     bytes = serializedBytes(graph);
