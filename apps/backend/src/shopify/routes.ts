@@ -16,6 +16,8 @@ import type { ShopifyService } from "./service.js";
 import type { ShopifyCatalogue } from "./catalogue.js";
 import type { ShopifyCleanup } from "./cleanup.js";
 import type { ShopifyWebhooks } from "./webhooks.js";
+import { cleanupDiagnostic } from "./runner.js";
+import { OperationFailure } from "../security/errors.js";
 
 export function shopifyRoutes(
   app: express.Express,
@@ -24,6 +26,7 @@ export function shopifyRoutes(
   catalogue?: ShopifyCatalogue,
   cleanup?: ShopifyCleanup,
   webhooks?: ShopifyWebhooks,
+  promptCleanup = false,
 ) {
   app.post(
     "/v1/shopify/simulate",
@@ -71,16 +74,57 @@ export function shopifyRoutes(
             : ShopifyControlSchema
         ).safeParse(req.body);
         if (!input.success) return deny("INVALID_INPUT", 400);
-        res.json(
-          await cleanup.request(
-            shopifyCookie(req.headers.cookie),
-            req.get("x-retailor-shopify-tab"),
-            input.data.workspaceId,
-            "exportId" in input.data && typeof input.data.exportId === "string"
-              ? input.data.exportId
-              : undefined,
-          ),
-        );
+        const owner = new AbortController(),
+          stop = () => owner.abort(),
+          timer = setTimeout(stop, 7000);
+        req.once("aborted", stop);
+        res.once("close", stop);
+        try {
+          const cookie = shopifyCookie(req.headers.cookie),
+            proof = req.get("x-retailor-shopify-tab"),
+            status = await cleanup.request(
+              cookie,
+              proof,
+              input.data.workspaceId,
+              "exportId" in input.data &&
+                typeof input.data.exportId === "string"
+                ? input.data.exportId
+                : undefined,
+            );
+          if (
+            promptCleanup &&
+            operation === "disconnect" &&
+            status.ended &&
+            status.state !== "cleaned" &&
+            !owner.signal.aborted
+          ) {
+            try {
+              const result = await cleanup.sweep(owner.signal);
+              cleanupDiagnostic(
+                result.claimed ? "completed" : "leased",
+                result.calls,
+                result.visited,
+              );
+            } catch (error) {
+              cleanupDiagnostic(
+                error instanceof OperationFailure ? error.code : "UNAVAILABLE",
+              );
+            }
+            res.json(
+              await cleanup.auth.status(
+                cookie,
+                proof,
+                input.data.workspaceId,
+                true,
+              ),
+            );
+          } else res.json(status);
+        } finally {
+          clearTimeout(timer);
+          req.removeListener("aborted", stop);
+          res.removeListener("close", stop);
+          owner.abort();
+        }
       },
     );
   }
