@@ -1,5 +1,13 @@
 # Retailor release status
 
+## Deployment held; current preparation —11November2026
+
+The owner wants hosted Shopify in the eventual paid release but explicitly says **do not deploy now**. [Readiness guide](SHOPIFY-HOSTED-READINESS.md), [remaining RTL-191 work](../tickets/RTL-191-enable-hosted-shopify.md). Current source includes the verified Stripe spinner/session explanation and photo-bearing centered order confirmation; [RTL-189](../validation/RTL-189.md) records895 passing Linux tests and all six quality gates. This is quality evidence, not fresh production-runtime image/scanner acceptance; the unchanged preflight correctly blocks stale image proof.
+
+Read-only observations preserve the existing `tryretailor.com` mapping/services, frontend `00002-xj6`, backend `00004-22g`, both origins and paid enablement. Domain delivery200 and anonymous backend health403 pass. First config read returnedDEADLINE; one deliberate follow-up returned200/live/paid-enabled/Stripe-ready. No cold-start cause or full hosted acceptance is inferred. No new image, revision, resource, secret binding, app setting, DNS or traffic change occurred. Cloud Build and Scheduler APIs are disabled; current Git workflow is unpaid quality only.
+
+Production Shopify remains disabled in source pending environment-specific app metadata, durable state/credentials, a cost-reviewed independent cleanup path and hosted verification. An actual Docker context probe confirms the Shopify logo is already included with identical bytes; fresh runtime asset delivery remains to be checked. These are concrete remaining tasks, not silently completed deployment work.
+
 ## Local Shopify candidate — 10 November2026
 
 The owner's AFK execute/validate loop implements RTL-162–165 and prepares RTL-166's integrated handoff. [Actual current evidence](../validation/RTL-166.md) separates local simulation/injected providers, exact-byte Linux packaging, fresh dependency auditing and pending native/hosted acceptance. Optional Connect/Skip, dashboard Connections, read/reviewed draft export/update/remove and independent cleanup are implemented locally. Root/app READMEs and [portfolio copy](SHOPIFY-PORTFOLIO.md) state native testing is pending. This work changes no deployed service, account configuration, domain, paid master or public listing. Historical deployed revisions below still identify the last observed deployment, not these unstaged Shopify bytes. Current image scan/login limitations and residual advisories must not be represented as a clean scan or public release acceptance.
