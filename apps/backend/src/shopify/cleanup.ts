@@ -26,10 +26,20 @@ const delay = (attempt: number, error?: unknown) =>
 
 /** Same durable use case for browser requests, local timer and private scheduled job. */
 export class ShopifyCleanup {
+  private requested: (() => void) | undefined;
   constructor(
     readonly auth: ShopifyService,
     readonly catalogue: ShopifyCatalogue,
   ) {}
+
+  /** Explicit local runner only; hosted cleanup keeps its private scheduler. */
+  onRequested(wake: () => void) {
+    if (this.requested) return deny("BUSY", 429);
+    this.requested = wake;
+    return () => {
+      if (this.requested === wake) this.requested = undefined;
+    };
+  }
 
   async beforeWrite(signal: AbortSignal) {
     signal.throwIfAborted();
@@ -46,7 +56,7 @@ export class ShopifyCleanup {
     workspaceId: string,
     exportId?: string,
   ) {
-    await this.auth.ledger.transact((data) => {
+    const requested = await this.auth.ledger.transact((data) => {
       const now = this.auth.clock(),
         binding = authenticated(data, cookie, proof, workspaceId, now, true),
         installation = installationFor(data, binding);
@@ -55,7 +65,7 @@ export class ShopifyCleanup {
           binding.pending = null;
           binding.generation++;
         }
-        return;
+        return false;
       }
       if (installation.appId !== this.auth.appId) return deny("FORBIDDEN", 403);
       if (exportId) {
@@ -65,7 +75,7 @@ export class ShopifyCleanup {
           (item) => item.id === exportId,
         );
         if (!intent) return deny("NOT_FOUND", 404);
-        if (intent.state === "removed") return;
+        if (intent.state === "removed") return false;
         intent.removalRequested = true;
         intent.state = "removal_pending";
       } else {
@@ -78,7 +88,10 @@ export class ShopifyCleanup {
       }
       // Fence any foreground result before acknowledging durable removal/end.
       binding.generation++;
+      return installation.state !== "cleaned";
     });
+    // Ownership and the durable fence must succeed before waking maintenance.
+    if (requested) this.requested?.();
     return this.auth.status(cookie, proof, workspaceId, true);
   }
 
