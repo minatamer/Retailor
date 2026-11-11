@@ -539,6 +539,12 @@ Build shared tokens and primitives before styling every feature. Reuse stable
 primitives and product states; do not turn a few repeated lines into an
 over-general component with unrelated boolean props.
 
+### Loading and placeholders are part of the design
+
+Treat every loading state and placeholder as first-class product UI, with the same visual quality as the completed screen. Include them in planning, implementation and feature acceptance. Match the project's design system and reuse shared components across startup, uploads, processing, assistant replies, integrations, checkout and small busy actions.
+
+Show useful feedback immediately, reserve the expected layout and reveal real content as it arrives. Use real progress when available and a deliberate indeterminate state otherwise; never invent completion or add artificial waits. Keep skeletons decorative, missing/error/empty states truthful, and cancellation/retry usable where supported. Check actual pending-to-loaded transitions, partial results and recovery on desktop and phone. A polished final screenshot alone does not establish loading quality.
+
 ### Responsive decisions are part of product scope
 
 Name the primary authoring device and the minimum complete experience at other
